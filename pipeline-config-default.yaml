@@ -1,0 +1,67 @@
+#AUTOMERGE_ENABLED: 1
+#OP_TEST_CONTAINER_OPT: "-t"
+#SCRIPT_URL: "https://raw.githubusercontent.com/operator-framework/operator-test-playbooks/master/upstream/test/iss.sh"
+#GODEBUG: x509ignoreCN=0
+#OP_TEST_MIRROR_LATEST_TAG: "v4.6"
+#QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP: ${{ secrets.QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP }} #REGISTRY_API_TOKEN_PROD
+#QUAY_API_TOKEN_OPERATORHUBIO: ${{ secrets.QUAY_API_TOKEN_OPERATORHUBIO }} #delete
+#QUAY_RH_INDEX_PW: ${{ secrets.QUAY_RH_INDEX_PW }} #REGISTRY_API_PW_PROD_MULTIARCH
+#REGISTRY_API_USER_PROD_MULTIARCH: XXXXXXXXXXX
+#IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
+#IIB_OUTPUT_REGISTRY_TOKEN: ${{ secrets.IIB_OUTPUT_REGISTRY_TOKEN }}
+#OP_TEST_DEBUG: 1
+#OP_TEST_SCRIPT_URL: "https://raw.githubusercontent.com/operator-framework/operator-test-playbooks/master/upstream/test/test.sh"
+#ISS_SCRIPT_URL: "https://raw.githubusercontent.com/operator-framework/operator-test-playbooks/master/upstream/test/iss.sh"
+#OP_TEST_IMAGE: "quay.io/operator_testing/operator-test-playbooks:latest"
+#CI_OHIO_TRIGGER_TOKEN: ${{ secrets.CI_OHIO_TRIGGER_TOKEN }}
+#OHIO_REGISTRY_TOKEN: ${{ secrets.OHIO_REGISTRY_TOKEN }}
+#QUAY_APPREG_TOKEN: ${{ secrets.QUAY_APPREG_TOKEN }}
+#QUAY_COURIER_TOKEN: ${{ secrets.QUAY_COURIER_TOKEN }}
+#REPO_GHA_PAT: ${{ secrets.REPO_GHA_PAT }}
+#OP_TEST_DRY_RUN: 0
+#KIND_KUBE_VERSION: v1.21.1
+
+production:
+  type: ocp
+  bundle:
+    registry: quay.io
+    organization: openshift-community-operators
+  index:
+    registry: quay.io
+    organisation: openshift-community-operators
+    name: catalog
+    tags:
+      - v4.6
+      - v4.7
+      - v4.8
+    latest: v4.6
+  mirror:
+    multiarch:
+      enabled: true
+      registry: quay.io
+      organisation: redhat
+      name: redhat----community-operator-index
+
+testing:
+    test_script_url: https://raw.githubusercontent.com/operator-framework/operator-test-playbooks/master/upstream/test/test.sh
+    iss_script_url: https://raw.githubusercontent.com/operator-framework/operator-test-playbooks/master/upstream/test/iss.sh
+    image: quay.io/operator_testing/operator-test-playbooks:latest
+
+operatorhubio:
+  enabled: false
+#base:
+#  organisation: operator-framework
+#  project: operator-test-playbooks
+#  tag: master
+tools:
+  kind_version: v0.9.0
+  kind_kube_version: v1.21.1
+  operator_sdk_version: v1.8.0
+#  operator_courier_version: 2.1.11
+#  olm_version: 0.17.0
+#  opm_version: v1.17.0
+#  oc_version: 4.3.5
+#  go_version: 1.13.7
+#  jq_version: 1.6
+#  yq_version: 2.2.1
+#  umoci_version: v0.4.5

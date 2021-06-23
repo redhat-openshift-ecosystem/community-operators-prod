@@ -3,20 +3,13 @@ name: Operator release
 env:
   OP_TEST_DEBUG: 1
   OP_TEST_CONTAINER_OPT: "-t"
-  OP_TEST_SCRIPT_URL: "https://raw.githubusercontent.com/operator-framework/operator-test-playbooks/master/upstream/test/test.sh"
-  ISS_SCRIPT_URL: "https://raw.githubusercontent.com/operator-framework/operator-test-playbooks/master/upstream/test/iss.sh"
-  OP_TEST_IMAGE: "quay.io/operator_testing/operator-test-playbooks:latest"
-  # OP_TEST_SCRIPT_URL: "https://raw.githubusercontent.com/operator-framework/operator-test-playbooks/feature/orange-release/upstream/test/test.sh"
-  # OP_TEST_IMAGE: "quay.io/operator_testing/operator-test-playbooks:master"
-  # OP_TEST_DRY_RUN: 1
+  OP_TEST_SCRIPT_URL: "{{ default_config.testing.test_script_url }}"
+  ISS_SCRIPT_URL: "{{ default_config.testing.iss_script_url }}"
+  OP_TEST_IMAGE: "{{ default_config.testing.image }}"
   OP_TEST_PROD: 1
   OP_TEST_INDEX_MIRROR: 0
-  OP_TEST_MIRROR_LATEST_TAG: "v4.6"
-  # OP_TEST_LABELS: "allow/ci-changes allow/operator-version-overwrite"
-  # OP_TEST_ADDED_MODIFIED_FILES: "community-operators/aqua/1.0.2/csv.yaml community-operators/aqua/1.0.2/csv1.yaml"
-  # OP_TEST_ADDED_MODIFIED_FILES: "upstream-community-operators/aqua/1.0.2/csv.yaml upstream-community-operators/aqua/1.0.2/csv1.yaml"
-  # OP_TEST_ADDED_MODIFIED_FILES: "upstream-community-operators/aqua/1.0.2/csv.yaml community-operators/aqua/1.0.2/csv1.yaml"
-  # OP_TEST_REMOVED_FILES: ""
+  OP_TEST_MIRROR_LATEST_TAG: "{{ default_config.production.index.latest }}"
+{% raw %}
   GODEBUG: x509ignoreCN=0
   CI_OHIO_TRIGGER_TOKEN: ${{ secrets.CI_OHIO_TRIGGER_TOKEN }}
   OHIO_REGISTRY_TOKEN: ${{ secrets.OHIO_REGISTRY_TOKEN }}
@@ -148,7 +141,9 @@ jobs:
       runs-on: ubuntu-latest
       strategy:
         matrix:
-          index-tag: [ v4.6, v4.7, v4.8 ]
+{% endraw %}
+        index-tag: [ {{ default_config.production.index.tags|join(', ') }} ]
+{% raw %}
         fail-fast: false
       steps:
         - name: Checkout code
@@ -232,7 +227,9 @@ jobs:
       runs-on: ubuntu-latest
       strategy:
         matrix:
-          index-tag: [ v4.6, v4.7, v4.8 ]
+{% endraw %}
+          index-tag: [ { { default_config.production.index.tags|join(', ') }} ]
+{% raw %}
         fail-fast: false
       steps:
         - name: Release sha
@@ -365,3 +362,5 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
         continue-on-error: true
+
+{% endraw %}

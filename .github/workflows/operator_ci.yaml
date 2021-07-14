@@ -1,9 +1,20 @@
+
 name: Operator CI
+
 on:
  pull_request_target:
    types: [opened, synchronize, reopened, ready_for_review, unlabeled]
+
 env:
-  AUTOMERGE_ENABLED: 1
+  AUTOMERGE_ENABLED: "1"
+  OPP_PRODUCTION_TYPE: "ocp"
+  OPP_SCRIPT_ENV_OPRT_URL: "https://raw.githubusercontent.com/operator-framework/community-operators/support/ci_01/ci/scripts/opp-oprt.sh"
+  OPP_SCRIPT_ENV_URL: "https://raw.githubusercontent.com/operator-framework/community-operators/support/ci_01/ci/scripts/opp-env.sh"
+  OPP_SCRIPT_COSMETICS_URL: "https://raw.githubusercontent.com/operator-framework/community-operators/support/ci_01/ci/scripts/opp-oprt-cosmetics.sh"
+  OPP_ANSIBLE_PULL_REPO: "https://github.com/redhat-openshift-ecosystem/operator-test-playbooks/"
+  OPP_ANSIBLE_PULL_BRANCH: "upstream-community"
+  OPP_REVIEWERS_ENABLED: 0
+
   
 jobs:
   operator-automerge-enabled:
@@ -42,35 +53,10 @@ jobs:
     needs: operator-automerge-enabled
     runs-on: ubuntu-latest
     steps:
-      - name: "Remove kubernetes-operator"
-        uses: actions/github-script@v3
-        continue-on-error: true
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.issues.removeLabel({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'kubernetes-operator'
-            })
-
-      - name: "Remove openshift-operator"
-        uses: actions/github-script@v3
-        continue-on-error: true
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.issues.removeLabel({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'openshift-operator'
-            })
-      - name: Setting labels from changes in directory changes
-        uses: actions/labeler@v2
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+      # - name: Setting labels from changes in directory changes
+      #   uses: actions/labeler@v2
+      #   with:
+      #     repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: "Remove package-validated"
         uses: actions/github-script@v3
@@ -99,26 +85,6 @@ jobs:
               repo: context.repo.repo,
               assignees: [ "J0zi", "mvalarh" ]
             });
-      # - name: Assign pull requests to Community Operator Submissions project
-      #   uses: srggrs/assign-one-project-github-action@1.2.1
-      #   if: github.event.action == 'opened' || github.event.action == 'reopened'
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   continue-on-error: true
-      #   with:
-      #     project: 'https://github.com/operator-framework/community-operators/projects/1'
-      # - name: "Request reviewer (test)"
-      #   uses: actions/github-script@v3
-      #   continue-on-error: true
-      #   with:
-      #     github-token: ${{secrets.GITHUB_TOKEN}}
-      #     script: |
-      #       github.pulls.requestReviewers({
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         pull_number: context.issue.number,
-      #         reviewers: [ "mvalahtv" ]
-      #       });
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -130,16 +96,17 @@ jobs:
       - name: Operator traffic light
         id: op-traffic-light
         env:
-          OP_TEST_LABELS: "${{ join(github.event.pull_request.labels.*.name, ' ') }}"
-          OP_TEST_PR_AUTHOR: "${{ github.event.pull_request.user.login }}"
-          OPRT_REPO: "${{ github.event.pull_request.head.repo.full_name }}"
-          OPRT_SHA: "${{ github.event.pull_request.head.sha }}"
-          #OPRT_SRC_BRANCH: "support/action-01"
+          OPP_LABELS: "${{ join(github.event.pull_request.labels.*.name, ' ') }}"
+          OPP_PR_AUTHOR: "${{ github.event.pull_request.user.login }}"
+          OPP_OPRT_REPO: "${{ github.event.pull_request.head.repo.full_name }}"
+          OPP_OPRT_SHA: "${{ github.event.pull_request.head.sha }}"
+          OPP_OPRT_SRC_REPO: "${{ github.event.pull_request.base.repo.full_name }}"
+          OPP_OPRT_SRC_BRANCH: "${{ github.event.pull_request.base.ref }}"
         run: |
-          bash <(curl -sL https://raw.githubusercontent.com/operator-framework/operator-test-playbooks/master/upstream/test/oprt.sh)
+          bash <(curl -sL $OPP_SCRIPT_ENV_OPRT_URL)
 
       # - name: "Comment operator test error code [10]"
-      #   if: steps.op-traffic-light.outputs.op_test_error_code == '10'
+      #   if: steps.op-traffic-light.outputs.opp_error_code == '10'
       #   uses: mshick/add-pr-comment@v1
       #   with:
       #     message: |
@@ -166,24 +133,24 @@ jobs:
             }
 
       - name: "Mention reviewers if exist"
-        if: (steps.op-traffic-light.outputs.op_test_pr_revievers != '') && (!contains(github.event.pull_request.labels.*.name, 'allow/ci-changes'))
+        if: (steps.op-traffic-light.outputs.opp_pr_revievers != '') && (!contains(github.event.pull_request.labels.*.name, 'allow/ci-changes'))
         uses: mshick/add-pr-comment@v1
         with:
           message: |
-            ${{ steps.op-traffic-light.outputs.op_test_pr_revievers }}, please approve as you are original reviewer(s).
+            ${{ steps.op-traffic-light.outputs.opp_pr_revievers }}, please approve as you are original reviewer(s).
             Please note, that you can more contributors to ci.yaml. More info [here](https://operator-framework.github.io/community-operators/operator-ci-yaml).
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
           allow-repeats: false
 
       - name: "Mention reviewers if ci.yaml was changed"
-        if: steps.op-traffic-light.outputs.op_test_pr_revievers != '' && steps.op-traffic-light.outputs.op_test_ci_yaml_changed == '1'
+        if: steps.op-traffic-light.outputs.opp_pr_revievers != '' && steps.op-traffic-light.outputs.opp_ci_yaml_changed == '1'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
             /hold
             
-            ${{ steps.op-traffic-light.outputs.op_test_pr_revievers }}, Please note that ci.yml was changed. 
+            ${{ steps.op-traffic-light.outputs.opp_pr_revievers }}, Please note that ci.yml was changed. 
 
             Please add comment with `/hold cancel` if change is OK.
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -192,7 +159,7 @@ jobs:
 
 
       - name: "Comment operator test error code [1]"
-        if: failure() && steps.op-traffic-light.outputs.op_test_error_code == '1'
+        if: failure() && steps.op-traffic-light.outputs.opp_error_code == '1'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
@@ -202,7 +169,7 @@ jobs:
           allow-repeats: true
 
       - name: "Comment operator test error code [2]"
-        if: failure() && steps.op-traffic-light.outputs.op_test_error_code == '2'
+        if: failure() && steps.op-traffic-light.outputs.opp_error_code == '2'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
@@ -217,7 +184,7 @@ jobs:
 
 
       - name: "Comment operator test error code [3]"
-        if: failure() && steps.op-traffic-light.outputs.op_test_error_code == '3'
+        if: failure() && steps.op-traffic-light.outputs.opp_error_code == '3'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
@@ -228,13 +195,13 @@ jobs:
           allow-repeats: true
 
       - name: "Comment operator test error code [4]"
-        if: failure() && steps.op-traffic-light.outputs.op_test_error_code == '4'
+        if: failure() && steps.op-traffic-light.outputs.opp_error_code == '4'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
             /hold
             
-            File `${{ steps.op-traffic-light.outputs.op_test_stream }}/${{ steps.op-traffic-light.outputs.op_test_name }}/ci.yaml` is missing or not valid. More details in failed test `Operator CI / operator-ci` logs. Documentation how to setup valid `ci.yaml` file can be found at https://operator-framework.github.io/community-operators/operator-ci-yaml."
+            File `${{ steps.op-traffic-light.outputs.opp_production_type }}/${{ steps.op-traffic-light.outputs.opp_name }}/ci.yaml` is missing or not valid. More details in failed test `Operator CI / operator-ci` logs. Documentation how to setup valid `ci.yaml` file can be found at https://operator-framework.github.io/community-operators/operator-ci-yaml."
 
             Note: Only single file modification on `ci.yaml` is allowed. Please make separate PR to apply `ci.yaml` file updates and get it merged before current PR.
 
@@ -244,7 +211,7 @@ jobs:
           allow-repeats: true
 
       - name: "Comment operator test error code [5]"
-        if: failure() && steps.op-traffic-light.outputs.op_test_error_code == '5'
+        if: failure() && steps.op-traffic-light.outputs.opp_error_code == '5'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
@@ -259,7 +226,7 @@ jobs:
 
       # Please make it automatic (so we set recreate label)
       - name: "Comment operator test error code [6]"
-        if: failure() && steps.op-traffic-light.outputs.op_test_error_code == '6'
+        if: failure() && steps.op-traffic-light.outputs.opp_error_code == '6'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
@@ -273,7 +240,7 @@ jobs:
           allow-repeats: true
 
       - name: "Comment operator test error code [7]"
-        if: failure() && steps.op-traffic-light.outputs.op_test_error_code == '7'
+        if: failure() && steps.op-traffic-light.outputs.opp_error_code == '7'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
@@ -286,7 +253,7 @@ jobs:
           repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
           allow-repeats: true
       - name: "Comment operator test error code [7]"
-        if: steps.op-traffic-light.outputs.op_test_dockerfile_changed == '1'
+        if: steps.op-traffic-light.outputs.opp_dockerfile_changed == '1'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
@@ -300,7 +267,7 @@ jobs:
       - name: Update title
         uses: actions/github-script@v3
         continue-on-error: true
-        if: always() && steps.op-traffic-light.outputs.op_test_pr_title != ''
+        if: always() && steps.op-traffic-light.outputs.opp_pr_title != ''
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -308,12 +275,12 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: "${{ steps.op-traffic-light.outputs.op_test_pr_title }}"
+              title: "${{ steps.op-traffic-light.outputs.opp_pr_title }}"
             })
 
       - name: Handle new operator
         uses: actions/github-script@v3
-        if: steps.op-traffic-light.outputs.op_test_is_new_operatror == '1'
+        if: steps.op-traffic-light.outputs.opp_is_new_operatror == '1'
         continue-on-error: true
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -327,19 +294,19 @@ jobs:
       - name: Verify operator modifications
         id: op-verify-modifications
         env:
-          OP_TEST_RECREATE: "${{ steps.op-traffic-light.outputs.op_test_recreate }}"
-          OP_TEST_ALLOW_SERIOUS_CHANGES: "${{ steps.op-traffic-light.outputs.op_test_allow_serious_changes }}"
-          OP_TEST_MODIFIED_CSVS: "${{ steps.op-traffic-light.outputs.op_test_modified_csvs }}"
-          OP_TEST_MODIFIED_CSVS_OTHERS: "${{ steps.op-traffic-light.outputs.op_test_modified_others }}"
+          OPP_RECREATE: "${{ steps.op-traffic-light.outputs.opp_recreate }}"
+          OPP_ALLOW_SERIOUS_CHANGES: "${{ steps.op-traffic-light.outputs.opp_allow_serious_changes }}"
+          OPP_MODIFIED_CSVS: "${{ steps.op-traffic-light.outputs.opp_modified_csvs }}"
+          OPP_MODIFIED_CSVS_OTHERS: "${{ steps.op-traffic-light.outputs.opp_modified_others }}"
         run: |
-          echo "::set-output name=op_check_cosmetic::0"
-          [[ $OP_TEST_RECREATE -eq 1 ]] && { echo "Recreating operator. Exiting with '0' ..."; exit 0; } || true
-          [[ $OP_TEST_ALLOW_SERIOUS_CHANGES -eq 1 ]] && { echo "Allowing serious changes. Exiting with '0' ..."; exit 0; } || true
-          [ -n "$OP_TEST_MODIFIED_CSVS" ] && echo "::set-output name=op_check_cosmetic::1" || true
-          [ -n "$OP_TEST_MODIFIED_CSVS_OTHERS" ] && { echo -e "Error:\n    Modifying exiting operator version !!!\n    Only cosmetic changes are allowed !!! Please ask maintainers to set `allow/serious-changes-to-existing` label.\n    Files that cannot be changed : '$OP_TEST_MODIFIED_CSVS_OTHERS'"; echo "::set-output name=op_check_cosmetic::2"; exit 20; } || true
+          echo "::set-output name=opp_check_cosmetic::0"
+          [[ $OPP_RECREATE -eq 1 ]] && { echo "Recreating operator. Exiting with '0' ..."; exit 0; } || true
+          [[ $OPP_ALLOW_SERIOUS_CHANGES -eq 1 ]] && { echo "Allowing serious changes. Exiting with '0' ..."; exit 0; } || true
+          [ -n "$OPP_MODIFIED_CSVS" ] && echo "::set-output name=opp_check_cosmetic::1" || true
+          [ -n "$OPP_MODIFIED_CSVS_OTHERS" ] && { echo -e "Error:\n    Modifying exiting operator version !!!\n    Only cosmetic changes are allowed !!! Please ask maintainers to set `allow/serious-changes-to-existing` label.\n    Files that cannot be changed : '$OPP_MODIFIED_CSVS_OTHERS'"; echo "::set-output name=opp_check_cosmetic::2"; exit 20; } || true
 
       - name: "Comment for cosmetics change error when csv is changed"
-        if: failure() && steps.op-verify-modifications.outputs.op_check_cosmetic == '2'
+        if: failure() && steps.op-verify-modifications.outputs.opp_check_cosmetic == '2'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
@@ -357,23 +324,20 @@ jobs:
 
       - name: Operator cosmetic change check
         id: op-cosmetic-change-check
-        if: steps.op-verify-modifications.outputs.op_check_cosmetic == '1'
+        if: steps.op-verify-modifications.outputs.opp_check_cosmetic == '1'
         env:
-          OP_TEST_MODIFIED_CSVS: "${{ steps.op-traffic-light.outputs.op_test_modified_csvs }}"
-          OP_TEST_MODIFIED_REPO_BRANCH: "${{ steps.op-traffic-light.outputs.op_test_repo_branch }}"
-          OP_TEST_ANSIBLE_PULL_REPO: "https://github.com/operator-framework/operator-test-playbooks"
-          OP_TEST_ANSIBLE_PULL_BRANCH: "master"
-          OP_TEST_STREAM: "${{ steps.op-traffic-light.outputs.op_test_stream }}"
+          OPP_MODIFIED_CSVS: "${{ steps.op-traffic-light.outputs.opp_modified_csvs }}"
+          OPP_MODIFIED_REPO_BRANCH: "${{ steps.op-traffic-light.outputs.opp_repo_branch }}"
         run: |
-          echo "OP_TEST_MODIFIED_CSVS=$OP_TEST_MODIFIED_CSVS"
-          echo "op_check_cosmetic: ${{ steps.op-verify-modifications.outputs.op_check_cosmetic }}"
-          echo "op_test_set_label_operator_version_overwrite: ${{ steps.op-traffic-light.outputs.op_test_set_label_operator_version_overwrite }}"
-          echo "op_test_set_label_operator_recreate: ${{ steps.op-traffic-light.outputs.op_test_set_label_operator_recreate }}"
-          bash <(curl -sL https://raw.githubusercontent.com/operator-framework/operator-test-playbooks/master/upstream/test/oprt_cosmetics.sh)
+          echo "OPP_MODIFIED_CSVS=$OPP_MODIFIED_CSVS"
+          echo "opp_check_cosmetic: ${{ steps.op-verify-modifications.outputs.opp_check_cosmetic }}"
+          echo "opp_set_label_operator_version_overwrite: ${{ steps.op-traffic-light.outputs.opp_set_label_operator_version_overwrite }}"
+          echo "opp_set_label_operator_recreate: ${{ steps.op-traffic-light.outputs.opp_set_label_operator_recreate }}"
+          bash <(curl -sL $OPP_SCRIPT_COSMETICS_URL)
           echo "DONE"
 
       - name: "Comment for cosmetics change error"
-        if: failure() && steps.op-verify-modifications.outputs.op_check_cosmetic == '1'
+        if: failure() && steps.op-verify-modifications.outputs.opp_check_cosmetic == '1'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
@@ -391,7 +355,7 @@ jobs:
 
       - name: "Removing Operator recreate label when exists"
         uses: actions/github-script@v3
-        if: steps.op-traffic-light.outputs.op_test_set_label_operator_version_overwrite == '1' && contains(github.event.pull_request.labels.*.name, 'allow/operator-recreate')
+        if: steps.op-traffic-light.outputs.opp_set_label_operator_version_overwrite == '1' && contains(github.event.pull_request.labels.*.name, 'allow/operator-recreate')
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -403,7 +367,7 @@ jobs:
             })
       - name: "Setting Operator version overwrite label"
         uses: actions/github-script@v3
-        if: steps.op-traffic-light.outputs.op_test_set_label_operator_version_overwrite == '1'
+        if: steps.op-traffic-light.outputs.opp_set_label_operator_version_overwrite == '1'
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -415,7 +379,7 @@ jobs:
             })
       - name: "Removing Operator version overwrite label when exists"
         uses: actions/github-script@v3
-        if: steps.op-traffic-light.outputs.op_test_set_label_operator_recreate == '1' && contains(github.event.pull_request.labels.*.name, 'allow/operator-version-overwrite')
+        if: steps.op-traffic-light.outputs.opp_set_label_operator_recreate == '1' && contains(github.event.pull_request.labels.*.name, 'allow/operator-version-overwrite')
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -427,7 +391,7 @@ jobs:
             })
       - name: "Setting Operator recreate label"
         uses: actions/github-script@v3
-        if: steps.op-traffic-light.outputs.op_test_set_label_operator_recreate == '1'
+        if: steps.op-traffic-light.outputs.opp_set_label_operator_recreate == '1'
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -440,7 +404,7 @@ jobs:
       - name: "Inform user that UpdateGraph is not present (semver mode)"
         uses: mshick/add-pr-comment@v1
         continue-on-error: true
-        if: steps.op-traffic-light.outputs.op_test_update_graph == '0' 
+        if: steps.op-traffic-light.outputs.opp_update_graph == '0' 
         with:
           message: |
             Warning: Operator is going to run in `semver-mode` since 'updateGraph' is not present in 'ci.yaml' file.
@@ -452,11 +416,11 @@ jobs:
       #   uses: kentaro-m/auto-assign-action@v1.1.2
       #   continue-on-error: true
       #   with:
-      #     configuration-path: "${{steps.op-traffic-light.outputs.op_test_stream }}/${{ steps.op-traffic-light.outputs.op_test_name }}/ci.yaml"
+      #     configuration-path: "${{steps.op-traffic-light.outputs.opp_production_type }}/${{ steps.op-traffic-light.outputs.opp_name }}/ci.yaml"
 
       - name: "Setting authorized-changes label"
         uses: actions/github-script@v3
-        if: steps.op-traffic-light.outputs.op_test_authorized_changes == '1'
+        if: steps.op-traffic-light.outputs.opp_authorized_changes == '1'
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -468,7 +432,7 @@ jobs:
             })
 
       # - name: "Setting msg when minor changes are allowed"
-      #   if:  steps.op-verify-modifications.outputs.op_check_cosmetic == '1' && ! contains(github.event.pull_request.labels.*.name, 'allow/operator-version-overwrite') && ! contains(github.event.pull_request.labels.*.name, 'allow/operator-recreate')
+      #   if:  steps.op-verify-modifications.outputs.opp_check_cosmetic == '1' && ! contains(github.event.pull_request.labels.*.name, 'allow/operator-version-overwrite') && ! contains(github.event.pull_request.labels.*.name, 'allow/operator-recreate')
       #   uses: mshick/add-pr-comment@v1
       #   with:
       #     message: |
@@ -484,19 +448,19 @@ jobs:
       #     allow-repeats: true
       - name: Info
         run: |
-          echo "steps.op-traffic-light.outputs.op_test_ready: ${{ steps.op-traffic-light.outputs.op_test_ready }}"
-          echo "steps.op-traffic-light.outputs.op_release_ready: ${{ steps.op-traffic-light.outputs.op_release_ready }}"
-          echo "steps.op-traffic-light.outputs.op_test_stream: ${{ steps.op-traffic-light.outputs.op_test_stream }}"
-          echo "steps.op-traffic-light.outputs.op_test_name: ${{ steps.op-traffic-light.outputs.op_test_name }}"
-          echo "steps.op-traffic-light.outputs.op_test_version: ${{ steps.op-traffic-light.outputs.op_test_version }}"
-          echo "steps.op-traffic-light.outputs.op_test_ci_yaml_only: ${{ steps.op-traffic-light.outputs.op_test_ci_yaml_only }}"
+          echo "steps.op-traffic-light.outputs.opp_test_ready: ${{ steps.op-traffic-light.outputs.opp_test_ready }}"
+          echo "steps.op-traffic-light.outputs.opp_release_ready: ${{ steps.op-traffic-light.outputs.opp_release_ready }}"
+          echo "steps.op-traffic-light.outputs.opp_production_type: ${{ steps.op-traffic-light.outputs.opp_production_type }}"
+          echo "steps.op-traffic-light.outputs.opp_name: ${{ steps.op-traffic-light.outputs.opp_name }}"
+          echo "steps.op-traffic-light.outputs.opp_version: ${{ steps.op-traffic-light.outputs.opp_version }}"
+          echo "steps.op-traffic-light.outputs.opp_ci_yaml_only: ${{ steps.op-traffic-light.outputs.opp_ci_yaml_only }}"
     outputs:
-      op_test_ready: "${{ steps.op-traffic-light.outputs.op_test_ready }}"
-      op_release_ready: "${{ steps.op-traffic-light.outputs.op_release_ready }}"
-      op_test_stream: "${{ steps.op-traffic-light.outputs.op_test_stream }}"
-      op_test_name: "${{ steps.op-traffic-light.outputs.op_test_name }}"
-      op_test_version: "${{ steps.op-traffic-light.outputs.op_test_version }}"
-      op_test_ci_yaml_only: "${{ steps.op-traffic-light.outputs.op_test_ci_yaml_only }}"
+      opp_test_ready: "${{ steps.op-traffic-light.outputs.opp_test_ready }}"
+      opp_release_ready: "${{ steps.op-traffic-light.outputs.opp_release_ready }}"
+      opp_production_type: "${{ steps.op-traffic-light.outputs.opp_production_type }}"
+      opp_name: "${{ steps.op-traffic-light.outputs.opp_name }}"
+      opp_version: "${{ steps.op-traffic-light.outputs.opp_version }}"
+      opp_ci_yaml_only: "${{ steps.op-traffic-light.outputs.opp_ci_yaml_only }}"
 
   operator-ci-ok-to-test:
     needs: operator-ci
@@ -518,12 +482,12 @@ jobs:
             })
       - name: Info
         run: |
-          echo "needs.operator-ci.outputs.op_test_stream: ${{ needs.operator-ci.outputs.op_test_stream }}"
-          echo "needs.operator-ci.outputs.op_test_ci_yaml_only: ${{ needs.operator-ci.outputs.op_test_ci_yaml_only }}"
+          echo "needs.operator-ci.outputs.opp_production_type: ${{ needs.operator-ci.outputs.opp_production_type }}"
+          echo "needs.operator-ci.outputs.opp_ci_yaml_only: ${{ needs.operator-ci.outputs.opp_ci_yaml_only }}"
 
       - name: "Setting ok-to-test label"
         uses: actions/github-script@v3
-        if: needs.operator-ci.outputs.op_test_stream == 'community-operators' && needs.operator-ci.outputs.op_test_ci_yaml_only != '1' && (!contains(github.event.pull_request.labels.*.name, 'allow/ci-changes'))
+        if: needs.operator-ci.outputs.opp_production_type != 'k8s' && needs.operator-ci.outputs.opp_ci_yaml_only != '1' && (!contains(github.event.pull_request.labels.*.name, 'allow/ci-changes'))
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -536,7 +500,7 @@ jobs:
 
       - name: "Setting installation-validated label (opensift+ci_yaml_only)"
         uses: actions/github-script@v3
-        if: needs.operator-ci.outputs.op_test_stream == 'community-operators' && needs.operator-ci.outputs.op_test_ci_yaml_only == '1'
+        if: needs.operator-ci.outputs.opp_production_type != 'k8s' && needs.operator-ci.outputs.opp_ci_yaml_only == '1'
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
@@ -546,4 +510,3 @@ jobs:
               repo: context.repo.repo,
               labels: [ 'installation-validated' ]
             })
-

@@ -187,6 +187,8 @@ spec:
     * A secret for the Docker registry
     * A secret for the database
     ```bash
+
+    
     oc create secret docker-registry aqua-registry --docker-server=registry.aquasec.com --docker-username=<AQUA_USERNAME> --docker-password=<AQUA_PASSWORD> --docker-email=<user email> -n aqua
     oc create secret generic aqua-database-password --from-literal=db-password=<password> -n aqua
     oc secrets add aqua-sa aqua-registry --for=pull -n aqua

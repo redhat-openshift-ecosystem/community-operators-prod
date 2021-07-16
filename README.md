@@ -15,7 +15,7 @@ Full documentation is generated via [mkdoc](https://www.mkdocs.org/) and is loca
 
 ### FOR OPENSHIFT COMMUNITY OPERATORS
 
-However, If you still need to publish the operator bundles with any of these API(s) on [OpenShift Container Platform](https://openshift.com) and [OKD](https://okd.io) ensure that it is configured with the criteria defined in [OKD/OpenShift Catalogs criteria and options](./docs/packaging-required-criteria-ocp.md).
+However, If you still need to publish the operator bundles with any of these API(s) on [OpenShift Container Platform](https://openshift.com) and [OKD](https://okd.io) ensure that it is configured with the criteria defined in [OKD/OpenShift Catalogs criteria and options](https://operator-framework.github.io/community-operators/packaging-required-criteria-ocp/).
 
 ## Reporting Bugs
 

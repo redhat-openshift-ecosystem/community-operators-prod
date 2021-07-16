@@ -2,11 +2,8 @@ name: Operator test
 
 
 on:
- pull_request:
-   types: [opened, reopened, synchronize, unlabeled]
-   branches:
-     - master
-     - main
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review, unlabeled]
 
 env:
   OPP_DEBUG: 1
@@ -31,7 +28,7 @@ env:
 
 jobs:
   pr-check:
-    if: (!contains(github.event.pull_request.labels.*.name, 'do-not-merge/hold'))
+    if: github.event.pull_request.draft == false || contains(github.event.pull_request.labels.*.name, 'allow/test-in-draft-mode')
     name: "PR-traffic-light"
     runs-on: ubuntu-latest
     steps:

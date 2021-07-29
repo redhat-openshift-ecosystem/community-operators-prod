@@ -11,32 +11,15 @@ metadata:
             "name": "simple-kmod"
           },
           "spec": {
-            "configuration": [
-              {
-                "name": "KMOD_NAMES",
-                "value": [
-                  "simple-kmod",
-                  "simple-procfs-kmod"
-                ]
-              }
-            ],
-            "dependsOn": [
-              {
-                "imageReference": "true",
-                "name": "driver-container-base"
-              }
-            ],
+            "chart": {
+              "name": "simple-kmod",
+              "repository": {
+                "name": "example",
+                "url": "file:///charts/example"
+              },
+              "version": "0.0.1"
+            },
             "driverContainer": {
-              "buildArgs": [
-                {
-                  "name": "KVER",
-                  "value": "{{.Values.kernelFullVersion}}"
-                },
-                {
-                  "name": "KMODVER",
-                  "value": "SRO"
-                }
-              ],
               "source": {
                 "git": {
                   "ref": "master",
@@ -44,7 +27,21 @@ metadata:
                 }
               }
             },
-            "namespace": "simple-kmod"
+            "namespace": "simple-kmod",
+            "set": {
+              "apiVersion": "sro.openshift.io/v1beta1",
+              "buildArgs": [
+                {
+                  "name": "KMODVER",
+                  "value": "SRO"
+                }
+              ],
+              "kind": "Values",
+              "kmodNames": [
+                "simple-kmod",
+                "simple-procfs-kmod"
+              ]
+            }
           }
         }
       ]
@@ -54,6 +51,8 @@ metadata:
     description: The special resource operator is an orchestrator for resources in a cluster required to deploy special hardware and software. Examples include hardware accelerators or software defined storage, where extra management or kernel modules are needed.
     operators.operatorframework.io/builder: operator-sdk-v1.2.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
+  labels:
+    operatorframework.io/arch.amd64: supported
   name: special-resource-operator.v4.8.0
   namespace: placeholder
 spec:
@@ -120,7 +119,12 @@ spec:
           resources:
           - cronjobs
           verbs:
+          - delete
           - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - '*'
           resources:
@@ -138,14 +142,21 @@ spec:
           resources:
           - imagepolicies
           verbs:
+          - delete
           - get
+          - update
         - apiGroups:
           - '*'
           resources:
           - jobs
           verbs:
           - create
+          - delete
           - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - '*'
           resources:
@@ -1128,6 +1139,8 @@ spec:
           resources:
           - storageclasses
           verbs:
+          - get
+          - list
           - watch
         - apiGroups:
           - storage.k8s.io
@@ -1290,7 +1303,7 @@ spec:
         serviceAccountName: default
     strategy: deployment
   installModes:
-  - supported: false
+  - supported: true
     type: OwnNamespace
   - supported: true
     type: SingleNamespace

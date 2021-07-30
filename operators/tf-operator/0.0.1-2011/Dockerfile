@@ -17,3 +17,4 @@ LABEL operators.operatorframework.io.bundle.channel.default.v1=stable
 
 COPY manifests /manifests/
 COPY metadata/annotations.yaml /metadata/annotations.yaml
+LABEL com.redhat.openshift.versions="v4.6"

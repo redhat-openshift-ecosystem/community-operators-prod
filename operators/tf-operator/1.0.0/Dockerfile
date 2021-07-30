@@ -15,6 +15,7 @@ LABEL operators.operatorframework.io.bundle.metadata.v1=metadata/
 LABEL operators.operatorframework.io.bundle.package.v1=tf-operator
 LABEL operators.operatorframework.io.bundle.channels.v1=alpha
 LABEL operators.operatorframework.io.bundle.channel.default.v1=alpha
+LABEL com.redhat.openshift.versions="v4.6"
 
 COPY manifests /manifests/
 COPY metadata/annotations.yaml /metadata/annotations.yaml

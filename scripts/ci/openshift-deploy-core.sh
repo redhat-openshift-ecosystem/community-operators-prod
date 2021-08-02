@@ -2,6 +2,8 @@
 #./openshift-deploy.sh test-only https://github.com/J0zi/community-operators.git bundle2 https://github.com/J0zi/operator-test-playbooks.git CVP-1793-exit-non-relevant-ocp-test
 
 set -e #fail in case of non zero return
+PLAYBOOK_REPO='https://github.com/redhat-openshift-ecosystem/operator-test-playbooks.git'
+PLAYBOOK_REPO_BRANCH='upstream-community'
 echo "OCP_CLUSTER_VERSION_SUFFIX=$OCP_CLUSTER_VERSION_SUFFIX"
 
 JQ_VERSION='1.6'
@@ -31,9 +33,6 @@ echo "PR_TARGET_REPO=$PR_TARGET_REPO"
 -X POST \
 -H "Accept: application/vnd.github.v3+json" \
 "https://api.github.com/repos/$PR_TARGET_REPO/dispatches" --data "{\"event_type\": \"openshift-test-status\", \"client_payload\": {\"source_pr\": \"$PULL_NUMBER\", \"remove_labels\": [\"installation-validated$OCP_CLUSTER_VERSION_SUFFIX\", \"openshift-started$OCP_CLUSTER_VERSION_SUFFIX\", \"installation-failed$OCP_CLUSTER_VERSION_SUFFIX\", \"installation-validated\"], \"add_labels\": [\"openshift-started$OCP_CLUSTER_VERSION_SUFFIX\"]}}"
-
-echo "OS"
-cat /etc/os-release
 
 pwd
 
@@ -203,10 +202,12 @@ if [ -d /tmp/playbooks2 ]; then rm -Rf /tmp/playbooks2; fi
 mkdir -p /tmp/playbooks2
 cd /tmp/playbooks2
 echo "We are in dir"
-[[ $TEST_MODE -ne 1 ]] && git clone https://github.com/operator-framework/operator-test-playbooks.git
-[[ $TEST_MODE -eq 1 ]] && git clone $TEST_PB_REPO
+
+[[ $TEST_MODE -ne 1 ]] && git clone $PLAYBOOK_REPO operator-test-playbooks
+[[ $TEST_MODE -eq 1 ]] && git clone $TEST_PB_REPO operator-test-playbooks
 cd operator-test-playbooks
 [[ $TEST_MODE -eq 1 ]] && git checkout $TEST_PB_BRANCH
+[[ $TEST_MODE -ne 1 ]] && git checkout $PLAYBOOK_REPO_BRANCH
 cd upstream
 echo "Config ..."
 export ANSIBLE_CONFIG=/tmp/playbooks2/operator-test-playbooks/upstream/ansible.cfg

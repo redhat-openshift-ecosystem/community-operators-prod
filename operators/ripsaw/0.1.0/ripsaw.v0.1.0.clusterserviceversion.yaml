@@ -10,6 +10,8 @@ metadata:
     description: '[Benchmark-operator](https://github.com/cloud-bulldozer/ripsaw/) is
       a benchmarking tool to benchmark your kubernetes cluster. The intent of this Operator
       is to deploy common workloads to establish a performance baseline of Kubernetes cluster'
+    containerImage: quay.io/cloud-bulldozer/benchmark-operator:latest
+    repository: https://github.com/cloud-bulldozer/benchmark-operator
   name: ripsaw.v0.1.0
   namespace: placeholder
 spec:
@@ -19,7 +21,7 @@ spec:
     - kind: Benchmark
       name: benchmarks.ripsaw.cloudbulldozer.io
       version: v1alpha1
-  description: '[Benchmark-operator](https://github.com/cloud-bulldozer/ripsaw/) is
+  description: '[Benchmark-operator](https://github.com/cloud-bulldozer/benchmark-operator/) is
     a benchmarking tool to benchmark your kubernetes cluster. The intent of this Operator
     is to deploy common workloads to establish a performance baseline of Kubernetes cluster'
   displayName: benchmark-operator
@@ -346,13 +348,17 @@ spec:
   - performance
   - benchmark
   links:
-  - name: Ripsaw
-    url: https://ripsaw.domain
+  - name: Site
+    url: https://github.com/cloud-bulldozer/benchmark-operator
+  - name: Documentation
+    url: https://github.com/cloud-bulldozer/benchmark-operator/tree/master/docs
   maintainers:
   - email: rsevilla@redhat.com
     name: rsevilla87
   - email: jtaleric@redhat.com
     name: jtaleric
+  - email: rzaleski@redhat.com
+    name: dry939
   - email: kwhitley@redhat.com
     name: whitleykeith
   maturity: alpha

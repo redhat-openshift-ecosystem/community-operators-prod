@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#./openshift-deploy.sh test-only https://github.com/J0zi/community-operators.git bundle2 https://github.com/J0zi/operator-test-playbooks.git CVP-1793-exit-non-relevant-ocp-test
+#./openshift-deploy.sh test-only https://github.com/J0zi/community-operators-pipeline.git do-not-delete-rehearsals https://github.com/redhat-openshift-ecosystem/operator-test-playbooks.git upstream-community
 
 set -e #fail in case of non zero return
 PLAYBOOK_REPO='https://github.com/redhat-openshift-ecosystem/operator-test-playbooks.git'
@@ -16,13 +16,7 @@ SUBDIR_ARG="-e work_subdir_name=oc-$OC_DIR_CORE"
 echo "SUBDIR_ARG = $SUBDIR_ARG"
 
 if [[ $TEST_MODE -ne 1  ]]; then
-    #CURRENT_PATH=/go/src/github.com/redhat-openshift-ecosystem/community-operators-pipeline/scripts/ci
-    CURRENT_PATH=$(pwd)
-    if [ $(echo $CURRENT_PATH|grep operator-framework)  ]; then
-         	TARGET_PATH=$(echo $CURRENT_PATH|sed -e 's/scripts\/ci/community-operators/g')
-    else
-                TARGET_PATH=$(echo $CURRENT_PATH|sed -e 's/scripts\/ci/operators/g')
-    fi
+    TARGET_PATH="$(dirname $(dirname $(dirname $(readlink -m $0))))/operators"
 fi
 echo "TARGET_PATH=$TARGET_PATH"
 export PR_TARGET_REPO=$(echo $TARGET_PATH|cut -d"/" -f 5-6)

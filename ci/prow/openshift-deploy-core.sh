@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#./openshift-deploy.sh test-only https://github.com/J0zi/community-operators-pipeline.git do-not-delete-rehearsals https://github.com/redhat-openshift-ecosystem/operator-test-playbooks.git upstream-community
+#./openshift-deploy.sh test-only https://github.com/J0zi/community-operators-pipeline.git do-not-delete-rehearsals https://github.com/redhat-openshift-ecosystem/operator-test-playbooks.git upstream-community 77 rehearsal
 
 set -e #fail in case of non zero return
 PLAYBOOK_REPO='https://github.com/redhat-openshift-ecosystem/operator-test-playbooks.git'
@@ -15,11 +15,15 @@ OC_DIR_CORE=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
 SUBDIR_ARG="-e work_subdir_name=oc-$OC_DIR_CORE"
 echo "SUBDIR_ARG = $SUBDIR_ARG"
 
-if [[ $TEST_MODE -ne 1  ]]; then
-    TARGET_PATH="$(dirname $(dirname $(dirname $(readlink -m $0))))/operators"
-fi
-echo "TARGET_PATH=$TARGET_PATH"
+# prod or test in rehearsal mode
+TARGET_PATH="$(dirname $(dirname $(dirname $(readlink -m $0))))/operators"
 export PR_TARGET_REPO=$(echo $TARGET_PATH|cut -d"/" -f 5-6)
+
+#local test only
+[[ $TEST_MODE -eq 1 ]] && TARGET_PATH='/tmp/oper-for-me-test/community-operators/operators'
+[[ $TEST_MODE -eq 1  ]] && [[ $REHEARSAL -ne 1 ]] && export PR_TARGET_REPO='redhat-openshift-ecosystem/community-operators-pipeline'
+
+echo "TARGET_PATH=$TARGET_PATH"
 echo "PR_TARGET_REPO=$PR_TARGET_REPO"
 
 #label start
@@ -32,16 +36,13 @@ pwd
 
 #[[ $TEST_MODE -ne 1 ]] && TARGET_PATH='/go/src/github.com/operator-framework/community-operators/community-operators'
 
-
-[[ $TEST_MODE -eq 1 ]] && TARGET_PATH='/tmp/oper-for-me-test/community-operators/community-operators'
-
 #temp test for development to test on a stable commit
 if [[ $TEST_MODE -eq 1 ]]; then
   echo "Need to clone test branch, cloning..."
   if [ -d /tmp/oper-for-me-test ]; then rm -Rf /tmp/oper-for-me-test; fi
   mkdir -p /tmp/oper-for-me-test
   cd /tmp/oper-for-me-test
-  git clone $TEST_COMMUNITY_REPO
+  git clone $TEST_COMMUNITY_REPO community-operators
   cd community-operators
   git checkout $TEST_COMMUNITY_BRANCH
   ls
@@ -67,7 +68,9 @@ chmod +x "/tmp/jq-$OC_DIR_CORE/bin/jq" && echo "Rights adjusted"
 -H "Accept: application/vnd.github.v3+json" \
 "https://api.github.com/repos/$PR_TARGET_REPO/issues/$PULL_NUMBER"|"/tmp/jq-$OC_DIR_CORE/bin/jq" '.labels[].name'|grep 'allow/longer-deployment' \
 && echo "Longer deployment detected" && EXTRA_ARGS='-e pod_start_retries=300'
+
 cd "$TARGET_PATH"
+echo "Checking PR $PULL_NUMBER on $PR_TARGET_REPO"
 tmpfile=$(mktemp /tmp/pr-details-XXXXXXX.json)
 curl -s https://api.github.com/repos/$PR_TARGET_REPO/pulls/$PULL_NUMBER -o $tmpfile
 cat $tmpfile
@@ -91,7 +94,7 @@ export OPRT=1
 echo "OPRT values set [OK]"
 [ -n "$OPRT_REPO" ] || { echo "Error: '\$OPRT_REPO' is empty !!!"; exit 1; }
 [ -n "$OPRT_SHA" ] || { echo "Error: '\$OPRT_SHA' is empty !!!"; exit 1; }
-echo "Going to clone"
+echo "Going to clone $REPO_FULL"
 git clone $REPO_FULL community-operators #> /dev/null 2>&1
 echo "Cloned  [OK]"
 cd community-operators

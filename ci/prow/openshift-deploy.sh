@@ -11,6 +11,7 @@ if [ -z "$1" ]; then echo "Production mode"; else
       export TEST_PB_REPO=$4
       export TEST_PB_BRANCH=$5
       export PULL_NUMBER=$6
+      if [ $7 = "rehearsal" ]; then echo "Rehearsal mode detected..."; export REHEARSAL=1;fi
     fi
   fi
 fi

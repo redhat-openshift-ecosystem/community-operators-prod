@@ -284,3 +284,22 @@ jobs:
         run: |
           echo "openshift: ${{ matrix.index-tag }}"
           bash <(curl -sL $OPP_SCRIPT_ISS_URL) openshift ${{ matrix.index-tag }}
+
+  slack-notification:
+    name: "Slack notification"
+    needs: [ pr-check, remove-ocp, operators-ocp, bundles-ocp, release-ocp, release-sha-ocp, push-to-quay-ocp ]
+
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report Status
+        uses: ravsamhq/notify-slack-action@master
+        with:
+          notification_title: 'Release pipeline failed: ${{ needs.pr-check.outputs.opp_pr_title }}'
+          footer: 'monitoring'
+#          status: ${{ needs.pr-check.result }}
+          status: 'failure'
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
+        continue-on-error: true

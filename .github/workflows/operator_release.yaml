@@ -12,6 +12,10 @@ on:
         description: 'Force to run release'
         required: true
         default: '0'
+      delete:
+        description: 'Delete operator (cockroachdb or cockroachdb/5.0.4) for debuging only'
+        required: false
+        default: ''
 
 env:
   OPP_DEBUG: 1
@@ -34,7 +38,8 @@ env:
   OPP_MIRROR_INDEX_ORGANIZATION: "redhat"
   OPP_MIRROR_INDEX_NAME: "redhat----community-operator-index"
   # OPP_MIRROR_INDEX_ENABLED: "1"
-  OPP_MIRROR_INDEX_MULTIARCH: "registry.redhat.io/openshift4/ose-operator-registry:v4.5"
+  OPP_MIRROR_INDEX_MULTIARCH_BASE: "registry.redhat.io/openshift4/ose-operator-registry"
+  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7"
   OPP_MIRROR_INDEX_MULTIARCH_POSTFIX: "s"
   IIB_INPUT_REGISTRY_USER: "jbreza@redhat.com"
   OPP_REGISTRY_MIRROR_USER: "redhat+iib_community"
@@ -45,15 +50,12 @@ env:
 
 
   OPP_ALLOW_FORCE_RELEASE: ${{ github.event.inputs.release }}
+  OPP_REMOVE_OPERATOR_AFTER_CLONE_PATH: "${{ github.event.inputs.delete }}"
   REGISTRY_RELEASE_API_TOKEN: ${{ secrets.REGISTRY_RELEASE_API_TOKEN }}
   REGISTRY_MIRROR_PW: ${{ secrets.REGISTRY_MIRROR_PW }}
-  
   GODEBUG: x509ignoreCN=0
   CI_OHIO_TRIGGER_TOKEN: ${{ secrets.CI_OHIO_TRIGGER_TOKEN }}
   OHIO_REGISTRY_TOKEN: ${{ secrets.OHIO_REGISTRY_TOKEN }}
-
-  #QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP: ${{ secrets.QUAY_API_TOKEN_OPENSHIFT_COMMUNITY_OP }}
-  #QUAY_API_TOKEN_OPERATORHUBIO: ${{ secrets.QUAY_API_TOKEN_OPERATORHUBIO }}
   QUAY_APPREG_TOKEN: ${{ secrets.QUAY_APPREG_TOKEN }}
   QUAY_COURIER_TOKEN: ${{ secrets.QUAY_COURIER_TOKEN }}
   REPO_GHA_PAT: ${{ secrets.REPO_GHA_PAT }}
@@ -62,7 +64,6 @@ jobs:
   pr-check:
     name: "PR-traffic-light"
     runs-on: ubuntu-latest
-
     steps:
       - name: Block until there is no running workflow
         uses: softprops/turnstyle@v1
@@ -83,7 +84,7 @@ jobs:
           python-version: '3.x'
       - name: Install dependencies
         run: python -m pip install --upgrade pip yq
-      - name: Operator test
+      - name: Operator traffic light
         id: op-traffic-light
         env:
           OPP_ADDED_MODIFIED_FILES: "${{ steps.files.outputs.added_modified }}"
@@ -109,139 +110,177 @@ jobs:
       opp_op_delete: "${{ steps.op-traffic-light.outputs.opp_op_delete }}"
       opp_release_delete_appreg: "${{ steps.op-traffic-light.outputs.opp_release_delete_appreg }}"
       opp_pr_title: "${{ steps.op-traffic-light.outputs.opp_pr_title }}"
+  remove-ocp:
+    name: "Remove / ocp"
 
-  # release-openshift_latest:
-  #   name: "Release / o7t latest"
-  #   needs: pr-check
-  #   if: needs.pr-check.outputs.opp_release_ready == '1'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v2
-  #     - name: Operator release
-  #       env:
-  #         OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
-  #       run: |
-  #         echo "OPP_LABELS=$OPP_LABELS"
-  #         echo "orange operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
-  #         bash <(curl -sL $OPP_SCRIPT_URL) orange operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH
-
-  release-openshift:
-      name: "Release / o7t"
-      needs: pr-check
-      if: needs.pr-check.outputs.opp_release_ready == '1'
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          index-tag: ['v4.6', 'v4.7', 'v4.8']
-
-        fail-fast: false
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v2
-        - name: Remove operator from index
-          if: needs.pr-check.outputs.opp_op_delete == '1'
-          env:
-            OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
-            OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
-          run: |
-            echo "OPP_LABELS=$OPP_LABELS"
-            echo "op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/dummy $OPP_THIS_REPO $OPP_THIS_BRANCH"
-            bash <(curl -sL $OPP_SCRIPT_URL) op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/dummy $OPP_THIS_REPO $OPP_THIS_BRANCH
-        - name: Index recreate only (Only ci.yaml was changed)
-          if: needs.pr-check.outputs.opp_ci_yaml_only == '1'
-          env:
-            OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
-            OPP_CI_YAML_ONLY: 1
-            OPP_IIB_INSTALL: 0
-            IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-            # OPP_MIRROR_IMAGE_POSTFIX: "s"
-            OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
-          run: |
-            echo "OPP_LABELS=$OPP_LABELS"
-            echo "orange_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
-            bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/sync $OPP_THIS_REPO $OPP_THIS_BRANCH
-        - name: Operator release (sync)
-          if: needs.pr-check.outputs.opp_ci_yaml_only == '0' && needs.pr-check.outputs.opp_ver_overwrite == '0'
-          env:
-            OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
-            OPP_IIB_INSTALL: 0
-            IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-            # OPP_MIRROR_IMAGE_POSTFIX: "s"
-            OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
-          run: |
-            echo "OPP_LABELS=$OPP_LABELS"
-            echo "orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
-            bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH
-        - name: Operator release (operator version overwrite)
-          if: needs.pr-check.outputs.opp_ci_yaml_only == '0' && needs.pr-check.outputs.opp_ver_overwrite == '1'
-          env:
-            OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
-            OPP_IIB_INSTALL: 0
-            IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-            # OPP_MIRROR_IMAGE_POSTFIX: "s"
-            OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
-          run: |
-            echo "OPP_LABELS=$OPP_LABELS"
-            echo "orange_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH"
-            bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH
-
-        - name: Prepare variables for the sign process
-          id: openshift-vars
-          env:
-            # QUAY_REGISTRY: 'redhat/redhat----community-operator-index'
-            OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
-            #QUAY_PW: ${{ secrets.QUAY_J }}
-            #QUAY_USER: ${{ secrets.QUAY_RH_RO_INDEX_USER }}
-          run: |
-            docker login ${OPP_MIRROR_INDEX_REGISTRY} -u $OPP_REGISTRY_MIRROR_USER -p $REGISTRY_MIRROR_PW
-            OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} | jq -r ".Digest")
-            OPERATOR_INDEX_RESOLVED="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}@${OPERATOR_INDEX_DIGEST}"
-            OPERATOR_INDEX="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG}"
-            echo $OPERATOR_INDEX_RESOLVED
-            echo $OPERATOR_INDEX
-            echo "::set-output name=operator_index_resolved::${OPERATOR_INDEX_RESOLVED}"
-            echo "::set-output name=operator_index::${OPERATOR_INDEX}"
-        - name: Initialize sign process
-          uses: operator-framework/community-operators@webhook
-          env:
-            INDEX_SHA: "${{ steps.openshift-vars.outputs.index_sha }}"
-            webhook_type: 'json-extended'
-            webhook_url: 'https://api.enterprise.redhat.com/hydra/umb-bridge/v1/publish'
-            webhook_secret: ${{ secrets.SIGNATURE_WEBHOOK_SECRET }}
-            data: "{\"index_image\": \"${{ steps.openshift-vars.outputs.operator_index }}\", \"index_image_resolved\": \"${{ steps.openshift-vars.outputs.operator_index_resolved }}\"}"
-
-  push-to-quay-o7t:
-    name: "Release / o7t push to quay"
     needs: pr-check
     if: needs.pr-check.outputs.opp_release_ready == '1'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        index-tag: ['v4.6', 'v4.7', 'v4.8']
+
+      fail-fast: false
+    steps:
+      - name: Remove operator from index
+        if: needs.pr-check.outputs.opp_op_delete == '1' && needs.pr-check.outputs.opp_name != ''
+        env:
+          OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
+          OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
+        run: |
+          echo "OPP_LABELS=$OPP_LABELS"
+          echo "op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/dummy $OPP_THIS_REPO $OPP_THIS_BRANCH"
+          bash <(curl -sL $OPP_SCRIPT_URL) op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/dummy $OPP_THIS_REPO $OPP_THIS_BRANCH
+      - name: Operator release (operator version overwrite)
+        if: needs.pr-check.outputs.opp_ci_yaml_only == '0' && needs.pr-check.outputs.opp_ver_overwrite == '1' && needs.pr-check.outputs.opp_name != '' && needs.pr-check.outputs.opp_version != ''
+        env:
+          OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
+          OPP_IIB_INSTALL: 0
+          IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
+          OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
+        run: |
+          echo "OPP_LABELS=$OPP_LABELS"
+          echo "op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH"
+          bash <(curl -sL $OPP_SCRIPT_URL) op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH
+
+  operators-ocp:
+    name: "Index check / ocp"
+    needs: [pr-check, remove-ocp ]
+
+    if: needs.pr-check.outputs.opp_release_ready == '1'
+    runs-on: ubuntu-latest
+    steps:
+      - name: List of missing operators
+        id: operators
+        env:
+          OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
+          OPP_IIB_INSTALL: 0
+          IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
+          OPERATOR_INDEX_TAG: "orange_v4.6 orange_v4.7 orange_v4.8"
+
+          OPP_INDEX_CHECK_ONLY: 1
+        run: |
+          echo "OPP_LABELS=$OPP_LABELS"
+          echo "'$OPERATOR_INDEX_TAG' operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
+          bash <(curl -sL $OPP_SCRIPT_URL) "$OPERATOR_INDEX_TAG" operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH
+          
+      - name: Index check
+        run: |
+          echo "Operators : ${{ steps.operators.outputs.opp_uncomplete_operators }}"
+          echo "Operators (v4.6) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_6 }}"
+          echo "Operators (v4.7) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_7 }}"
+          echo "Operators (v4.8) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_8 }}"
+
+    outputs:
+      opp_uncomplete_operators: "${{ steps.operators.outputs.opp_uncomplete_operators }}"
+      opp_uncomplete_operators_v4_6: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_6 }}"
+      opp_uncomplete_operators_v4_7: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_7 }}"
+      opp_uncomplete_operators_v4_8: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_8 }}"
+
+  bundles-ocp:
+    name: "Bundles / ocp"
+    needs: [ pr-check, remove-ocp, operators-ocp ]
+    if: needs.pr-check.outputs.opp_release_ready == '1' && needs.operators-ocp.outputs.opp_uncomplete_operators != ''
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build bundles
+        env:
+          OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
+          OPP_IIB_INSTALL: 0
+          IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
+          OPERATOR_INDEX_TAG: latest
+          OPP_SKIP_INDEX: 1
+          OPP_FORCE_OPERATORS: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators }}"
+
+        run: |
+          echo "OPP_LABELS=$OPP_LABELS"
+          echo "OPP_FORCE_OPERATORS=$OPP_FORCE_OPERATORS"
+          echo "orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
+          bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH
+
+  release-ocp:
+    name: "Index / ocp"
+    needs: [ pr-check, operators-ocp, bundles-ocp ]
+    if: needs.pr-check.outputs.opp_release_ready == '1' && needs.operators-ocp.outputs.opp_uncomplete_operators != ''
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        index-tag: ['v4.6', 'v4.7', 'v4.8']
+
+      fail-fast: false
+    steps:
+      - name: Index sync
+        env:
+          OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
+          OPP_IIB_INSTALL: 0
+          OPP_FORCE_INDEX_UPDATE: 1
+          IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
+          OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
+          # OPP_FORCE_OPERATORS: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators }}"
+          OPP_FORCE_OPERATORS: ""
+          OPP_FORCE_OPERATORS_v4_6: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_6 }}"
+          OPP_FORCE_OPERATORS_v4_7: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_7 }}"
+          OPP_FORCE_OPERATORS_v4_8: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_8 }}"
+
+        run: |
+          echo "OPP_LABELS=$OPP_LABELS"
+          echo "orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
+          bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH
+
+      - name: Prepare variables for the sign process
+        id: openshift-vars
+        env:
+          OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
+        run: |
+          docker login ${OPP_MIRROR_INDEX_REGISTRY} -u $OPP_REGISTRY_MIRROR_USER -p $REGISTRY_MIRROR_PW
+          OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} | jq -r ".Digest")
+          OPERATOR_INDEX_RESOLVED="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}@${OPERATOR_INDEX_DIGEST}"
+          OPERATOR_INDEX="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG}"
+          echo $OPERATOR_INDEX_RESOLVED
+          echo $OPERATOR_INDEX
+          echo "::set-output name=operator_index_resolved::${OPERATOR_INDEX_RESOLVED}"
+          echo "::set-output name=operator_index::${OPERATOR_INDEX}"
+      - name: Initialize sign process
+        uses: operator-framework/community-operators@webhook
+        env:
+          INDEX_SHA: "${{ steps.openshift-vars.outputs.index_sha }}"
+          webhook_type: 'json-extended'
+          webhook_url: 'https://api.enterprise.redhat.com/hydra/umb-bridge/v1/publish'
+          webhook_secret: ${{ secrets.SIGNATURE_WEBHOOK_SECRET }}
+          data: "{\"index_image\": \"${{ steps.openshift-vars.outputs.operator_index }}\", \"index_image_resolved\": \"${{ steps.openshift-vars.outputs.operator_index_resolved }}\"}"
+  push-to-quay-ocp:
+    name: "Push to quay / ocp"
+
+    needs: pr-check
+    if: needs.pr-check.outputs.opp_release_ready == '1' && needs.pr-check.outputs.opp_name != '' && needs.pr-check.outputs.opp_version != ''
     runs-on: ubuntu-latest
     env:
       DELETE_APPREG: "${{ needs.pr-check.outputs.opp_release_delete_appreg }}"
       OPP_VERSION: "${{ needs.pr-check.outputs.opp_version }}"
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
       - name: Push to quay
         run: |
           echo "push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH"
           bash <(curl -sL $OPP_SCRIPT_URL) push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH
 
-  release-sha-openshift:
-      name: "Release sha / o7t"
-      needs: [ pr-check, release-openshift ]
-      if: needs.pr-check.outputs.opp_release_ready == '1'
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          index-tag: ['v4.6', 'v4.7', 'v4.8']
+  release-sha-ocp:
+    name: "Index production / ocp"
+    needs: [ pr-check, release-ocp ]
 
-        fail-fast: false
-      steps:
-        - name: Release sha
-          env:
-            IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-            IIB_OUTPUT_REGISTRY_TOKEN: ${{ secrets.IIB_OUTPUT_REGISTRY_TOKEN }}
-          run: |
-            echo "openshift: ${{ matrix.index-tag }}"
-            bash <(curl -sL $OPP_SCRIPT_ISS_URL) openshift ${{ matrix.index-tag }}
+    if: needs.pr-check.outputs.opp_release_ready == '1'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        index-tag: ['v4.6', 'v4.7', 'v4.8']
+
+      fail-fast: false
+    steps:
+      - name: Release sha
+        env:
+          IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
+          IIB_OUTPUT_REGISTRY_TOKEN: ${{ secrets.IIB_OUTPUT_REGISTRY_TOKEN }}
+        run: |
+          echo "openshift: ${{ matrix.index-tag }}"
+          bash <(curl -sL $OPP_SCRIPT_ISS_URL) openshift ${{ matrix.index-tag }}

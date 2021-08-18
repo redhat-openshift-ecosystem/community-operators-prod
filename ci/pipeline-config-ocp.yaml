@@ -1,0 +1,56 @@
+production:
+  type: ocp
+  bundle:
+    registry: quay.io
+    organization: openshift-community-operators
+  index:
+    registry: quay.io
+    organization: openshift-community-operators
+    name: catalog
+    tags:
+      - v4.6
+      - v4.7
+      - v4.8
+    latest: v4.6
+    signature: 1
+  mirror:
+    enabled: 1
+    multiarch:
+      base: registry.redhat.io/openshift4/ose-operator-registry
+      base_tags:
+        - v4.5
+        - v4.6
+        - v4.7
+      postfix: s
+    registry: quay.io
+#    organization: community-operators-backup
+#    name: catalog_prod
+    organization: redhat
+    name: redhat----community-operator-index
+    username:
+      in: jbreza@redhat.com
+#      out: framework_automation
+      out: redhat+iib_community
+
+pipeline:
+  base: https://github.com
+  repo: redhat-openshift-ecosystem/community-operators-prod
+  branch: main
+  ci_scripts_dir: https://raw.githubusercontent.com/redhat-openshift-ecosystem/community-operators-pipeline/ci/latest/ci/scripts
+  image: quay.io/operator_testing/operator-test-playbooks:latest
+  automerge:
+    enabled: 1
+  reviewers:
+    enabled: 1
+
+operatorhubio:
+  enabled: 0
+
+#base:
+#  organisation: operator-framework
+#  project: operator-test-playbooks
+#  tag: master
+tools:
+  kind_version: v0.9.0
+  kind_kube_version: v1.21.1
+  operator_sdk_version: v1.8.0

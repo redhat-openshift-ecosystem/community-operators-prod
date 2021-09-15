@@ -16,7 +16,7 @@ metadata:
                 "enabled": false
               },
               "image": {
-                "name": "gcr.io/datadoghq/agent:7.26.0"
+                "name": "gcr.io/datadoghq/agent:7.31.0"
               },
               "log": {
                 "enabled": false,
@@ -49,13 +49,13 @@ metadata:
                 }
               },
               "image": {
-                "name": "gcr.io/datadoghq/cluster-agent:1.11.0"
+                "name": "gcr.io/datadoghq/cluster-agent:1.15.0"
               },
               "replicas": 2
             },
             "clusterChecksRunner": {
               "image": {
-                "name": "gcr.io/datadoghq/agent:7.26.0"
+                "name": "gcr.io/datadoghq/agent:7.31.0"
               },
               "replicas": 2
             },
@@ -97,9 +97,13 @@ metadata:
       ]
     capabilities: Full Lifecycle
     categories: Monitoring, Logging & Tracing
+    containerImage: gcr.io/datadoghq/operator:0.7.0
     description: Datadog provides a modern monitoring and analytics platform. Gather
       metrics, logs and traces for full observability of your Kubernetes cluster with
       Datadog Operator.
+    # Prevent cluster upgrades to OpenShift Version 4.9 when this
+    # bundle is installed on the cluster
+    olm.properties: '[{"type": "olm.maxOpenShiftVersion", "value": "4.8"}]'
     operators.operatorframework.io/builder: operator-sdk-v1.4.0+git
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
     repository: https://github.com/DataDog/datadog-operator
@@ -875,3 +879,4 @@ spec:
   provider:
     name: Datadog
   version: 0.7.0
+  replaces: datadog-operator.v0.6.0

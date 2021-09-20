@@ -8,10 +8,10 @@ metadata:
           "apiVersion": "primer.gitops.io/v1alpha1",
           "kind": "Export",
           "metadata": {
-            "name": "export-sample"
+            "name": "primer"
           },
           "spec": {
-            "foo": "bar"
+            "method": "download"
           }
         }
       ]
@@ -345,13 +345,13 @@ spec:
         serviceAccountName: gitops-primer-controller-manager
     strategy: deployment
   installModes:
-  - supported: true
+  - supported: false
     type: OwnNamespace
   - supported: false
     type: SingleNamespace
   - supported: false
     type: MultiNamespace
-  - supported: false
+  - supported: true
     type: AllNamespaces
   keywords:
   - gitops

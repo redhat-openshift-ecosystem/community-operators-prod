@@ -433,11 +433,11 @@ spec:
                 - name: DATABASE_IMAGE
                   value: quay.io/ocpmetal/postgresql-12-centos7@sha256:94727d70e0afbf4e167e078744f3a10ac9d82edc553d57b0ecbb5443264f07e1
                 - name: AGENT_IMAGE
-                  value: quay.io/ocpmetal/assisted-installer-agent@sha256:13a101a7eb8eb1e4ad1f37a428812b5f164851b74bd88bdfc72da5e3abcbc3f0
+                  value: quay.io/ocpmetal/assisted-installer-agent@sha256:712607a27aae61a66769263e5091e32ad5d20999c773e7777fb66e80b26c63fe
                 - name: CONTROLLER_IMAGE
-                  value: quay.io/ocpmetal/assisted-installer-controller@sha256:a759c57be5514b74e05ff65b636cd8fac4aa61c085a353f832b46269fa27de57
+                  value: quay.io/ocpmetal/assisted-installer-controller@sha256:b5dfbd5ca3d443d8736493c732745ed58c87226f33036e2d544860a5cb3e7376
                 - name: INSTALLER_IMAGE
-                  value: quay.io/ocpmetal/assisted-installer@sha256:2e79920989dd301b71ee4ed740023f5702a2bb2728b314e5abfbba4e08577683
+                  value: quay.io/ocpmetal/assisted-installer@sha256:b6d33c502a6f92936c701822b66550880cbf17d07602c0c10b5b34b2e5d963fe
                 - name: OPENSHIFT_VERSIONS
                   value: '{"4.8":{"display_name":"4.8.0-fc.3","release_version":"4.8.0-fc.3","release_image":"quay.io/openshift-release-dev/ocp-release:4.8.0-fc.3-x86_64","rhcos_image":"https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/4.8.0-fc.3/rhcos-4.8.0-fc.3-x86_64-live.x86_64.iso","rhcos_rootfs":"https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/4.8.0-fc.3/rhcos-live-rootfs.x86_64.img","rhcos_version":"48.84.202105062123-0","support_level":"beta"}}'
                 - name: SERVICE_ACCOUNT_NAME
@@ -568,11 +568,11 @@ spec:
     name: controller
   - image: quay.io/ocpmetal/postgresql-12-centos7@sha256:94727d70e0afbf4e167e078744f3a10ac9d82edc553d57b0ecbb5443264f07e1
     name: postgresql
-  - image: quay.io/ocpmetal/assisted-installer@sha256:2e79920989dd301b71ee4ed740023f5702a2bb2728b314e5abfbba4e08577683
+  - image: quay.io/ocpmetal/assisted-installer@sha256:b6d33c502a6f92936c701822b66550880cbf17d07602c0c10b5b34b2e5d963fe
     name: installer
-  - image: quay.io/ocpmetal/assisted-installer-agent@sha256:13a101a7eb8eb1e4ad1f37a428812b5f164851b74bd88bdfc72da5e3abcbc3f0
+  - image: quay.io/ocpmetal/assisted-installer-agent@sha256:712607a27aae61a66769263e5091e32ad5d20999c773e7777fb66e80b26c63fe
     name: agent
-  - image: quay.io/ocpmetal/assisted-installer-controller@sha256:a759c57be5514b74e05ff65b636cd8fac4aa61c085a353f832b46269fa27de57
+  - image: quay.io/ocpmetal/assisted-installer-controller@sha256:b5dfbd5ca3d443d8736493c732745ed58c87226f33036e2d544860a5cb3e7376
     name: reporter
   skips:
   - assisted-service-operator.v0.0.1

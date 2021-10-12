@@ -349,7 +349,6 @@ jobs:
           echo "::set-output name=operator_index::${OPERATOR_INDEX}"
       - name: Initialize sign process
         uses: operator-framework/community-operators@webhook
-        continue-on-error: true
         env:
           INDEX_SHA: "${{ steps.openshift-vars.outputs.index_sha }}"
           webhook_type: 'json-extended'

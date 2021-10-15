@@ -34,8 +34,13 @@ spec:
           spec:
             description: VeleroSpec defines the desired state of Velero
             properties:
+              backupImages:
+                description: BackupImages is used to specify whether you want to deploy
+                  a registry for enabling backup and restore of images
+                type: boolean
               backupStorageLocations:
-                description: Velero configuration
+                description: BackupStorageLocations defines the list of desired configuration
+                  to use for BackupStorageLocations
                 items:
                   description: BackupStorageLocationSpec defines the desired state
                     of a Velero BackupStorageLocation
@@ -114,6 +119,8 @@ spec:
                   type: object
                 type: array
               customVeleroPlugins:
+                description: CustomVeleroPlugins defines the custom plugin to be installed
+                  with Velero
                 items:
                   properties:
                     image:
@@ -126,33 +133,76 @@ spec:
                   type: object
                 type: array
               defaultVeleroPlugins:
-                description: Plugin configuration
+                description: DefaultVeleroPlugins defines the list of default plugins
+                  (aws, gcp, azure, openshift, csi) to be installed with Velero
                 items:
                   type: string
                 type: array
               enableRestic:
-                description: Restic options. When false or missing, operator will
-                  attempt to delete Restic DaemonSet
+                description: EnableRestic is a boolean to specify if restic daemonset
+                  instance should be created or not
+                type: boolean
+              noDefaultBackupLocation:
+                description: If you need to install Velero without a default backup
+                  storage location NoDefaultBackupLocation flag is required for confirmation
                 type: boolean
               noobaa:
                 description: Noobaa is a boolean to specify if we should install backup
                   storage from OCS operator with Noobaa
-                type: boolean
-              olmManaged:
-                description: 'Important: Run "make" to regenerate code after modifying
-                  this file Determine whether this was installed via OLM'
                 type: boolean
               podAnnotations:
                 additionalProperties:
                   type: string
                 description: add annotations to pods deployed by operator
                 type: object
+              podDnsConfig:
+                description: PodDNSConfig defines the DNS parameters of a pod in addition
+                  to those generated from DNSPolicy. https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config
+                properties:
+                  nameservers:
+                    description: A list of DNS name server IP addresses. This will
+                      be appended to the base nameservers generated from DNSPolicy.
+                      Duplicated nameservers will be removed.
+                    items:
+                      type: string
+                    type: array
+                  options:
+                    description: A list of DNS resolver options. This will be merged
+                      with the base options generated from DNSPolicy. Duplicated entries
+                      will be removed. Resolution options given in Options will override
+                      those that appear in the base DNSPolicy.
+                    items:
+                      description: PodDNSConfigOption defines DNS resolver options
+                        of a pod.
+                      properties:
+                        name:
+                          description: Required.
+                          type: string
+                        value:
+                          type: string
+                      type: object
+                    type: array
+                  searches:
+                    description: A list of DNS search domains for host-name lookup.
+                      This will be appended to the base search paths generated from
+                      DNSPolicy. Duplicated search paths will be removed.
+                    items:
+                      type: string
+                    type: array
+                type: object
+              podDnsPolicy:
+                description: DNSPolicy defines how a pod's DNS will be configured.
+                  https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
+                type: string
               resticNodeSelector:
                 additionalProperties:
                   type: string
+                description: ResticNodeSelector defines the nodeSelector to be supplied
+                  to Restic podSpec
                 type: object
               resticResourceAllocations:
-                description: ResourceRequirements describes the compute resource requirements.
+                description: ResticResourceAllocations defines the CPU and Memory
+                  resource allocations for the restic Pod
                 properties:
                   limits:
                     additionalProperties:
@@ -178,13 +228,19 @@ spec:
                     type: object
                 type: object
               resticSupplementalGroups:
+                description: ResticSupplementalGroups defines the linux groups to
+                  be applied to the Restic Pod
                 items:
                   format: int64
                   type: integer
                 type: array
               resticTimeout:
+                description: ResticTimeout defines the Restic timeout, default value
+                  is 1h
                 type: string
               resticTolerations:
+                description: ResticTolerations defines the list of tolerations to
+                  be applied to Restic daemonset
                 items:
                   description: The pod this Toleration is attached to tolerates any
                     taint that matches the triple <key,value,effect> using the matching
@@ -223,16 +279,25 @@ spec:
                       type: string
                   type: object
                 type: array
+              restoreResourcesVersionPriority:
+                description: RestoreResourceVersionPriority represents a configmap
+                  that will be created if defined for use in conjunction with `EnableAPIGroupVersions`
+                  feature flag Defining this field automatically add EnableAPIGroupVersions
+                  to the velero server feature flag
+                type: string
               unsupportedOverrides:
                 additionalProperties:
                   type: string
                 type: object
               veleroFeatureFlags:
+                description: VeleroFeatureFlags defines the list of features to enable
+                  for Velero instance
                 items:
                   type: string
                 type: array
               veleroResourceAllocations:
-                description: ResourceRequirements describes the compute resource requirements.
+                description: VeleroResourceAllocations defines the CPU and Memory
+                  resource allocations for the Velero Pod
                 properties:
                   limits:
                     additionalProperties:
@@ -258,7 +323,8 @@ spec:
                     type: object
                 type: object
               veleroTolerations:
-                description: We do not currently support setting tolerations for Velero
+                description: VeleroTolerations defines the list of tolerations to
+                  be applied to Velero deployment
                 items:
                   description: The pod this Toleration is attached to tolerates any
                     taint that matches the triple <key,value,effect> using the matching
@@ -298,6 +364,8 @@ spec:
                   type: object
                 type: array
               volumeSnapshotLocations:
+                description: VolumeSnapshotLocations defines the list of desired configuration
+                  to use for VolumeSnapshotLocations
                 items:
                   description: VolumeSnapshotLocationSpec defines the specification
                     for a Velero VolumeSnapshotLocation.
@@ -314,8 +382,6 @@ spec:
                   - provider
                   type: object
                 type: array
-            required:
-            - backupStorageLocations
             type: object
           status:
             description: VeleroStatus defines the observed state of Velero

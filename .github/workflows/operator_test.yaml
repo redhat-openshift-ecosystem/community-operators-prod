@@ -33,6 +33,7 @@ env:
   KIND_KUBE_VERSION: "v1.21.1"
   OPP_PRODUCTION_TYPE: "ocp"
   OPP_REVIEWERS_ENABLED: 1
+#  ARTEFACT_PATH: "/tmp/operator-test" #hardcoded for now
 
 
 jobs:
@@ -41,30 +42,12 @@ jobs:
     name: "PR-traffic-light"
     runs-on: ubuntu-latest
     steps:
-      # Checks out a copy of your repository on the ubuntu-latest machine
-      # - name: Checkout code
-      #   uses: actions/checkout@v2
-      # - id: files
-      #   uses: jitterbit/get-changed-files@v1
-      #   continue-on-error: true
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
       - name: Install dependencies
         run: python -m pip install --upgrade pip yq
-      # - name: Operator traffic light
-      #   id: op-traffic-light
-      #   env:
-      #     OPP_LABELS: "${{ join(github.event.pull_request.labels.*.name, ' ') }}"
-      #     OPP_MODIFIED_FILES: "${{ steps.files.outputs.modified }}"
-      #     OPP_ADDED_MODIFIED_FILES: "${{ steps.files.outputs.added_modified }}"
-      #     OPP_RENAMED_FILES: "${{ steps.files.outputs.renamed }}"
-      #     OPP_REMOVED_FILES: "${{ steps.files.outputs.removed }}"
-      #   run: |
-      #     echo "Using script '$OPP_SCRIPT_ENV_URL' ..."
-      #     echo "global labels $OPP_LABELS"
-      #     bash <(curl -sL $OPP_SCRIPT_ENV_URL)
       - name: Operator traffic light
         id: op-traffic-light
         env:
@@ -90,12 +73,17 @@ jobs:
           OPP_OPRT_SRC_BRANCH: "${{ github.event.pull_request.base.ref }}"
           OPP_AUTO_LABEL: "${{ steps.op-traffic-light.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           ANSIBLE_FORCE_COLOR: 1
-          DISPLAY_SKIPPED_HOSTS: 0
+          ANSIBLE_DISPLAY_SKIPPED_HOSTS: 0
           ANSIBLE_STDOUT_CALLBACK: "yaml"
         run: |
-          # OPP_ANSIBLE_PULL_BRANCH="upstream-community-dev"
+          OPP_ANSIBLE_PULL_BRANCH="upstream-community-dev"
           [ "$OPP_AUTO_LABEL" = '1' ] && ANSIBLE_ARGS="-e automatic_cluster_version_label=true" || ANSIBLE_ARGS="-e automatic_cluster_version_label=false"
-          ansible-pull -U $OPP_ANSIBLE_PULL_REPO -C $OPP_ANSIBLE_PULL_BRANCH -i localhost, -e run_upstream=true -e run_prepare_catalog_repo_upstream=false -e run_remove_catalog_repo=false upstream/local.yml --tags reset_tools,operator_info -e operator_dir=$PWD/operators/operators/${{ steps.op-traffic-light.outputs.opp_name }} -e cluster_type=$OPP_PRODUCTION_TYPE -e strict_cluster_version_labels=true $ANSIBLE_ARGS
+
+          ANSIBLE_ARGS="$ANSIBLE_ARGS -e stream_kind=openshift_upstream"
+          echo $ANSIBLE_ARGS
+
+          ansible-pull -U $OPP_ANSIBLE_PULL_REPO -C $OPP_ANSIBLE_PULL_BRANCH -i localhost, -e run_upstream=true -e run_prepare_catalog_repo_upstream=false -e run_remove_catalog_repo=false upstream/local.yml --tags reset_tools,operator_info -e operator_dir=$PWD/operators/operators/${{ steps.op-traffic-light.outputs.opp_name }} -e cluster_type=$OPP_PRODUCTION_TYPE -e strict_cluster_version_labels=true -e production_registry_namespace=$OPP_RELEASE_BUNDLE_REGISTRY/$OPP_RELEASE_BUNDLE_ORGANIZATION $ANSIBLE_ARGS
+
       - name: Operator info (result)
         id: op-info-result
         if: always()
@@ -122,6 +110,21 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
 
+      - name: Upload operator_info
+        uses: actions/upload-artifact@v2
+        with:
+          name: operator_info
+          path: "/tmp/operator-test/op_info.yaml"
+      - name: Upload converted operators
+        uses: actions/upload-artifact@v2
+        with:
+          name: operators_converted
+          path: "/tmp/operator-test/operators"
+      - shell: bash
+        run: |
+          ls /tmp/operator-test/
+          cat /tmp/operator-test/op_info.yaml
+
     outputs:
       opp_test_ready: "${{ steps.op-traffic-light.outputs.opp_test_ready }}"
       opp_release_ready: "${{ steps.op-traffic-light.outputs.opp_release_ready }}"
@@ -142,6 +145,21 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+      - name: Download operator_info
+        uses: actions/download-artifact@v2
+        with:
+          name: operator_info
+          path: "/tmp/operator-test/"
+      - name: Download converted operators
+        uses: actions/download-artifact@v2
+        with:
+          name: operators_converted
+          path: "/tmp/operator-test/operators"
+      - name: Debug artefacts
+        shell: bash
+        run: |
+          ls /tmp/operator-test/operators
+          head /tmp/operator-test/op_info.yaml
       - name: Operator test
         env:
           OPP_LABELS: "${{ join(github.event.pull_request.labels.*.name, ' ') }}"
@@ -190,7 +208,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6', 'v4.7', 'v4.8']
+        index-tag: ['v4.6', 'v4.7', 'v4.8', 'v4.9']
 
       fail-fast: false
     steps:
@@ -198,6 +216,21 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+      - name: Download operator_info
+        uses: actions/download-artifact@v2
+        with:
+          name: operator_info
+          path: /tmp/operator-test/
+      - name: Download converted operators
+        uses: actions/download-artifact@v2
+        with:
+          name: operators_converted
+          path: /tmp/operator-test/operators
+      - name: Debug artefacts
+        shell: bash
+        run: |
+          ls /tmp/operator-test/operators
+          head /tmp/operator-test/op_info.yaml
       - name: Operator test
         env:
           OPP_LABELS: "${{ join(github.event.pull_request.labels.*.name, ' ') }}"
@@ -216,7 +249,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6', 'v4.7', 'v4.8']
+        index-tag: ['v4.6', 'v4.7', 'v4.8', 'v4.9']
 
       fail-fast: false
     steps:
@@ -224,6 +257,21 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+      - name: Download operator_info
+        uses: actions/download-artifact@v2
+        with:
+          name: operator_info
+          path: /tmp/operator-test/
+      - name: Download converted operators
+        uses: actions/download-artifact@v2
+        with:
+          name: operators_converted
+          path: /tmp/operator-test/operators
+      - name: Debug artefacts
+        shell: bash
+        run: |
+          ls /tmp/operator-test/operators
+          head /tmp/operator-test/op_info.yaml
       - name: Operator test
         env:
           OPP_LABELS: "${{ join(github.event.pull_request.labels.*.name, ' ') }}"

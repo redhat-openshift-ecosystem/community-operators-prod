@@ -11,6 +11,7 @@ production:
       - v4.6
       - v4.7
       - v4.8
+      - v4.9
     latest: v4.6
     signature: 1
   mirror:
@@ -38,6 +39,9 @@ pipeline:
   branch: main
   ci_scripts_dir: https://raw.githubusercontent.com/redhat-openshift-ecosystem/community-operators-pipeline/ci/latest/ci/scripts
   image: quay.io/operator_testing/operator-test-playbooks:latest
+  playbooks:
+    repo: https://github.com/redhat-openshift-ecosystem/operator-test-playbooks
+    branch: "upstream-community"
   automerge:
     enabled: 1
   reviewers:

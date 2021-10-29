@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Info"
+        if: context.payload.client_payload.remove_labels != 'undefined'
         uses: actions/github-script@v4
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
@@ -40,6 +41,7 @@ jobs:
         continue-on-error: true
 
       - name: "Add labels"
+        if: context.payload.client_payload.add_labels != 'undefined'
         uses: actions/github-script@v4
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}

@@ -29,7 +29,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            if (context.payload.client_payload.remove_labels != undefined)
+            if (context.payload.client_payload.remove_labels != undefined) {
               for (const label of context.payload.client_payload.remove_labels) {
                 github.issues.removeLabel({
                   issue_number: context.payload.client_payload.source_pr,
@@ -46,7 +46,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            if (context.payload.client_payload.add_labels != undefined)
+            if (context.payload.client_payload.add_labels != undefined) {
               github.issues.addLabels({
                 issue_number: context.payload.client_payload.source_pr,
                 owner: context.repo.owner,

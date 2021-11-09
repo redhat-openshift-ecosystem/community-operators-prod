@@ -1,7 +1,7 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: aqua-operator.v6.2.0
+  name: aqua-operator.v6.5.1
   namespace: placeholder
   annotations:
     # Setting olm.maxOpenShiftVersion automatically
@@ -11,13 +11,13 @@ metadata:
     # is compatible with it. Please, ensure that your project is no longer using these API(s) and that you start to
     # distribute solutions which is compatible with Openshift 4.9.
     # For further information, check the README of this repository.
-    olm.properties: '[{"type": "olm.maxOpenShiftVersion", "value": "4.8"}]'
+    olm.properties: '[{"type": "olm.maxOpenShiftVersion", "value": "4.9"}]'
     capabilities: Seamless Upgrades
     categories: Security
-    olm.skipRange: ">=1.0.2 <6.2.0"
+    olm.skipRange: ">=1.0.2 <6.5.0"
     description: The Aqua Security Operator runs within a Openshift cluster and provides a means to deploy and manage Aqua Security cluster and components.
     certified: "false"
-    containerImage: aquasec/aqua-operator:6.2.0
+    containerImage: aquasec/aqua-operator:6.5.0
     createdAt: 2020-03-25T08:00:00Z
     support: Aqua Security, Inc.
     repository: https://github.com/aquasecurity/aqua-operator
@@ -34,7 +34,7 @@ metadata:
             "infra": {
               "serviceAccount": "aqua-sa",
               "namespace": "aqua",
-              "version": "6.2",
+              "version": "6.5",
               "requirements": true
             },
             "common": {
@@ -88,7 +88,7 @@ metadata:
           "spec": {
             "infra": {
               "serviceAccount": "aqua-sa",
-              "version": "6.2"
+              "version": "6.5"
             },
             "common": {
               "imagePullSecret": "aqua-registry",
@@ -115,7 +115,7 @@ metadata:
           "spec": {
             "infra": {
               "serviceAccount": "aqua-sa",
-              "version": "6.2"
+              "version": "6.5"
             },
             "common": {
               "imagePullSecret": "aqua-registry"
@@ -143,11 +143,11 @@ metadata:
           },
           "spec": {
             "infra": {
-              "version": "6.2",
+              "version": "6.5",
               "serviceAccount": "aqua-kube-enforcer-sa"
             },
             "config": {
-              "gateway_address": "aqua-gateway.aqua:8443",
+              "gateway_address": "aqua-gateway:8443",
               "cluster_name": "aqua-secure",
               "imagePullSecret": "aqua-registry"
             },
@@ -173,7 +173,7 @@ metadata:
           "spec": {
             "infra": {
               "serviceAccount": "aqua-sa",
-              "version": "6.2"
+              "version": "6.5"
             },
             "common": {
               "databaseSecret": {
@@ -210,7 +210,7 @@ metadata:
           "spec": {
             "infra": {
               "serviceAccount": "aqua-sa",
-              "version": "6.2"
+              "version": "6.5"
             },
             "common": {
               "imagePullSecret": "aqua-registry"
@@ -240,7 +240,7 @@ metadata:
           "spec": {
             "infra": {
               "serviceAccount": "aqua-sa",
-              "version": "6.2"
+              "version": "6.5"
             },
             "common": {
               "databaseSecret": {
@@ -271,7 +271,8 @@ metadata:
       ]
 spec:
   displayName: Aqua Security Operator
-  version: 6.2.0
+  version: 6.5.1
+  replaces: aqua-operator.v6.5.0
   description: |-
     The Aqua Security Operator runs within an OpenShift cluster and provides a means to deploy and manage the Aqua Security cluster and components :
     * Server (aka “console”)
@@ -286,7 +287,6 @@ spec:
     * Deploy Aqua Security components on OpenShift
     * Scale up Aqua Security components with extra replicas
     * Assign metadata tags to Aqua Security components
-    * Automatically scale the number of Aqua scanners based on the number of images in the scan queue
 
     ## Before You Begin Using the Operator CRDs
 
@@ -296,7 +296,7 @@ spec:
     ## Instructions and exmaples
 
     Follow instructions and exmaples
-    [here](https://github.com/aquasecurity/aqua-operator/blob/6.2.0/docs/DeployOpenShiftOperator.md)
+    [here](https://github.com/aquasecurity/aqua-operator/blob/6.5.0/docs/DeployOpenShiftOperator.md)
 
   keywords: ['aqua-security', 'scanning', 'security', 'runtime-security']
   maintainers:
@@ -453,7 +453,7 @@ spec:
                 serviceAccountName: aqua-operator
                 containers:
                   - name: aqua-operator
-                    image: aquasec/aqua-operator:6.2.0
+                    image: aquasec/aqua-operator:6.5.0
                     imagePullPolicy: Always
                     command:
                       - aqua-operator

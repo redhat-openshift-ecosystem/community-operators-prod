@@ -1,17 +1,12 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: maistraoperator.v1.1.0
+  name: maistraoperator.v2.1.0
   namespace: placeholder
+  labels:
+    operatorframework.io/arch.amd64: supported
+
   annotations:
-    # Setting olm.maxOpenShiftVersion automatically
-    # This property was added via an automatic process since it was possible to identify that this distribution uses API(s),
-    # which will be removed in the k8s version 1.22 and OpenShift version OCP 4.9. Then, it will prevent OCP users to
-    # upgrade their cluster to 4.9 before they have installed in their current clusters a version of your operator that
-    # is compatible with it. Please, ensure that your project is no longer using these API(s) and that you start to
-    # distribute solutions which is compatible with Openshift 4.9.
-    # For further information, check the README of this repository.
-    olm.properties: '[{"type": "olm.maxOpenShiftVersion", "value": "4.8"}]'
     categories: "OpenShift Optional, Integration & Delivery"
     capabilities: "Seamless Upgrades"
     certified: "false"
@@ -19,54 +14,48 @@ metadata:
     description: |-
       The Maistra Operator enables you to install, configure, and manage an instance of Maistra service mesh. Maistra is based on the open source Istio project.
 
-    containerImage: maistra/istio-ubi8-operator:1.1.0
-    createdAt: 2020-04-09T19:39:10UTC
+    containerImage: quay.io/maistra/istio-ubi8-operator:2.1.0
+    createdAt: 2021-11-09T14:40:20EST
     support: Red Hat, Inc. 
-    olm.skipRange: ">=1.0.2 <1.1.0"
+    olm.skipRange: ">=1.0.2 <2.1.0-0"
+    operators.openshift.io/infrastructure-features: '[]'
     alm-examples: |-
       [
         {
-          "apiVersion": "maistra.io/v1",
+          "apiVersion": "maistra.io/v2",
           "kind": "ServiceMeshControlPlane",
           "metadata": {
-            "name": "basic-install",
+            "name": "basic",
             "namespace": "control-plane-namespace"
           },
           "spec": {
-            "version": "v1.1",
-            "istio": {
-              "gateways": {
-                "istio-egressgateway": {
-                  "autoscaleEnabled": false
-                },
-                "istio-ingressgateway": {
-                  "autoscaleEnabled": false,
-                  "ior_enabled": false
+            "version": "v2.1",
+            "tracing": {
+              "type": "Jaeger",
+              "sampling": 10000
+            },
+            "policy": {
+               "type": "Istiod"
+            },
+            "telemetry": {
+               "type": "Istiod"
+            },
+            "addons": {
+              "jaeger": {
+                "install": {
+                  "storage": {
+                    "type": "Memory"
+                  }
                 }
               },
-              "mixer": {
-                "policy": {
-                  "autoscaleEnabled": false
-                },
-                "telemetry": {
-                  "autoscaleEnabled": false
-                }
-              },
-              "pilot": {
-                "autoscaleEnabled": false,
-                "traceSampling": 100.0
+              "prometheus": {
+                "enabled": true
               },
               "kiali": {
                 "enabled": true
               },
               "grafana": {
                 "enabled": true
-              },
-              "tracing": {
-                "enabled": true,
-                "jaeger": {
-                  "template": "all-in-one"
-                }
               }
             }
           }
@@ -94,14 +83,14 @@ metadata:
           },
           "spec": {
             "controlPlaneRef": {
-              "name": "basic-install",
+              "name": "basic",
               "namespace": "control-plane-namespace"
             }
           }
         }
       ]
 spec:
-  version: 1.1.0
+  version: 2.1.0
   maturity: alpha
   displayName: Maistra Service Mesh
   description: |-
@@ -210,7 +199,6 @@ spec:
     url: https://github.com/Maistra/istio-operator
   - name: Bugs
     url: https://issues.redhat.com/projects/MAISTRA
-  replaces: maistraoperator.v1.0.8
   installModes:
   - type: OwnNamespace
     supported: false
@@ -220,6 +208,23 @@ spec:
     supported: false
   - type: AllNamespaces
     supported: true
+  relatedImages:
+  - name: v2_1.3scale-istio-adapter
+    image: quay.io/3scale/3scale-istio-adapter:v2.0.0
+  - name: v2_1.cni
+    image: quay.io/maistra/istio-cni-ubi8:2.1.0
+  - name: v2_1.grafana
+    image: quay.io/maistra/grafana-ubi8:2.1.0
+  - name: v2_1.pilot
+    image: quay.io/maistra/pilot-ubi8:2.1.0
+  - name: v2_1.prometheus
+    image: quay.io/maistra/prometheus-ubi8:2.1.0
+  - name: v2_1.proxyv2
+    image: quay.io/maistra/proxyv2-ubi8:2.1.0
+  - name: v2_1.wasm-cacher
+    image: quay.io/maistra/pilot-ubi8:2.1.0
+  - name: v2_1.rls
+    image: quay.io/maistra/ratelimit-ubi8:2.1.0
   install:
     strategy: deployment
     spec:
@@ -227,212 +232,243 @@ spec:
       - serviceAccountName: istio-operator
         rules:
 
+        # operator-sdk rules
         - apiGroups:
-          - ''
+            - monitoring.coreos.com
           resources:
-          - configmaps
-          - endpoints
-          - namespaces
-          - persistentvolumeclaims
-          - pods
-          - replicationcontrollers
-          - secrets
-          - serviceaccounts
-          - services
-          - events
+            - servicemonitors
           verbs:
-          - '*'
+            - get
+            - create
         - apiGroups:
-          - apps
-          - extensions
+            - ""
           resources:
-          - daemonsets
-          - deployments
-          - deployments/finalizers
-          - ingresses
-          - ingresses/status
-          - replicasets
-          - statefulsets
+            - services/finalizers
           verbs:
-          - '*'
+            - '*'
+        # operator rules for managing istio
         - apiGroups:
-          - autoscaling
+            - ""
           resources:
-          - horizontalpodautoscalers
+            - configmaps
+            - endpoints
+            - namespaces
+            - persistentvolumeclaims
+            - pods
+            - replicationcontrollers
+            - secrets
+            - serviceaccounts
+            - services
+            - events # is this needed?
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - policy
+            - apps
+            - extensions
           resources:
-          - poddisruptionbudgets
+            - daemonsets
+            - deployments
+            - deployments/finalizers
+            - ingresses # is this needed? should it be converted to a route?
+            - ingresses/status
+            - replicasets
+            - statefulsets
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - admissionregistration.k8s.io
+            - autoscaling
           resources:
-          - mutatingwebhookconfigurations
-          - validatingwebhookconfigurations
+            - horizontalpodautoscalers
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - apiextensions.k8s.io
+            - policy
           resources:
-          - customresourcedefinitions
+            - poddisruptionbudgets
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - certmanager.k8s.io
+            - admissionregistration.k8s.io
           resources:
-          - clusterissuers
+            - mutatingwebhookconfigurations
+            - validatingwebhookconfigurations
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - networking.k8s.io
+            - apiextensions.k8s.io
           resources:
-          - networkpolicies
+            - customresourcedefinitions
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - rbac.authorization.k8s.io
+            - certmanager.k8s.io
           resources:
-          - clusterrolebindings
-          - clusterroles
-          - rolebindings
-          - roles
+            - clusterissuers
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - authentication.istio.io
+            - networking.k8s.io
           resources:
-          - '*'
+            - networkpolicies
+            - ingresses
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - config.istio.io
+            - rbac.authorization.k8s.io
           resources:
-          - '*'
+            - clusterrolebindings
+            - clusterroles
+            - rolebindings
+            - roles
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - networking.istio.io
+            - authentication.istio.io
           resources:
-          - '*'
+            - '*'
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - rbac.istio.io
+            - config.istio.io
           resources:
-          - '*'
+            - '*'
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - security.istio.io
+            - networking.istio.io
           resources:
-          - '*'
+            - '*'
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - jaegertracing.io
+            - rbac.istio.io
           resources:
-          - jaegers
+            - '*'
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - kiali.io
+            - security.istio.io
           resources:
-          - kialis
+            - '*'
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - maistra.io
+            - jaegertracing.io
           resources:
-          - '*'
+            - jaegers
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - authentication.maistra.io
+            - kiali.io
           resources:
-          - '*'
+            - kialis
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - rbac.maistra.io
+            - maistra.io
           resources:
-          - '*'
+            - '*'
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - route.openshift.io
+            - authentication.maistra.io
           resources:
-          - routes
-          - routes/custom-host
+            - '*'
           verbs:
-          - '*'
+            - '*'
         - apiGroups:
-          - authorization.k8s.io
+            - rbac.maistra.io
           resources:
-          - subjectaccessreviews
+            - '*'
           verbs:
-          - create
+            - '*'
         - apiGroups:
-          - network.openshift.io
+            - route.openshift.io
           resources:
-          - clusternetworks
+            - routes
+            - routes/custom-host
           verbs:
-          - get
+            - '*'
+        # required by smmr controller
         - apiGroups:
-          - config.openshift.io
+            - authorization.k8s.io
           resources:
-          - networks
+            - subjectaccessreviews
           verbs:
-          - get
+            - create
         - apiGroups:
-          - network.openshift.io
+            - network.openshift.io
           resources:
-          - netnamespaces
+            - clusternetworks
           verbs:
-          - get
-          - list
-          - watch
-          - update
+            - get
+            - list
+            - watch
         - apiGroups:
-          - k8s.cni.cncf.io
+            - config.openshift.io
           resources:
-          - network-attachment-definitions
+            - networks
           verbs:
-          - create
-          - delete
-          - get
-          - list
-          - patch
-          - watch
+            - get
+            - list
+            - watch
         - apiGroups:
-          - security.openshift.io
+            - image.openshift.io
           resources:
-          - securitycontextconstraints
+            - imagestreams
+          verbs:
+            - get
+            - list
+            - watch
+        - apiGroups:
+            - network.openshift.io
+          resources:
+            - netnamespaces
+          verbs:
+            - get
+            - list
+            - watch
+            - update
+        - apiGroups:
+            - k8s.cni.cncf.io
+          resources:
+            - network-attachment-definitions
+          verbs:
+            - create
+            - delete
+            - get
+            - list
+            - patch
+            - watch
+        # required by cni daemonset
+        - apiGroups:
+            - security.openshift.io
+          resources:
+            - securitycontextconstraints
           resourceNames:
-          - privileged
+            - privileged
           verbs:
-          - use
+            - use
+        # required by pod locality controller
         - apiGroups:
-          - ''
+            - ""
           resources:
-          - nodes
-          - nodes/proxy
+            - nodes
+            - nodes/proxy
           verbs:
-          - get
-          - list
-          - watch
-        - apiGroups:
-          - authentication.k8s.io
+            - get
+            - list
+            - watch
+        - apiGroups: # might be required by citadel
+            - authentication.k8s.io
           resources:
-          - tokenreviews
+            - tokenreviews
           verbs:
-          - create
+            - create
         - nonResourceURLs:
-          - /metrics
+            - /metrics
           verbs:
-          - get
+            - get
       deployments:
       - name: istio-operator
         spec:
@@ -445,114 +481,173 @@ spec:
             metadata:
               labels:
                 name: istio-operator
+              annotations:
+                olm.relatedImage.v2_1.3scale-istio-adapter: quay.io/3scale/3scale-istio-adapter:v2.0.0
+                olm.relatedImage.v2_1.cni: quay.io/maistra/istio-cni-ubi8:2.1.0
+                olm.relatedImage.v2_1.grafana: quay.io/maistra/grafana-ubi8:2.1.0
+                olm.relatedImage.v2_1.pilot: quay.io/maistra/pilot-ubi8:2.1.0
+                olm.relatedImage.v2_1.prometheus: quay.io/maistra/prometheus-ubi8:2.1.0
+                olm.relatedImage.v2_1.proxyv2: quay.io/maistra/proxyv2-ubi8:2.1.0
+                olm.relatedImage.v2_1.wasm-cacher: quay.io/maistra/pilot-ubi8:2.1.0
+                olm.relatedImage.v2_1.rls: quay.io/maistra/ratelimit-ubi8:2.1.0
             spec:
               serviceAccountName: istio-operator
               containers:
-              - name: istio-operator
-                image: maistra/istio-ubi8-operator:1.1.0
-                ports:
-                - containerPort: 11999
-                  name: validation
-                - containerPort: 60000
-                  name: metrics
-                command:
-                - istio-operator
-                imagePullPolicy: Always
-                env:
-                - name: WATCH_NAMESPACE
-                  value: ''
-                - name: POD_NAME
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: metadata.name
-                - name: OPERATOR_NAME
-                  value: istio-operator
-                - name: ISTIO_CNI_IMAGE_V1_0
-                  value: maistra/istio-cni-ubi8:1.0.8
-                - name: ISTIO_CNI_IMAGE_V1_1
-                  value: maistra/istio-cni-ubi8:1.1.0
+                - name: istio-operator
+                  image: quay.io/maistra/istio-ubi8-operator:2.1.0
+                  ports:
+                    - containerPort: 11999
+                      name: validation
+                    - containerPort: 60000
+                      name: metrics
+                  command:
+                    - istio-operator
+                    - --config
+                    - /etc/operator/olm/config.properties
+                  imagePullPolicy: Always
+                  env:
+                    - name: WATCH_NAMESPACE
+                      value: ""
+                    - name: POD_NAME
+                      valueFrom:
+                        fieldRef:
+                          fieldPath: metadata.name
+                    - name: OPERATOR_NAME
+                      value: istio-operator
+                      #        - name: ISTIO_CNI_IMAGE_PULL_SECRET
+                      #          value: name-of-secret
+                  volumeMounts:
+                    - name: operator-olm-config
+                      mountPath: /etc/operator/olm
+                      readOnly: true
+                    - name: webhook-tls-volume
+                      readOnly: true
+                      mountPath: /tmp/k8s-webhook-server/serving-certs
+                    - name: smcp-templates
+                      readOnly: true
+                      mountPath: /usr/local/share/istio-operator/templates/
+              volumes:
+                - name: operator-olm-config
+                  downwardAPI:
+                    defaultMode: 420
+                    items:
+                      - fieldRef:
+                          fieldPath: metadata.annotations
+                        path: config.properties
+                - name: webhook-tls-volume
+                  secret:
+                    secretName: maistra-operator-serving-cert
+                    optional: true # this won't be available until service-ca creates the secret
+                - name: smcp-templates
+                  configMap:
+                    name: smcp-templates
+                    optional: true
   customresourcedefinitions:
     owned:
     - name: servicemeshcontrolplanes.maistra.io
-      version: v1
+      version: v2
       kind: ServiceMeshControlPlane
       displayName: Istio Service Mesh Control Plane
       description: An Istio control plane installation
       specDescriptors:
-      - description: Specify the version of control control plane you want to install
-        displayName: Control Plane Version
+      - displayName: Control Plane Version
+        description: Specify the version of the control plane you want to install
         path: version
         x-descriptors:
           - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:General'
-          - 'urn:alm:descriptor:com.tectonic.ui:select:v1.1'
-          - 'urn:alm:descriptor:com.tectonic.ui:select:v1.0'
-      - description: Enable mTLS for communication between control plane components (galley, pilot, etc.)
-        displayName: Control Plane Security
-        path: istio.global.controlPlaneSecurityEnabled
+          - 'urn:alm:descriptor:com.tectonic.ui:select:v2.1'
+      - displayName: Control Plane Security
+        description: Enable mTLS for communication between control plane components
+        path: security.controlPlane.mtls
         x-descriptors:
           - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:General'
           - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
-      - description: Enable mTLS for communcation between services in the mesh
-        displayName: Data Plane Security
-        path: istio.global.mtls.enabled
+      - displayName: Install Prometheus
+        description: Set to true to install Prometheus
+        path: addons.prometheus.enabled
+        x-descriptors:
+        - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:metrics'
+        - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
+      - displayName: Data Plane Security
+        description: Enable mTLS for communcation between services in the mesh
+        path: security.dataPlane.mtls
         x-descriptors:
           - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:General'
           - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
-      - description: Set to true to install Kiali
-        displayName: Install Kiali
-        path: istio.kiali.enabled
+      - displayName: Install Kiali
+        description: Set to true to install Kiali
+        path: addons.kiali.enabled
         x-descriptors:
           - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:visualization'
           - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
-      - description: Set to true to install Grafana
-        displayName: Install Grafana
-        path: istio.grafana.enabled
+      - displayName: Install Grafana
+        description: Set to true to install Grafana
+        path: addons.grafana.enabled
         x-descriptors:
           - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:visualization'
           - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
-      - description: Set to false to disable tracing
-        displayName: Install Jaeger
-        path: istio.tracing.enabled
+      - displayName: Tracing provider
+        description: Select the provider to use for tracing
+        path: tracing.type
         x-descriptors:
           - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:tracing'
-          - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
-      - description: Set template to use when installing Jaeger
-        displayName: Jaeger template
-        path: istio.tracing.jaeger.template
+          - 'urn:alm:descriptor:com.tectonic.ui:select:None'
+          - 'urn:alm:descriptor:com.tectonic.ui:select:Jaeger'
+          - 'urn:alm:descriptor:com.tectonic.ui:select:Stackdriver'
+      - displayName: Jaeger Storage Type
+        description: Set storage type for Jaeger (applies only when Jaeger is selected as the tracing provider)
+        path: addons.jaeger.install.storage.type
         x-descriptors:
           - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:tracing'
-          - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:istio.tracing.enabled:true'
-          - 'urn:alm:descriptor:com.tectonic.ui:select:all-in-one'
-          - 'urn:alm:descriptor:com.tectonic.ui:select:production-elasticsearch'
-      - description: Set to true to install the Istio 3Scale adapter
-        displayName: Install 3Scale Adapter
-        path: threeScale.enabled
+          - 'urn:alm:descriptor:com.tectonic.ui:select:Memory'
+          - 'urn:alm:descriptor:com.tectonic.ui:select:Elasticsearch'
+      - displayName: Type of Policy
+        description: Select "Mixer" when deploying a control plane version less than "v2.0" or when planning to install 3scale adapter
+        path: policy.type
         x-descriptors:
-          - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:API_Management'
+          - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:Policy'
+          - 'urn:alm:descriptor:com.tectonic.ui:select:Istiod'
+          - 'urn:alm:descriptor:com.tectonic.ui:select:Mixer'
+      - displayName: Install 3Scale Adapter
+        description: Set to true to install the Istio 3Scale adapter (applies only when Policy type is set to Mixer)
+        path: addons.3scale.enabled
+        x-descriptors:
+          - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:Policy'
           - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
-          - 'urn:alm:descriptor:com.tectonic.ui:advanced'
-      - description: Limits describes the minimum/maximum amount of compute resources required/allowed
-        displayName: Default Resource Requirements
-        path: istio.global.defaultResources
+      - displayName: Type of Telemetry
+        description: Select "Mixer" when deploying a control plane version less than "v2.0"
+        path: telemetry.type
         x-descriptors:
-          - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:Resource_Requirements'
+          - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:Telemetry'
+          - 'urn:alm:descriptor:com.tectonic.ui:select:Istiod'
+          - 'urn:alm:descriptor:com.tectonic.ui:select:Mixer'
+      - displayName: Default Resource Requirements
+        description: Set the default compute resource requests and limits for control plane components
+        path: runtime.defaults.container.resources
+        x-descriptors:
           - 'urn:alm:descriptor:com.tectonic.ui:resourceRequirements'
           - 'urn:alm:descriptor:com.tectonic.ui:advanced'
+      statusDescriptors:
+        - displayName: Components
+          description: Status of components deployed by this ServiceMeshControlPlane resource
+          path: readiness.components
+          x-descriptors:
+            - "urn:alm:descriptor:com.tectonic.ui:podStatuses"
     - name: servicemeshmembers.maistra.io
       version: v1
       kind: ServiceMeshMember
       displayName: Istio Service Mesh Member
       description: Marks the containing namespace as a member of the referenced Service Mesh
       specDescriptors:
-      - path: controlPlaneRef.namespace
+      - displayName: Namespace
         description: The namespace of the ServiceMeshControlPlane to which this namespace belongs
-        displayName: Namespace
+        path: controlPlaneRef.namespace
         x-descriptors:
           - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:Service_Mesh_Control_Plane'
-          - 'urn:alm:descriptor:io.kubernetes:Namespace'
-      - path: controlPlaneRef.name
+          - 'urn:alm:descriptor:io.kubernetes:Project'
+      - displayName: Name
         description: The name of the ServiceMeshControlPlane to which this namespace belongs
-        displayName: Name
+        path: controlPlaneRef.name
         x-descriptors:
           - 'urn:alm:descriptor:com.tectonic.ui:fieldGroup:Service_Mesh_Control_Plane'
           - 'urn:alm:descriptor:com.tectonic.ui:text'

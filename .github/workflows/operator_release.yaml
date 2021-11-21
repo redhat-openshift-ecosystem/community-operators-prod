@@ -29,7 +29,7 @@ env:
   OPP_ANSIBLE_PULL_REPO: "https://github.com/redhat-openshift-ecosystem/operator-test-playbooks"
   OPP_ANSIBLE_PULL_BRANCH: "upstream-community"
   OPP_PROD: 1
-  OPP_MIRROR_LATEST_TAG: ""
+  OPP_MIRROR_LATEST_TAG: "v4.6"
   OPP_PRODUCTION_TYPE: "ocp"
   OPP_RELEASE_BUNDLE_REGISTRY: "quay.io"
   OPP_RELEASE_BUNDLE_ORGANIZATION: "openshift-community-operators"
@@ -43,7 +43,7 @@ env:
   OPP_MIRROR_INDEX_MULTIARCH_BASE: "registry.redhat.io/openshift4/ose-operator-registry"
   OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9"
   OPP_MIRROR_INDEX_MULTIARCH_POSTFIX: "s"
-  IIB_INPUT_REGISTRY_USER: "jbreza@redhat.com"
+  IIB_INPUT_REGISTRY_USER: "mavala"
   OPP_REGISTRY_MIRROR_USER: "redhat+iib_community"
   OPP_THIS_REPO_BASE: "https://github.com"
   OPP_THIS_REPO: "redhat-openshift-ecosystem/community-operators-prod"
@@ -349,6 +349,7 @@ jobs:
           echo "::set-output name=operator_index::${OPERATOR_INDEX}"
       - name: Initialize sign process
         uses: operator-framework/community-operators@webhook
+        continue-on-error: true
         env:
           INDEX_SHA: "${{ steps.openshift-vars.outputs.index_sha }}"
           webhook_type: 'json-extended'

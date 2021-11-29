@@ -4,7 +4,7 @@ metadata:
   name: openebsoperator.v2.10.0
   namespace: default
   annotations:
-    olm.properties: '[{"type": "olm.maxOpenShiftVersion", "value": "4.5"}]'
+    olm.properties: '[{"type": "olm.maxOpenShiftVersion", "value": "4.8"}]'
     capabilities: Basic Install
     categories: "Storage"
     containerImage: index.docker.io/openebs/helm-operator:v0.0.6
@@ -468,13 +468,13 @@ spec:
             version: v1
           - kind: ClusterRole
             name: ''
-            version: rbac.authorization.k8s.io/v1beta1
+            version: rbac.authorization.k8s.io/v1
           - kind: ClusterRoleBinding
             name: ''
-            version: rbac.authorization.k8s.io/v1beta1
+            version: rbac.authorization.k8s.io/v1
           - kind: Deployment
             name: ''
-            version: apps/v1beta1
+            version: apps/v1
           - kind: Service
             name: ''
             version: v1
@@ -483,13 +483,13 @@ spec:
             version: v1
           - kind: DaemonSet
             name: ''
-            version: extensions/v1beta1
+            version: apps/v1
           - kind: Secret
             name: ''
             version: v1
           - kind: ValidatingWebhookConfiguration
             name: ''
-            version: admissionregistration.k8s.io/v1beta1
+            version: admissionregistration.k8s.io/v1
         specDescriptors:
           - description: Image pull policy
             displayName: Image

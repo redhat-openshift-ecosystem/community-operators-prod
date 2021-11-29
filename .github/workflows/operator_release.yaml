@@ -11,7 +11,7 @@ on:
       release:
         description: 'Force to run release'
         required: true
-        default: '0'
+        default: '0'   
       delete:
         description: 'Delete operator (cockroachdb or cockroachdb/5.0.4) for debuging only'
         required: false
@@ -26,6 +26,8 @@ env:
   OPP_SCRIPT_CLEANUP_URL: "https://raw.githubusercontent.com/redhat-openshift-ecosystem/community-operators-pipeline/ci/latest/ci/scripts/opp-disk-cleanup-on-startup.sh"
   OPP_SCRIPT_TRIGGER_OHIO_URL: "https://raw.githubusercontent.com/redhat-openshift-ecosystem/community-operators-pipeline/ci/latest/ci/scripts/opp-trigger-operatorhubio-ci.sh"
   OPP_IMAGE: "quay.io/operator_testing/operator-test-playbooks:latest"
+  OPP_ANSIBLE_PULL_REPO: "https://github.com/redhat-openshift-ecosystem/operator-test-playbooks"
+  OPP_ANSIBLE_PULL_BRANCH: "upstream-community"
   OPP_PROD: 1
   OPP_MIRROR_LATEST_TAG: "v4.6"
   OPP_PRODUCTION_TYPE: "ocp"
@@ -37,11 +39,11 @@ env:
   OPP_MIRROR_INDEX_REGISTRY: "quay.io"
   OPP_MIRROR_INDEX_ORGANIZATION: "redhat"
   OPP_MIRROR_INDEX_NAME: "redhat----community-operator-index"
-  # OPP_MIRROR_INDEX_ENABLED: "1"
+  OPP_MIRROR_INDEX_ENABLED: "1"
   OPP_MIRROR_INDEX_MULTIARCH_BASE: "registry.redhat.io/openshift4/ose-operator-registry"
-  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7"
+  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9"
   OPP_MIRROR_INDEX_MULTIARCH_POSTFIX: "s"
-  IIB_INPUT_REGISTRY_USER: "jbreza@redhat.com"
+  IIB_INPUT_REGISTRY_USER: "mavala"
   OPP_REGISTRY_MIRROR_USER: "redhat+iib_community"
   OPP_THIS_REPO_BASE: "https://github.com"
   OPP_THIS_REPO: "redhat-openshift-ecosystem/community-operators-prod"
@@ -98,6 +100,7 @@ jobs:
           echo "OPP_LABELS=$OPP_LABELS"
           echo "Using script '$OPP_SCRIPT_ENV_URL' ..."
           bash <(curl -sL $OPP_SCRIPT_ENV_URL)
+
     outputs:
       opp_labels: "${{ steps.prinfo.outputs.labels }}"
       opp_test_ready: "${{ steps.op-traffic-light.outputs.opp_test_ready }}"
@@ -110,6 +113,7 @@ jobs:
       opp_op_delete: "${{ steps.op-traffic-light.outputs.opp_op_delete }}"
       opp_release_delete_appreg: "${{ steps.op-traffic-light.outputs.opp_release_delete_appreg }}"
       opp_pr_title: "${{ steps.op-traffic-light.outputs.opp_pr_title }}"
+      opp_auto_packagemanifest_cluster_version_label: "${{ steps.op-traffic-light.outputs.opp_auto_packagemanifest_cluster_version_label }}"
   remove-ocp:
     name: "Remove / ocp"
 
@@ -118,7 +122,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6', 'v4.7', 'v4.8']
+        index-tag: ['v4.6', 'v4.7', 'v4.8', 'v4.9']
 
       fail-fast: false
     steps:
@@ -126,6 +130,7 @@ jobs:
         if: needs.pr-check.outputs.opp_op_delete == '1' && needs.pr-check.outputs.opp_name != ''
         env:
           OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
+          OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
         run: |
           echo "OPP_LABELS=$OPP_LABELS"
@@ -135,6 +140,7 @@ jobs:
         if: needs.pr-check.outputs.opp_ci_yaml_only == '0' && needs.pr-check.outputs.opp_ver_overwrite == '1' && needs.pr-check.outputs.opp_name != '' && needs.pr-check.outputs.opp_version != ''
         env:
           OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
+          OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPP_IIB_INSTALL: 0
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
           OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
@@ -154,9 +160,10 @@ jobs:
         id: operators
         env:
           OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
+          OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPP_IIB_INSTALL: 0
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-          OPERATOR_INDEX_TAG: "orange_v4.6 orange_v4.7 orange_v4.8"
+          OPERATOR_INDEX_TAG: "orange_v4.6 orange_v4.7 orange_v4.8 orange_v4.9"
 
           OPP_INDEX_CHECK_ONLY: 1
         run: |
@@ -170,12 +177,41 @@ jobs:
           echo "Operators (v4.6) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_6 }}"
           echo "Operators (v4.7) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_7 }}"
           echo "Operators (v4.8) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_8 }}"
+          echo "Operators (v4.9) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_9 }}"
 
+      - name: Operator info
+        id: op-info
+        env:
+          OPP_FORCE_OPERATORS: ${{ steps.operators.outputs.opp_uncomplete_operators }}
+          OPP_AUTO_LABEL: 1
+          ANSIBLE_FORCE_COLOR: 1
+          ANSIBLE_DISPLAY_SKIPPED_HOSTS: 0
+          ANSIBLE_STDOUT_CALLBACK: "yaml"
+        run: |
+          # OPP_ANSIBLE_PULL_BRANCH="upstream-community-dev"
+          OPP_FORCE_OPERATORS=${OPP_FORCE_OPERATORS// /,}
+          echo $OPP_FORCE_OPERATORS
+          [ "$OPP_AUTO_LABEL" = '1' ] && ANSIBLE_ARGS="-e automatic_cluster_version_label=true" || ANSIBLE_ARGS="-e automatic_cluster_version_label=false"
+          ansible-pull -U $OPP_ANSIBLE_PULL_REPO -C $OPP_ANSIBLE_PULL_BRANCH -i localhost, -e run_upstream=true -e run_prepare_catalog_repo_upstream=true -e catalog_repo=$OPP_THIS_REPO_BASE/$OPP_THIS_REPO -e catalog_repo_branch=$OPP_THIS_BRANCH upstream/local.yml --tags reset_tools,operator_info -e operator_base_dir=/tmp/community-operators-for-catalog/operators -e operators=$OPP_FORCE_OPERATORS -e cluster_type=$OPP_PRODUCTION_TYPE -e strict_cluster_version_labels=true -e stream_kind=openshift_upstream -e production_registry_namespace=$OPP_RELEASE_BUNDLE_REGISTRY/$OPP_RELEASE_BUNDLE_ORGANIZATION $ANSIBLE_ARGS
+      - name: Upload operator_info
+        uses: actions/upload-artifact@v2
+        with:
+          name: operator_info
+          path: "/tmp/operator-test/op_info.yaml"
+      - name: Upload converted operators
+        uses: actions/upload-artifact@v2
+        with:
+          name: operators_converted
+          path: "/tmp/operator-test/operators"
+      - shell: bash
+        run: |
+          [ -f /tmp/operator-test/op_info.yaml ] && cat /tmp/operator-test/op_info.yaml || echo "::set-output name=opp_uncomplete_operators::"          
     outputs:
       opp_uncomplete_operators: "${{ steps.operators.outputs.opp_uncomplete_operators }}"
       opp_uncomplete_operators_v4_6: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_6 }}"
       opp_uncomplete_operators_v4_7: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_7 }}"
       opp_uncomplete_operators_v4_8: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_8 }}"
+      opp_uncomplete_operators_v4_9: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_9 }}"
 
   bundles-ocp:
     name: "Bundles / ocp"
@@ -184,9 +220,20 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+      - name: Download operator_info
+        uses: actions/download-artifact@v2
+        with:
+          name: operator_info
+          path: /tmp/operator-test/
+      - name: Download converted operators
+        uses: actions/download-artifact@v2
+        with:
+          name: operators_converted
+          path: /tmp/operator-test/operators
       - name: Build bundles
         env:
           OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
+          OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPP_IIB_INSTALL: 0
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
           OPERATOR_INDEX_TAG: latest
@@ -207,14 +254,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6', 'v4.7', 'v4.8']
+        index-tag: ['v4.6', 'v4.7', 'v4.8', 'v4.9']
 
       fail-fast: false
     steps:
+      - name: Download operator_info
+        uses: actions/download-artifact@v2
+        with:
+          name: operator_info
+          path: /tmp/operator-test/
+      - name: Download converted operators
+        uses: actions/download-artifact@v2
+        with:
+          name: operators_converted
+          path: /tmp/operator-test/operators
       - name: Index sync
         env:
           OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
+          OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPP_IIB_INSTALL: 0
+          OPP_MIRROR_INDEX_ENABLED: 0
           OPP_FORCE_INDEX_UPDATE: 1
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
           OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
@@ -223,6 +282,7 @@ jobs:
           OPP_FORCE_OPERATORS_v4_6: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_6 }}"
           OPP_FORCE_OPERATORS_v4_7: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_7 }}"
           OPP_FORCE_OPERATORS_v4_8: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_8 }}"
+          OPP_FORCE_OPERATORS_v4_9: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_9 }}"
 
         run: |
           echo "OPP_LABELS=$OPP_LABELS"
@@ -242,7 +302,7 @@ jobs:
       - name: Push to quay
         run: |
           echo "push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH"
-          bash <(curl -sL $OPP_SCRIPT_URL) push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH
+          bash <(curl -sL $OPP_SCRIPT_URL) push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH || true
 
   release-sha-ocp:
     name: "Index production / ocp"
@@ -252,10 +312,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6', 'v4.7', 'v4.8']
+        index-tag: ['v4.6', 'v4.7', 'v4.8', 'v4.9']
 
       fail-fast: false
     steps:
+      - name: Download operator_info
+        uses: actions/download-artifact@v2
+        with:
+          name: operator_info
+          path: /tmp/operator-test/
+      - name: Download converted operators
+        uses: actions/download-artifact@v2
+        with:
+          name: operators_converted
+          path: /tmp/operator-test/operators
       - name: Release sha
         env:
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
@@ -268,6 +338,7 @@ jobs:
         id: openshift-vars
         env:
           OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
+          OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
         run: |
           docker login ${OPP_MIRROR_INDEX_REGISTRY} -u $OPP_REGISTRY_MIRROR_USER -p $REGISTRY_MIRROR_PW
           OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} | jq -r ".Digest")
@@ -279,6 +350,7 @@ jobs:
           echo "::set-output name=operator_index::${OPERATOR_INDEX}"
       - name: Initialize sign process
         uses: operator-framework/community-operators@webhook
+        continue-on-error: true
         env:
           INDEX_SHA: "${{ steps.openshift-vars.outputs.index_sha }}"
           webhook_type: 'json-extended'

@@ -122,7 +122,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6', 'v4.7', 'v4.8', 'v4.9']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb']
 
       fail-fast: false
     steps:
@@ -146,8 +146,12 @@ jobs:
           OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
         run: |
           echo "OPP_LABELS=$OPP_LABELS"
+          FAKE_RC=false
+          FAKE_TYPE=$(echo $OPERATOR_INDEX_TAG | cut -d '-' -f 2)
+          [[ $FAKE_TYPE == *rc* ]] && FAKE_RC=true || true
+
           echo "op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH"
-          bash <(curl -sL $OPP_SCRIPT_URL) op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH
+          bash <(curl -sL $OPP_SCRIPT_URL) op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH || $FAKE_RC
 
   operators-ocp:
     name: "Index check / ocp"
@@ -163,7 +167,7 @@ jobs:
           OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPP_IIB_INSTALL: 0
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-          OPERATOR_INDEX_TAG: "orange_v4.6 orange_v4.7 orange_v4.8 orange_v4.9"
+          OPERATOR_INDEX_TAG: "orange_v4.6 orange_v4.7 orange_v4.8 orange_v4.9 orange_v4.10"
 
           OPP_INDEX_CHECK_ONLY: 1
         run: |
@@ -178,6 +182,7 @@ jobs:
           echo "Operators (v4.7) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_7 }}"
           echo "Operators (v4.8) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_8 }}"
           echo "Operators (v4.9) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_9 }}"
+          echo "Operators (v4.10) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"
 
       - name: Operator info
         id: op-info
@@ -212,6 +217,7 @@ jobs:
       opp_uncomplete_operators_v4_7: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_7 }}"
       opp_uncomplete_operators_v4_8: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_8 }}"
       opp_uncomplete_operators_v4_9: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_9 }}"
+      opp_uncomplete_operators_v4_10: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"
 
   bundles-ocp:
     name: "Bundles / ocp"
@@ -243,8 +249,11 @@ jobs:
         run: |
           echo "OPP_LABELS=$OPP_LABELS"
           echo "OPP_FORCE_OPERATORS=$OPP_FORCE_OPERATORS"
+          FAKE_RC=false
+          FAKE_TYPE=$(echo $OPERATOR_INDEX_TAG | cut -d '-' -f 2)
+          [[ $FAKE_TYPE == *rc* ]] && FAKE_RC=true || true
           echo "orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
-          bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH
+          bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH || $FAKE_RC
 
   release-ocp:
     name: "Index / ocp"
@@ -254,7 +263,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6', 'v4.7', 'v4.8', 'v4.9']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb']
 
       fail-fast: false
     steps:
@@ -283,11 +292,15 @@ jobs:
           OPP_FORCE_OPERATORS_v4_7: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_7 }}"
           OPP_FORCE_OPERATORS_v4_8: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_8 }}"
           OPP_FORCE_OPERATORS_v4_9: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_9 }}"
+          OPP_FORCE_OPERATORS_v4_10: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_10 }}"
 
         run: |
           echo "OPP_LABELS=$OPP_LABELS"
+          FAKE_RC=false
+          FAKE_TYPE=$(echo $OPERATOR_INDEX_TAG | cut -d '-' -f 2)
+          [[ $FAKE_TYPE == *rc* ]] && FAKE_RC=true || true
           echo "orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
-          bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH
+          bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH || $FAKE_RC
 
   push-to-quay-ocp:
     name: "Push to quay / ocp"
@@ -312,7 +325,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6', 'v4.7', 'v4.8', 'v4.9']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb']
 
       fail-fast: false
     steps:
@@ -328,11 +341,16 @@ jobs:
           path: /tmp/operator-test/operators
       - name: Release sha
         env:
+          OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
           IIB_OUTPUT_REGISTRY_TOKEN: ${{ secrets.IIB_OUTPUT_REGISTRY_TOKEN }}
         run: |
-          echo "openshift: ${{ matrix.index-tag }}"
-          bash <(curl -sL $OPP_SCRIPT_ISS_URL) openshift ${{ matrix.index-tag }}
+          FAKE_RC=false
+          FAKE_TYPE=$(echo $OPERATOR_INDEX_TAG | cut -d '-' -f 2)
+          [[ $FAKE_TYPE == *rc* ]] && FAKE_RC=true || true
+
+          echo "openshift: $OPERATOR_INDEX_TAG"
+          bash <(curl -sL $OPP_SCRIPT_ISS_URL) openshift $OPERATOR_INDEX_TAG || $FAKE_RC
 
       - name: Prepare variables for the sign process
         id: openshift-vars

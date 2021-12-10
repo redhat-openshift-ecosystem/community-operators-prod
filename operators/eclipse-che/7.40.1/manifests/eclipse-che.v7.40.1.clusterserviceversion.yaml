@@ -59,9 +59,6 @@ metadata:
               "chePostgresUser": "",
               "externalDb": false
             },
-            "devWorkspace": {
-              "enable": true
-            },
             "metrics": {
               "enable": true
             },
@@ -116,17 +113,17 @@ metadata:
     categories: Developer Tools
     certified: "false"
     containerImage: quay.io/eclipse/che-operator@sha256:7396450a283682b2703ee6fb512a105890abe18bc5379360b544cbddde5801ea
-    createdAt: "2021-12-08T18:53:14Z"
+    createdAt: "2021-12-08T18:58:48Z"
     description: A Kube-native development solution that delivers portable and collaborative
       developer workspaces.
-    operatorframework.io/suggested-namespace: openshift-operators
+    operatorframework.io/suggested-namespace: eclipse-che
     operators.openshift.io/infrastructure-features: '["disconnected", "proxy-aware",
       "fips"]'
     operators.operatorframework.io/builder: operator-sdk-v1.6.1+git
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/eclipse-che/che-operator
     support: Eclipse Foundation
-  name: eclipse-che.v7.40.1-all-namespaces
+  name: eclipse-che.v7.40.1
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -245,6 +242,9 @@ spec:
               used by the Che installation.
             displayName: Persistent storage
             path: storage
+          - path: devWorkspace
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:hidden
         statusDescriptors:
           - description: Status of a Che installation. Can be `Available`, `Unavailable`,
               or `Available, Rolling Update in Progress`.
@@ -1164,7 +1164,7 @@ spec:
                       - name: MAX_CONCURRENT_RECONCILES
                         value: "1"
                       - name: ALLOW_DEVWORKSPACE_ENGINE
-                        value: "true"
+                        value: "false"
                       - name: ADD_COMPONENT_READINESS_INIT_CONTAINERS
                         value: "false"
                       - name: RELATED_IMAGE_che_plugin_sidecar_plugin_registry_image_IBZWQYJSGU3DUNDCMNSTEZJTHFTGKZJWMI4WKNDBHBRDIZJYGY4DCMZYGBRWKMRUGYZDMNZUGU4TOYJUHBRDQMLDGEZTCY3CMJTDANJVMRSDKZBQMMZQ____
@@ -1538,13 +1538,13 @@ spec:
           serviceAccountName: che-operator
     strategy: deployment
   installModes:
-    - supported: false
-      type: OwnNamespace
-    - supported: false
-      type: SingleNamespace
-    - supported: false
-      type: MultiNamespace
     - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: false
       type: AllNamespaces
   keywords:
     - eclipse che
@@ -1566,8 +1566,8 @@ spec:
   maturity: stable
   provider:
     name: Eclipse Foundation
-  replaces: eclipse-che.v7.39.2-all-namespaces
-  version: 7.40.1-all-namespaces
+  replaces: eclipse-che.v7.39.2
+  version: 7.40.1
   relatedImages:
     - name: che-operator-7.40.1
       image: quay.io/eclipse/che-operator@sha256:7396450a283682b2703ee6fb512a105890abe18bc5379360b544cbddde5801ea

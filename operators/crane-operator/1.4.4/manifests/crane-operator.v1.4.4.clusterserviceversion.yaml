@@ -17,7 +17,7 @@ metadata:
     capabilities: Seamless Upgrades
     description: Facilitates migration of container workloads from OpenShift 3.x to OpenShift 4.x
     categories: 'OpenShift Optional'
-    containerImage: quay.io/konveyor/mig-operator-container:latest
+    containerImage: quay.io/konveyor/mig-operator-container:release-1.4.4
     createdAt: 2019-07-25T10:21:00Z
     repository: https://github.com/konveyor/mig-operator
     alm-examples: |-
@@ -252,29 +252,29 @@ spec:
   - crane-operator.v1.2.0
   relatedImages:
   - name: controller
-    image: quay.io/konveyor/mig-controller:latest
+    image: quay.io/konveyor/mig-controller:release-1.4.4
   - name: ui
-    image: quay.io/konveyor/mig-ui:latest
+    image: quay.io/konveyor/mig-ui:release-1.4.4
   - name: velero
-    image: quay.io/konveyor/velero:latest
+    image: quay.io/konveyor/velero:release-1.4.4
   - name: velero_restic_restore_helper
-    image: quay.io/konveyor/velero-restic-restore-helper:latest
+    image: quay.io/konveyor/velero-restic-restore-helper:release-1.4.4
   - name: migration_plugin
-    image: quay.io/konveyor/openshift-velero-plugin:latest
+    image: quay.io/konveyor/openshift-velero-plugin:release-1.4.4
   - name: aws_plugin
-    image: quay.io/konveyor/velero-plugin-for-aws:latest
+    image: quay.io/konveyor/velero-plugin-for-aws:release-1.4.4
   - name: azure_plugin
-    image: quay.io/konveyor/velero-plugin-for-microsoft-azure:latest
+    image: quay.io/konveyor/velero-plugin-for-microsoft-azure:release-1.4.4
   - name: gcp_plugin
-    image: quay.io/konveyor/velero-plugin-for-gcp:latest
+    image: quay.io/konveyor/velero-plugin-for-gcp:release-1.4.4
   - name: registry
-    image: quay.io/konveyor/registry:latest
+    image: quay.io/konveyor/registry:release-1.4.4
   - name: hook_runner
-    image: quay.io/konveyor/hook-runner:latest
+    image: quay.io/konveyor/hook-runner:release-1.4.4
   - name: mig_log_reader
-    image: quay.io/konveyor/mig-log-reader:latest
+    image: quay.io/konveyor/mig-log-reader:release-1.4.4
   - name: rsync_transfer
-    image: quay.io/konveyor/rsync-transfer:latest
+    image: quay.io/konveyor/rsync-transfer:release-1.4.4
   displayName: Crane Operator
   description: |
     The Crane Operator enables installation of the application migration tool components.
@@ -801,7 +801,7 @@ spec:
               serviceAccount: migration-operator
               containers:
               - name: operator
-                image: quay.io/konveyor/mig-operator-container:latest
+                image: quay.io/konveyor/mig-operator-container:release-1.4.4
                 imagePullPolicy: Always
                 volumeMounts:
                 - mountPath: /tmp/ansible-operator/runner

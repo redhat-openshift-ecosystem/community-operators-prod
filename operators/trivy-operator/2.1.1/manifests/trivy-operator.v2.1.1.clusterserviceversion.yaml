@@ -206,6 +206,17 @@ spec:
           - watch
           - list
         - apiGroups:
+          - "admissionregistration.k8s.io"
+          resources:
+          - mutatingwebhookconfigurations
+          - validatingwebhookconfigurations
+          verbs:
+          - create
+          - patch
+          - get
+          - watch
+          - list
+        - apiGroups:
           - security.openshift.io
           resources:
           - securitycontextconstraints

@@ -30,7 +30,7 @@ metadata:
           }
         }
       ]
-  name: trivy-operator.v2.1.0
+  name: trivy-operator.v2.1.1
   namespace: trivy-operator
 spec:
   customresourcedefinitions:
@@ -157,7 +157,7 @@ spec:
   provider:
     name: devopstales
     url: devopstales.github.io
-  version: 2.1.0
+  version: 2.1.1
   installModes:
   - supported: true
     type: OwnNamespace
@@ -205,6 +205,14 @@ spec:
           - get
           - watch
           - list
+        - apiGroups:
+          - security.openshift.io
+          resources:
+          - securitycontextconstraints
+          resourceNames:
+          - anyuid
+          verbs:
+          - use
         serviceAccountName: trivy-operator
       services:
       - name: trivy-operator

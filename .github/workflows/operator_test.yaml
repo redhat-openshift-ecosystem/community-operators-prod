@@ -24,7 +24,7 @@ env:
   OPP_RELEASE_BUNDLE_ORGANIZATION: "openshift-community-operators"
   OPP_RELEASE_INDEX_REGISTRY: "quay.io"
   OPP_RELEASE_INDEX_ORGANIZATION: "openshift-community-operators"
-  OPP_RELEASE_INDEX_NAME: "catalog"
+  OPP_RELEASE_INDEX_NAME: "catalog_tmp"
   OPP_MIRROR_INDEX_MULTIARCH_BASE: "registry.redhat.io/openshift4/ose-operator-registry"
   OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9"
   OPP_MIRROR_INDEX_MULTIARCH_POSTFIX: "s"
@@ -209,7 +209,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6', 'v4.7', 'v4.8', 'v4.9']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb']
 
       fail-fast: false
     steps:
@@ -250,7 +250,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6', 'v4.7', 'v4.8', 'v4.9']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb']
 
       fail-fast: false
     steps:

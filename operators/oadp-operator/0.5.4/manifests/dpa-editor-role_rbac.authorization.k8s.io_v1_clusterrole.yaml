@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: dpa-editor-role
+rules:
+- apiGroups:
+  - oadp.openshift.io
+  resources:
+  - dataprotectionapplications
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - oadp.openshift.io
+  resources:
+  - dataprotectionapplications/status
+  verbs:
+  - get

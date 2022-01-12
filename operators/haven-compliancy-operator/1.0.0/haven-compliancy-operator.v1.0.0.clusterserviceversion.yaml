@@ -1,0 +1,221 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  name: haven-compliancy-operator.v1.0.0
+  namespace: placeholder
+  annotations:
+    alm-examples: '[{"apiVersion":"","kind":"","metadata":{"name":""},"spec":{}}]'
+    k8sMaxVersion: ''
+    categories: 'Monitoring, Security'
+    certified: 'false'
+    createdAt: ''
+    description: Scan a cluster for Haven Compliancy.
+    containerImage: ''
+    support: ''
+    capabilities: Basic Install
+    repository: ''
+spec:
+  displayName: Haven Compliancy Checker Dashboard
+  description: >+
+    ## Haven Compliancy Checker
+
+    The Haven Compliancy Checker will check a cluster agains the Haven Standard.
+    Currently Haven will run 15 checks to validate a cluster.
+
+    ## The Dashboard
+
+    This operator adds a dashboard to the cluster that will start a new check
+    and display the results.
+
+    The dashboard has been build for **OpenShift** clusters.
+
+  maturity: alpha
+  version: 1.0.0
+  replaces: ''
+  skips: []
+  minKubeVersion: 1.16.0
+  keywords:
+    - Haven
+    - Compliancy
+    - Check
+    - VNG
+    - CommonGround
+  maintainers:
+    - name: Jolle
+      email: jolle.snaas@hcs-company.com
+  provider:
+    name: HCS Company
+  labels: {}
+  selector:
+    matchLabels: {}
+  links:
+    - name: GitLab
+      url: 'https://gitlab.com/hcs-company/haven-compliancy-dashboard'
+    - name: Haven
+      url: 'https://haven.commonground.nl/techniek/checks'
+  icon:
+    - base64data: >-
+        iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAADXklEQVRYhc2XQUhVQRSGv3e1NEqKwoKoRQXRskVQlIvUoNwY6CKqjWBtpZUEkSAFRe1Cwo1EQS0kd1Y7wcRWSdQmLEI3LSooKS3TVy8m/nmejvfeZ7TpwDDz5pz//8+dOzPnPviPrUqtACRmXMkKik3MOLQVW/IP/n/BLgs4DvQB94EB4CxQl0MU5+oUOyBsn7h8XCbBdmAUKKW0aaAphSiOmxSThh0Vd2oSBfWbgFcCLADfNV4E5g1ZgyGKZA3GPy9MSRwLGr+ShtX8bZGkX4HfDNknRxz6F25jVWnOxnhs5Ox3msRM6h1gDjgN1AL7gUmzMqFvMQm0ON+kMLXimHNJ1VvtRD8OO5JrLtNWs6Shv2ASuOB8rQ57zXEftv4k4ym6NL9W/T7nv2QSuOR8+xy2K2P1EvsK9mjj/FDQM2CDEbnlnrLT+DqdL8RG2yCukrgXpWW1y/bEEb0GbgBjhiD0X4AtSzC2AZ/lK6ofE/a14wwayyxR35yy40tm+ewKXRYmnoaL5sjGpU7janaaZYsTZxw4CsYWz3doV/jT+itgzzitZRbfSThCQ8AHZT8LPASGTRLFjCROAI/1SubFMSROq5FpiRmvB3a5933PvBKfhMVuFnZ9BneuVQOrUuai3c1Jojql/K5y+FyrcuN1QE1KXFoSV42/RljPl2uJ+lC1rgMTwFvgJXAbOJCTRNxwN1WCJ4WdEFdmJcQ5jrma4Nt50pP4kbLrbfskbqtVtjix1xyzbzlnOXxwWLtjkiiaS8dXwkVpWM0/jsYjJzYDPACm3F3+DtjIktXrdrQ34ZSwM47zkdMkDnYo6Kch2C3fGnMHxKc7ZRI46RIcFgZxxAf4KY0dVjvRj6OOpFvzoaYHO+j8vSaBXuc76LDdzh+0ytqJfhxxQT2aX62+0a1A9KOx9TU6bI/jDlpl7YKpaLNm47wHDsm3FRh3Iu0mgXbnGxcGcbw3vLPSSt0Hg27Xhg313GykKDBtPjbQeNrFzAhbdJyDXty+hp3AR7NrI9gfy7aUr+K2jNiiOQEfpWE1yxYnwufUm4zL5CvQ4eLtuEMxadg35lOt4m1YB5zTcXoKjKjYhOqWVVLj3C7Fjgg7LK68f1WkJRHNF5C8glIpdsXlOP6rtU/6t/+O87jK9gtgpJbVetITwAAAAABJRU5ErkJggg==
+      mediatype: image/png
+  customresourcedefinitions:
+    owned: []
+    required: []
+  install:
+    strategy: deployment
+    spec:
+      permissions:
+        - serviceAccountName: haven-operator
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - namespaces
+              verbs:
+                - get
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - '*'
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+            - apiGroups:
+                - charts.jolle.dev
+              resources:
+                - havens
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - clusterrolebindings
+              verbs:
+                - '*'
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+                - services
+              verbs:
+                - '*'
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - '*'
+            - apiGroups:
+                - route.openshift.io
+              resources:
+                - routes
+              verbs:
+                - '*'
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+        - serviceAccountName: haven-operator
+      deployments:
+        - name: haven-dashboard
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: haven-dashboard
+            template:
+              metadata:
+                labels:
+                  app: haven-dashboard
+              spec:
+                serviceAccountName: haven-operator
+                volumes:
+                  - name: proxy-tls
+                    secret:
+                      secretName: proxy-tls
+                containers:
+                  - name: oauth-proxy
+                    image: 'docker.io/openshift/oauth-proxy:latest'
+                    imagePullPolicy: IfNotPresent
+                    ports:
+                      - containerPort: 8443
+                        name: public
+                    args:
+                      - '--https-address=:8443'
+                      - '--provider=openshift'
+                      - '--openshift-service-account=haven-operator'
+                      - '--upstream=http://localhost:8442'
+                      - '--tls-cert=/etc/tls/private/tls.crt'
+                      - '--tls-key=/etc/tls/private/tls.key'
+                      - '--cookie-secret=xnTArXKttlwktkp_hpIKiQ=='
+                    volumeMounts:
+                      - mountPath: /etc/tls/private
+                        name: proxy-tls
+                  - name: app
+                    image: 'docker.io/j0113/haven-compliancy-dashboard:1.3'
+                    imagePullPolicy: IfNotPresent
+  installModes:
+    - type: OwnNamespace
+      supported: true
+    - type: SingleNamespace
+      supported: true
+    - type: MultiNamespace
+      supported: false
+    - type: AllNamespaces
+      supported: false

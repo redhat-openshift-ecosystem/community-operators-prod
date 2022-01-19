@@ -27,7 +27,7 @@ metadata:
           }
         }
       ]
-    capabilities: Basic install
+    capabilities: Basic Install
     categories: Integration & Delivery,OpenShift Optional
     containerImage: quay.io/openshift/origin-cluster-nfd-operator:4.9
     description: "The NFD operator creates and maintains the Node Feature Discovery (NFD) on Kubernetes. It detects hardware features available on each  node in a Kubernetes cluster, and advertises those features using node labels.\n\nNFD consists of two software components:\n    \n## NFD-Master\n\nNFD-Master is the daemon responsible for communication towards the Kubernetes\nAPI. That is, it receives labeling requests from the worker and modifies node\nobjects accordingly.\n\n## NFD-Worker\n\nNFD-Worker is a daemon responsible for feature detection. It then communicates\nthe information to nfd-master which does the actual node labeling.  One\ninstance of nfd-worker is supposed to be running on each node of the cluster,\n\n### Feature discovery\n\nFeature discovery is divided into domain-specific feature sources:\n\n- CPU\n- IOMMU\n- Kernel\n- Memory\n- Network\n- PCI\n- Storage\n- System\n- USB\n- Custom (rule-based custom features)\n- Local (hooks for user-specific features)\n\nEach feature source is responsible for detecting a set of features which. in\nturn, are turned into node feature labels.  Feature labels are prefixed with\n`feature.node.kubernetes.io/` and also contain the name of the feature source.\nNon-standard user-specific feature labels can be created with the local and\ncustom feature sources.\n"

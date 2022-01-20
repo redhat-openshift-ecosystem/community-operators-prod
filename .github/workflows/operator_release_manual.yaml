@@ -1,9 +1,6 @@
-name: Operator release 
+name: Operator release manual for OCP
+
 on:
-  push:
-    branches:
-      - master
-      - main
 
   workflow_dispatch:
     inputs:
@@ -15,6 +12,23 @@ on:
         description: 'Delete operator virtually (cockroachdb or cockroachdb/5.0.4) for debuging only'
         required: false
         default: ''
+
+      delete_for_renew:
+        description: 'Remove operator from index before run'
+        required: true
+        default: '0'
+      index:
+        description: 'Target index (e.g. v4.10-db)'
+        required: true
+        default: 'v4.10-db'
+      list_of_operators:
+        description: 'List of operators to be recreated in the index, list has to be devided by spaces (e.g. aqua ripsaw)'
+        required: true
+        default: ''
+      mirror_index_to_final_location:
+        description: 'Recommended to disable mirror during a new manual index release to avoid production index overwrite with partial content'
+        required: true
+        default: '0'
 
 env:
   OPP_DEBUG: 1
@@ -121,12 +135,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.11-rc']
+
+        index-tag: ['${{ github.event.inputs.index }}']
 
       fail-fast: false
     steps:
       - name: Remove operator from index
-        if: needs.pr-check.outputs.opp_op_delete == '1' && needs.pr-check.outputs.opp_name != ''
+
+        if: github.event.inputs.list_of_operators !='' && github.event.inputs.delete_for_renew == '1'
 
         env:
           OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
@@ -134,9 +150,11 @@ jobs:
           OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
         run: |
 
+          for operator_to_delete in ${{ github.event.inputs.list_of_operators }}; do
           echo "OPP_LABELS=$OPP_LABELS"
-          echo "op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/dummy $OPP_THIS_REPO $OPP_THIS_BRANCH"
-          bash <(curl -sL $OPP_SCRIPT_URL) op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/dummy $OPP_THIS_REPO $OPP_THIS_BRANCH
+          echo "op_delete_${OPERATOR_INDEX_TAG} operators/$operator_to_delete/dummy $OPP_THIS_REPO $OPP_THIS_BRANCH"
+          bash <(curl -sL $OPP_SCRIPT_URL) op_delete_${OPERATOR_INDEX_TAG} operators/$operator_to_delete/dummy $OPP_THIS_REPO $OPP_THIS_BRANCH
+          done
 
       - name: Operator release (operator version overwrite)
         if: needs.pr-check.outputs.opp_ci_yaml_only == '0' && needs.pr-check.outputs.opp_ver_overwrite == '1' && needs.pr-check.outputs.opp_name != '' && needs.pr-check.outputs.opp_version != ''
@@ -173,10 +191,12 @@ jobs:
 
           OPP_INDEX_CHECK_ONLY: 1
         run: |
-
-          echo "OPP_LABELS=$OPP_LABELS"
-          echo "'$OPERATOR_INDEX_TAG' operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
-          bash <(curl -sL $OPP_SCRIPT_URL) "$OPERATOR_INDEX_TAG" operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH
+ 
+          TARGET_INDEX_RAW=${{ github.event.inputs.index }}
+          TARGET_INDEX_RAW=$(echo $TARGET_INDEX_RAW|cut -d '-' -f1)
+          TARGET_INDEX_UNDERLINE=$(echo $TARGET_INDEX_RAW|tr '.' '_') 
+          echo "::set-output name=opp_uncomplete_operators::${{ github.event.inputs.list_of_operators }}"
+          echo "::set-output name=opp_uncomplete_operators_$TARGET_INDEX_UNDERLINE::${{ github.event.inputs.list_of_operators }}"
 
       - name: Index check
         run: |
@@ -191,7 +211,7 @@ jobs:
         id: op-info
         env:
 
-          OPP_FORCE_OPERATORS: ${{ steps.operators.outputs.opp_uncomplete_operators }}
+          OPP_FORCE_OPERATORS: "${{ github.event.inputs.list_of_operators }}"
 
           OPP_AUTO_LABEL: 1
           ANSIBLE_FORCE_COLOR: 1
@@ -268,7 +288,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.11-rc']
+
+        index-tag: ['${{ github.event.inputs.index }}']
 
       fail-fast: false
     steps:
@@ -330,7 +351,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.11-rc']
+
+        index-tag: ['${{ github.event.inputs.index }}']
 
       fail-fast: false
     steps:

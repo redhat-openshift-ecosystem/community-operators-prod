@@ -34,10 +34,29 @@ spec:
           spec:
             description: StsConfigSpec defines the desired state of StsConfig
             properties:
+              aprLevel:
+                default: 0
+                maximum: 8
+                minimum: 0
+                type: integer
               domainNumber:
                 default: 24
+                description: PTP domain number
                 maximum: 48
                 minimum: 24
+                type: integer
+              esmcMode:
+                default: 2
+                description: "Configures the ESMC Mode \n 1 - Manual \n 2 - Auto (default)"
+                maximum: 2
+                minimum: 1
+                type: integer
+              forwardable:
+                default: 0
+                description: "Forwardable/Non-Forwardable Multicast Address \n 0 -
+                  Non-Forwardable (default) \n 1 - Forwardable"
+                maximum: 1
+                minimum: 0
                 type: integer
               interfaces:
                 items:
@@ -57,8 +76,21 @@ spec:
                       - Master
                       - Slave
                       type: string
+                    ql:
+                      default: 4
+                      description: "Configures QL value for the interface \n if syncOption
+                        is 1 (Europe) \n =========================== \n 1 - QL-PRC
+                        \n 2 - QL-PRTC \n 3 - QL-EEC1 \n 4 - QL-DNU (default) \n if
+                        syncOption is 2 (United States) \n ==================================
+                        \n 5 - QL-PRS \n 2 - QL-PRTC \n 6 - QL-EEC2 \n 7 - QL-DUS
+                        (default)"
+                      maximum: 7
+                      minimum: 1
+                      type: integer
                     qlEnable:
                       default: 0
+                      description: Configures QL enable for the interface 0 - Disable
+                        QL 1 - Enable QL (default)
                       maximum: 1
                       minimum: 0
                       type: integer
@@ -74,11 +106,27 @@ spec:
                 type: array
               mode:
                 default: T-GM.8275.1
+                description: "Telecom G8275 Profile \n T-BC-8275.1 (default) \n T-GM.8275.1
+                  \n T-TSC.8275.1"
                 enum:
                 - T-GM.8275.1
                 - T-BC-8275.1
                 - T-TSC.8275.1
                 type: string
+              mode10MHz:
+                default: 2
+                description: "Set 10MHz Connector Mode \n 1 - 10MHz IN \n 2 - 10MHz
+                  OUT (default) \n 3 - PPS OUT"
+                maximum: 3
+                minimum: 1
+                type: integer
+              modePPS:
+                default: 2
+                description: "Set 1PPS Connector Mode \n 1 - PPS IN \n 2 - PPS OUT
+                  (default)"
+                maximum: 2
+                minimum: 1
+                type: integer
               namespace:
                 default: sts-silicom
                 type: string
@@ -88,32 +136,85 @@ spec:
                 type: object
               phyLedsCtl:
                 default: 0
+                description: "Enable/disable Phy Leds Control Switch \n 0 - disable
+                  Phy Leds Control Switch (default) \n 1 - enable Phy Leds Control
+                  Switch"
                 maximum: 1
+                minimum: 0
+                type: integer
+              priority2:
+                default: 128
+                description: "Set Priority 2 for GM PTP Clock \n Valid range 0-255,
+                  smaller values indicate higher priority"
+                maximum: 255
                 minimum: 0
                 type: integer
               src10MHz:
                 default: 1
+                description: "Set 10MHz OUT Source \n 1 - PLL (default) \n 2 - GPS
+                  \n 3 - IN"
                 maximum: 3
                 minimum: 1
                 type: integer
               srcPPS:
                 default: 1
+                description: "Set PPS OUT Source \n 1 - PLL (default) \n 2 - GPS \n
+                  3 - IN"
                 maximum: 3
+                minimum: 1
+                type: integer
+              ssmMode:
+                default: 1
+                description: "Configures the SSM Mode \n 1 - SSM Code (default) \n
+                  2 - ESSM Code"
+                maximum: 2
+                minimum: 1
+                type: integer
+              syncOption:
+                default: 1
+                description: "Configures the synchronization network \n 1 - Option
+                  1 refers to synchronization networks designed for Europe \n 2 -
+                  Option 2 refers to synchronization networks designed for United
+                  States"
+                maximum: 2
                 minimum: 1
                 type: integer
               synceCpu:
                 default: 10
+                description: Set CPU Pin for SyncE ESMC thread
                 maximum: 40
-                minimum: 1
-                type: integer
-              synceOption:
-                default: 1
-                maximum: 2
                 minimum: 1
                 type: integer
               synceRecClkPort:
                 default: 0
+                description: Set SyncE Recovery Clock Port
                 maximum: 7
+                minimum: 0
+                type: integer
+              traceLevel:
+                default: 0
+                maximum: 8
+                minimum: 0
+                type: integer
+              tracePtpMsg:
+                default: -1
+                description: "Trace PTP Message \n Valid range -1-10 \n -1 - Disable
+                  Trace log for PTP Messages (default) \n 0 - Enable Trace for all
+                  types of PTP Messages \n 1 - Enable Trace for SYNC Messages \n 2
+                  - Enable Trace for DELAY_REQ Messages \n 3 - Enable Trace for PEER_DELAY_REQ
+                  Messages \n 4 - Enable Trace for PEER_DELAY_RESP Messages \n 5 -
+                  Enable Trace for FOLLOW_UP Messages \n 6 - Enable Trace for DELAY_RESP
+                  Messages \n 7 - Enable Trace for PEER_DELAY_FOLLOW_UP Messages \n
+                  8 - Enable Trace for ANNOUNCE Messages \n 9 - Enable Trace for SIGNAL
+                  Messages \n 10 - Enable Trace for MANAGEMENT Messages"
+                maximum: 10
+                minimum: -1
+                type: integer
+              twoStep:
+                default: 0
+                description: "Enable/disable two-step PTP Clock \n 0 - Disable two-step
+                  clock, (set one-step clock) (default) \n 1 - Enable two-step clock"
+                maximum: 1
                 minimum: 0
                 type: integer
             required:

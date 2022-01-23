@@ -162,6 +162,21 @@ metadata:
               "phcs2Sys": "quay.io/silicom/phcs2sys:3.1.1",
               "ts2Phcs": "quay.io/silicom/ts2phcs:1.0.0",
               "tsyncd": "quay.io/silicom/tsyncd:2.0.1.0"
+            },
+            "namespace": "sts-silicom",
+            "sro": {
+              "chart": {
+                "name": "ice-special-resource",
+                "repository": {
+                  "name": "ice-special-resource",
+                  "url": "http://ice-driver-src"
+                },
+                "version": "0.0.1"
+              },
+              "iceVersion": "1.7.16",
+              "namespace": "openshift-operators",
+              "srcImage": "quay.io/silicom/ice-driver-src:1.7.16",
+              "srcSvcPort": 3000
             }
           }
         }
@@ -174,7 +189,7 @@ metadata:
     description: This Operator is a Kubernetes custom controller whose goal is to
       serve the installation and lifecycle management of Silicom STS device plugins
       for Kubernetes.
-    operators.operatorframework.io/builder: operator-sdk-v1.13.0+git
+    operators.operatorframework.io/builder: operator-sdk-v1.15.0+git
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: github.com/silicomdk/sts-operator
   name: silicom-sts-operator.v0.0.1

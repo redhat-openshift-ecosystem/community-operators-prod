@@ -8,48 +8,11 @@ metadata:
           "apiVersion": "sts.silicom.com/v1alpha1",
           "kind": "StsConfig",
           "metadata": {
-            "name": "bc-1",
-            "namespace": "sts-silicom"
-          },
-          "spec": {
-            "interfaces": [
-              {
-                "ethName": "enp2s0f0",
-                "ethPort": 0,
-                "holdoff": 500,
-                "mode": "Slave",
-                "synce": 1
-              },
-              {
-                "ethName": "enp2s0f1",
-                "ethPort": 1,
-                "holdoff": 500,
-                "mode": "Master",
-                "synce": 1
-              },
-              {
-                "ethName": "enp2s0f2",
-                "ethPort": 2,
-                "holdoff": 500,
-                "mode": "Master",
-                "synce": 1
-              }
-            ],
-            "mode": "T-TBC.8275.1",
-            "namespace": "sts-silicom",
-            "nodeSelector": {
-              "sts.silicom.com/config": "bc-1"
-            }
-          }
-        },
-        {
-          "apiVersion": "sts.silicom.com/v1alpha1",
-          "kind": "StsConfig",
-          "metadata": {
             "name": "gm-1",
             "namespace": "sts-silicom"
           },
           "spec": {
+            "imageRegistry": "quay.io/silicom",
             "interfaces": [
               {
                 "ethName": "enp2s0f0",
@@ -70,7 +33,66 @@ metadata:
             "namespace": "sts-silicom",
             "nodeSelector": {
               "sts.silicom.com/config": "gm-1"
-            }
+            },
+            "stsVersion": "2.0.1.1"
+          }
+        },
+        {
+          "apiVersion": "sts.silicom.com/v1alpha1",
+          "kind": "StsConfig",
+          "metadata": {
+            "name": "bc-1"
+          },
+          "spec": {
+            "aprLevel": 0,
+            "domainNumber": 24,
+            "esmcMode": 1,
+            "forwardable": 0,
+            "interfaces": [
+              {
+                "ethName": "enp2s0f0",
+                "ethPort": 0,
+                "holdoff": 500,
+                "mode": "Slave",
+                "ql": 4,
+                "qlEnable": 1,
+                "synce": 1
+              },
+              {
+                "ethName": "enp2s0f1",
+                "ethPort": 1,
+                "holdoff": 500,
+                "mode": "Master",
+                "ql": 4,
+                "qlEnable": 1,
+                "synce": 1
+              },
+              {
+                "ethName": "enp2s0f2",
+                "ethPort": 2,
+                "holdoff": 500,
+                "mode": "Master",
+                "ql": 4,
+                "qlEnable": 1,
+                "synce": 1
+              }
+            ],
+            "mode": "T-TBC.8275.1",
+            "mode10MHz": 2,
+            "modePPS": 2,
+            "namespace": "sts-silicom",
+            "nodeSelector": {
+              "sts.silicom.com/config": "bc-1"
+            },
+            "phyLedsCtl": 0,
+            "priority2": 128,
+            "src10MHz": 1,
+            "srcPPS": 1,
+            "syncOption": 1,
+            "synceCpu": 10,
+            "synceRecClkPort": 0,
+            "tracePtpMsg": -1,
+            "twoStep": 0
           }
         },
         {
@@ -150,18 +172,18 @@ metadata:
           "apiVersion": "sts.silicom.com/v1alpha1",
           "kind": "StsOperatorConfig",
           "metadata": {
-            "name": "stsoperatorconfig",
-            "namespace": "sts-silicom"
+            "name": "sts-operator-config"
           },
           "spec": {
             "gpsSvcPort": 2947,
             "grpcSvcPort": 50051,
             "images": {
               "gpsd": "quay.io/silicom/gpsd:3.23.1",
-              "grpcTsyncd": "quay.io/silicom/grpc-tsyncd:2.0.1.0",
+              "grpcTsyncd": "quay.io/silicom/grpc-tsyncd:2.0.1.1",
               "phcs2Sys": "quay.io/silicom/phcs2sys:3.1.1",
+              "stsPlugin": "quay.io/silicom/sts-plugin:0.0.1",
               "ts2Phcs": "quay.io/silicom/ts2phcs:1.0.0",
-              "tsyncd": "quay.io/silicom/tsyncd:2.0.1.0"
+              "tsyncd": "quay.io/silicom/tsyncd:2.0.1.1"
             },
             "namespace": "sts-silicom",
             "sro": {

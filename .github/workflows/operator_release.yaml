@@ -1,11 +1,10 @@
-
-name: Operator release
-
+name: Operator release 
 on:
   push:
     branches:
       - master
       - main
+
   workflow_dispatch:
     inputs:
       release:
@@ -13,7 +12,7 @@ on:
         required: true
         default: '0'   
       delete:
-        description: 'Delete operator (cockroachdb or cockroachdb/5.0.4) for debuging only'
+        description: 'Delete operator virtually (cockroachdb or cockroachdb/5.0.4) for debuging only'
         required: false
         default: ''
 
@@ -122,20 +121,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb', 'v4.11-rc']
 
       fail-fast: false
     steps:
       - name: Remove operator from index
         if: needs.pr-check.outputs.opp_op_delete == '1' && needs.pr-check.outputs.opp_name != ''
+
         env:
           OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
           OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
         run: |
+
           echo "OPP_LABELS=$OPP_LABELS"
           echo "op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/dummy $OPP_THIS_REPO $OPP_THIS_BRANCH"
           bash <(curl -sL $OPP_SCRIPT_URL) op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/dummy $OPP_THIS_REPO $OPP_THIS_BRANCH
+
       - name: Operator release (operator version overwrite)
         if: needs.pr-check.outputs.opp_ci_yaml_only == '0' && needs.pr-check.outputs.opp_ver_overwrite == '1' && needs.pr-check.outputs.opp_name != '' && needs.pr-check.outputs.opp_version != ''
         env:
@@ -167,14 +169,15 @@ jobs:
           OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPP_IIB_INSTALL: 0
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-          OPERATOR_INDEX_TAG: "orange_v4.6 orange_v4.7 orange_v4.8 orange_v4.9 orange_v4.10"
+          OPERATOR_INDEX_TAG: "orange_v4.6 orange_v4.7 orange_v4.8 orange_v4.9 orange_v4.10 orange_v4.11"
 
           OPP_INDEX_CHECK_ONLY: 1
         run: |
+
           echo "OPP_LABELS=$OPP_LABELS"
           echo "'$OPERATOR_INDEX_TAG' operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
           bash <(curl -sL $OPP_SCRIPT_URL) "$OPERATOR_INDEX_TAG" operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH
-          
+
       - name: Index check
         run: |
           echo "Operators : ${{ steps.operators.outputs.opp_uncomplete_operators }}"
@@ -183,11 +186,14 @@ jobs:
           echo "Operators (v4.8) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_8 }}"
           echo "Operators (v4.9) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_9 }}"
           echo "Operators (v4.10) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"
+          echo "Operators (v4.11) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_11 }}"
 
       - name: Operator info
         id: op-info
         env:
+
           OPP_FORCE_OPERATORS: ${{ steps.operators.outputs.opp_uncomplete_operators }}
+
           OPP_AUTO_LABEL: 1
           ANSIBLE_FORCE_COLOR: 1
           ANSIBLE_DISPLAY_SKIPPED_HOSTS: 0
@@ -218,6 +224,7 @@ jobs:
       opp_uncomplete_operators_v4_8: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_8 }}"
       opp_uncomplete_operators_v4_9: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_9 }}"
       opp_uncomplete_operators_v4_10: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"
+      opp_uncomplete_operators_v4_11: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_11 }}"
 
   bundles-ocp:
     name: "Bundles / ocp"
@@ -263,7 +270,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb', 'v4.11-rc']
 
       fail-fast: false
     steps:
@@ -293,12 +300,14 @@ jobs:
           OPP_FORCE_OPERATORS_v4_8: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_8 }}"
           OPP_FORCE_OPERATORS_v4_9: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_9 }}"
           OPP_FORCE_OPERATORS_v4_10: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_10 }}"
+          OPP_FORCE_OPERATORS_v4_11: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators_v4_11 }}"
 
         run: |
           echo "OPP_LABELS=$OPP_LABELS"
           FAKE_RC=false
           FAKE_TYPE=$(echo $OPERATOR_INDEX_TAG | cut -d '-' -f 2)
           [[ $FAKE_TYPE == *rc* ]] && FAKE_RC=true || true
+
           echo "orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
           bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH || $FAKE_RC
 
@@ -321,11 +330,11 @@ jobs:
     name: "Index production / ocp"
     needs: [ pr-check, release-ocp ]
 
-    if: needs.pr-check.outputs.opp_release_ready == '1'
+    if: needs.pr-check.outputs.opp_release_ready == '1' && ( github.event.inputs.mirror_index_to_final_location == '' || github.event.inputs.mirror_index_to_final_location != '0')
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb', 'v4.11-rc']
 
       fail-fast: false
     steps:
@@ -339,7 +348,8 @@ jobs:
         with:
           name: operators_converted
           path: /tmp/operator-test/operators
-      - name: Release sha
+
+      - name: Release final index
         env:
           OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}

@@ -9,7 +9,7 @@ metadata:
           "kind": "StsConfig",
           "metadata": {
             "name": "gm-1",
-            "namespace": "sts-silicom"
+            "namespace": "openshift-operators"
           },
           "spec": {
             "interfaces": [
@@ -29,7 +29,7 @@ metadata:
               }
             ],
             "mode": "T-GM.8275.1",
-            "namespace": "sts-silicom",
+            "namespace": "openshift-operators",
             "nodeSelector": {
               "sts.silicom.com/config": "gm-1"
             }
@@ -83,7 +83,7 @@ metadata:
             "mode": "T-TBC.8275.1",
             "mode10MHz": 2,
             "modePPS": 2,
-            "namespace": "sts-silicom",
+            "namespace": "openshift-operators",
             "nodeSelector": {
               "sts.silicom.com/config": "bc-1"
             },
@@ -175,7 +175,8 @@ metadata:
           "apiVersion": "sts.silicom.com/v1alpha1",
           "kind": "StsOperatorConfig",
           "metadata": {
-            "name": "sts-operator-config"
+            "name": "sts-operator-config",
+            "namespace": "openshift-operators"
           },
           "spec": {
             "gpsSvcPort": 2947,
@@ -188,7 +189,7 @@ metadata:
               "ts2Phcs": "quay.io/silicom/ts2phcs:1.0.0",
               "tsyncd": "quay.io/silicom/tsyncd:2.1.0.0"
             },
-            "namespace": "sts-silicom",
+            "namespace": "openshift-operators",
             "sro": {
               "chart": {
                 "name": "ice-special-resource",
@@ -198,9 +199,9 @@ metadata:
                 },
                 "version": "0.0.1"
               },
-              "iceVersion": "1.7.16",
+              "iceVersion": "1.7.16.1",
               "namespace": "openshift-operators",
-              "srcImage": "quay.io/silicom/ice-driver-src:1.7.16",
+              "srcImage": "quay.io/silicom/ice-driver-src:1.7.16.1",
               "srcSvcPort": 3000
             }
           }
@@ -440,6 +441,16 @@ spec:
           verbs:
           - create
         serviceAccountName: sts-controller-manager
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - nodes
+          verbs:
+          - get
+          - list
+          - update
+        serviceAccountName: sts-plugin
       deployments:
       - name: sts-controller-manager
         spec:
@@ -543,6 +554,47 @@ spec:
           - create
           - patch
         serviceAccountName: sts-controller-manager
+      - rules:
+        - apiGroups:
+          - sts.silicom.com
+          resources:
+          - stsnodes
+          - stsnodes/status
+          verbs:
+          - get
+          - list
+          - update
+          - create
+          - delete
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: sts-plugin
+      - rules:
+        - apiGroups:
+          - sts.silicom.com
+          resources:
+          - '*'
+          verbs:
+          - get
+          - list
+          - watch
+          - patch
+          - update
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: sts-tsync
     strategy: deployment
   installModes:
   - supported: false

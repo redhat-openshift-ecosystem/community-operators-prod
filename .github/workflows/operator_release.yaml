@@ -12,7 +12,7 @@ on:
         required: true
         default: '0'   
       delete:
-        description: 'Delete operator virtually (cockroachdb or cockroachdb/5.0.4) for debuging only'
+        description: 'Remove operator virtually from git (cockroachdb or cockroachdb/5.0.4) for debuging only'
         required: false
         default: ''
 
@@ -199,7 +199,6 @@ jobs:
           ANSIBLE_DISPLAY_SKIPPED_HOSTS: 0
           ANSIBLE_STDOUT_CALLBACK: "yaml"
         run: |
-          # OPP_ANSIBLE_PULL_BRANCH="upstream-community-dev"
           OPP_FORCE_OPERATORS=${OPP_FORCE_OPERATORS// /,}
           echo $OPP_FORCE_OPERATORS
           [ "$OPP_AUTO_LABEL" = '1' ] && ANSIBLE_ARGS="-e automatic_cluster_version_label=true" || ANSIBLE_ARGS="-e automatic_cluster_version_label=false"

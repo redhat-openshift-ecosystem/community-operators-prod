@@ -1,5 +1,4 @@
-name: Operator release manual for OCP
-
+name: Operator release manual
 on:
 
   workflow_dispatch:
@@ -9,24 +8,28 @@ on:
         required: true
         default: '0'   
       delete:
-        description: 'Delete operator virtually (cockroachdb or cockroachdb/5.0.4) for debuging only'
+        description: 'Remove operator virtually from git (cockroachdb or cockroachdb/5.0.4) for debuging only'
         required: false
         default: ''
 
       delete_for_renew:
-        description: 'Remove operator from index before run'
+        description: 'Remove operator from index (allow/operator-recreate)'
         required: true
         default: '0'
+
+
       index:
-        description: 'Target index (e.g. v4.10-db)'
+        description: 'Target index (e.g. v4.10, v4.10-db)'
         required: true
         default: 'v4.10-db'
+
       list_of_operators:
-        description: 'List of operators to be recreated in the index, list has to be devided by spaces (e.g. aqua ripsaw)'
+        description: 'List of operators to be synced in the index, list has to be devided by spaces (e.g. aqua ripsaw)'
         required: true
         default: ''
+
       mirror_index_to_final_location:
-        description: 'Recommended to disable mirror during a new manual index release to avoid production index overwrite with partial content'
+        description: 'Push final index to production'
         required: true
         default: '0'
 
@@ -219,7 +222,6 @@ jobs:
           ANSIBLE_DISPLAY_SKIPPED_HOSTS: 0
           ANSIBLE_STDOUT_CALLBACK: "yaml"
         run: |
-          # OPP_ANSIBLE_PULL_BRANCH="upstream-community-dev"
           OPP_FORCE_OPERATORS=${OPP_FORCE_OPERATORS// /,}
           echo $OPP_FORCE_OPERATORS
           [ "$OPP_AUTO_LABEL" = '1' ] && ANSIBLE_ARGS="-e automatic_cluster_version_label=true" || ANSIBLE_ARGS="-e automatic_cluster_version_label=false"

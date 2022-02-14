@@ -3,7 +3,7 @@
 
 ## About this repository
 
-This repo is the canonical source for Kubernetes Operators that appear on [OpenShift Container Platform](https://openshift.com) and [OKD](https://okd.io).
+This repo is the canonical source for Kubernetes Operators that appear on [OpenShift Container Platform](https://openshift.com)
 
 ## Documentation
 

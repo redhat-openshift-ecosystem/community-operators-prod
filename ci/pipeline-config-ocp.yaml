@@ -12,7 +12,7 @@ production:
       - v4.7-db
       - v4.8-db
       - v4.9-db
-      - v4.10-rcdb
+      - v4.10-db
       - v4.11-rc
     latest: "v4.6"
     signature: 1
@@ -36,7 +36,10 @@ production:
       in: mavala
 #      out: framework_automation
       out: redhat+iib_community
-
+  test:
+    installation_skip:
+      - ack-
+      
 pipeline:
   base: https://github.com
   repo: redhat-openshift-ecosystem/community-operators-prod

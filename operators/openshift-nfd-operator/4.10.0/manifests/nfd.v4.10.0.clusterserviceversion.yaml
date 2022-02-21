@@ -1,0 +1,933 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "nfd.openshift.io/v1",
+          "kind": "NodeFeatureDiscovery",
+          "metadata": {
+            "name": "nfd-instance",
+            "namespace": "openshift-nfd"
+          },
+          "spec": {
+            "customConfig": {
+              "configData": "#    - name: \"more.kernel.features\"\n#      matchOn:\n#      - loadedKMod: [\"example_kmod3\"]\n#    - name: \"more.features.by.nodename\"\n#      value: customValue\n#      matchOn:\n#      - nodename: [\"special-.*-node-.*\"]\n"
+            },
+            "operand": {
+              "image": "quay.io/openshift/origin-node-feature-discovery:4.10",
+              "servicePort": 12000
+            },
+            "workerConfig": {
+              "configData": "core:\n#  labelWhiteList:\n#  noPublish: false\n  sleepInterval: 60s\n#  sources: [all]\n#  klog:\n#    addDirHeader: false\n#    alsologtostderr: false\n#    logBacktraceAt:\n#    logtostderr: true\n#    skipHeaders: false\n#    stderrthreshold: 2\n#    v: 0\n#    vmodule:\n##   NOTE: the following options are not dynamically run-time \n##          configurable and require a nfd-worker restart to take effect\n##          after being changed\n#    logDir:\n#    logFile:\n#    logFileMaxSize: 1800\n#    skipLogHeaders: false\nsources:\n#  cpu:\n#    cpuid:\n##     NOTE: whitelist has priority over blacklist\n#      attributeBlacklist:\n#        - \"BMI1\"\n#        - \"BMI2\"\n#        - \"CLMUL\"\n#        - \"CMOV\"\n#        - \"CX16\"\n#        - \"ERMS\"\n#        - \"F16C\"\n#        - \"HTT\"\n#        - \"LZCNT\"\n#        - \"MMX\"\n#        - \"MMXEXT\"\n#        - \"NX\"\n#        - \"POPCNT\"\n#        - \"RDRAND\"\n#        - \"RDSEED\"\n#        - \"RDTSCP\"\n#        - \"SGX\"\n#        - \"SSE\"\n#        - \"SSE2\"\n#        - \"SSE3\"\n#        - \"SSE4.1\"\n#        - \"SSE4.2\"\n#        - \"SSSE3\"\n#      attributeWhitelist:\n#  kernel:\n#    kconfigFile: \"/path/to/kconfig\"\n#    configOpts:\n#      - \"NO_HZ\"\n#      - \"X86\"\n#      - \"DMI\"\n  pci:\n    deviceClassWhitelist:\n      - \"0200\"\n      - \"03\"\n      - \"12\"\n    deviceLabelFields:\n#      - \"class\"\n      - \"vendor\"\n#      - \"device\"\n#      - \"subsystem_vendor\"\n#      - \"subsystem_device\"\n#  usb:\n#    deviceClassWhitelist:\n#      - \"0e\"\n#      - \"ef\"\n#      - \"fe\"\n#      - \"ff\"\n#    deviceLabelFields:\n#      - \"class\"\n#      - \"vendor\"\n#      - \"device\"\n#  custom:\n#    - name: \"my.kernel.feature\"\n#      matchOn:\n#        - loadedKMod: [\"example_kmod1\", \"example_kmod2\"]\n#    - name: \"my.pci.feature\"\n#      matchOn:\n#        - pciId:\n#            class: [\"0200\"]\n#            vendor: [\"15b3\"]\n#            device: [\"1014\", \"1017\"]\n#        - pciId :\n#            vendor: [\"8086\"]\n#            device: [\"1000\", \"1100\"]\n#    - name: \"my.usb.feature\"\n#      matchOn:\n#        - usbId:\n#          class: [\"ff\"]\n#          vendor: [\"03e7\"]\n#          device: [\"2485\"]\n#        - usbId:\n#          class: [\"fe\"]\n#          vendor: [\"1a6e\"]\n#          device: [\"089a\"]\n#    - name: \"my.combined.feature\"\n#      matchOn:\n#        - pciId:\n#            vendor: [\"15b3\"]\n#            device: [\"1014\", \"1017\"]\n#          loadedKMod : [\"vendor_kmod1\", \"vendor_kmod2\"]\n"
+            }
+          }
+        },
+        {
+          "apiVersion": "nfd.openshift.io/v1alpha1",
+          "kind": "NodeFeatureRule",
+          "metadata": {
+            "name": "my-sample-rule-object"
+          },
+          "spec": {
+            "rules": [
+              {
+                "labels": {
+                  "my-sample-feature": "true"
+                },
+                "matchFeatures": [
+                  {
+                    "feature": "kernel.loadedmodule",
+                    "matchExpressions": {
+                      "dummy": {
+                        "op": "Exists"
+                      }
+                    }
+                  },
+                  {
+                    "feature": "kernel.config",
+                    "matchExpressions": {
+                      "X86": {
+                        "op": "In",
+                        "value": [
+                          "y"
+                        ]
+                      }
+                    }
+                  }
+                ],
+                "name": "my sample rule"
+              }
+            ]
+          }
+        }
+      ]
+    capabilities: Deep Insights
+    categories: Integration & Delivery,OpenShift Optional
+    containerImage: quay.io/openshift/origin-cluster-nfd-operator:4.10
+    description: |-
+      The Node Feature Discovery Operator manages the detection of hardware features and configuration in a Kubernetes cluster by labeling the nodes with hardware-specific information. The Node Feature Discovery (NFD) will label the host with node-specific attributes, like PCI cards, kernel, or OS version, and many more.
+
+      NFD consists  of the following software components:
+
+      The NFD Operator is based on the Operator Framework an open source toolkit to manage Kubernetes native applications, called Operators, in an effective, automated, and scalable way.
+
+      ##NFD-Master
+      NFD-Master is the daemon responsible for communication towards the Kubernetes API. That is, it receives labeling requests from the worker and modifies node objects accordingly.
+
+      ##NFD-Worker
+      NFD-Worker is a daemon responsible for feature detection. It then communicates the information to nfd-master which does the actual node labeling. One instance of nfd-worker is supposed to be running on each node of the cluster.
+
+      ##NFD-Topology-Updater
+      NFD-Topology-Updater is a daemon responsible for examining allocated resources on a worker node to account for resources available to be allocated to new pod on a per-zone basis (where a zone can be a NUMA node). It then communicates the information to nfd-master which does the NodeResourceTopology CR creation corresponding to all the nodes in the cluster. One instance of nfd-topology-updater is supposed to be running on each node of the cluster.
+    olm.skipRange: '>=4.6.0 <4.11.0'
+    operatorframework.io/cluster-monitoring: "true"
+    operatorframework.io/suggested-namespace: openshift-nfd
+    operators.openshift.io/infrastructure-features: '["disconnected"]'
+    operators.operatorframework.io/builder: operator-sdk-v1.16.0+git
+    operators.operatorframework.io/internal-objects: '["noderesourcetopologies.topology.node.k8s.io"]'
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    provider: Red Hat
+    repository: https://github.com/openshift/cluster-nfd-operator
+    support: Red Hat
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.arm64: supported
+    operatorframework.io/arch.ppc64le: supported
+    operatorframework.io/arch.s390x: supported
+  name: nfd.v4.10.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: |
+        The NodeFeatureDiscovery instance is the CustomResource being watched by the NFD-Operator, and holds all the needed information to setup the behaviour of the master and worker pods
+      kind: NodeFeatureDiscovery
+      name: nodefeaturediscoveries.nfd.openshift.io
+      version: v1
+    - description: |
+        NodeFeatureRule resource specifies a configuration for feature-based customization of node objects, such as node labeling.
+      kind: NodeFeatureRule
+      name: nodefeaturerules.nfd.openshift.io
+      version: v1alpha1
+    - description: |
+        NodeResourceTopology resource describes node resources and their topology.
+      kind: NodeResourceTopology
+      name: noderesourcetopologies.topology.node.k8s.io
+      version: v1alpha1
+  description: |-
+    The Node Feature Discovery Operator manages the detection of hardware features and configuration in a Kubernetes cluster by labeling the nodes with hardware-specific information. The Node Feature Discovery (NFD) will label the host with node-specific attributes, like PCI cards, kernel, or OS version, and many more.
+
+    NFD consists  of the following software components:
+
+    The NFD Operator is based on the Operator Framework an open source toolkit to manage Kubernetes native applications, called Operators, in an effective, automated, and scalable way.
+
+    ##NFD-Master
+    NFD-Master is the daemon responsible for communication towards the Kubernetes API. That is, it receives labeling requests from the worker and modifies node objects accordingly.
+
+    ##NFD-Worker
+    NFD-Worker is a daemon responsible for feature detection. It then communicates the information to nfd-master which does the actual node labeling. One instance of nfd-worker is supposed to be running on each node of the cluster.
+
+    ##NFD-Topology-Updater
+    NFD-Topology-Updater is a daemon responsible for examining allocated resources on a worker node to account for resources available to be allocated to new pod on a per-zone basis (where a zone can be a NUMA node). It then communicates the information to nfd-master which does the NodeResourceTopology CR creation corresponding to all the nodes in the cluster. One instance of nfd-topology-updater is supposed to be running on each node of the cluster.
+  displayName: Node Feature Discovery Operator
+  icon:
+  - base64data: |
+      iVBORw0KGgoAAAANSUhEUgAAAikAAAIACAMAAABw7gzSAAAABGdBTUEAALGPC/xhBQAAAAFzUkdC
+      AK7OHOkAAAMAUExURUdwTNskLtgmMtohLdErLP0AANsjMP8AANgnRdckMNojL9smLtsjLdQqKtkj
+      Lt8iLt0iL9wkLdsiLtgkL9ckJNkkLtgkL9s1NdgiL9ojMNwhLdojL98gMOAcMdskLd4lLt4iLdki
+      Lt0lLt8iL9ojL9UjLtojMNoiLtokL9okL9kjL9okMNokLtokL9ckLdojL+QZM7IgON4fOtokL9oj
+      L9ojL9sjL98jLNgiLtojMNkjL9kjL9okMNgiMNokL9ohMNkiL+EjLNohMNkiL9kiMNoiLdkkMNgi
+      MNojL9okL9kiMNokMNchLdojL9giLtgjMNchMNokMOAlK98kLugjKNoiL+gjKNojL9kjL9ojMNok
+      MNojMNkjLtckLegjKOgjJ9ojMNgkLegjKOgiKNQjL9okLuUkKdsjL+UhJugjKNckL9okMNoiL+ci
+      KNgjMMMfMtkjL+gjKOcjKegjJugkKOgjKMEdNNohMOUhKOgjKOgiKOgjKOcjKdkjL9okL+YiKOcj
+      KOgjKOghJtgiMMIfNL4gNMMfM9chL9klMNokL+YiJ9ohMOgjKOckKOgiKOgjKOcjKOgkKNkiLscg
+      MtchLdgjLr0gNdcjL9IgLugkKOcjKeciKOkjKOgkKNojMMYgMtokL78gNb8fNr4gNMIgM+gjKNoh
+      MOgjKeYkKMYgM68gN7wfNNokL9oiLugiKegjKNokMNIiLrcgNb4gNegkKLgfNbcgNrQfN8ogMrge
+      NdQgLsQfNMAgNcAfNegjKMkgMcogMLwfNsIfM78gNb4fNMogM+ciKMceMswfMcwgMb4hNr0gNMYg
+      MbwgNMEgM7EeN88hL8wfMckhM8ogM8ohMcAfNLciNtciK98kLN8jLNokMOgkKbkhNcIgNawiO64i
+      OsAgNLohNdYjML4hNdkjMNgjMMYhM8siMsQhNNMjMbogN8giM9AiMsIiM80iMrwgNrMhOcwiMrYh
+      OMEgNdEiMbghOM8iMuYjKb0hNLAhOuEkLOckKd4jLeQjK8IgNq0iOnrHRtUAAADadFJOUwAgE/sL
+      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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - policy
+          resourceNames:
+          - nfd-worker
+          resources:
+          - podsecuritypolicies
+          verbs:
+          - use
+        - apiGroups:
+          - ""
+          resources:
+          - nodes/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - nfd.openshift.io
+          resources:
+          - nodefeaturerules
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - topology.node.k8s.io
+          resources:
+          - noderesourcetopologies
+          verbs:
+          - create
+          - get
+          - update
+        - apiGroups:
+          - apps
+          resources:
+          - daemonsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - cert-manager.io
+          resources:
+          - certificates
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - cert-manager.io
+          resources:
+          - issuers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - clusteroperators
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - clusteroperators/status
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - clusterversions
+          verbs:
+          - get
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - proxies
+          verbs:
+          - get
+          - list
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - endpoints
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - imagestreams/layers
+          verbs:
+          - get
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - nodes
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - persistentvolumeclaims
+          verbs:
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - persistentvolumes
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods/log
+          verbs:
+          - get
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - serviceaccounts
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - prometheusrules
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - nfd.openshift.io
+          resources:
+          - nodefeaturediscoveries
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - nfd.openshift.io
+          resources:
+          - nodefeaturediscoveries/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - nfd.openshift.io
+          resources:
+          - nodefeaturediscoveries/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterroles
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - rolebindings
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - roles
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - security.openshift.io
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - use
+          - watch
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: nfd-operator
+      deployments:
+      - name: nfd-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=10
+                - --tls-cert-file=/etc/secrets/tls.crt
+                - --tls-private-key-file=/etc/secrets/tls.key
+                - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+                image: registry.redhat.io/openshift4/ose-kube-rbac-proxy
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 250m
+                    memory: 64Mi
+                securityContext:
+                  readOnlyRootFilesystem: true
+                volumeMounts:
+                - mountPath: /etc/secrets
+                  name: node-feature-discovery-operator-tls
+              - args:
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                command:
+                - /node-feature-discovery-operator
+                env:
+                - name: SSL_CERT_DIR
+                  value: /etc/pki/tls/certs
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['olm.targetNamespaces']
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: OPERATOR_NAME
+                  value: cluster-nfd-operator
+                - name: NODE_FEATURE_DISCOVERY_IMAGE
+                  value: quay.io/openshift/origin-node-feature-discovery:4.10
+                image: quay.io/openshift/origin-cluster-nfd-operator:4.10
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                ports:
+                - containerPort: 8080
+                  name: metrics
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources: {}
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  readOnlyRootFilesystem: true
+              serviceAccountName: nfd-operator
+              terminationGracePeriodSeconds: 10
+              volumes:
+              - name: node-feature-discovery-operator-tls
+                secret:
+                  secretName: node-feature-discovery-operator-tls
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          - coordination.k8s.io
+          resources:
+          - configmaps
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - roles
+          - rolebindings
+          - clusterroles
+          - clusterrolebindings
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - services
+          - endpoints
+          - persistentvolumeclaims
+          - events
+          - configmaps
+          - secrets
+          - serviceaccounts
+          - nodes
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          verbs:
+          - '*'
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - get
+          - create
+        - apiGroups:
+          - nfd.openshift.io
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        serviceAccountName: nfd-operator
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - feature-discovery
+  - feature-detection
+  - node-labels
+  links:
+  - name: Node Feature Discovery Operator
+    url: https://docs.openshift.com/container-platform/4.9/hardware_enablement/psap-node-feature-discovery-operator.html
+  - name: Node Feature Discovery Documentation
+    url: https://kubernetes-sigs.github.io/node-feature-discovery/stable/get-started/index.html
+  maintainers:
+  - email: openshift-psap@redhat.com
+    name: openshift-psap
+  maturity: stable
+  minKubeVersion: 1.22.0
+  provider:
+    name: Red Hat
+    url: https://github.com/openshift/cluster-nfd-operator
+  version: 4.10.0
+  replaces: nfd.v4.9.0

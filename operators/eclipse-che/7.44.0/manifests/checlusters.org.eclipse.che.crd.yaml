@@ -1,19 +1,25 @@
 #
-#  Copyright (c) 2019-2021 Red Hat, Inc.
-#    This program and the accompanying materials are made
-#    available under the terms of the Eclipse Public License 2.0
-#    which is available at https://www.eclipse.org/legal/epl-2.0/
+# Copyright (c) 2019-2021 Red Hat, Inc.
+# This program and the accompanying materials are made
+# available under the terms of the Eclipse Public License 2.0
+# which is available at https://www.eclipse.org/legal/epl-2.0/
 #
-#  SPDX-License-Identifier: EPL-2.0
+# SPDX-License-Identifier: EPL-2.0
 #
-#  Contributors:
-#    Red Hat, Inc. - initial API and implementation
+# Contributors:
+#   Red Hat, Inc. - initial API and implementation
+#
+
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: che
+    app.kubernetes.io/managed-by: olm
+    app.kubernetes.io/name: che
   name: checlusters.org.eclipse.che
 spec:
   group: org.eclipse.che
@@ -55,14 +61,16 @@ spec:
                     used by the Che installation.
                   properties:
                     debug:
-                      description: Debug internal identity provider.
+                      description: Deprecated. The value of this flag is ignored.
+                        Debug internal identity provider.
                       type: boolean
                     externalIdentityProvider:
-                      description: 'Instructs the Operator on whether or not to deploy
-                        a dedicated Identity Provider (Keycloak or RH SSO instance).
-                        Instructs the Operator on whether to deploy a dedicated Identity
-                        Provider (Keycloak or RH-SSO instance). By default, a dedicated
-                        Identity Provider server is deployed as part of the Che installation.
+                      description: 'Deprecated. The value of this flag is ignored.
+                        Instructs the Operator on whether or not to deploy a dedicated
+                        Identity Provider (Keycloak or RH SSO instance). Instructs
+                        the Operator on whether to deploy a dedicated Identity Provider
+                        (Keycloak or RH-SSO instance). By default, a dedicated Identity
+                        Provider server is deployed as part of the Che installation.
                         When `externalIdentityProvider` is `true`, no dedicated identity
                         provider will be deployed by the Operator and you will need
                         to provide details about the external identity provider you
@@ -84,18 +92,21 @@ spec:
                         Sidecar functionality is now implemented in Traefik plugin.
                       type: string
                     identityProviderAdminUserName:
-                      description: Overrides the name of the Identity Provider administrator
+                      description: Deprecated. The value of this flag is ignored.
+                        Overrides the name of the Identity Provider administrator
                         user. Defaults to `admin`.
                       type: string
                     identityProviderClientId:
-                      description: Name of a Identity provider, Keycloak or RH-SSO,
-                        `client-id` that is used for Che. Override this when an external
-                        Identity Provider is in use. See the `externalIdentityProvider`
-                        field. When omitted or left blank, it is set to the value
-                        of the `flavour` field suffixed with `-public`.
+                      description: Deprecated. The value of this flag is ignored.
+                        Name of a Identity provider, Keycloak or RH-SSO, `client-id`
+                        that is used for Che. Override this when an external Identity
+                        Provider is in use. See the `externalIdentityProvider` field.
+                        When omitted or left blank, it is set to the value of the
+                        `flavour` field suffixed with `-public`.
                       type: string
                     identityProviderContainerResources:
-                      description: Identity provider container custom settings.
+                      description: Deprecated. The value of this flag is ignored.
+                        Identity provider container custom settings.
                       properties:
                         limits:
                           description: Limits describes the maximum amount of compute
@@ -123,19 +134,22 @@ spec:
                           type: object
                       type: object
                     identityProviderImage:
-                      description: Overrides the container image used in the Identity
-                        Provider, Keycloak or RH-SSO, deployment. This includes the
-                        image tag. Omit it or leave it empty to use the default container
-                        image provided by the Operator.
+                      description: Deprecated. The value of this flag is ignored.
+                        Overrides the container image used in the Identity Provider,
+                        Keycloak or RH-SSO, deployment. This includes the image tag.
+                        Omit it or leave it empty to use the default container image
+                        provided by the Operator.
                       type: string
                     identityProviderImagePullPolicy:
-                      description: Overrides the image pull policy used in the Identity
-                        Provider, Keycloak or RH-SSO, deployment. Default value is
-                        `Always` for `nightly`, `next` or `latest` images, and `IfNotPresent`
+                      description: Deprecated. The value of this flag is ignored.
+                        Overrides the image pull policy used in the Identity Provider,
+                        Keycloak or RH-SSO, deployment. Default value is `Always`
+                        for `nightly`, `next` or `latest` images, and `IfNotPresent`
                         in other cases.
                       type: string
                     identityProviderIngress:
-                      description: Ingress custom settings.
+                      description: Deprecated. The value of this flag is ignored.
+                        Ingress custom settings.
                       properties:
                         annotations:
                           additionalProperties:
@@ -151,38 +165,44 @@ spec:
                           type: string
                       type: object
                     identityProviderPassword:
-                      description: Overrides the password of Keycloak administrator
-                        user. Override this when an external Identity Provider is
-                        in use. See the `externalIdentityProvider` field. When omitted
-                        or left blank, it is set to an auto-generated password.
+                      description: Deprecated. The value of this flag is ignored.
+                        Overrides the password of Keycloak administrator user. Override
+                        this when an external Identity Provider is in use. See the
+                        `externalIdentityProvider` field. When omitted or left blank,
+                        it is set to an auto-generated password.
                       type: string
                     identityProviderPostgresPassword:
-                      description: Password for a Identity Provider, Keycloak or RH-SSO,
-                        to connect to the database. Override this when an external
-                        Identity Provider is in use. See the `externalIdentityProvider`
-                        field. When omitted or left blank, it is set to an auto-generated
-                        password.
+                      description: Deprecated. The value of this flag is ignored.
+                        Password for a Identity Provider, Keycloak or RH-SSO, to connect
+                        to the database. Override this when an external Identity Provider
+                        is in use. See the `externalIdentityProvider` field. When
+                        omitted or left blank, it is set to an auto-generated password.
                       type: string
                     identityProviderPostgresSecret:
-                      description: 'The secret that contains `password` for the Identity
-                        Provider, Keycloak or RH-SSO, to connect to the database.
-                        When the secret is defined, the `identityProviderPostgresPassword`
-                        is ignored. When the value is omitted or left blank, the one
-                        of following scenarios applies: 1. `identityProviderPostgresPassword`
-                        is defined, then it will be used to connect to the database.
+                      description: 'Deprecated. The value of this flag is ignored.
+                        The secret that contains `password` for the Identity Provider,
+                        Keycloak or RH-SSO, to connect to the database. When the secret
+                        is defined, the `identityProviderPostgresPassword` is ignored.
+                        When the value is omitted or left blank, the one of following
+                        scenarios applies: 1. `identityProviderPostgresPassword` is
+                        defined, then it will be used to connect to the database.
                         2. `identityProviderPostgresPassword` is not defined, then
                         a new secret with the name `che-identity-postgres-secret`
-                        will be created with an auto-generated value for `password`.'
+                        will be created with an auto-generated value for `password`.
+                        The secret must have `app.kubernetes.io/part-of=che.eclipse.org`
+                        label.'
                       type: string
                     identityProviderRealm:
-                      description: Name of a Identity provider, Keycloak or RH-SSO,
-                        realm that is used for Che. Override this when an external
-                        Identity Provider is in use. See the `externalIdentityProvider`
-                        field. When omitted or left blank, it is set to the value
-                        of the `flavour` field.
+                      description: Deprecated. The value of this flag is ignored.
+                        Name of a Identity provider, Keycloak or RH-SSO, realm that
+                        is used for Che. Override this when an external Identity Provider
+                        is in use. See the `externalIdentityProvider` field. When
+                        omitted or left blank, it is set to the value of the `flavour`
+                        field.
                       type: string
                     identityProviderRoute:
-                      description: Route custom settings.
+                      description: Deprecated. The value of this flag is ignored.
+                        Route custom settings.
                       properties:
                         annotations:
                           additionalProperties:
@@ -204,8 +224,9 @@ spec:
                           type: string
                       type: object
                     identityProviderSecret:
-                      description: 'The secret that contains `user` and `password`
-                        for Identity Provider. When the secret is defined, the `identityProviderAdminUserName`
+                      description: 'Deprecated. The value of this flag is ignored.
+                        The secret that contains `user` and `password` for Identity
+                        Provider. When the secret is defined, the `identityProviderAdminUserName`
                         and `identityProviderPassword` are ignored. When the value
                         is omitted or left blank, the one of following scenarios applies:
                         1. `identityProviderAdminUserName` and `identityProviderPassword`
@@ -213,7 +234,8 @@ spec:
                         or `identityProviderPassword` are not defined, then a new
                         secret with the name `che-identity-secret` will be created
                         with default value `admin` for `user` and with an auto-generated
-                        value for `password`.'
+                        value for `password`. The secret must have `app.kubernetes.io/part-of=che.eclipse.org`
+                        label.'
                       type: string
                     identityProviderURL:
                       description: Public URL of the Identity Provider server (Keycloak
@@ -223,20 +245,22 @@ spec:
                         set by the Operator.
                       type: string
                     initialOpenShiftOAuthUser:
-                      description: For operating with the OpenShift OAuth authentication,
-                        create a new user account since the kubeadmin can not be used.
-                        If the value is true, then a new OpenShift OAuth user will
-                        be created for the HTPasswd identity provider. If the value
-                        is false and the user has already been created, then it will
+                      description: Deprecated. The value of this flag is ignored.
+                        For operating with the OpenShift OAuth authentication, create
+                        a new user account since the kubeadmin can not be used. If
+                        the value is true, then a new OpenShift OAuth user will be
+                        created for the HTPasswd identity provider. If the value is
+                        false and the user has already been created, then it will
                         be removed. If value is an empty, then do nothing. The user's
                         credentials are stored in the `openshift-oauth-user-credentials`
                         secret in 'openshift-config' namespace by Operator. Note that
                         this solution is Openshift 4 platform-specific.
                       type: boolean
                     nativeUserMode:
-                      description: Enables native user mode. Currently works only
-                        on OpenShift and DevWorkspace engine. Native User mode uses
-                        OpenShift OAuth directly as identity provider, without Keycloak.
+                      description: Deprecated. The value of this flag is ignored.
+                        Enables native user mode. Currently works only on OpenShift
+                        and DevWorkspace engine. Native User mode uses OpenShift OAuth
+                        directly as identity provider, without Keycloak.
                       type: boolean
                     oAuthClientName:
                       description: Name of the OpenShift `OAuthClient` resource used
@@ -250,17 +274,19 @@ spec:
                         field.
                       type: string
                     openShiftoAuth:
-                      description: 'Enables the integration of the identity provider
-                        (Keycloak / RHSSO) with OpenShift OAuth. Empty value on OpenShift
-                        by default. This will allow users to directly login with their
+                      description: 'Deprecated. The value of this flag is ignored.
+                        Enables the integration of the identity provider (Keycloak
+                        / RHSSO) with OpenShift OAuth. Empty value on OpenShift by
+                        default. This will allow users to directly login with their
                         OpenShift user through the OpenShift login, and have their
                         workspaces created under personal OpenShift namespaces. WARNING:
                         the `kubeadmin` user is NOT supported, and logging through
                         it will NOT allow accessing the Che Dashboard.'
                       type: boolean
                     updateAdminPassword:
-                      description: Forces the default `admin` Che user to update password
-                        on first login. Defaults to `false`.
+                      description: Deprecated. The value of this flag is ignored.
+                        Forces the default `admin` Che user to update password on
+                        first login. Defaults to `false`.
                       type: boolean
                   type: object
                 database:
@@ -326,7 +352,8 @@ spec:
                         to connect to the DB. 2. `chePostgresUser` or `chePostgresPassword`
                         are not defined, then a new secret with the name `che-postgres-secret`
                         will be created with default value of `pgche` for `user` and
-                        with an auto-generated value for `password`.'
+                        with an auto-generated value for `password`. The secret must
+                        have `app.kubernetes.io/part-of=che.eclipse.org` label.'
                       type: string
                     chePostgresUser:
                       description: PostgreSQL user that the Che server uses to connect
@@ -356,6 +383,11 @@ spec:
                       description: 'Indicates a PostgreSQL version image to use. Allowed
                         values are: `9.6` and `13.3`. Migrate your PostgreSQL database
                         to switch from one version to another.'
+                      type: string
+                    pvcClaimSize:
+                      description: Size of the persistent volume claim for database.
+                        Defaults to `1Gi`. To update pvc storageclass that provisions
+                        it must support resize when Eclipse Che has been already deployed.
                       type: string
                   type: object
                 devWorkspace:
@@ -441,10 +473,11 @@ spec:
                         This MUST be explicitly specified: there are no defaults.'
                       type: string
                     ingressStrategy:
-                      description: 'Strategy for ingress creation. Options are: `multi-host`
-                        (host is explicitly provided in ingress), `single-host` (host
-                        is provided, path-based rules) and `default-host` (no host
-                        is provided, path-based rules). Defaults to `multi-host` Deprecated
+                      description: 'Deprecated. The value of this flag is ignored.
+                        Strategy for ingress creation. Options are: `multi-host` (host
+                        is explicitly provided in ingress), `single-host` (host is
+                        provided, path-based rules) and `default-host` (no host is
+                        provided, path-based rules). Defaults to `multi-host` Deprecated
                         in favor of `serverExposureStrategy` in the `server` section,
                         which defines this regardless of the cluster type. When both
                         are defined, the `serverExposureStrategy` option takes precedence.'
@@ -458,15 +491,16 @@ spec:
                         run as. Default value is `1724`.
                       type: string
                     singleHostExposureType:
-                      description: When the serverExposureStrategy is set to `single-host`,
-                        the way the server, registries and workspaces are exposed
-                        is further configured by this property. The possible values
-                        are `native`, which means that the server and workspaces are
-                        exposed using ingresses on K8s or `gateway` where the server
-                        and workspaces are exposed using a custom gateway based on
-                        link:https://doc.traefik.io/traefik/[Traefik]. All the endpoints
-                        whether backed by the ingress or gateway `route` always point
-                        to the subpaths on the same domain. Defaults to `native`.
+                      description: Deprecated. The value of this flag is ignored.
+                        When the serverExposureStrategy is set to `single-host`, the
+                        way the server, registries and workspaces are exposed is further
+                        configured by this property. The possible values are `native`,
+                        which means that the server and workspaces are exposed using
+                        ingresses on K8s or `gateway` where the server and workspaces
+                        are exposed using a custom gateway based on link:https://doc.traefik.io/traefik/[Traefik].
+                        All the endpoints whether backed by the ingress or gateway
+                        `route` always point to the subpaths on the same domain. Defaults
+                        to `native`.
                       type: string
                     tlsSecretName:
                       description: Name of a secret that will be used to setup ingress
@@ -511,18 +545,18 @@ spec:
                       type: boolean
                     cheClusterRoles:
                       description: A comma-separated list of ClusterRoles that will
-                        be assigned to Che ServiceAccount. Be aware that the Che Operator
-                        has to already have all permissions in these ClusterRoles
-                        to grant them.
+                        be assigned to Che ServiceAccount. Each role must have `app.kubernetes.io/part-of=che.eclipse.org`
+                        label. Be aware that the Che Operator has to already have
+                        all permissions in these ClusterRoles to grant them.
                       type: string
                     cheDebug:
                       description: Enables the debug mode for Che server. Defaults
                         to `false`.
                       type: string
                     cheFlavor:
-                      description: Specifies a variation of the installation. The
-                        options are `che` for upstream Che installations, or `codeready`
-                        for link:https://developers.redhat.com/products/codeready-workspaces/overview[CodeReady
+                      description: Deprecated. The value of this flag is ignored.
+                        Specifies a variation of the installation. The options are
+                        `che` for upstream Che installations, or `codeready` for link:https://developers.redhat.com/products/codeready-workspaces/overview[CodeReady
                         Workspaces] installation. Override the default value only
                         on necessary occasions.
                       type: string
@@ -534,7 +568,8 @@ spec:
                     cheHostTLSSecret:
                       description: Name of a secret containing certificates to secure
                         ingress or route for the custom host name of the installed
-                        Che server. See the `cheHost` field.
+                        Che server. The secret must have `app.kubernetes.io/part-of=che.eclipse.org`
+                        label. See the `cheHost` field.
                       type: string
                     cheImage:
                       description: Overrides the container image used in Che deployment.
@@ -596,8 +631,8 @@ spec:
                       type: object
                     cheWorkspaceClusterRole:
                       description: Custom cluster role bound to the user for the Che
-                        workspaces. The default roles are used when omitted or left
-                        blank.
+                        workspaces. The role must have `app.kubernetes.io/part-of=che.eclipse.org`
+                        label. The default roles are used when omitted or left blank.
                       type: string
                     customCheProperties:
                       additionalProperties:
@@ -630,7 +665,8 @@ spec:
                         or `latest` images, and `IfNotPresent` in other cases.
                       type: string
                     dashboardIngress:
-                      description: Dashboard ingress custom settings.
+                      description: Deprecated. The value of this flag is ignored.
+                        Dashboard ingress custom settings.
                       properties:
                         annotations:
                           additionalProperties:
@@ -654,7 +690,8 @@ spec:
                         deployment. Defaults to 16Mi.
                       type: string
                     dashboardRoute:
-                      description: Dashboard route custom settings.
+                      description: Deprecated. The value of this flag is ignored.
+                        Dashboard route custom settings.
                       properties:
                         annotations:
                           additionalProperties:
@@ -690,7 +727,8 @@ spec:
                         by the Operator.
                       type: string
                     devfileRegistryIngress:
-                      description: The devfile registry ingress custom settings.
+                      description: Deprecated. The value of this flag is ignored.
+                        The devfile registry ingress custom settings.
                       properties:
                         annotations:
                           additionalProperties:
@@ -719,7 +757,8 @@ spec:
                         `next` or `latest` images, and `IfNotPresent` in other cases.
                       type: string
                     devfileRegistryRoute:
-                      description: The devfile registry route custom settings.
+                      description: Deprecated. The value of this flag is ignored.
+                        The devfile registry route custom settings.
                       properties:
                         annotations:
                           additionalProperties:
@@ -745,9 +784,9 @@ spec:
                         fields.
                       type: string
                     disableInternalClusterSVCNames:
-                      description: Disable internal cluster SVC names usage to communicate
-                        between components to speed up the traffic and avoid proxy
-                        issues.
+                      description: Deprecated. The value of this flag is ignored.
+                        Disable internal cluster SVC names usage to communicate between
+                        components to speed up the traffic and avoid proxy issues.
                       type: boolean
                     externalDevfileRegistries:
                       description: External devfile registries, that serves sample,
@@ -781,7 +820,9 @@ spec:
                     gitSelfSignedCert:
                       description: When enabled, the certificate from `che-git-self-signed-cert`
                         ConfigMap will be propagated to the Che components and provide
-                        particular configuration for Git.
+                        particular configuration for Git. Note, the `che-git-self-signed-cert`
+                        ConfigMap must have `app.kubernetes.io/part-of=che.eclipse.org`
+                        label.
                       type: boolean
                     nonProxyHosts:
                       description: 'List of hosts that will be reached directly, bypassing
@@ -810,7 +851,8 @@ spec:
                         by the Operator.
                       type: string
                     pluginRegistryIngress:
-                      description: Plugin registry ingress custom settings.
+                      description: Deprecated. The value of this flag is ignored.
+                        Plugin registry ingress custom settings.
                       properties:
                         annotations:
                           additionalProperties:
@@ -839,7 +881,8 @@ spec:
                         `next` or `latest` images, and `IfNotPresent` in other cases.
                       type: string
                     pluginRegistryRoute:
-                      description: Plugin registry route custom settings.
+                      description: Deprecated. The value of this flag is ignored.
+                        Plugin registry route custom settings.
                       properties:
                         annotations:
                           additionalProperties:
@@ -880,7 +923,8 @@ spec:
                     proxySecret:
                       description: The secret that contains `user` and `password`
                         for a proxy server. When the secret is defined, the `proxyUser`
-                        and `proxyPassword` are ignored.
+                        and `proxyPassword` are ignored. The secret must have `app.kubernetes.io/part-of=che.eclipse.org`
+                        label.
                       type: string
                     proxyURL:
                       description: URL (protocol+host name) of the proxy server. This
@@ -914,8 +958,9 @@ spec:
                         deployment In cores. (500m = .5 cores). Default to 100m.
                       type: string
                     serverExposureStrategy:
-                      description: Sets the server and workspaces exposure type. Possible
-                        values are `multi-host`, `single-host`, `default-host`. Defaults
+                      description: Deprecated. The value of this flag is ignored.
+                        Sets the server and workspaces exposure type. Possible values
+                        are `multi-host`, `single-host`, `default-host`. Defaults
                         to `multi-host`, which creates a separate ingress, or OpenShift
                         routes, for every required endpoint. `single-host` makes Che
                         exposed on a single host name with workspaces exposed on subpaths.
@@ -940,7 +985,8 @@ spec:
                         required when adding the OpenShift OAuth provider, which has
                         HTTPS endpoint signed with self-signed cert. The Che server
                         must be aware of its CA cert to be able to request it. This
-                        is disabled by default.
+                        is disabled by default. The Config Map must have `app.kubernetes.io/part-of=che.eclipse.org`
+                        label.
                       type: string
                     singleHostGatewayConfigMapLabels:
                       additionalProperties:
@@ -973,6 +1019,70 @@ spec:
                         placeholders, such as che-workspace-<username>. In that case,
                         a new namespace will be created for each user or workspace.
                       type: string
+                    workspacePodNodeSelector:
+                      additionalProperties:
+                        type: string
+                      description: The node selector that limits the nodes that can
+                        run the workspace pods.
+                      type: object
+                    workspacePodTolerations:
+                      description: The pod tolerations put on the workspace pods to
+                        limit where the workspace pods can run.
+                      items:
+                        description: The pod this Toleration is attached to tolerates
+                          any taint that matches the triple <key,value,effect> using
+                          the matching operator <operator>.
+                        properties:
+                          effect:
+                            description: Effect indicates the taint effect to match.
+                              Empty means match all taint effects. When specified,
+                              allowed values are NoSchedule, PreferNoSchedule and
+                              NoExecute.
+                            type: string
+                          key:
+                            description: Key is the taint key that the toleration
+                              applies to. Empty means match all taint keys. If the
+                              key is empty, operator must be Exists; this combination
+                              means to match all values and all keys.
+                            type: string
+                          operator:
+                            description: Operator represents a key's relationship
+                              to the value. Valid operators are Exists and Equal.
+                              Defaults to Equal. Exists is equivalent to wildcard
+                              for value, so that a pod can tolerate all taints of
+                              a particular category.
+                            type: string
+                          tolerationSeconds:
+                            description: TolerationSeconds represents the period of
+                              time the toleration (which must be of effect NoExecute,
+                              otherwise this field is ignored) tolerates the taint.
+                              By default, it is not set, which means tolerate the
+                              taint forever (do not evict). Zero and negative values
+                              will be treated as 0 (evict immediately) by the system.
+                            format: int64
+                            type: integer
+                          value:
+                            description: Value is the taint value the toleration matches
+                              to. If the operator is Exists, the value should be empty,
+                              otherwise just a regular string.
+                            type: string
+                        type: object
+                      type: array
+                    workspacesDefaultPlugins:
+                      description: Default plug-ins applied to Devworkspaces.
+                      items:
+                        properties:
+                          editor:
+                            description: The editor id to specify default plug-ins
+                              for.
+                            type: string
+                          plugins:
+                            description: Default plug-in uris for the specified editor.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      type: array
                   type: object
                 storage:
                   description: Configuration settings related to the persistent storage

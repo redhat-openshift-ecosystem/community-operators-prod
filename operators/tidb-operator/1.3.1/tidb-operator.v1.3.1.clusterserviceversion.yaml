@@ -173,6 +173,7 @@ spec:
   version: 1.3.1
   replaces: tidb-operator.v1.1.7
   skips: []
+  minKubeVersion: 1.16.0
   keywords:
     - TiDB
     - SQL
@@ -565,16 +566,9 @@ spec:
                       requests:
                         cpu: 80m
                         memory: 50Mi
-                    livenessProbe:
-                      tcpSocket:
-                        port: 6060
-                      initialDelaySeconds: 30
-                      periodSeconds: 10
-                      failureThreshold: 10
                     command:
                       - /usr/local/bin/tidb-controller-manager
-                      - >-
-                        -tidb-backup-manager-image=pingcap/tidb-backup-manager:v1.3.1
+                      - '-tidb-backup-manager-image=pingcap/tidb-backup-manager:v1.3.1'
                       - '-tidb-discovery-image=pingcap/tidb-operator:v1.3.1'
                       - '-cluster-scoped=true'
                       - '-cluster-permission-node=true'

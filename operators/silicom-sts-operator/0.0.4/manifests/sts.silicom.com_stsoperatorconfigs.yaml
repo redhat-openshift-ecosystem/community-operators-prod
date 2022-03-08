@@ -1,0 +1,137 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.6.1
+  creationTimestamp: null
+  name: stsoperatorconfigs.sts.silicom.com
+spec:
+  group: sts.silicom.com
+  names:
+    kind: StsOperatorConfig
+    listKind: StsOperatorConfigList
+    plural: stsoperatorconfigs
+    singular: stsoperatorconfig
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: StsOperatorConfig is the Schema for the stsoperatorconfigs API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: StsOperatorConfigSpec defines the desired state of StsOperatorConfig
+            properties:
+              gpsSvcPort:
+                default: 2947
+                type: integer
+              grpcSvcPort:
+                default: 50051
+                type: integer
+              images:
+                properties:
+                  gpsd:
+                    default: quay.io/silicom/gpsd:3.23.1
+                    type: string
+                  grpcTsyncd:
+                    default: quay.io/silicom/grpc-tsyncd:2.1.0.0
+                    type: string
+                  phc2sys:
+                    default: quay.io/silicom/phc2sys:3.1.1
+                    type: string
+                  stsPlugin:
+                    default: quay.io/silicom/sts-plugin:0.0.2
+                    type: string
+                  tsyncExtts:
+                    default: quay.io/silicom/tsync_extts:1.0.0
+                    type: string
+                  tsyncd:
+                    default: quay.io/silicom/tsyncd:2.1.0.0
+                    type: string
+                type: object
+              sro:
+                properties:
+                  build:
+                    default: true
+                    type: boolean
+                  chart:
+                    properties:
+                      name:
+                        type: string
+                      repository:
+                        properties:
+                          caFile:
+                            type: string
+                          certFile:
+                            type: string
+                          insecure_skip_tls_verify:
+                            default: false
+                            type: boolean
+                          keyFile:
+                            type: string
+                          name:
+                            type: string
+                          password:
+                            type: string
+                          url:
+                            type: string
+                          username:
+                            type: string
+                        required:
+                        - name
+                        - url
+                        type: object
+                      tags:
+                        items:
+                          type: string
+                        type: array
+                      version:
+                        type: string
+                    required:
+                    - name
+                    - repository
+                    - version
+                    type: object
+                  driverRegistry:
+                    default: image-registry.openshift-image-registry.svc:5000
+                    type: string
+                  iceVersion:
+                    default: 1.7.16
+                    type: string
+                  namespace:
+                    default: openshift-operators
+                    type: string
+                  srcImage:
+                    default: quay.io/silicom/ice-driver-src:1.7.16
+                    type: string
+                  srcSvcPort:
+                    default: 3000
+                    type: integer
+                type: object
+            type: object
+          status:
+            description: StsOperatorConfigStatus defines the observed state of StsOperatorConfig
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

@@ -142,7 +142,7 @@ jobs:
           allow-repeats: false
 
       - name: "Mention reviewers if ci.yaml was changed"
-        if: steps.op-traffic-light.outputs.opp_pr_revievers != '' && steps.op-traffic-light.outputs.opp_ci_yaml_changed == '1'
+        if: steps.op-traffic-light.outputs.opp_pr_revievers != '' && steps.op-traffic-light.outputs.opp_ci_yaml_changed == '1' && steps.op-traffic-light.outputs.opp_authorized_changes == '0'
         uses: mshick/add-pr-comment@v1
         with:
           message: |

@@ -65,6 +65,7 @@ jobs:
 
       - name: Operator info
         id: op-info
+        if: steps.op-traffic-light.outputs.opp_op_delete == '0'
         env:
           OPP_LABELS: "${{ join(github.event.pull_request.labels.*.name, ' ') }}"
           OPP_PR_AUTHOR: "${{ github.event.pull_request.user.login }}"
@@ -87,13 +88,13 @@ jobs:
 
       - name: Operator info (result)
         id: op-info-result
-        if: always()
+        if: always() && steps.op-traffic-light.outputs.opp_op_delete == '0'
         run: |
           echo "::set-output name=opp_check_err_cluster_version_autolabel::0"
           [ -f /tmp/operator-test/op_auto_labels.yaml ] && echo "::set-output name=opp_check_err_cluster_version_autolabel::1" || true
       - name: Operator info (comment)
         id: op-info-comment
-        if: always() && steps.op-info-result.outputs.opp_check_err_cluster_version_autolabel == '1'
+        if: always() && steps.op-info-result.outputs.opp_check_err_cluster_version_autolabel == '1' && steps.op-traffic-light.outputs.opp_op_delete == '0'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
@@ -113,15 +114,18 @@ jobs:
 
       - name: Upload operator_info
         uses: actions/upload-artifact@v2
+        if: steps.op-traffic-light.outputs.opp_op_delete == '0'
         with:
           name: operator_info
           path: "/tmp/operator-test/op_info.yaml"
       - name: Upload converted operators
+        if: steps.op-traffic-light.outputs.opp_op_delete == '0'
         uses: actions/upload-artifact@v2
         with:
           name: operators_converted
           path: "/tmp/operator-test/operators"
       - shell: bash
+        if: steps.op-traffic-light.outputs.opp_op_delete == '0'
         run: |
           ls /tmp/operator-test/
           cat /tmp/operator-test/op_info.yaml
@@ -140,7 +144,7 @@ jobs:
   test-kiwi:
     name: "kiwi / Full operator test"
     needs: pr-check
-    if: needs.pr-check.outputs.opp_test_ready == '1'
+    if: needs.pr-check.outputs.opp_test_ready == '1' && needs.pr-check.outputs.opp_op_delete == '0'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -207,7 +211,7 @@ jobs:
   test-lemon-openshift:
     name: "lemon / Deploy from scratch"
     needs: pr-check
-    if: needs.pr-check.outputs.opp_test_ready == '1'
+    if: needs.pr-check.outputs.opp_test_ready == '1' && needs.pr-check.outputs.opp_op_delete == '0'
     runs-on: ubuntu-latest
     strategy:
       matrix:

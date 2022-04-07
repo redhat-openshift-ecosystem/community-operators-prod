@@ -15,7 +15,10 @@ production:
       - v4.10-db
       - v4.11-rc
     latest: "v4.6"
-    signature: 1
+    signature:
+      enabled: 1
+      alias: registry.redhat.io/redhat/community-operator-index
+      endpoint: https://community-signing-pipeline-prod.apps.pipelines-prod.ijdb.p1.openshiftapps.com
   mirror:
     enabled: 1
     multiarch:
@@ -39,6 +42,7 @@ production:
   test:
     installation_skip:
       - ack-
+      - community-windows-machine-config-operator
       
 pipeline:
   base: https://github.com

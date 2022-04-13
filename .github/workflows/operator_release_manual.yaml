@@ -338,7 +338,22 @@ jobs:
           echo "orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
           bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH || $FAKE_RC
 
-      - name: Sign index
+      # - name: Sign index
+      #   id: openshift-vars
+      #   env:
+      #     OPERATOR_INDEX_TAG_RAW: ${{ matrix.index-tag }}
+      #     OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
+      #   run: |
+      #     docker login ${OPP_MIRROR_INDEX_REGISTRY} -u $OPP_REGISTRY_MIRROR_USER -p $REGISTRY_MIRROR_PW
+      #     OPERATOR_INDEX_TAG=$(echo ${OPERATOR_INDEX_TAG_RAW} |cut -d'-' -f1)
+      #     skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} > /dev/null # error out if needed
+      #     OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} | jq -r ".Digest")
+      #     OPERATOR_INDEX_RESOLVED="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}@${OPERATOR_INDEX_DIGEST}"
+      #     OPERATOR_INDEX="${INDEX_PATH_TO_SIGN}:${OPERATOR_INDEX_TAG}"
+      #     SIGNATURE_PAYLOAD="{\"manifest_digest\": \"${OPERATOR_INDEX_DIGEST}\", \"reference\": \"${OPERATOR_INDEX}\",\"requester\": \"${{ secrets.SIGNATURE_WEBHOOK_REQUESTER_EMAIL }}\"}"
+      #     echo ${SIGNATURE_PAYLOAD}
+      #     curl ${SIGNATURE_ENDPOINT} -d "${SIGNATURE_PAYLOAD}" -u "community-op-cert:${{ secrets.SIGNATURE_WEBHOOK_PASSWD }}"
+      - name: Prepare variables for the sign process
         id: openshift-vars
         env:
           OPERATOR_INDEX_TAG_RAW: ${{ matrix.index-tag }}
@@ -349,23 +364,21 @@ jobs:
           skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} > /dev/null # error out if needed
           OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} | jq -r ".Digest")
           OPERATOR_INDEX_RESOLVED="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}@${OPERATOR_INDEX_DIGEST}"
-          # OPERATOR_INDEX="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG}"
-          OPERATOR_INDEX="${INDEX_PATH_TO_SIGN}:${OPERATOR_INDEX_TAG}"
-          SIGNATURE_PAYLOAD="{\"manifest_digest\": \"${OPERATOR_INDEX_DIGEST}\", \"reference\": \"${OPERATOR_INDEX}\",\"requester\": \"${{ secrets.SIGNATURE_WEBHOOK_REQUESTER_EMAIL }}\"}"
-          echo ${SIGNATURE_PAYLOAD}
-          curl ${SIGNATURE_ENDPOINT} -d "${SIGNATURE_PAYLOAD}" -u "community-op-cert:${{ secrets.SIGNATURE_WEBHOOK_PASSWD }}"
-          # echo "::set-output name=operator_index_resolved::${OPERATOR_INDEX_RESOLVED}"
-          # echo "::set-output name=operator_index::${OPERATOR_INDEX}"
-      # - name: Initialize sign process
-      #   uses: operator-framework/community-operators@webhook
-      #   continue-on-error: true
-      #   env:
-      #     INDEX_SHA: "${{ steps.openshift-vars.outputs.index_sha }}"
-      #     webhook_type: 'json-extended'
-      #     webhook_url: 'https://api.enterprise.redhat.com/hydra/umb-bridge/v1/publish'
-      #     webhook_secret: ${{ secrets.SIGNATURE_WEBHOOK_SECRET }}
-      #     data: "{\"index_image\": \"${{ steps.openshift-vars.outputs.operator_index }}\", \"index_image_resolved\": \"${{ steps.openshift-vars.outputs.operator_index_resolved }}\"}"
-
+          OPERATOR_INDEX="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG}"
+          echo $OPERATOR_INDEX_RESOLVED
+          echo $OPERATOR_INDEX
+          echo "::set-output name=operator_index_resolved::${OPERATOR_INDEX_RESOLVED}"
+          echo "::set-output name=operator_index::${OPERATOR_INDEX}"
+      - name: Initialize sign process
+        uses: operator-framework/community-operators@webhook
+        continue-on-error: true
+        env:
+          INDEX_SHA: "${{ steps.openshift-vars.outputs.index_sha }}"
+          webhook_type: 'json-extended'
+          webhook_url: 'https://api.enterprise.redhat.com/hydra/umb-bridge/v1/publish'
+          webhook_secret: ${{ secrets.SIGNATURE_WEBHOOK_SECRET }}
+          data: "{\"index_image\": \"${{ steps.openshift-vars.outputs.operator_index }}\", \"index_image_resolved\": \"${{ steps.openshift-vars.outputs.operator_index_resolved }}\"}"
+ 
   push-to-quay-ocp:
     name: "Push to quay / ocp"
 

@@ -6,8 +6,8 @@ metadata:
     capabilities: Basic Install
     categories: Storage,Monitoring
     certified: 'false'
-    containerImage: quay.io/redhat-cop/volume-expander-operator@sha256:13c0ef37e384beb429a43bb814712416f5ab1b5cc70c96c78d44fa1c2c90a321
-    createdAt: "2022-04-24T14:37:56Z"
+    containerImage: quay.io/redhat-cop/volume-expander-operator@sha256:a7600149b78bf1d9e4f9c634d759e5dd2fc2f200c105161bfe58b24b946712d4
+    createdAt: "2022-04-25T14:04:11Z"
     description: This operator provides automation expanding pod's volumes when they are about to run out of space.
     operatorframework.io/cluster-monitoring: 'true'
     operatorframework.io/suggested-namespace: volume-expander-operator
@@ -135,7 +135,7 @@ spec:
                       - --leader-elect
                     command:
                       - /manager
-                    image: quay.io/redhat-cop/volume-expander-operator@sha256:13c0ef37e384beb429a43bb814712416f5ab1b5cc70c96c78d44fa1c2c90a321
+                    image: quay.io/redhat-cop/volume-expander-operator@sha256:a7600149b78bf1d9e4f9c634d759e5dd2fc2f200c105161bfe58b24b946712d4
                     livenessProbe:
                       httpGet:
                         path: /healthz
@@ -223,4 +223,4 @@ spec:
     - name: quay.io/redhat-cop/kube-rbac-proxy
       image: quay.io/redhat-cop/kube-rbac-proxy@sha256:c68135620167c41e3d9f6c1d2ca1eb8fa24312b86186d09b8010656b9d25fb47
     - name: quay.io/redhat-cop/volume-expander-operator
-      image: quay.io/redhat-cop/volume-expander-operator@sha256:13c0ef37e384beb429a43bb814712416f5ab1b5cc70c96c78d44fa1c2c90a321
+      image: quay.io/redhat-cop/volume-expander-operator@sha256:a7600149b78bf1d9e4f9c634d759e5dd2fc2f200c105161bfe58b24b946712d4

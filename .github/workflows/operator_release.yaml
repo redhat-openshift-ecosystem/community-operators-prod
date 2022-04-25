@@ -12,7 +12,7 @@ on:
         required: true
         default: '0'   
       delete:
-        description: 'Delete operator virtually (cockroachdb or cockroachdb/5.0.4) for debuging only'
+        description: 'Remove operator virtually from git (cockroachdb or cockroachdb/5.0.4) for debuging only'
         required: false
         default: ''
 
@@ -47,6 +47,8 @@ env:
   OPP_THIS_REPO_BASE: "https://github.com"
   OPP_THIS_REPO: "redhat-openshift-ecosystem/community-operators-prod"
   OPP_THIS_BRANCH: "main"
+  INDEX_PATH_TO_SIGN: "registry.redhat.io/redhat/community-operator-index"
+  SIGNATURE_ENDPOINT: "https://community-signing-pipeline-prod.apps.pipelines-prod.ijdb.p1.openshiftapps.com"
   OPP_REVIEWERS_ENABLED: 0
 
 
@@ -66,10 +68,6 @@ jobs:
     name: "PR-traffic-light"
     runs-on: ubuntu-latest
     steps:
-      - name: Block until there is no running workflow
-        uses: softprops/turnstyle@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Checkout code
         uses: actions/checkout@v2
       - id: files
@@ -99,7 +97,11 @@ jobs:
           echo "OPP_LABELS=$OPP_LABELS"
           echo "Using script '$OPP_SCRIPT_ENV_URL' ..."
           bash <(curl -sL $OPP_SCRIPT_ENV_URL)
-
+      - name: Block until there is no running workflow
+        if: steps.op-traffic-light.outputs.opp_release_ready == '1'
+        uses: softprops/turnstyle@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
       opp_labels: "${{ steps.prinfo.outputs.labels }}"
       opp_test_ready: "${{ steps.op-traffic-light.outputs.opp_test_ready }}"
@@ -121,7 +123,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb', 'v4.11-rc']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11-rc']
 
       fail-fast: false
     steps:
@@ -159,7 +161,7 @@ jobs:
     name: "Index check / ocp"
     needs: [pr-check, remove-ocp ]
 
-    if: needs.pr-check.outputs.opp_release_ready == '1'
+    if: needs.pr-check.outputs.opp_release_ready == '1' && needs.pr-check.outputs.opp_op_delete == '0'
     runs-on: ubuntu-latest
     steps:
       - name: List of missing operators
@@ -199,7 +201,6 @@ jobs:
           ANSIBLE_DISPLAY_SKIPPED_HOSTS: 0
           ANSIBLE_STDOUT_CALLBACK: "yaml"
         run: |
-          # OPP_ANSIBLE_PULL_BRANCH="upstream-community-dev"
           OPP_FORCE_OPERATORS=${OPP_FORCE_OPERATORS// /,}
           echo $OPP_FORCE_OPERATORS
           [ "$OPP_AUTO_LABEL" = '1' ] && ANSIBLE_ARGS="-e automatic_cluster_version_label=true" || ANSIBLE_ARGS="-e automatic_cluster_version_label=false"
@@ -270,7 +271,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb', 'v4.11-rc']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11-rc']
 
       fail-fast: false
     steps:
@@ -288,10 +289,11 @@ jobs:
         env:
           OPP_LABELS: "${{ needs.pr-check.outputs.opp_labels }}"
           OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
-          OPP_IIB_INSTALL: 0
-          OPP_MIRROR_INDEX_ENABLED: 0
+          OPP_IIB_INSTALL: 1
+
           OPP_FORCE_INDEX_UPDATE: 1
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
+          IIB_OUTPUT_REGISTRY_TOKEN: ${{ secrets.IIB_OUTPUT_REGISTRY_TOKEN }}
           OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
           # OPP_FORCE_OPERATORS: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators }}"
           OPP_FORCE_OPERATORS: ""
@@ -311,6 +313,47 @@ jobs:
           echo "orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
           bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH || $FAKE_RC
 
+      - name: Sign index
+        id: openshift-vars
+        env:
+          OPERATOR_INDEX_TAG_RAW: ${{ matrix.index-tag }}
+          OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
+        run: |
+          docker login ${OPP_MIRROR_INDEX_REGISTRY} -u $OPP_REGISTRY_MIRROR_USER -p $REGISTRY_MIRROR_PW
+          OPERATOR_INDEX_TAG=$(echo ${OPERATOR_INDEX_TAG_RAW} |cut -d'-' -f1)
+          skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} > /dev/null # error out if needed
+          OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} | jq -r ".Digest")
+          OPERATOR_INDEX_RESOLVED="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}@${OPERATOR_INDEX_DIGEST}"
+          OPERATOR_INDEX="${INDEX_PATH_TO_SIGN}:${OPERATOR_INDEX_TAG}"
+          SIGNATURE_PAYLOAD="{\"manifest_digest\": \"${OPERATOR_INDEX_DIGEST}\", \"reference\": \"${OPERATOR_INDEX}\",\"requester\": \"${{ secrets.SIGNATURE_WEBHOOK_REQUESTER_EMAIL }}\"}"
+          echo ${SIGNATURE_PAYLOAD}
+          curl ${SIGNATURE_ENDPOINT} -d "${SIGNATURE_PAYLOAD}" -u "community-op-cert:${{ secrets.SIGNATURE_WEBHOOK_PASSWD }}"
+      # - name: Prepare variables for the sign process
+      #   id: openshift-vars
+      #   env:
+      #     OPERATOR_INDEX_TAG_RAW: ${{ matrix.index-tag }}
+      #     OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
+      #   run: |
+      #     docker login ${OPP_MIRROR_INDEX_REGISTRY} -u $OPP_REGISTRY_MIRROR_USER -p $REGISTRY_MIRROR_PW
+      #     OPERATOR_INDEX_TAG=$(echo ${OPERATOR_INDEX_TAG_RAW} |cut -d'-' -f1)
+      #     skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} > /dev/null # error out if needed
+      #     OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} | jq -r ".Digest")
+      #     OPERATOR_INDEX_RESOLVED="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}@${OPERATOR_INDEX_DIGEST}"
+      #     OPERATOR_INDEX="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG}"
+      #     echo $OPERATOR_INDEX_RESOLVED
+      #     echo $OPERATOR_INDEX
+      #     echo "::set-output name=operator_index_resolved::${OPERATOR_INDEX_RESOLVED}"
+      #     echo "::set-output name=operator_index::${OPERATOR_INDEX}"
+      # - name: Initialize sign process
+      #   uses: operator-framework/community-operators@webhook
+      #   continue-on-error: true
+      #   env:
+      #     INDEX_SHA: "${{ steps.openshift-vars.outputs.index_sha }}"
+      #     webhook_type: 'json-extended'
+      #     webhook_url: 'https://api.enterprise.redhat.com/hydra/umb-bridge/v1/publish'
+      #     webhook_secret: ${{ secrets.SIGNATURE_WEBHOOK_SECRET }}
+      #     data: "{\"index_image\": \"${{ steps.openshift-vars.outputs.operator_index }}\", \"index_image_resolved\": \"${{ steps.openshift-vars.outputs.operator_index_resolved }}\"}"
+ 
   push-to-quay-ocp:
     name: "Push to quay / ocp"
 
@@ -326,71 +369,46 @@ jobs:
           echo "push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH"
           bash <(curl -sL $OPP_SCRIPT_URL) push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH || true
 
-  release-sha-ocp:
-    name: "Index production / ocp"
-    needs: [ pr-check, release-ocp ]
+#   release-sha-ocp:
+#     name: "Index production / ocp"
+#     needs: [ pr-check, release-ocp ]
+# 
+#     if: needs.pr-check.outputs.opp_release_ready == '1' && ( github.event.inputs.mirror_index_to_final_location == '' || github.event.inputs.mirror_index_to_final_location != '0')
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+# # #         index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11-rc']
+# # # 
+#       fail-fast: false
+#     steps:
+      # - name: Download operator_info
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: operator_info
+      #     path: /tmp/operator-test/
+      # - name: Download converted operators
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: operators_converted
+      #     path: /tmp/operator-test/operators
 
-    if: needs.pr-check.outputs.opp_release_ready == '1' && ( github.event.inputs.mirror_index_to_final_location == '' || github.event.inputs.mirror_index_to_final_location != '0')
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb', 'v4.11-rc']
+      # - name: Release final index
+      #   env:
+      #     OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
+      #     IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
+      #     IIB_OUTPUT_REGISTRY_TOKEN: ${{ secrets.IIB_OUTPUT_REGISTRY_TOKEN }}
+      #   run: |
+      #     FAKE_RC=false
+      #     FAKE_TYPE=$(echo $OPERATOR_INDEX_TAG | cut -d '-' -f 2)
+      #     [[ $FAKE_TYPE == *rc* ]] && FAKE_RC=true || true
 
-      fail-fast: false
-    steps:
-      - name: Download operator_info
-        uses: actions/download-artifact@v2
-        with:
-          name: operator_info
-          path: /tmp/operator-test/
-      - name: Download converted operators
-        uses: actions/download-artifact@v2
-        with:
-          name: operators_converted
-          path: /tmp/operator-test/operators
-
-      - name: Release final index
-        env:
-          OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
-          IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-          IIB_OUTPUT_REGISTRY_TOKEN: ${{ secrets.IIB_OUTPUT_REGISTRY_TOKEN }}
-        run: |
-          FAKE_RC=false
-          FAKE_TYPE=$(echo $OPERATOR_INDEX_TAG | cut -d '-' -f 2)
-          [[ $FAKE_TYPE == *rc* ]] && FAKE_RC=true || true
-
-          echo "openshift: $OPERATOR_INDEX_TAG"
-          bash <(curl -sL $OPP_SCRIPT_ISS_URL) openshift $OPERATOR_INDEX_TAG || $FAKE_RC
-
-      - name: Prepare variables for the sign process
-        id: openshift-vars
-        env:
-          OPERATOR_INDEX_TAG_RAW: ${{ matrix.index-tag }}
-          OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
-        run: |
-          docker login ${OPP_MIRROR_INDEX_REGISTRY} -u $OPP_REGISTRY_MIRROR_USER -p $REGISTRY_MIRROR_PW
-          OPERATOR_INDEX_TAG=$(echo ${OPERATOR_INDEX_TAG_RAW} |cut -d'-' -f1)
-          skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} > /dev/null # error out if needed
-          OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} | jq -r ".Digest")
-          OPERATOR_INDEX_RESOLVED="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}@${OPERATOR_INDEX_DIGEST}"
-          OPERATOR_INDEX="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG}"
-          echo $OPERATOR_INDEX_RESOLVED
-          echo $OPERATOR_INDEX
-          echo "::set-output name=operator_index_resolved::${OPERATOR_INDEX_RESOLVED}"
-          echo "::set-output name=operator_index::${OPERATOR_INDEX}"
-      - name: Initialize sign process
-        uses: operator-framework/community-operators@webhook
-        continue-on-error: true
-        env:
-          INDEX_SHA: "${{ steps.openshift-vars.outputs.index_sha }}"
-          webhook_type: 'json-extended'
-          webhook_url: 'https://api.enterprise.redhat.com/hydra/umb-bridge/v1/publish'
-          webhook_secret: ${{ secrets.SIGNATURE_WEBHOOK_SECRET }}
-          data: "{\"index_image\": \"${{ steps.openshift-vars.outputs.operator_index }}\", \"index_image_resolved\": \"${{ steps.openshift-vars.outputs.operator_index_resolved }}\"}"
+      #     echo "openshift: $OPERATOR_INDEX_TAG"
+      #     bash <(curl -sL $OPP_SCRIPT_ISS_URL) openshift $OPERATOR_INDEX_TAG || $FAKE_RC
+# 
 
   slack-notification:
     name: "Slack notification"
-    needs: [ pr-check, remove-ocp, operators-ocp, bundles-ocp, release-ocp, release-sha-ocp, push-to-quay-ocp ]
+    needs: [ pr-check, remove-ocp, operators-ocp, bundles-ocp, release-ocp, push-to-quay-ocp ]
 
     if: failure()
     runs-on: ubuntu-latest

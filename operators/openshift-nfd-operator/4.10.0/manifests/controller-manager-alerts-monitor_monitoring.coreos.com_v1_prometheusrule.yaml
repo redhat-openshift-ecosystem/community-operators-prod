@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    role: alert-rules
+  name: controller-manager-alerts-monitor
+spec:
+  groups:
+  - name: node-feature-discovery-operator.rules
+    rules:
+    - alert: NFDDegraded
+      annotations:
+        message: |
+          The Node Feature Discovery Operator is degraded. Review the "NodeFeatureDiscovery" CustomResource object for further details.
+      expr: nfd_degraded_info == 1
+      for: 1h
+      labels:
+        severity: warning

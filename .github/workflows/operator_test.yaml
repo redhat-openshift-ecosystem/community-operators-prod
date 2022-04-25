@@ -34,6 +34,7 @@ env:
   KIND_KUBE_VERSION: "v1.21.1"
   OPP_PRODUCTION_TYPE: "ocp"
   OPP_REVIEWERS_ENABLED: 1
+  OPP_FORCE_DEPLOY_ON_K8S_OPENSHIFT_VERSION: 4.8
 #  ARTEFACT_PATH: "/tmp/operator-test" #hardcoded for now
 
 
@@ -65,6 +66,7 @@ jobs:
 
       - name: Operator info
         id: op-info
+        if: steps.op-traffic-light.outputs.opp_op_delete == '0'
         env:
           OPP_LABELS: "${{ join(github.event.pull_request.labels.*.name, ' ') }}"
           OPP_PR_AUTHOR: "${{ github.event.pull_request.user.login }}"
@@ -83,17 +85,17 @@ jobs:
           ANSIBLE_ARGS="$ANSIBLE_ARGS -e stream_kind=openshift_upstream"
           echo $ANSIBLE_ARGS
 
-          ansible-pull -U $OPP_ANSIBLE_PULL_REPO -C $OPP_ANSIBLE_PULL_BRANCH -i localhost, -e run_upstream=true -e run_prepare_catalog_repo_upstream=false -e run_remove_catalog_repo=false upstream/local.yml --tags reset_tools,operator_info -e operator_dir=$PWD/operators/operators/${{ steps.op-traffic-light.outputs.opp_name }} -e cluster_type=$OPP_PRODUCTION_TYPE -e strict_cluster_version_labels=true -e production_registry_namespace=$OPP_RELEASE_BUNDLE_REGISTRY/$OPP_RELEASE_BUNDLE_ORGANIZATION $ANSIBLE_ARGS
+          ansible-pull -U $OPP_ANSIBLE_PULL_REPO -C $OPP_ANSIBLE_PULL_BRANCH -i localhost, -e run_upstream=true -e run_prepare_catalog_repo_upstream=false -e run_remove_catalog_repo=false upstream/local.yml --tags reset_tools,operator_info -e operator_dir=$PWD/operators/operators/${{ steps.op-traffic-light.outputs.opp_name }} -e cluster_type=$OPP_PRODUCTION_TYPE -e strict_cluster_version_labels=true -e strict_k8s_bundles=true -e production_registry_namespace=$OPP_RELEASE_BUNDLE_REGISTRY/$OPP_RELEASE_BUNDLE_ORGANIZATION $ANSIBLE_ARGS
 
       - name: Operator info (result)
         id: op-info-result
-        if: always()
+        if: always() && steps.op-traffic-light.outputs.opp_op_delete == '0'
         run: |
           echo "::set-output name=opp_check_err_cluster_version_autolabel::0"
           [ -f /tmp/operator-test/op_auto_labels.yaml ] && echo "::set-output name=opp_check_err_cluster_version_autolabel::1" || true
       - name: Operator info (comment)
         id: op-info-comment
-        if: always() && steps.op-info-result.outputs.opp_check_err_cluster_version_autolabel == '1'
+        if: always() && steps.op-info-result.outputs.opp_check_err_cluster_version_autolabel == '1' && steps.op-traffic-light.outputs.opp_op_delete == '0'
         uses: mshick/add-pr-comment@v1
         with:
           message: |
@@ -113,15 +115,18 @@ jobs:
 
       - name: Upload operator_info
         uses: actions/upload-artifact@v2
+        if: steps.op-traffic-light.outputs.opp_op_delete == '0'
         with:
           name: operator_info
           path: "/tmp/operator-test/op_info.yaml"
       - name: Upload converted operators
+        if: steps.op-traffic-light.outputs.opp_op_delete == '0'
         uses: actions/upload-artifact@v2
         with:
           name: operators_converted
           path: "/tmp/operator-test/operators"
       - shell: bash
+        if: steps.op-traffic-light.outputs.opp_op_delete == '0'
         run: |
           ls /tmp/operator-test/
           cat /tmp/operator-test/op_info.yaml
@@ -135,11 +140,12 @@ jobs:
       opp_ci_yaml_only: "${{ steps.op-traffic-light.outputs.opp_ci_yaml_only }}"
       opp_op_delete: "${{ steps.op-traffic-light.outputs.opp_op_delete }}"
       opp_auto_packagemanifest_cluster_version_label: "${{ steps.op-traffic-light.outputs.opp_auto_packagemanifest_cluster_version_label }}"
+      opp_installation_skipped: "${{ steps.op-traffic-light.outputs.opp_installation_skipped }}"
 
   test-kiwi:
     name: "kiwi / Full operator test"
     needs: pr-check
-    if: needs.pr-check.outputs.opp_test_ready == '1'
+    if: needs.pr-check.outputs.opp_test_ready == '1' && needs.pr-check.outputs.opp_op_delete == '0'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -165,6 +171,7 @@ jobs:
         env:
           OPP_LABELS: "${{ join(github.event.pull_request.labels.*.name, ' ') }}"
           OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
+          OPP_INSTALLATION_SKIP: "${{ needs.pr-check.outputs.opp_installation_skipped }}"
         run: |
           echo "kiwi operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }}"
           bash <(curl -sL $OPP_SCRIPT_URL) kiwi "operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }}"
@@ -205,11 +212,11 @@ jobs:
   test-lemon-openshift:
     name: "lemon / Deploy from scratch"
     needs: pr-check
-    if: needs.pr-check.outputs.opp_test_ready == '1'
+    if: needs.pr-check.outputs.opp_test_ready == '1' && needs.pr-check.outputs.opp_op_delete == '0'
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb', 'v4.11-rc']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11-rc']
 
       fail-fast: false
     steps:
@@ -250,7 +257,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-rcdb', 'v4.11-rc']
+        index-tag: ['v4.6-db', 'v4.7-db', 'v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11-rc']
 
       fail-fast: false
     steps:

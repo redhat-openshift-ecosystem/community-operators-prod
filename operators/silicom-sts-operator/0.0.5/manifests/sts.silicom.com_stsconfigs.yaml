@@ -1,0 +1,608 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.6.1
+  creationTimestamp: null
+  name: stsconfigs.sts.silicom.com
+spec:
+  group: sts.silicom.com
+  names:
+    kind: StsConfig
+    listKind: StsConfigList
+    plural: stsconfigs
+    singular: stsconfig
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: StsConfig is the Schema for the stsconfigs API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: StsConfigSpec defines the desired state of StsConfig
+            properties:
+              aprLevel:
+                default: 0
+                maximum: 8
+                minimum: 0
+                type: integer
+              domainNum_8265_2:
+                default: 4
+                maximum: 23
+                minimum: 4
+                type: integer
+              domainNum_8275_1:
+                default: 24
+                maximum: 43
+                minimum: 24
+                type: integer
+              domainNum_8275_2:
+                default: 44
+                maximum: 63
+                minimum: 44
+                type: integer
+              esmcMode:
+                default: 2
+                description: "Configures the ESMC Mode \n 1 - Manual \n 2 - Auto (default)"
+                maximum: 2
+                minimum: 1
+                type: integer
+              forwardable:
+                default: 0
+                description: "Forwardable/Non-Forwardable Multicast Address \n 0 -
+                  Non-Forwardable (default) \n 1 - Forwardable"
+                maximum: 1
+                minimum: 0
+                type: integer
+              gnssSpec:
+                properties:
+                  gnssAntSet:
+                    default: 1
+                    description: "Antenna setting Valid range 0-2 \n     0 - Unknown
+                      \n     1 - Passive \n     2 - Active"
+                    maximum: 2
+                    minimum: 0
+                    type: integer
+                  gnssCableDelay:
+                    description: "Antenna cable delay settings (nsec) Valid range
+                      +-50,000,000 \n     N - nanoseconds"
+                    maximum: 50000000
+                    minimum: -50000000
+                    type: integer
+                  gnssClockOutEn:
+                    default: 1
+                    description: "Enable/disable the Clock Out Valid range 0-1 \n
+                      \    0 - Disable \n     1 - Enable (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssDutyLockTP1:
+                    default: 10
+                    description: "Set Time Pulse Duty Cycle (%), when locked to GNSS
+                      time, for the first Time Pulse Valid range 0-100 \n     10 -
+                      (default)"
+                    maximum: 100
+                    minimum: 0
+                    type: integer
+                  gnssDutyLockTP2:
+                    default: 50
+                    description: "Set Time Pulse Duty Cycle (%), when locked to GNSS
+                      time, for the second Time Pulse Valid range 0-100 \n     50
+                      - (default)"
+                    maximum: 100
+                    minimum: 0
+                    type: integer
+                  gnssDutyTP1:
+                    default: 1
+                    description: "Set Time Pulse Duty Cycle (%) for the first Time
+                      Pulse Valid range 0-100 \n     0 - (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssDutyTP2:
+                    default: 0
+                    description: "Set Time Pulse Duty Cycle (%) for the second Time
+                      Pulse Valid range 0-100 \n     0 - (default)"
+                    maximum: 100
+                    minimum: 0
+                    type: integer
+                  gnssFreqLockTP1:
+                    default: 1
+                    description: "Set Time pulse Frequency (Hz), when locked to GNSS
+                      time, for the first Time Pulse Valid range \n     1 - (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssFreqLockTP2:
+                    default: 10000000
+                    description: "Set Time pulse Frequency (Hz), when locked to GNSS
+                      time, for the second Time Pulse Valid range \n     10000000
+                      - (default)"
+                    type: integer
+                  gnssFreqTP1:
+                    default: 1
+                    description: "Set Time Pulse Frequency (Hz) for the first Time
+                      Pulse Valid range \n     1 - (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssFreqTP2:
+                    default: 10000000
+                    description: "Set Time Pulse Frequency (Hz) for the second Time
+                      Pulse Valid range \n     10000000 - (default)"
+                    type: integer
+                  gnssIntfDetect:
+                    default: 1
+                    description: "Enable/disable interference detection Valid range
+                      0-1 \n     0 - Disable interference detection \n     1 - Enable
+                      interference detection (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssLockMode:
+                    default: 1
+                    description: "GNSS Lock Mode Valid range 0-1 \n     0 - Manual
+                      \n     1 - Auto (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssLockTh:
+                    default: 100
+                    description: "GNSS Lock Threshold (nsec) Valid range 0-10000 \n
+                      \    100 - (default)"
+                    maximum: 10000
+                    minimum: 0
+                    type: integer
+                  gnssMinElev:
+                    description: "Minimum elevation level (degrees) Valid range \n
+                      \    N - degrees"
+                    type: integer
+                  gnssMinSatSig:
+                    description: "Minimum satellite signal level for navigation (dBHz)
+                      Valid range \n     N - dBHz"
+                    type: integer
+                  gnssMsgNmeaUsb:
+                    default: 31
+                    description: "Information Message Flags for NMEA Protocol on the
+                      USB (bitmask) Valid range 0-31 \n     Bit 0 - Enable (default)
+                      / Disable Error Information Messages \n     Bit 1 - Enable (default)
+                      / Disable Warning Information Messages \n     Bit 2 - Enable
+                      (default) / Disable Notice Information Messages \n     Bit 3
+                      - Enable/Disable (default) Test Information Messages \n     Bit
+                      4 - Enable/Disable (default) Debug Information Messages"
+                    maximum: 31
+                    minimum: 0
+                    type: integer
+                  gnssMsgUbxUsb:
+                    default: 31
+                    description: "Information Message Flags for UBX Protocol on the
+                      USB (bitmask) Valid range 0-31 \n     Bit 0 - Enable (default)
+                      / Disable Error Information Messages \n     Bit 1 - Enable (default)
+                      / Disable Warning Information Messages \n     Bit 2 - Enable
+                      (default) / Disable Notice Information Messages \n     Bit 3
+                      - Enable/Disable (default) Test Information Messages \n     Bit
+                      4 - Enable/Disable (default) Debug Information Messages"
+                    maximum: 31
+                    minimum: 0
+                    type: integer
+                  gnssPulseDef:
+                    default: 1
+                    description: "Time Pulse is interpreted as Period or Frequency
+                      Valid range 0-1 \n     0 - Period \n     1 - Frequency (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssPulseLenDef:
+                    default: 1
+                    description: "Time Pulse Length is interpreted as Pulse Ratio
+                      (%) or Length (nsec) Valid range 0-1 \n     0 - Pulse Ratio
+                      (default) \n     1 - Length"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssRecvTMode:
+                    default: 1
+                    description: "Receiver Time Mode Valid range 0-2 \n     0 - Disabled
+                      \n     1 - Survey-in (default) \n     2 - Fixed Mode (true ARP
+                      position information required)"
+                    maximum: 2
+                    minimum: 0
+                    type: integer
+                  gnssSigBDSB1En:
+                    default: 1
+                    description: "Enable/disable BeiDou B1I Valid range 0-1 \n     0
+                      - Disable BeiDou B1I \n     1 - Enable BeiDou B1I (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigBDSB2En:
+                    default: 1
+                    description: "Enable/disable BeiDou B2I Valid range 0-1 \n     0
+                      - Disable BeiDou B2I \n     1 - Enable BeiDou B2I (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigBDSEn:
+                    default: 1
+                    description: "Enable/disable BeiDou Valid range 0-1 \n     0 -
+                      Disable BeiDou \n     1 - Enable BeiDou (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigGLOEn:
+                    default: 1
+                    description: "Enable/disable GLONASS Valid range 0-1 \n     0
+                      - Disable GLONASS \n     1 - Enable GLONASS (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigGLOL1En:
+                    default: 1
+                    description: "Enable/disable GLONASS L1 Valid range 0-1 \n     0
+                      - Disable GLONASS L1 \n     1 - Enable GLONASS L1 (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigGLOL2En:
+                    default: 1
+                    description: "Enable/disable GLONASS L2 Valid range 0-1 \n     0
+                      - Disable GLONASS L2 \n     1 - Enable GLONASS L2 (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigGalE1En:
+                    default: 1
+                    description: "Enable/disable Galileo E1 Valid range 0-1 \n     0
+                      - Disable Galileo E1 \n     1 - Enable Galileo E1 (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigGalE5BEn:
+                    default: 1
+                    description: "Enable/disable Galileo E5b Valid range 0-1 \n     0
+                      - Disable Galileo E5b \n     1 - Enable Galileo E5b (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigGalEn:
+                    default: 1
+                    description: "Enable/disable Galileo Valid range 0-1 \n     0
+                      - Disable Galileo \n     1 - Enable Galileo (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigGpsEn:
+                    default: 1
+                    description: "Enable/disable GPS \n Valid range 0-1 \n 0 - Disable
+                      GPS \n 1 - Enable GPS (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigGpsL1CAEn:
+                    default: 1
+                    description: "Enable/disable GPS L1C/A Valid range 0-1 \n     0
+                      - Disable GPS L1C/A \n     1 - Enable GPS L1C/A (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigGpsL2CEn:
+                    default: 1
+                    description: "Enable/disable GPS L2C Valid range 0-1 \n     0
+                      - Disable GPS L2C \n     1 - Enable GPS L2C (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigQZSSEn:
+                    default: 1
+                    description: "Enable/disable QZSS Valid range 0-1 \n     0 - Disable
+                      QZSS \n     1 - Enable QZSS (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigQZSSL1CAEn:
+                    default: 1
+                    description: "Enable/disable QZSS L1C/A Valid range 0-1 \n     0
+                      - Disable QZSS L1C/A \n     1 - Enable QZSS L1C/A (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigQZSSL1SEn:
+                    default: 1
+                    description: "Enable/disable QZSS L1S Valid range 0-1 \n     0
+                      - Disable QZSS L1S (default) \n     1 - Enable QZSS L1S"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigQZSSL2CEn:
+                    default: 1
+                    description: "Enable/disable QZSS L2C Valid range 0-1 \n     0
+                      - Disable QZSS L2C \n     1 - Enable QZSS L2C (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigSBASEn:
+                    default: 1
+                    description: "Enable/disable SBAS Valid range 0-1 \n     0 - Disable
+                      SBAS \n     1 - Enable SBAS (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSigSBASL1CAEn:
+                    default: 1
+                    description: "Enable/disable SBAS L1C/A Valid range 0-1 \n     0
+                      - Disable SBAS L1C/A (default) \n     1 - Enable SBAS L1C/A"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssSvinAccLimit:
+                    default: 100000
+                    description: "Survey-in Position Accuracy Limit (mm) Valid range
+                      \n     100000 - (default)"
+                    type: integer
+                  gnssSvinMinDur:
+                    default: 120
+                    description: "Survey-in Minimum Duration (sec) Valid range \n
+                      \    120 - (default)"
+                    type: integer
+                  gnssTP1En:
+                    default: 1
+                    description: "Enable/disable the first Time Pulse Valid range
+                      0-1 \n     0 - Disable \n     1 - Enable (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssTP2En:
+                    default: 1
+                    description: "Enable/disable the second Time Pulse (10 MHz) Valid
+                      range 0-1 \n     0 - Disable \n     1 - Enable (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssUseLockTP1:
+                    default: 1
+                    description: "Use locked parameters, when possible, for the first
+                      Time Pulse Valid range 0-1 \n     0 - Disable \n     1 - Enable
+                      (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                  gnssUseLockTP2:
+                    default: 1
+                    description: "Use locked parameters, when possible, for the second
+                      Time Pulse Valid range 0-1 \n     0 - Disable \n     1 - Enable
+                      (default)"
+                    maximum: 1
+                    minimum: 0
+                    type: integer
+                type: object
+              interfaces:
+                items:
+                  properties:
+                    ethName:
+                      type: string
+                    ethPort:
+                      description: This is 1 based
+                      minimum: 1
+                      type: integer
+                    holdoff:
+                      default: 500
+                      maximum: 1800
+                      minimum: 300
+                      type: integer
+                    ipv4:
+                      default: 0
+                      maximum: 1
+                      minimum: 0
+                      type: integer
+                    ipv6:
+                      default: 0
+                      maximum: 1
+                      minimum: 0
+                      type: integer
+                    mode:
+                      default: Master
+                      enum:
+                      - Master
+                      - Slave
+                      type: string
+                    ql:
+                      default: 4
+                      description: "Configures QL value for the interface \n if syncOption
+                        is 1 (Europe) \n =========================== \n 1 - QL-PRC
+                        \n 2 - QL-PRTC \n 3 - QL-EEC1 \n 4 - QL-DNU (default) \n if
+                        syncOption is 2 (United States) \n ==================================
+                        \n 5 - QL-PRS \n 2 - QL-PRTC \n 6 - QL-EEC2 \n 7 - QL-DUS
+                        (default)"
+                      maximum: 7
+                      minimum: 1
+                      type: integer
+                    qlEnable:
+                      default: 0
+                      description: Configures QL enable for the interface 0 - Disable
+                        QL 1 - Enable QL (default)
+                      maximum: 1
+                      minimum: 0
+                      type: integer
+                    synce:
+                      default: 0
+                      maximum: 1
+                      minimum: 0
+                      type: integer
+                  required:
+                  - ethName
+                  type: object
+                type: array
+              mode:
+                default: T-GM.8275.1
+                description: "Telecom G8275 Profile \n T-BC-8275.1 (default) \n T-GM.8275.1
+                  \n T-TSC.8275.1"
+                enum:
+                - T-GM.8275.1
+                - T-BC-8275.1
+                - T-TSC.8275.1
+                - T-GM.8275.2
+                - T-BC-P-8275.2
+                type: string
+              mode10MHz:
+                default: 2
+                description: "Set 10MHz Connector Mode \n 1 - 10MHz IN \n 2 - 10MHz
+                  OUT (default) \n 3 - PPS OUT"
+                maximum: 3
+                minimum: 1
+                type: integer
+              modePPS:
+                default: 2
+                description: "Set 1PPS Connector Mode \n 1 - PPS IN \n 2 - PPS OUT
+                  (default)"
+                maximum: 2
+                minimum: 1
+                type: integer
+              namespace:
+                default: sts-silicom
+                type: string
+              nodeSelector:
+                additionalProperties:
+                  type: string
+                type: object
+              phyLedsCtl:
+                default: 0
+                description: "Enable/disable Phy Leds Control Switch \n 0 - disable
+                  Phy Leds Control Switch (default) \n 1 - enable Phy Leds Control
+                  Switch"
+                maximum: 1
+                minimum: 0
+                type: integer
+              priority2:
+                default: 128
+                description: "Set Priority 2 for GM PTP Clock \n Valid range 0-255,
+                  smaller values indicate higher priority"
+                maximum: 255
+                minimum: 0
+                type: integer
+              src10MHz:
+                default: 1
+                description: "Set 10MHz OUT Source \n 1 - PLL (default) \n 2 - GPS
+                  \n 3 - IN"
+                maximum: 3
+                minimum: 1
+                type: integer
+              srcPPS:
+                default: 1
+                description: "Set PPS OUT Source \n 1 - PLL (default) \n 2 - GPS \n
+                  3 - IN"
+                maximum: 3
+                minimum: 1
+                type: integer
+              ssmMode:
+                default: 1
+                description: "Configures the SSM Mode \n 1 - SSM Code (default) \n
+                  2 - ESSM Code"
+                maximum: 2
+                minimum: 1
+                type: integer
+              syncOption:
+                default: 1
+                description: "Configures the synchronization network \n 1 - Option
+                  1 refers to synchronization networks designed for Europe \n 2 -
+                  Option 2 refers to synchronization networks designed for United
+                  States"
+                maximum: 2
+                minimum: 1
+                type: integer
+              synceCpu:
+                default: 10
+                description: Set CPU Pin for SyncE ESMC thread
+                maximum: 40
+                minimum: 1
+                type: integer
+              synceHoldOff:
+                default: 500
+                maximum: 1800
+                minimum: 300
+                type: integer
+              synceRecClkPort:
+                default: 0
+                description: Set SyncE Recovery Clock Port
+                maximum: 7
+                minimum: 0
+                type: integer
+              traceLevel:
+                default: 0
+                maximum: 8
+                minimum: 0
+                type: integer
+              traceModule:
+                default: 23
+                description: "Trace module \n Valid range 0-36 \n 0 - Read/Write \n
+                  1 - Init \n 2 - Lan \n 3 - Lan Stats \n 4 - Device specific interrupt
+                  \n 5 - System interrupt \n 6 - TS Engine interrupt \n 7 - Packet
+                  interrupt \n 8 - PLL interrupt \n 9 - Signal Handler \n 10 - TS
+                  Packet Stream interrupt \n 11 - Transport Layer interrupt \n 12
+                  - PTP Timestamp interrupt \n 13 - Packet Schedule interrupt \n 14
+                  - Main PTP Engine \n 15 - PTP Best-Master-Clock related \n 16 -
+                  PTP Unicast Negotiation related \n 17 - PTP Unicast Discovery related
+                  \n 18 - PTP Clock, Port or Stream State related \n 19 - TS RECORD
+                  MGR \n 20 - Socket Layer \n 21 - Clock Switch \n 22 - DCO MGR \n
+                  23 - Track Packet Process (default) \n 24 - TOD Manager \n 25 -
+                  TSIF \n 26 - MSGQ \n 27 - FPE \n 28 - PTP Foreign Master Table \n
+                  29 - PTSF \n 30 - Notify \n 31 - Signal Pipe Handler \n 32 - G781
+                  \n 33 - PTP Timer \n 34 - PTP Tlv \n 35 - HO Utils \n 36 - TSA"
+                maximum: 36
+                minimum: 0
+                type: integer
+              tracePtpMsg:
+                default: -1
+                description: "Trace PTP Message \n Valid range -1-10 \n -1 - Disable
+                  Trace log for PTP Messages (default) \n 0 - Enable Trace for all
+                  types of PTP Messages \n 1 - Enable Trace for SYNC Messages \n 2
+                  - Enable Trace for DELAY_REQ Messages \n 3 - Enable Trace for PEER_DELAY_REQ
+                  Messages \n 4 - Enable Trace for PEER_DELAY_RESP Messages \n 5 -
+                  Enable Trace for FOLLOW_UP Messages \n 6 - Enable Trace for DELAY_RESP
+                  Messages \n 7 - Enable Trace for PEER_DELAY_FOLLOW_UP Messages \n
+                  8 - Enable Trace for ANNOUNCE Messages \n 9 - Enable Trace for SIGNAL
+                  Messages \n 10 - Enable Trace for MANAGEMENT Messages"
+                maximum: 10
+                minimum: -1
+                type: integer
+              twoStep:
+                default: 0
+                description: "Enable/disable two-step PTP Clock \n 0 - Disable two-step
+                  clock, (set one-step clock) (default) \n 1 - Enable two-step clock"
+                maximum: 1
+                minimum: 0
+                type: integer
+            required:
+            - interfaces
+            type: object
+          status:
+            description: StsConfigStatus defines the observed state of StsConfig
+            properties:
+              nodes:
+                items:
+                  type: string
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

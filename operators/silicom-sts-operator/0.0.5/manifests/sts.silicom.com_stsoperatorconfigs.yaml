@@ -34,32 +34,33 @@ spec:
           spec:
             description: StsOperatorConfigSpec defines the desired state of StsOperatorConfig
             properties:
-              gpsSvcPort:
-                default: 2947
-                type: integer
-              grpcSvcPort:
-                default: 50051
-                type: integer
               images:
                 properties:
                   gpsd:
                     default: quay.io/silicom/gpsd:3.23.1
                     type: string
                   grpcTsyncd:
-                    default: quay.io/silicom/grpc-tsyncd:2.1.0.0
+                    default: quay.io/silicom/grpc-tsyncd:2.1.1.1
                     type: string
                   phc2sys:
                     default: quay.io/silicom/phc2sys:3.1.1
                     type: string
                   stsPlugin:
-                    default: quay.io/silicom/sts-plugin:0.0.2
+                    default: quay.io/silicom/sts-plugin:0.0.5
                     type: string
                   tsyncExtts:
                     default: quay.io/silicom/tsync_extts:1.0.0
                     type: string
                   tsyncd:
-                    default: quay.io/silicom/tsyncd:2.1.0.0
+                    default: quay.io/silicom/tsyncd:2.1.1.1
                     type: string
+                required:
+                - gpsd
+                - grpcTsyncd
+                - phc2sys
+                - stsPlugin
+                - tsyncExtts
+                - tsyncd
                 type: object
               sro:
                 properties:
@@ -108,22 +109,27 @@ spec:
                     default: image-registry.openshift-image-registry.svc:5000
                     type: string
                   iceVersion:
-                    default: 1.7.16
+                    default: 1.8.3
                     type: string
                   namespace:
                     default: openshift-operators
                     type: string
                   srcImage:
-                    default: quay.io/silicom/ice-driver-src:1.7.16
+                    default: quay.io/silicom/ice-driver-src:1.8.3
                     type: string
                   srcSvcPort:
                     default: 3000
                     type: integer
                 type: object
+            required:
+            - images
+            - sro
             type: object
           status:
             description: StsOperatorConfigStatus defines the observed state of StsOperatorConfig
             type: object
+        required:
+        - spec
         type: object
     served: true
     storage: true

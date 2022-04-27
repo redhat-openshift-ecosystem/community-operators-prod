@@ -289,6 +289,7 @@ jobs:
           OPP_MIRROR_INDEX_ENABLED: 1
           OPP_IIB_INSTALL: 1
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
+          OPP_INSTALLATION_SKIP: "${{ needs.pr-check.outputs.opp_installation_skipped }}"
         run: |
           echo "orange_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }}"
           bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} "operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }}"

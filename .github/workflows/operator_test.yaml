@@ -89,7 +89,7 @@ jobs:
 
       - name: Operator info (result)
         id: op-info-result
-        if: always() && (steps.op-traffic-light.outputs.opp_op_delete == '0' || steps.op-traffic-light.outputs.opp_is_new_operatror == '1' )
+        if: always() && (steps.op-traffic-light.outputs.opp_op_delete == '0' || steps.op-traffic-light.outputs.opp_is_new_operatror == '1' || steps.op-traffic-light.outputs.opp_recreate == '1' )
         run: |
           echo "::set-output name=opp_check_err_cluster_version_autolabel::0"
           [ -f /tmp/operator-test/op_auto_labels.yaml ] && echo "::set-output name=opp_check_err_cluster_version_autolabel::1" || true
@@ -115,18 +115,18 @@ jobs:
 
       - name: Upload operator_info
         uses: actions/upload-artifact@v2
-        if: steps.op-traffic-light.outputs.opp_op_delete == '0' || steps.op-traffic-light.outputs.opp_is_new_operatror == '1'
+        if: steps.op-traffic-light.outputs.opp_op_delete == '0' || steps.op-traffic-light.outputs.opp_is_new_operatror == '1' || steps.op-traffic-light.outputs.opp_recreate == '1' 
         with:
           name: operator_info
           path: "/tmp/operator-test/op_info.yaml"
       - name: Upload converted operators
-        if: steps.op-traffic-light.outputs.opp_op_delete == '0' || steps.op-traffic-light.outputs.opp_is_new_operatror == '1'
+        if: steps.op-traffic-light.outputs.opp_op_delete == '0' || steps.op-traffic-light.outputs.opp_is_new_operatror == '1' || steps.op-traffic-light.outputs.opp_recreate == '1' 
         uses: actions/upload-artifact@v2
         with:
           name: operators_converted
           path: "/tmp/operator-test/operators"
       - shell: bash
-        if: steps.op-traffic-light.outputs.opp_op_delete == '0' || steps.op-traffic-light.outputs.opp_is_new_operatror == '1'
+        if: steps.op-traffic-light.outputs.opp_op_delete == '0' || steps.op-traffic-light.outputs.opp_is_new_operatror == '1' || steps.op-traffic-light.outputs.opp_recreate == '1' 
         run: |
           ls /tmp/operator-test/
           cat /tmp/operator-test/op_info.yaml
@@ -139,6 +139,7 @@ jobs:
       opp_version: "${{ steps.op-traffic-light.outputs.opp_version }}"
       opp_ci_yaml_only: "${{ steps.op-traffic-light.outputs.opp_ci_yaml_only }}"
       opp_op_delete: "${{ steps.op-traffic-light.outputs.opp_op_delete }}"
+      opp_recreate: "${{ steps.op-traffic-light.outputs.opp_recreate }}"
       opp_is_new_operatror: "${{ steps.op-traffic-light.outputs.opp_is_new_operatror }}"
       opp_auto_packagemanifest_cluster_version_label: "${{ steps.op-traffic-light.outputs.opp_auto_packagemanifest_cluster_version_label }}"
       opp_installation_skipped: "${{ steps.op-traffic-light.outputs.opp_installation_skipped }}"
@@ -146,7 +147,7 @@ jobs:
   test-kiwi:
     name: "kiwi / Full operator test"
     needs: pr-check
-    if: needs.pr-check.outputs.opp_test_ready == '1' && (needs.pr-check.outputs.outputs.opp_op_delete == '0' || needs.pr-check.outputs.opp_is_new_operatror == '1' )
+    if: needs.pr-check.outputs.opp_test_ready == '1' && (needs.pr-check.outputs.outputs.opp_op_delete == '0' || needs.pr-check.outputs.opp_is_new_operatror == '1' || needs.pr-check.outputs.outputs.opp_recreate == '1' )
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -213,7 +214,7 @@ jobs:
   test-lemon-openshift:
     name: "lemon / Deploy from scratch"
     needs: pr-check
-    if: needs.pr-check.outputs.opp_test_ready == '1' && (needs.pr-check.outputs.opp_op_delete == '0' || needs.pr-check.outputs.opp_is_new_operatror == '1' )
+    if: needs.pr-check.outputs.opp_test_ready == '1' && (needs.pr-check.outputs.opp_op_delete == '0' || needs.pr-check.outputs.opp_is_new_operatror == '1' || needs.pr-check.outputs.outputs.opp_recreate == '1')
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -254,7 +255,7 @@ jobs:
   test-orange-openshift:
     name: "orange / Deploy o7t"
     needs: pr-check
-    if: needs.pr-check.outputs.opp_test_ready == '1' && (needs.pr-check.outputs.opp_op_delete == '0' || needs.pr-check.outputs.opp_is_new_operatror == '1' )
+    if: needs.pr-check.outputs.opp_test_ready == '1' && (needs.pr-check.outputs.opp_op_delete == '0' || needs.pr-check.outputs.opp_is_new_operatror == '1' || needs.pr-check.outputs.outputs.opp_recreate == '1')
     runs-on: ubuntu-latest
     strategy:
       matrix:

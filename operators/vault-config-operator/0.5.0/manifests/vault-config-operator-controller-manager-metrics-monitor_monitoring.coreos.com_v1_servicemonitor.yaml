@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    control-plane: vault-config-operator
+  name: vault-config-operator-controller-manager-metrics-monitor
+spec:
+  endpoints:
+  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    interval: 30s
+    port: https
+    scheme: https
+    tlsConfig:
+      ca:
+        secret:
+          key: tls.crt
+          name: vault-config-operator-certs
+          optional: false
+      serverName: vault-config-operator-controller-manager-metrics-service.vault-config-operator.svc
+  selector:
+    matchLabels:
+      control-plane: vault-config-operator

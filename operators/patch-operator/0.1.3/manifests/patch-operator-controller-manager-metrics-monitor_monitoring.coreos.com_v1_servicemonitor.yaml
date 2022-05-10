@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    control-plane: patch-operator
+  name: patch-operator-controller-manager-metrics-monitor
+spec:
+  endpoints:
+  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    interval: 30s
+    port: https
+    scheme: https
+    tlsConfig:
+      ca:
+        secret:
+          key: tls.crt
+          name: patch-operator-certs
+          optional: false
+      serverName: patch-operator-controller-manager-metrics-service.patch-operator.svc
+  selector:
+    matchLabels:
+      control-plane: patch-operator

@@ -356,22 +356,22 @@ jobs:
       #     webhook_secret: ${{ secrets.SIGNATURE_WEBHOOK_SECRET }}
       #     data: "{\"index_image\": \"${{ steps.openshift-vars.outputs.operator_index }}\", \"index_image_resolved\": \"${{ steps.openshift-vars.outputs.operator_index_resolved }}\"}"
  
-  push-to-quay-ocp:
-    name: "Push to quay / ocp"
+#   push-to-quay-ocp:
+#     name: "Push to quay / ocp"
+# 
+#     needs: pr-check
+#     if: needs.pr-check.outputs.opp_release_ready == '1' && needs.pr-check.outputs.opp_name != '' && needs.pr-check.outputs.opp_version != ''
+#     runs-on: ubuntu-latest
+#     env:
+#       DELETE_APPREG: "${{ needs.pr-check.outputs.opp_release_delete_appreg }}"
+#       OPP_VERSION: "${{ needs.pr-check.outputs.opp_version }}"
+#     steps:
+#       - name: Push to quay
+#         run: |
+#           echo "push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH"
+#           bash <(curl -sL $OPP_SCRIPT_URL) push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH || true
 
-    needs: pr-check
-    if: needs.pr-check.outputs.opp_release_ready == '1' && needs.pr-check.outputs.opp_name != '' && needs.pr-check.outputs.opp_version != ''
-    runs-on: ubuntu-latest
-    env:
-      DELETE_APPREG: "${{ needs.pr-check.outputs.opp_release_delete_appreg }}"
-      OPP_VERSION: "${{ needs.pr-check.outputs.opp_version }}"
-    steps:
-      - name: Push to quay
-        run: |
-          echo "push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH"
-          bash <(curl -sL $OPP_SCRIPT_URL) push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH || true
-
-#   release-sha-ocp:
+# #   release-sha-ocp:
 #     name: "Index production / ocp"
 #     needs: [ pr-check, release-ocp ]
 # 
@@ -410,7 +410,7 @@ jobs:
 
   slack-notification:
     name: "Slack notification"
-    needs: [ pr-check, remove-ocp, operators-ocp, bundles-ocp, release-ocp, push-to-quay-ocp ]
+    needs: [ pr-check, remove-ocp, operators-ocp, bundles-ocp, release-ocp ]
 
     if: failure()
     runs-on: ubuntu-latest

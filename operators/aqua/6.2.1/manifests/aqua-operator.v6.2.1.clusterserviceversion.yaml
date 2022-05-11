@@ -1,7 +1,7 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: aqua-operator.v6.5.3
+  name: aqua-operator.v6.2.1
   namespace: placeholder
   annotations:
     # Setting olm.maxOpenShiftVersion automatically
@@ -11,13 +11,13 @@ metadata:
     # is compatible with it. Please, ensure that your project is no longer using these API(s) and that you start to
     # distribute solutions which is compatible with Openshift 4.9.
     # For further information, check the README of this repository.
-    olm.properties: '[{"type": "olm.maxOpenShiftVersion", "value": "4.9"}]'
+    olm.properties: '[{"type": "olm.maxOpenShiftVersion", "value": "4.8"}]'
     capabilities: Seamless Upgrades
     categories: Security
-    olm.skipRange: ">=1.0.2 <6.5.0"
+    olm.skipRange: ">=1.0.2 <6.2.1"
     description: The Aqua Security Operator runs within a Openshift cluster and provides a means to deploy and manage Aqua Security cluster and components.
     certified: "false"
-    containerImage: aquasec/aqua-operator:6.5.0
+    containerImage: aquasec/aqua-operator:6.2.0
     createdAt: 2020-03-25T08:00:00Z
     support: Aqua Security, Inc.
     repository: https://github.com/aquasecurity/aqua-operator
@@ -34,7 +34,7 @@ metadata:
             "infra": {
               "serviceAccount": "aqua-sa",
               "namespace": "aqua",
-              "version": "6.5",
+              "version": "6.2",
               "requirements": true
             },
             "common": {
@@ -89,7 +89,7 @@ metadata:
           "spec": {
             "infra": {
               "serviceAccount": "aqua-sa",
-              "version": "6.5"
+              "version": "6.2"
             },
             "common": {
               "imagePullSecret": "aqua-registry",
@@ -117,7 +117,7 @@ metadata:
           "spec": {
             "infra": {
               "serviceAccount": "aqua-sa",
-              "version": "6.5"
+              "version": "6.2"
             },
             "common": {
               "imagePullSecret": "aqua-registry"
@@ -146,7 +146,7 @@ metadata:
           },
           "spec": {
             "infra": {
-              "version": "6.5",
+              "version": "6.2",
               "serviceAccount": "aqua-kube-enforcer-sa"
             },
             "config": {
@@ -157,41 +157,13 @@ metadata:
             "deploy": {
               "service": "ClusterIP",
               "image": {
-                "registry": "registry.aquasec.com",
-                "tag": "<<KUBE_ENFORCER_TAG>>",
-                "repository": "kube-enforcer",
-                "pullPolicy": "Always"
+                  "registry": "registry.aquasec.com",
+                  "tag": "<<KUBE_ENFORCER_TAG>>",
+                  "repository": "kube-enforcer",
+                  "pullPolicy": "Always"
               }
             },
-            "token": "<<KUBE_ENFORCER_GROUP_TOKEN>>",
-            "starboard": {
-              "allowAnyVersion": true,
-              "infra": {
-                "version": "0.14.1",
-                "serviceAccount": "starboard-operator"
-              },
-              "config": {
-                "imagePullSecret": "starboard-registry"
-              },
-              "deploy": {
-                "replicas": 1,
-                "image": {
-                  "registry": "docker.io/aquasec",
-                  "tag": "",
-                  "repository": "starboard-operator",
-                  "pullPolicy": "IfNotPresent"
-                }
-              },
-              "logDevMode": false,
-              "concurrentScanJobsLimit": "",
-              "scanJobRetryAfter": "",
-              "metricsBindAddress": "",
-              "healthProbeBindAddress": "",
-              "cisKubernetesBenchmarkEnable": "",
-              "vulnerabilityScannerEnabled": "",
-              "batchDeleteLimit": "",
-              "batchDeleteDelay": ""
-            }
+            "token": "<<KUBE_ENFORCER_GROUP_TOKEN>>"
           }
         },
         {
@@ -204,7 +176,7 @@ metadata:
           "spec": {
             "infra": {
               "serviceAccount": "aqua-sa",
-              "version": "6.5"
+              "version": "6.2"
             },
             "common": {
               "databaseSecret": {
@@ -242,7 +214,7 @@ metadata:
           "spec": {
             "infra": {
               "serviceAccount": "aqua-sa",
-              "version": "6.5"
+              "version": "6.2"
             },
             "common": {
               "imagePullSecret": "aqua-registry"
@@ -273,7 +245,7 @@ metadata:
           "spec": {
             "infra": {
               "serviceAccount": "aqua-sa",
-              "version": "6.5"
+              "version": "6.2"
             },
             "common": {
               "databaseSecret": {
@@ -303,11 +275,10 @@ metadata:
           }
         }
       ]
-    operators.operatorframework.io/internal-objects: '["aquastarboards.aquasecurity.github.io","configauditreports.aquasecurity.github.io", "clusterconfigauditreports.aquasecurity.github.io"]'
 spec:
   displayName: Aqua Security Operator
-  version: 6.5.3
-  replaces: aqua-operator.v6.5.2
+  version: 6.2.1
+  replaces: aqua-operator.v6.2.0
   description: |-
     The Aqua Security Operator runs within an OpenShift cluster and provides a means to deploy and manage the Aqua Security cluster and components :
     * Server (aka “console”)
@@ -331,7 +302,7 @@ spec:
     ## Instructions and exmaples
 
     Follow instructions and exmaples
-    [here](https://github.com/aquasecurity/aqua-operator/blob/6.5.0/docs/DeployOpenShiftOperator.md)
+    [here](https://github.com/aquasecurity/aqua-operator/blob/6.2.0/docs/DeployOpenShiftOperator.md)
 
   keywords: ['aqua-security', 'scanning', 'security', 'runtime-security']
   maintainers:
@@ -446,15 +417,6 @@ spec:
               verbs:
                 - '*'
             - apiGroups:
-                - aquasecurity.github.io
-              resources:
-                - '*'
-                - aquastarboards
-                - configauditreports
-                - clusterconfigauditreports
-              verbs:
-                - '*'
-            - apiGroups:
                 - rbac.authorization.k8s.io
                 - authorization.k8s.io
               resources:
@@ -499,7 +461,7 @@ spec:
                 serviceAccountName: aqua-operator
                 containers:
                   - name: aqua-operator
-                    image: aquasec/aqua-operator:6.5.0
+                    image: aquasec/aqua-operator:6.2.0
                     imagePullPolicy: Always
                     command:
                       - aqua-operator
@@ -519,56 +481,38 @@ spec:
                         name: metrics
   customresourcedefinitions:
     owned:
-      - description: Aqua Security CSP Deployment with Aqua Operator
-        displayName: AquaCsp
-        kind: AquaCsp
+      - kind: AquaCsp
         name: aquacsps.operator.aquasec.com
         version: v1alpha1
-      - description: Aqua Security Database Deployment with Aqua Operator
-        displayName: AquaDatabase
-        kind: AquaDatabase
+        displayName: AquaCsp
+        description: Aqua Security CSP Deployment with Aqua Operator
+      - kind: AquaDatabase
         name: aquadatabases.operator.aquasec.com
         version: v1alpha1
-      - description: Aqua Security Enforcer Deployment with Aqua Operator
-        displayName: AquaEnforcer
-        kind: AquaEnforcer
+        displayName: AquaDatabase
+        description: Aqua Security Database Deployment with Aqua Operator
+      - kind: AquaEnforcer
         name: aquaenforcers.operator.aquasec.com
         version: v1alpha1
-      - description: Aqua Security KubeEnforcer Deployment with Aqua Operator
-        displayName: AquaKubeEnforcer
-        kind: AquaKubeEnforcer
+        displayName: AquaEnforcer
+        description: Aqua Security Enforcer Deployment with Aqua Operator
+      - kind: AquaKubeEnforcer
         name: aquakubeenforcers.operator.aquasec.com
         version: v1alpha1
-      - description: Aqua Security Gateway Deployment with Aqua Operator
-        displayName: AquaGateway
-        kind: AquaGateway
+        displayName: AquaKubeEnforcer
+        description: Aqua Security KubeEnforcer Deployment with Aqua Operator
+      - kind: AquaGateway
         name: aquagateways.operator.aquasec.com
         version: v1alpha1
-      - description: Aqua Security Scanner Deployment with Aqua Operator
-        displayName: AquaScanner
-        kind: AquaScanner
+        displayName: AquaGateway
+        description: Aqua Security Gateway Deployment with Aqua Operator
+      - kind: AquaScanner
         name: aquascanners.operator.aquasec.com
         version: v1alpha1
-      - description: Aqua Security Server Deployment with Aqua Operator
-        displayName: AquaServer
-        kind: AquaServer
+        displayName: AquaScanner
+        description: Aqua Security Scanner Deployment with Aqua Operator
+      - kind: AquaServer
         name: aquaservers.operator.aquasec.com
         version: v1alpha1
-      - name: aquastarboards.aquasecurity.github.io
-        version: v1alpha1
-        kind: AquaStarboard
-        displayName: AquaStarboard
-        description: Aqua Starboard for kube-enforcer.
-        group: aquakubeenforcers.operator.aquasec.com
-      - name: clusterconfigauditreports.aquasecurity.github.io
-        version: v1alpha1
-        kind: ClusterConfigAuditReport
-        displayName: ClusterConfigAuditReport
-        description: For Aqua Starboard.
-        group: aquakubeenforcers.operator.aquasec.com
-      - name: configauditreports.aquasecurity.github.io
-        version: v1alpha1
-        kind: ConfigAuditReport
-        displayName: ConfigAuditReport
-        description: For Aqua Starboard.
-        group: aquakubeenforcers.operator.aquasec.com
+        displayName: AquaServer
+        description: Aqua Security Server Deployment with Aqua Operator

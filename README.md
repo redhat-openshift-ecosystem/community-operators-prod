@@ -27,9 +27,13 @@ to block cluster admins upgrades when they have Operator versions installed that
 work well in OCP versions higher than the value informed. Also, by defining a valid OCP range via the annotation `com.redhat.openshift.versions` 
 into the `metadata/annotations.yaml` for our solution does **not** end up shipped on OCP/OKD versions where it cannot be installed.
 
-> WARNING: `olm.maxOpenShiftVersion` should ONLY be used if you are 100% sure that your Operator bundle version cannot work in upper releases. Otherwise, 
-> you might provide a bad user experience since cluster admins will be unable to upgrade their clusters with your solution installed. Then, if you do not
-> provide any upper version and a valid path it can result in them remove the whole solution to move forward. 
+> WARNING: `olm.maxOpenShiftVersion` should ONLY be used if you are 100% sure that your Operator bundle version 
+> cannot work in upper releases. Otherwise, you might provide a bad user experience. Be aware that cluster admins 
+> will be unable to upgrade their clusters with your solution installed. Then, suppose you do not provide any upper 
+> version and a valid upgrade path for those who have your Operator installed be able to upgrade it and consequently
+> be allowed to upgrade their cluster version (i.e from OCP 4.10 to 4.11). In that case, cluster admins might 
+> choose to uninstall your Operator and no longer use it so that they can move forward and upgrade their cluster 
+> version without it.
 
 Please, make sure you check the following announcements:
 - [How to deal with removal of v1beta1 CRD removals in Kubernetes 1.22 / OpenShift 4.9](https://github.com/redhat-openshift-ecosystem/community-operators-prod/discussions/138)

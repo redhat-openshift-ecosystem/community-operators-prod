@@ -323,13 +323,29 @@ jobs:
         run: |
           docker login ${OPP_MIRROR_INDEX_REGISTRY} -u $OPP_REGISTRY_MIRROR_USER -p $REGISTRY_MIRROR_PW
           OPERATOR_INDEX_TAG=$(echo ${OPERATOR_INDEX_TAG_RAW} |cut -d'-' -f1)
-          skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} > /dev/null # error out if needed
-          OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} | jq -r ".Digest")
-          OPERATOR_INDEX_RESOLVED="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}@${OPERATOR_INDEX_DIGEST}"
+          echo "OPERATOR_INDEX_TAG=$OPERATOR_INDEX_TAG"
           OPERATOR_INDEX="${INDEX_PATH_TO_SIGN}:${OPERATOR_INDEX_TAG}"
-          SIGNATURE_PAYLOAD="{\"manifest_digest\": \"${OPERATOR_INDEX_DIGEST}\", \"reference\": \"${OPERATOR_INDEX}\",\"requester\": \"${{ secrets.SIGNATURE_WEBHOOK_REQUESTER_EMAIL }}\"}"
-          echo ${SIGNATURE_PAYLOAD}
-          curl ${SIGNATURE_ENDPOINT} -d "${SIGNATURE_PAYLOAD}" -u "community-op-cert:${{ secrets.SIGNATURE_WEBHOOK_PASSWD }}"
+          MANIFEST_LIST=${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG}
+          echo "MANIFEST_LIST=$MANIFEST_LIST"
+          INDIVIDUAL_IMAGE_MANIFESTS=$(docker manifest inspect $MANIFEST_LIST|jq '.manifests[]|.digest'|tr -d '"')
+          echo "INDIVIDUAL_IMAGE_MANIFESTS=$INDIVIDUAL_IMAGE_MANIFESTS"
+          INDIVIDUAL_IMAGE_MANIFESTS_COUNT=$(echo $INDIVIDUAL_IMAGE_MANIFESTS| sed 's/[^ ]//g' | wc -c)
+          echo "INDIVIDUAL_IMAGE_MANIFESTS_COUNT=$INDIVIDUAL_IMAGE_MANIFESTS_COUNT"
+          
+          for ITERATE_OVER_MANIFESTS in $(seq 1 $INDIVIDUAL_IMAGE_MANIFESTS_COUNT); do
+            echo $ITERATE_OVER_MANIFESTS
+            OPERATOR_INDEX_DIGEST=$(echo $INDIVIDUAL_IMAGE_MANIFESTS|cut -d " " -f${ITERATE_OVER_MANIFESTS})
+            echo "OPERATOR_INDEX_DIGEST=$OPERATOR_INDEX_DIGEST"
+            SIGNATURE_PAYLOAD="{\"manifest_digest\": \"${OPERATOR_INDEX_DIGEST}\", \"reference\": \"${OPERATOR_INDEX}\",\"requester\": \"${{ secrets.SIGNATURE_WEBHOOK_REQUESTER_EMAIL }}\"}"
+            echo ${SIGNATURE_PAYLOAD}
+            curl ${SIGNATURE_ENDPOINT} -d "${SIGNATURE_PAYLOAD}" -u "community-op-cert:${{ secrets.SIGNATURE_WEBHOOK_PASSWD }}"
+          done
+
+          # skopeo inspect docker://$MANIFEST_LIST > /dev/null # error out if needed
+          # OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://$MANIFEST_LIST | jq -r ".Digest")
+          #OPERATOR_INDEX_RESOLVED="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}@${OPERATOR_INDEX_DIGEST}"
+          
+          
       # - name: Prepare variables for the sign process
       #   id: openshift-vars
       #   env:

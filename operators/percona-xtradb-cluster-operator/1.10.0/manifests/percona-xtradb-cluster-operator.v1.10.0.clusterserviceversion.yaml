@@ -1,46 +1,272 @@
+---
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: percona-xtradb-cluster-operator.v1.7.0
+  name: percona-xtradb-cluster-operator.v1.10.0
   namespace: default
   annotations:
-    # Setting olm.maxOpenShiftVersion automatically
-    # This property was added via an automatic process since it was possible to identify that this distribution uses API(s),
-    # which will be removed in the k8s version 1.22 and OpenShift version OCP 4.9. Then, it will prevent OCP users to
-    # upgrade their cluster to 4.9 before they have installed in their current clusters a version of your operator that
-    # is compatible with it. Please, ensure that your project is no longer using these API(s) and that you start to
-    # distribute solutions which is compatible with Openshift 4.9.
-    # For further information, check the README of this repository.
-    olm.properties: '[{"type": "olm.maxOpenShiftVersion", "value": "4.8"}]'
     alm-examples: >-
-      [{"apiVersion":"pxc.percona.com/v1-7-0","kind":"PerconaXtraDBCluster","metadata":{"name":"cluster1","finalizers":["delete-pxc-pods-in-order"]},"spec":{"crVersion":"1.7.0","secretsName":"my-cluster-secrets","vaultSecretName":"keyring-secret-vault","sslSecretName":"my-cluster-ssl","sslInternalSecretName":"my-cluster-ssl-internal","logCollectorSecretName":"my-log-collector-secrets","allowUnsafeConfigurations":false,"updateStrategy":"SmartUpdate","upgradeOptions":{"versionServiceEndpoint":"https://check.percona.com","apply":"disabled","schedule":"0 4 * * *"},"pxc":{"size":3,"image":"percona/percona-xtradb-cluster:8.0.21-12.1","resources":{"requests":{"memory":"1G","cpu":"600m"}},"affinity":{"antiAffinityTopologyKey":"kubernetes.io/hostname"},"podDisruptionBudget":{"maxUnavailable":1},"volumeSpec":{"persistentVolumeClaim":{"resources":{"requests":{"storage":"6G"}}}},"gracePeriod":600},"haproxy":{"enabled":true,"size":3,"image":"percona/percona-xtradb-cluster-operator:1.7.0-haproxy","resources":{"requests":{"memory":"1G","cpu":"600m"}},"affinity":{"antiAffinityTopologyKey":"kubernetes.io/hostname"},"podDisruptionBudget":{"maxUnavailable":1},"gracePeriod":30},"proxysql":{"enabled":false,"size":3,"image":"percona/percona-xtradb-cluster-operator:1.7.0-proxysql","resources":{"requests":{"memory":"1G","cpu":"600m"}},"affinity":{"antiAffinityTopologyKey":"kubernetes.io/hostname"},"volumeSpec":{"persistentVolumeClaim":{"resources":{"requests":{"storage":"2G"}}}},"podDisruptionBudget":{"maxUnavailable":1},"gracePeriod":30},"logcollector":{"enabled":true,"image":"percona/percona-xtradb-cluster-operator:1.7.0-logcollector"},"pmm":{"enabled":false,"image":"percona/pmm-client:2.12.0","serverHost":"monitoring-service","serverUser":"pmm"},"backup":{"image":"percona/percona-xtradb-cluster-operator:1.7.0-pxc8.0-backup","pitr":{"enabled":false,"storageName":"STORAGE-NAME-HERE","timeBetweenUploads":60},"storages":{"s3-us-west":{"type":"s3","s3":{"bucket":"S3-BACKUP-BUCKET-NAME-HERE","credentialsSecret":"my-cluster-name-backup-s3","region":"us-west-2"}},"fs-pvc":{"type":"filesystem","volume":{"persistentVolumeClaim":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"6G"}}}}}},"schedule":[{"name":"sat-night-backup","schedule":"0 0 * * 6","keep":3,"storageName":"s3-us-west"},{"name":"daily-backup","schedule":"0 0 * * *","keep":5,"storageName":"fs-pvc"}]}}},{"apiVersion":"pxc.percona.com/v1","kind":"PerconaXtraDBClusterBackup","metadata":{"name":"backup1"},"spec":{"pxcCluster":"cluster1","storageName":"fs-pvc"}},{"apiVersion":"pxc.percona.com/v1alpha1","kind":"PerconaXtraDBBackup","metadata":{"name":"backup1"},"spec":{"pxcCluster":"cluster1","storageName":"s3-us-west"}},{"apiVersion":"pxc.percona.com/v1","kind":"PerconaXtraDBClusterRestore","metadata":{"name":"restore1"},"spec":{"pxcCluster":"cluster1","backupName":"backup1"}},{"apiVersion":"pxc.percona.com/v1","kind":"PerconaXtraDBClusterBackup","metadata":{"name":"backup1"},"spec":{"pxcCluster":"cluster1","storageName":"fs-pvc"}},{"apiVersion":"pxc.percona.com/v1alpha1","kind":"PerconaXtraDBBackup","metadata":{"name":"backup1"},"spec":{"pxcCluster":"cluster1","storageName":"s3-us-west"}},{"apiVersion":"pxc.percona.com/v1","kind":"PerconaXtraDBClusterRestore","metadata":{"name":"restore1"},"spec":{"pxcCluster":"cluster1","backupName":"backup1"}}]
+      [
+        {
+          "apiVersion": "pxc.percona.com/v1-10-0",
+          "kind": "PerconaXtraDBCluster",
+          "metadata": {
+            "name": "cluster1",
+            "finalizers": [
+              "delete-pxc-pods-in-order"
+            ]
+          },
+          "spec": {
+            "crVersion": "1.10.0",
+            "secretsName": "my-cluster-secrets",
+            "vaultSecretName": "keyring-secret-vault",
+            "sslSecretName": "my-cluster-ssl",
+            "sslInternalSecretName": "my-cluster-ssl-internal",
+            "logCollectorSecretName": "my-log-collector-secrets",
+            "allowUnsafeConfigurations": false,
+            "updateStrategy": "SmartUpdate",
+            "upgradeOptions": {
+              "versionServiceEndpoint": "https://check.percona.com",
+              "apply": "8.0-recommended",
+              "schedule": "0 4 * * *"
+            },
+            "pxc": {
+              "size": 3,
+              "image": "percona/percona-xtradb-cluster:8.0.23-14.1",
+              "autoRecovery": true,
+              "resources": {
+                "requests": {
+                  "memory": "1G",
+                  "cpu": "600m"
+                }
+              },
+              "affinity": {
+                "antiAffinityTopologyKey": "kubernetes.io/hostname"
+              },
+              "podDisruptionBudget": {
+                "maxUnavailable": 1
+              },
+              "volumeSpec": {
+                "persistentVolumeClaim": {
+                  "resources": {
+                    "requests": {
+                      "storage": "6G"
+                    }
+                  }
+                }
+              },
+              "gracePeriod": 600
+            },
+            "haproxy": {
+              "enabled": true,
+              "size": 3,
+              "image": "percona/percona-xtradb-cluster-operator:1.10.0-haproxy",
+              "resources": {
+                "requests": {
+                  "memory": "1G",
+                  "cpu": "600m"
+                }
+              },
+              "affinity": {
+                "antiAffinityTopologyKey": "kubernetes.io/hostname"
+              },
+              "podDisruptionBudget": {
+                "maxUnavailable": 1
+              },
+              "gracePeriod": 30
+            },
+            "proxysql": {
+              "enabled": false,
+              "size": 3,
+              "image": "percona/percona-xtradb-cluster-operator:1.10.0-proxysql",
+              "resources": {
+                "requests": {
+                  "memory": "1G",
+                  "cpu": "600m"
+                }
+              },
+              "affinity": {
+                "antiAffinityTopologyKey": "kubernetes.io/hostname"
+              },
+              "volumeSpec": {
+                "persistentVolumeClaim": {
+                  "resources": {
+                    "requests": {
+                      "storage": "2G"
+                    }
+                  }
+                }
+              },
+              "podDisruptionBudget": {
+                "maxUnavailable": 1
+              },
+              "gracePeriod": 30
+            },
+            "logcollector": {
+              "enabled": true,
+              "image": "percona/percona-xtradb-cluster-operator:1.10.0-logcollector",
+              "resources": {
+                "requests": {
+                  "memory": "100M",
+                  "cpu": "200m"
+                }
+              }
+            },
+            "pmm": {
+              "enabled": false,
+              "image": "percona/pmm-client:2.23.0",
+              "serverHost": "monitoring-service",
+              "serverUser": "admin",
+              "resources": {
+                "requests": {
+                  "memory": "150M",
+                  "cpu": "300m"
+                }
+              }
+            },
+            "backup": {
+              "image": "percona/percona-xtradb-cluster-operator:1.10.0-pxc8.0-backup",
+              "pitr": {
+                "enabled": false,
+                "storageName": "STORAGE-NAME-HERE",
+                "timeBetweenUploads": 60
+              },
+              "storages": {
+                "s3-us-west": {
+                  "type": "s3",
+                  "s3": {
+                    "bucket": "S3-BACKUP-BUCKET-NAME-HERE",
+                    "credentialsSecret": "my-cluster-name-backup-s3",
+                    "region": "us-west-2"
+                  }
+                },
+                "fs-pvc": {
+                  "type": "filesystem",
+                  "volume": {
+                    "persistentVolumeClaim": {
+                      "accessModes": [
+                        "ReadWriteOnce"
+                      ],
+                      "resources": {
+                        "requests": {
+                          "storage": "6G"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "schedule": [
+                {
+                  "name": "sat-night-backup",
+                  "schedule": "0 0 * * 6",
+                  "keep": 3,
+                  "storageName": "s3-us-west"
+                },
+                {
+                  "name": "daily-backup",
+                  "schedule": "0 0 * * *",
+                  "keep": 5,
+                  "storageName": "fs-pvc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "apiVersion": "pxc.percona.com/v1",
+          "kind": "PerconaXtraDBClusterBackup",
+          "metadata": {
+            "name": "backup1"
+          },
+          "spec": {
+            "pxcCluster": "cluster1",
+            "storageName": "fs-pvc"
+          }
+        },
+        {
+          "apiVersion": "pxc.percona.com/v1alpha1",
+          "kind": "PerconaXtraDBBackup",
+          "metadata": {
+            "name": "backup1"
+          },
+          "spec": {
+            "pxcCluster": "cluster1",
+            "storageName": "s3-us-west"
+          }
+        },
+        {
+          "apiVersion": "pxc.percona.com/v1",
+          "kind": "PerconaXtraDBClusterRestore",
+          "metadata": {
+            "name": "restore1"
+          },
+          "spec": {
+            "pxcCluster": "cluster1",
+            "backupName": "backup1"
+          }
+        },
+        {
+          "apiVersion": "pxc.percona.com/v1",
+          "kind": "PerconaXtraDBClusterBackup",
+          "metadata": {
+            "name": "backup1"
+          },
+          "spec": {
+            "pxcCluster": "cluster1",
+            "storageName": "fs-pvc"
+          }
+        },
+        {
+          "apiVersion": "pxc.percona.com/v1alpha1",
+          "kind": "PerconaXtraDBBackup",
+          "metadata": {
+            "name": "backup1"
+          },
+          "spec": {
+            "pxcCluster": "cluster1",
+            "storageName": "s3-us-west"
+          }
+        },
+        {
+          "apiVersion": "pxc.percona.com/v1",
+          "kind": "PerconaXtraDBClusterRestore",
+          "metadata": {
+            "name": "restore1"
+          },
+          "spec": {
+            "pxcCluster": "cluster1",
+            "backupName": "backup1"
+          }
+        }
+      ]
     categories: Database
     certified: 'true'
-    createdAt: '2021-02-02T13:11:44.000Z'
+    createdAt: '2021-12-22T13:11:44.000Z'
     description: >-
-      Percona XtraDB Cluster Operator manages the lifecycle of Percona XtraDB
+      Percona Distribution for MySQL Operator manages the lifecycle of Percona XtraDB
       cluster instances.
-    containerImage: 'percona/percona-xtradb-cluster-operator:1.7.0'
+    containerImage: 'percona/percona-xtradb-cluster-operator:1.10.0'
     support: Percona
     capabilities: Deep Insights
     repository: 'https://github.com/percona/percona-xtradb-cluster-operator'
 spec:
-  displayName: Percona XtraDB Cluster Operator
+  displayName: Percona Distribution for MySQL Operator
   description: >+
 
     ## Percona is Cloud Native
 
 
-    The Percona Kubernetes Operator for Percona XtraDB Cluster automates the
-    creation, alteration, or deletion of nodes in your cluster environment. It
-    can be used to instantiate a new database cluster or to scale an existing
-    database cluster. The Operator contains all necessary Kubernetes settings to
-    provide a proper and consistent Percona XtraDB Cluster instance.
+    Percona Distribution for MySQL Operator is an open-source drop in replacement for
+    MySQL Enterprise with synchronous replication running on Kubernetes. It
+    automates the deployment and management of the members in your Percona
+    XtraDB Cluster environment. It can be used to instantiate a new Percona
+    XtraDB Cluster, or to scale an existing environment.
 
 
     Consult the
     [documentation](https://percona.github.io/percona-xtradb-cluster-operator/)
-    on the Percona Kubernetes Operator for Percona XtraDB Cluster for complete
+    on the Percona Distribution for MySQL Operator for complete
     details on capabilities and options.
 
 
@@ -60,7 +286,13 @@ spec:
 
     * **Automate Your Backups**  [configure cluster
     backups](https://percona.github.io/percona-xtradb-cluster-operator/configure/operator)
-    to run on a scheduled basis. Backups are stored on a persistent volume.
+    to run on a scheduled basis. Backups can be stored on a persistent volume or S3-compatible
+    storage. Leverage [Point-in-time recovery](https://www.percona.com/doc/kubernetes-operator-for-pxc/backups.html#storing-binary-logs-for-point-in-time-recovery)
+    to reduce RPO/RTO.
+
+    * **Proxy integration**  choose HAProxy or ProxySQL as a proxy in front of
+    the Percona XtraDB Cluster. Proxies are deployed and configured automatically
+    with the Operator.
 
 
     ### Common Configurations
@@ -86,7 +318,7 @@ spec:
 
     * Update Reader members before Writer member at cluster upgrades
 
-    * Support multiple PXC minor versions by the Operator
+    * Support MySQL versions 5.7 and 8.0
 
     ### Before You Start
 
@@ -120,55 +352,25 @@ spec:
       operator: b3BlcmF0b3JhZG1pbg==
     ```
 
+    ###  Release Highlights
 
-
-
-
-
-
-
-
-    ###  New Features
-
-
-    * Add support for point-in-time recovery
-
-    * PXC cluster will now recover automatically from a full crash when Pods are stuck in CrashLoopBackOff status
-
-    * Official support for Percona Monitoring and Management (PMM) v.2
-
-    ### Improvements
-
-    * Percona XtraDB Cluster Pod logs are now stored on Persistent Volumes. Users can debug the issues even after the Pod restart
-
-    * User can now change ServiceType for HAProxy replicas Kubernetes service
-
-    * Reduce the number of ConfigMap object updates from the Operator to improve performance of the Kubernetes cluster
-
-    * Change default configuration of ProxySQL to WRITERS_ARE_READERS=yes so Percona XtraDB Cluster continues operating with a single node left
-
-    * User can now limit cluster-wide Operator access to specific namespaces (Thanks to user mgar for contribution)
-
-    * Improve error message when not enough memory is set for auto-tuning
-
-    * Add schema validation for Custom Resource. Now cr.yaml is validated by a WebHook for syntax typos before being applied. It works only in cluster-wide mode due to access restrictions
-
-    * Percona XtraDB Cluster operator can now be deployed through RedHat Marketplace
-
-    * Check HAProxy custom configuration for syntax errors before applying it to avoid Pod getting stuck in CrashLoopBackOff status (Thanks to user pservit for reporting this issue)
-
-    #### Known Issues and Limitations
-
-    OpenShift 3.11 requires additional configuration for the correct HAProxy
-    operation: the feature gate PodShareProcessNamespace should be set to true.
-    If getting it enabled is not possible, we recommend using ProxySQL instead
-    of HAProxy with OpenShift 3.11. Other OpenShift and Kubernetes versions are
-    not affected.
-
+    * Custom sidecar containers allow users to customize Percona XtraDB Cluster and other Operator components without changing the container images. In this release, we enable
+      even more customization, by allowing users to mount volumes into the sidecar containers.
+    * In this release, we put a lot of effort into fixing bugs that were reported by the community. We appreciate everyone who helped us with discovering these issues and
+      contributed to the fixes.
+    * Mount volumes into sidecar containers to enable customization (Thanks to Sridhar L for contributing)
+    * spec.Backup.serviceAccount and spec.automountServiceAccountToken Custom Resource options can now be used in the Helm chart
+      (Thanks to Gerwin van de Steeg for reporting this issue)
+    * The logrotate command now doesn’t use verbose mode to avoid flooding the log with rotate information
+    * Logs are now strictly following JSON specification to simplify parsing
+    * New source_retry_count and source_connect_retry options were added to tune source retries for replication between two clusters
+    * New replicasServiceEnabled option was added to allow disabling the Kubernetes Service for haproxy-replicas, which may be useful to avoid the unwanted forwarding of the
+      application write requests to all Percona XtraDB Cluster instances
+    * Logrotate now doesn’t rotate GRA logs (binlog events in ROW format representing the failed transaction) as ordinary log files, storing them for 7 days instead which
+      gives additional time to debug the problem
 
   maturity: stable
-  version: 1.7.0
-  replaces: percona-xtradb-cluster-operator.v1.4.0
+  version: 1.10.0
   minKubeVersion: ''
   keywords:
     - mysql
@@ -203,7 +405,7 @@ spec:
         displayName: PerconaXtraDBCluster
         kind: PerconaXtraDBCluster
         name: perconaxtradbclusters.pxc.percona.com
-        version: v1-7-0
+        version: v1-10-0
         specDescriptors: []
         statusDescriptors: []
         resources:
@@ -310,94 +512,94 @@ spec:
       permissions:
         - rules:
             - apiGroups:
-                - pxc.percona.com
+              - pxc.percona.com
               resources:
-                - perconaxtradbclusters
-                - perconaxtradbclusters/status
-                - perconaxtradbclusterbackups
-                - perconaxtradbclusterbackups/status
-                - perconaxtradbclusterrestores
-                - perconaxtradbclusterrestores/status
+              - perconaxtradbclusters
+              - perconaxtradbclusters/status
+              - perconaxtradbclusterbackups
+              - perconaxtradbclusterbackups/status
+              - perconaxtradbclusterrestores
+              - perconaxtradbclusterrestores/status
               verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
             - apiGroups:
-                - ''
+              - ""
               resources:
-                - pods
-                - pods/exec
-                - pods/log
-                - configmaps
-                - services
-                - persistentvolumeclaims
-                - secrets
+              - pods
+              - pods/exec
+              - pods/log
+              - configmaps
+              - services
+              - persistentvolumeclaims
+              - secrets
               verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
             - apiGroups:
-                - apps
+              - apps
               resources:
-                - deployments
-                - replicasets
-                - statefulsets
+              - deployments
+              - replicasets
+              - statefulsets
               verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
             - apiGroups:
-                - batch
+              - batch
               resources:
-                - jobs
-                - cronjobs
+              - jobs
+              - cronjobs
               verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
             - apiGroups:
-                - policy
+              - policy
               resources:
-                - poddisruptionbudgets
+              - poddisruptionbudgets
               verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
             - apiGroups:
-                - certmanager.k8s.io
-                - cert-manager.io
+              - certmanager.k8s.io
+              - cert-manager.io
               resources:
-                - issuers
-                - certificates
+              - issuers
+              - certificates
               verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
-                - deletecollection
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
+              - deletecollection
           serviceAccountName: percona-xtradb-cluster-operator
         - serviceAccountName: percona-xtradb-cluster-operator-workload
           rules:
@@ -413,19 +615,32 @@ spec:
             replicas: 1
             selector:
               matchLabels:
-                name: percona-xtradb-cluster-operator
+                app.kubernetes.io/component: operator
+                app.kubernetes.io/instance: percona-xtradb-cluster-operator
+                app.kubernetes.io/name: percona-xtradb-cluster-operator
+                app.kubernetes.io/part-of: percona-xtradb-cluster-operator
             template:
               metadata:
                 labels:
-                  name: percona-xtradb-cluster-operator
+                  app.kubernetes.io/component: operator
+                  app.kubernetes.io/instance: percona-xtradb-cluster-operator
+                  app.kubernetes.io/name: percona-xtradb-cluster-operator
+                  app.kubernetes.io/part-of: percona-xtradb-cluster-operator
               spec:
                 serviceAccountName: percona-xtradb-cluster-operator
                 containers:
                   - name: percona-xtradb-cluster-operator
-                    image: 'percona/percona-xtradb-cluster-operator:1.7.0'
+                    image: 'percona/percona-xtradb-cluster-operator:1.10.0'
+                    livenessProbe:
+                      failureThreshold: 3
+                      httpGet:
+                        path: /metrics
+                        port: metrics
+                        scheme: HTTP
                     ports:
-                      - containerPort: 60000
+                      - containerPort: 8080
                         name: metrics
+                        protocol: TCP
                     command:
                       - percona-xtradb-cluster-operator
                     imagePullPolicy: Always
@@ -433,10 +648,12 @@ spec:
                       - name: WATCH_NAMESPACE
                         valueFrom:
                           fieldRef:
+                            apiVersion: v1
                             fieldPath: metadata.namespace
                       - name: POD_NAME
                         valueFrom:
                           fieldRef:
+                            apiVersion: v1
                             fieldPath: metadata.name
                       - name: OPERATOR_NAME
                         value: percona-xtradb-cluster-operator
@@ -444,99 +661,99 @@ spec:
       spec:
         permissions:
           kind: Role
-          apiVersion: rbac.authorization.k8s.io/v1beta1
+          apiVersion: rbac.authorization.k8s.io/v1
           metadata:
             name: percona-xtradb-cluster-operator
           rules:
-            - apiGroups:
-                - pxc.percona.com
-              resources:
-                - perconaxtradbclusters
-                - perconaxtradbclusters/status
-                - perconaxtradbclusterbackups
-                - perconaxtradbclusterbackups/status
-                - perconaxtradbclusterrestores
-                - perconaxtradbclusterrestores/status
-              verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
-            - apiGroups:
-                - ''
-              resources:
-                - pods
-                - pods/exec
-                - pods/log
-                - configmaps
-                - services
-                - persistentvolumeclaims
-                - secrets
-              verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
-            - apiGroups:
-                - apps
-              resources:
-                - deployments
-                - replicasets
-                - statefulsets
-              verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
-            - apiGroups:
-                - batch
-              resources:
-                - jobs
-                - cronjobs
-              verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
-            - apiGroups:
-                - policy
-              resources:
-                - poddisruptionbudgets
-              verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
-            - apiGroups:
-                - certmanager.k8s.io
-                - cert-manager.io
-              resources:
-                - issuers
-                - certificates
-              verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
-                - deletecollection
+          - apiGroups:
+            - pxc.percona.com
+            resources:
+            - perconaxtradbclusters
+            - perconaxtradbclusters/status
+            - perconaxtradbclusterbackups
+            - perconaxtradbclusterbackups/status
+            - perconaxtradbclusterrestores
+            - perconaxtradbclusterrestores/status
+            verbs:
+            - get
+            - list
+            - watch
+            - create
+            - update
+            - patch
+            - delete
+          - apiGroups:
+            - ""
+            resources:
+            - pods
+            - pods/exec
+            - pods/log
+            - configmaps
+            - services
+            - persistentvolumeclaims
+            - secrets
+            verbs:
+            - get
+            - list
+            - watch
+            - create
+            - update
+            - patch
+            - delete
+          - apiGroups:
+            - apps
+            resources:
+            - deployments
+            - replicasets
+            - statefulsets
+            verbs:
+            - get
+            - list
+            - watch
+            - create
+            - update
+            - patch
+            - delete
+          - apiGroups:
+            - batch
+            resources:
+            - jobs
+            - cronjobs
+            verbs:
+            - get
+            - list
+            - watch
+            - create
+            - update
+            - patch
+            - delete
+          - apiGroups:
+            - policy
+            resources:
+            - poddisruptionbudgets
+            verbs:
+            - get
+            - list
+            - watch
+            - create
+            - update
+            - patch
+            - delete
+          - apiGroups:
+            - certmanager.k8s.io
+            - cert-manager.io
+            resources:
+            - issuers
+            - certificates
+            verbs:
+            - get
+            - list
+            - watch
+            - create
+            - update
+            - patch
+            - delete
+            - deletecollection
           serviceAccountName: percona-xtradb-cluster-operator
         deployments: []
   installModes:
@@ -549,3 +766,4 @@ spec:
     - type: AllNamespaces
       supported: false
   apiservicedefinitions: {}
+

@@ -29,14 +29,14 @@ metadata:
       ]
     capabilities: Auto Pilot
     categories: Monitoring,Integration & Delivery,Logging & Tracing,Developer Tools
-    containerImage: quay.io/sosivio/sosivio-operator:v1.4.1-79
+    containerImage: quay.io/sosivio/sosivio-operator:v1.4.1-78
     createdAt: "2021-10-28 01:01:01"
     description: Sosivio Autonomuous Cloud Native
     operators.operatorframework.io/builder: operator-sdk-v1.13.0+git
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/Sosivio/operator
     support: Community
-  name: sosivio-operator.v1.4.1-79
+  name: sosivio-operator.v1.4.1-78
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
@@ -132,7 +132,7 @@ spec:
                       - --leader-elect
                     command:
                       - /manager
-                    image: quay.io/sosivio/sosivio-operator:v1.4.1-79
+                    image: quay.io/sosivio/sosivio-operator:v1.4.1-78
                     livenessProbe:
                       httpGet:
                         path: /healthz
@@ -260,4 +260,4 @@ spec:
     - image: quay.io/sosivio/discovery-engine@sha256:3891fe02fe82941e56fdac8fb18d23f70b84a100b1162dc7c724088bed43e78c
       name: discovery-engine
     - image: quay.io/sosivio/notifier@sha256:7f2dae6056e913325ce0cdbb34e0374e8a8d5f3ff34e75f0e927d4c51aaa358f
-  version: "1.4.1"
+  version: "1.4.1-79"

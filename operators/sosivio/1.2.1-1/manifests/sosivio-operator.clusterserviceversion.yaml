@@ -29,14 +29,14 @@ metadata:
       ]
     capabilities: Auto Pilot
     categories: Monitoring,Integration & Delivery,Logging & Tracing,Developer Tools
-    containerImage: quay.io/sosivio/sosivio-operator:v1.3.1-76
+    containerImage: quay.io/sosivio/sosivio-operator:v1.2.1-1
     createdAt: "2021-10-28 01:01:01"
     description: Sosivio Autonomuous Cloud Native
     operators.operatorframework.io/builder: operator-sdk-v1.13.0+git
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/Sosivio/operator
     support: Community
-  name: sosivio-operator.v1.3.1-76
+  name: sosivio-operator.v1.2.1-1
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
@@ -132,7 +132,7 @@ spec:
                       - --leader-elect
                     command:
                       - /manager
-                    image: quay.io/sosivio/sosivio-operator:v1.3.1-76
+                    image: quay.io/sosivio/sosivio-operator:v1.2.1-1
                     livenessProbe:
                       httpGet:
                         path: /healthz
@@ -223,45 +223,46 @@ spec:
     name: sosivio
     url: https://www.sosiv.io
   relatedImages:
-    - image: quay.io/sosivio/sosivio-operator@sha256:54833c7fc78070e3215dafc4a90b44fb0191278f22f416fdda4ebb0b30baf3ca
+    - image: quay.io/sosivio/sosivio-operator@sha256:bd3f72340f08b7277ef69b1a0b923e100322c16111dc5d65171e0b38f4ed486e
       name: operator
-    - image: quay.io/sosivio/kube-rbac-proxy@sha256:34e8724e0f47e31eb2ec3279ac398b657db5f60f167426ee73138e2e84af6486
+    - image: gcr.io/kubebuilder/kube-rbac-proxy@sha256:db06cc4c084dd0253134f156dddaaf53ef1c3fb3cc809e5d81711baa4029ea4c
       name: kube-rbac-proxy
-    - image: release.sosiv.io/nsqd@sha256:1a87ae9876adea742b2b69a16e246c362992c47fd041185b7b00a9e27f95fedc
+    - image: release.sosiv.io/nsqd@sha256:fb3692bfe18d845215a5712bf5579afd507d2563c216031923a31e6cd040bb0b
       name: nsqd
-    - image: release.sosiv.io/nsqadmin@sha256:62e82b3ed550bc9f417dd259b38add12e037b1c5b0d09e75e1d41eb30b00c16d
+    - image: release.sosiv.io/nsqadmin@sha256:0d6a57ef29531250b37fb767f7e7674703e69e3ff4c2601554dff7344cafc37a
       name: nsqadmin
-    - image: release.sosiv.io/nsqlookupd@sha256:171556aa3c48acedf0ae7c0907943129ef9074d07c4dd8dec830c41770edad2a
+    - image: release.sosiv.io/nsqlookupd@sha256:57e6235c5b166e4903618ddb00bcdaa33a89f9af8bb0ea33ac217e3f4ad7b556
       name: nsqlookupd
-    - image: release.sosiv.io/crud-manager@sha256:a1252e44223fa5f5900c664a697e97d572965a8c5bafa65f4f0c48f74c371d54
+    - image: release.sosiv.io/crud-manager@sha256:0b31b739e4e246cb89b1dab9bc75c395e77548c5cdbdf32ce5c90026f7f5d975
       name: crud-manager
-    - image: release.sosiv.io/sosivio-node-collector@sha256:b9da902efee437c7c96cfcb7c392b3777855d0fbab5a88249d16989bc146f194
+    - image: release.sosiv.io/sosivio-node-collector@sha256:b845b15a468ff5835a02a62cc9e8feb1b44244f4984454f0f8838f73aa80fa9d
       name: sosivio-node-collector
-    - image: release.sosiv.io/sosivio-node-pinger@sha256:64a83d81d4e3e7adc730eea7ffdb626e3adaaed7780df8608dcd72101e8cec94
+    - image: release.sosiv.io/sosivio-node-pinger@sha256:e34fccd9a72886efa1a160fc0c721d539a50a2abe1439b84105a1b7e00bdfa12
       name: sosivio-node-pinger
-    - image: release.sosiv.io/classifier@sha256:64492c8b0500194f8e76786723c676783b04aa2b8ebc30af7a79b8ad455edfc5
+    - image: release.sosiv.io/classifier@sha256:b749240f9c09096cac88b887324bc990922cfd687e7171c873ae8befd761a80b
       name: classifier
-    - image: release.sosiv.io/communicator@sha256:d7e2b6509a1d8117f1a2de6675ccf56672402c081a3095981e1ecd40225c461a
+    - image: release.sosiv.io/ruleengine@sha256:f6b02bd3c3d6dac298b815b3cd5e66dd0401d927a03c368f196136181cebfd9c
+      name: ruleengine
+    - image: release.sosiv.io/communicator@sha256:f9e1bff4dc539db79efb0427214ad10e29ef17b872cba92e6c2654e186680eb9
       name: communicator
-    - image: release.sosiv.io/analyzer@sha256:62b44a2cbc7587b01603407f262527a67011816d42e89c6bebf7d9a3a28d46b5
+    - image: release.sosiv.io/analyzer@sha256:f10c6ece458f11b9719b7ede0abf114bd48f250bad60ae95da26117e14c9bd10
       name: analyzer
-    - image: release.sosiv.io/sosivio-dashboard@sha256:a0bec736207be74ccaf118d75618fe0b33c7a0ac8543ce1aaf7ea0db875569cb
+    - image: release.sosiv.io/sosivio-dashboard@sha256:4261054410d0ae2fd5893d52144010524cce1c5c09f5b44243641d703b1bdb61
       name: sosivio-dashboard
-    - image: release.sosiv.io/authentication@sha256:8334cca2058b91c69091d7fdcce46dfa9c09befdad40909d4ab16f6bd5d2f810
+    - image: release.sosiv.io/authentication@sha256:a6e565fe983a82a31c51faf89ec79d46e5692ec66267a7824f245e413f9259f0
       name: authentication
-    - image: release.sosiv.io/actuator@sha256:5cd94db305edfc5f79fd32b127993ae5a9be16ba917345a823417055f767ca98
+    - image: release.sosiv.io/actuator@sha256:94e682b667381dbe1238b94204b63c6d904abd7913a5e3e0339d649caac463a2
       name: actuator
-    - image: release.sosiv.io/sequence-recognition@sha256:05a4702937efa67bf71eb149ae2ecf59855b7503567902897410aff61401b9ee
+    - image: release.sosiv.io/sequence-recognition@sha256:0454191c37bff6be23a5678b367066aea106eda2a600e6dff4c34014a138d43e
       name: sequence-recognition
-    - image: release.sosiv.io/correlation-entities@sha256:6064c9a80f504c87fb356278580523a31f61851ac353827fcb33dda360358b6e
+    - image: release.sosiv.io/correlation-entities@sha256:f5e5632267379ac213c423732f97057ff605608fa31db748181d9dee5e3d0c82
       name: correlation-entities
-    - image: release.sosiv.io/contract-testing@sha256:a4baa361c1f63c67fabd9b394449ca24c27226bac920abcf64b00f251513126c
+    - image: release.sosiv.io/contract-testing@sha256:bdf64e08e5f12c1802d9a9ff3c442c4367455963abc3a7f52c2f8d002a3446fb
       name: contract-testing
-    - image: release.sosiv.io/sosiviodb@sha256:ddde5ce59df6d68f9a7adf71d1e61132783c3cc4af2c7ccfc0941af35a4d0ad1
+    - image: release.sosiv.io/sosiviodb@sha256:91cc368e3fe6263427ae3e999181afe9d47870125a2973c18c3cee2350651506
       name: sosiviodb
-    - image: release.sosiv.io/draingo@sha256:bdbd95c9ffd7cd7ee482992589944b6b078b838614b921a5b309664653ab1584
+    - image: release.sosiv.io/draingo@sha256:357203984b06da3975e852e73a181d93ea68842289c9878845f70cb2fa8a9123
       name: draingo
-    - image: release.sosiv.io/discovery-engine@sha256:2dad130ba5ad2e91d1b50b9668cceebde6bca4fd4d15b3933428b1c4f0d0f25d
+    - image: release.sosiv.io/discovery-engine@sha256:dd0ffc5e9df3852f56559ea256b1d89bc584817d59447a46aaa9a16937a8cb84
       name: discovery-engine
-    - image: release.sosiv.io/notifier@sha256:a809f8fb046847c3fa91d984cc8162f0dd92245e3c0c0b6a847404a10f450214
-  version: "1.3.1"
+  version: "1.2.1-1"

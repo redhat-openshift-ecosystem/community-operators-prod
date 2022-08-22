@@ -6,7 +6,7 @@ metadata:
       [
         {
           "apiVersion": "operator.open-cluster-management.io/v1alpha1",
-          "kind": "MultiClusterGlobalHub",
+          "kind": "MulticlusterGlobalHub",
           "metadata": {
             "name": "multiclusterglobalhub"
           },
@@ -24,8 +24,8 @@ metadata:
     categories: Integration & Delivery,OpenShift Optional
     certified: "false"
     containerImage: quay.io/stolostron/multicluster-global-hub-operator:v0.5.0
-    createdAt: "2022-08-19T20:00:31Z"
-    description: Manages the installation and upgrade of the MultiCluster Global Hub.
+    createdAt: "2022-08-21T20:00:31Z"
+    description: Manages the installation and upgrade of the Multicluster Global Hub.
     operatorframework.io/suggested-namespace: open-cluster-management
     operators.operatorframework.io/builder: operator-sdk-v1.19.0+git
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
@@ -37,13 +37,13 @@ spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
-    - description: MultiClusterGlobalHub is the Schema for the multiclusterglobalhubs
+    - description: MulticlusterGlobalHub is the Schema for the multiclusterglobalhubs
         API
-      displayName: Multi Cluster Global Hub
-      kind: MultiClusterGlobalHub
+      displayName: Multicluster Global Hub
+      kind: MulticlusterGlobalHub
       name: multiclusterglobalhubs.operator.open-cluster-management.io
       version: v1alpha1
-  description: "MultiCluster Global Hub Operator defines the configuration for multicluster
+  description: "Multicluster Global Hub Operator defines the configuration for multicluster
     global hub installation and upgrade with one custom resource.\n\n## Prerequisites\n\n-
     Red Hat Advanced Cluster Management for Kubernetes (RHACM) 2.5 or later needs
     to be installed.\n- PostgreSQL needs to be installed and a database is created
@@ -70,7 +70,7 @@ spec:
     \               1/1     Running   0          19s\n```\n\nThe operator is now providing
     new Custom Resources Definitions: `multiclusterglobalhubs.operator.open-cluster-management.io`\n\n##
     Using the Multicluster Global Hub Operator\n\nAfter installing the operator, create
-    an instance of the MultiClusterGlobalHub resource to install the Multicluster
+    an instance of the MulticlusterGlobalHub resource to install the Multicluster
     Global Hub.\n\nThe pods of Multicluster Global Hub are created in the `open-cluster-management`
     namespace:\n\n```\n$ kubectl get pods -n open-cluster-management\nNAME                                                             READY
     \  STATUS    RESTARTS   AGE\nmulticluster-global-hub-operator-5ccbbc878d-98fdp

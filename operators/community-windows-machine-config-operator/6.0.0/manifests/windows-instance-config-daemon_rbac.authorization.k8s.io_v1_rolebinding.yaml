@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  creationTimestamp: null
+  name: windows-instance-config-daemon
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: windows-instance-config-daemon
+subjects:
+- kind: ServiceAccount
+  name: windows-instance-config-daemon
+  namespace: openshift-windows-machine-config-operator

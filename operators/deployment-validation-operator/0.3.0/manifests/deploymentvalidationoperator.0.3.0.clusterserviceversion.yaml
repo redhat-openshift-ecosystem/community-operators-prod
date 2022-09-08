@@ -84,6 +84,10 @@ spec:
                 image: quay.io/deployment-validation-operator/dv-operator:0.3.0
                 imagePullPolicy: Always
                 name: deployment-validation-operator
+                ports:
+                - containerPort: 8383
+                  name: http-metrics
+                  protocol: TCP
                 args:
                 - --config /config/deployment-validation-operator-config.yaml
                 resources:

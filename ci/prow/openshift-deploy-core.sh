@@ -100,7 +100,6 @@ cd "$TARGET_PATH"
 echo "Checking PR $PULL_NUMBER on $PR_TARGET_REPO"
 tmpfile=$(mktemp /tmp/pr-details-XXXXXXX.json)
 curl -s https://api.github.com/repos/$PR_TARGET_REPO/pulls/$PULL_NUMBER -o $tmpfile
-cat $tmpfile
 REPO_FULL=$(cat $tmpfile | /tmp/jq-$OC_DIR_CORE/bin/jq -r '.head.repo.clone_url')
 echo "REPO_FULL=$REPO_FULL"
 BRANCH=$(cat $tmpfile | /tmp/jq-$OC_DIR_CORE/bin/jq -r '.head.ref')

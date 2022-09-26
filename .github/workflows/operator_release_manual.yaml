@@ -314,6 +314,7 @@ jobs:
           path: /tmp/operator-test/operators
       - name: Print space info (before)
         run: |
+          du -h -d 3 /tmp | sort  -h -r
           df -h
           docker images
 
@@ -348,8 +349,10 @@ jobs:
       - name: Print space info (after)
         if: always()
         run: |
+          docker exec -t op-test /bin/bash -c "du -h -d 3 /tmp | sort  -h -r" || true
+          docker exec -t op-test /bin/bash -c "podman images ; df -h" || true
+          echo "local df:"
           df -h
-          docker images
 
       - name: Sign index
         id: openshift-vars

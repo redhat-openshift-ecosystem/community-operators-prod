@@ -291,10 +291,13 @@ spec:
     ```
 
     apiVersion: v1
+
     kind: Secret
+
     metadata:
       name: my-cluster-name-secrets
     type: Opaque
+
     data:
       MONGODB_BACKUP_USER: YmFja3Vw
       MONGODB_BACKUP_PASSWORD: YmFja3VwMTIzNDU2
@@ -305,9 +308,6 @@ spec:
       MONGODB_USER_ADMIN_USER: dXNlckFkbWlu
       MONGODB_USER_ADMIN_PASSWORD: dXNlckFkbWluMTIzNDU2
       PMM_SERVER_API_KEY: dXNlckFkbWluMTIzNDU2
-#      PMM_SERVER_USER: cG1t
-#      PMM_SERVER_PASSWORD: c3VwYXxefHBheno=
-
     ```
 
     ### Release Highlights
@@ -562,6 +562,7 @@ spec:
             selector:
               matchLabels:
                 name: percona-server-mongodb-operator
+            strategy: {}
             template:
               metadata:
                 labels:

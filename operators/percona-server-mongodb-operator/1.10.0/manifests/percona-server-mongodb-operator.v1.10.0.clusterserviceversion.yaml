@@ -1,251 +1,17 @@
----
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: percona-server-mongodb-operator.v1.11.0
+  name: percona-server-mongodb-operator.v1.10.0
   namespace: default
   annotations:
     alm-examples: >-
-      [
-        {
-          "apiVersion": "psmdb.percona.com/v1-11-0",
-          "kind": "PerconaServerMongoDB",
-          "metadata": {
-            "name": "my-cluster-name"
-          },
-          "spec": {
-            "crVersion": "1.11.0",
-            "image": "percona/percona-server-mongodb:4.4.10-11",
-            "imagePullPolicy": "Always",
-            "allowUnsafeConfigurations": false,
-            "updateStrategy": "SmartUpdate",
-            "upgradeOptions": {
-              "versionServiceEndpoint": "https://check.percona.com",
-              "apply": "disabled",
-              "schedule": "0 2 * * *",
-              "setFCV": false
-            },
-            "secrets": {
-              "users": "my-cluster-name-secrets"
-            },
-            "pmm": {
-              "enabled": false,
-              "image": "percona/pmm-client:2.24.0",
-              "serverHost": "monitoring-service"
-            },
-            "replsets": [
-              {
-                "name": "rs0",
-                "size": 3,
-                "affinity": {
-                  "antiAffinityTopologyKey": "kubernetes.io/hostname"
-                },
-                "podDisruptionBudget": {
-                  "maxUnavailable": 1
-                },
-                "expose": {
-                  "enabled": false,
-                  "exposeType": "ClusterIP"
-                },
-                "nonvoting": {
-                  "enabled": false,
-                  "size": 3,
-                  "affinity": {
-                    "antiAffinityTopologyKey": "kubernetes.io/hostname"
-                  },
-                  "podDisruptionBudget": {
-                    "maxUnavailable": 1
-                  },
-                  "resources": {
-                    "limits": {
-                      "cpu": "300m",
-                      "memory": "0.5G"
-                    },
-                    "requests": {
-                      "cpu": "300m",
-                      "memory": "0.5G"
-                    }
-                  },
-                  "volumeSpec": {
-                    "persistentVolumeClaim": {
-                      "resources": {
-                        "requests": {
-                          "storage": "1Gi"
-                        }
-                      }
-                    }
-                  }
-                },
-                "arbiter": {
-                  "enabled": false,
-                  "size": 1,
-                  "affinity": {
-                    "antiAffinityTopologyKey": "kubernetes.io/hostname"
-                  }
-                },
-                "resources": {
-                  "limits": {
-                    "cpu": "300m",
-                    "memory": "0.5G"
-                  },
-                  "requests": {
-                    "cpu": "300m",
-                    "memory": "0.5G"
-                  }
-                },
-                "volumeSpec": {
-                  "persistentVolumeClaim": {
-                    "resources": {
-                      "requests": {
-                        "storage": "3Gi"
-                      }
-                    }
-                  }
-                }
-              }
-            ],
-            "sharding": {
-              "enabled": true,
-              "configsvrReplSet": {
-                "size": 3,
-                "affinity": {
-                  "antiAffinityTopologyKey": "kubernetes.io/hostname"
-                },
-                "podDisruptionBudget": {
-                  "maxUnavailable": 1
-                },
-                "expose": {
-                  "enabled": false,
-                  "exposeType": "ClusterIP"
-                },
-                "resources": {
-                  "limits": {
-                    "cpu": "300m",
-                    "memory": "0.5G"
-                  },
-                  "requests": {
-                    "cpu": "300m",
-                    "memory": "0.5G"
-                  }
-                },
-                "volumeSpec": {
-                  "persistentVolumeClaim": {
-                    "resources": {
-                      "requests": {
-                        "storage": "3Gi"
-                      }
-                    }
-                  }
-                }
-              },
-              "mongos": {
-                "size": 3,
-                "affinity": {
-                  "antiAffinityTopologyKey": "kubernetes.io/hostname"
-                },
-                "podDisruptionBudget": {
-                  "maxUnavailable": 1
-                },
-                "resources": {
-                  "limits": {
-                    "cpu": "300m",
-                    "memory": "0.5G"
-                  },
-                  "requests": {
-                    "cpu": "300m",
-                    "memory": "0.5G"
-                  }
-                },
-                "expose": {
-                  "exposeType": "ClusterIP"
-                }
-              }
-            },
-            "mongod": {
-              "net": {
-                "port": 27017,
-                "hostPort": 0
-              },
-              "security": {
-                "redactClientLogData": false,
-                "enableEncryption": true,
-                "encryptionKeySecret": "my-cluster-name-mongodb-encryption-key",
-                "encryptionCipherMode": "AES256-CBC"
-              },
-              "setParameter": {
-                "ttlMonitorSleepSecs": 60,
-                "wiredTigerConcurrentReadTransactions": 128,
-                "wiredTigerConcurrentWriteTransactions": 128
-              },
-              "storage": {
-                "engine": "wiredTiger",
-                "inMemory": {
-                  "engineConfig": {
-                    "inMemorySizeRatio": 0.9
-                  }
-                },
-                "wiredTiger": {
-                  "engineConfig": {
-                    "cacheSizeRatio": 0.5,
-                    "directoryForIndexes": false,
-                    "journalCompressor": "snappy"
-                  },
-                  "collectionConfig": {
-                    "blockCompressor": "snappy"
-                  },
-                  "indexConfig": {
-                    "prefixCompression": true
-                  }
-                }
-              },
-              "operationProfiling": {
-                "mode": "slowOp",
-                "slowOpThresholdMs": 100,
-                "rateLimit": 100
-              }
-            },
-            "backup": {
-              "enabled": true,
-              "restartOnFailure": true,
-              "image": "percona/percona-server-mongodb-operator:1.11.0-backup",
-              "serviceAccountName": "percona-server-mongodb-operator",
-              "storages": null,
-              "pitr": {
-                "enabled": false
-              },
-              "tasks": null
-            }
-          }
-        },
-        {
-          "apiVersion": "psmdb.percona.com/v1",
-          "kind": "PerconaServerMongoDBBackup",
-          "metadata": {
-            "name": "backup1"
-          },
-          "spec": {
-            "psmdbCluster": "my-cluster-name",
-            "storageName": "s3-us-west"
-          }
-        },
-        {
-          "apiVersion": "psmdb.percona.com/v1",
-          "kind": "PerconaServerMongoDBRestore",
-          "metadata": {
-            "name": "restore1"
-          },
-          "spec": {
-            "backupName": "backup1",
-            "clusterName": "my-cluster-name"
-          }
-        }
-      ]
+      [{"apiVersion":"psmdb.percona.com/v1-10-0","kind":"PerconaServerMongoDB","metadata":{"name":"my-cluster-name"},"spec":{"crVersion":"1.10.0","image":"percona/percona-server-mongodb:4.4.8-9","imagePullPolicy":"Always","allowUnsafeConfigurations":false,"updateStrategy":"SmartUpdate","upgradeOptions":{"versionServiceEndpoint":"https://check.percona.com","apply":"disabled","schedule":"0 2 * * *","setFCV":false},"secrets":{"users":"my-cluster-name-secrets"},"pmm":{"enabled":false,"image":"percona/pmm-client:2.21.0","serverHost":"monitoring-service"},"replsets":[{"name":"rs0","size":3,"affinity":{"antiAffinityTopologyKey":"kubernetes.io/hostname"},"podDisruptionBudget":{"maxUnavailable":1},"expose":{"enabled":false,"exposeType":"ClusterIP"},"nonvoting":{"enabled":false,"size":3,"affinity":{"antiAffinityTopologyKey":"kubernetes.io/hostname"},"podDisruptionBudget":{"maxUnavailable":1},"resources":{"limits":{"cpu":"300m","memory":"0.5G"},"requests":{"cpu":"300m","memory":"0.5G"}},"volumeSpec":{"persistentVolumeClaim":{"resources":{"requests":{"storage":"1Gi"}}}}},"arbiter":{"enabled":false,"size":1,"affinity":{"antiAffinityTopologyKey":"kubernetes.io/hostname"}},"resources":{"limits":{"cpu":"300m","memory":"0.5G"},"requests":{"cpu":"300m","memory":"0.5G"}},"volumeSpec":{"persistentVolumeClaim":{"resources":{"requests":{"storage":"3Gi"}}}}}],"sharding":{"enabled":true,"configsvrReplSet":{"size":3,"affinity":{"antiAffinityTopologyKey":"kubernetes.io/hostname"},"podDisruptionBudget":{"maxUnavailable":1},"expose":{"enabled":false,"exposeType":"ClusterIP"},"resources":{"limits":{"cpu":"300m","memory":"0.5G"},"requests":{"cpu":"300m","memory":"0.5G"}},"volumeSpec":{"persistentVolumeClaim":{"resources":{"requests":{"storage":"3Gi"}}}}},"mongos":{"size":3,"affinity":{"antiAffinityTopologyKey":"kubernetes.io/hostname"},"podDisruptionBudget":{"maxUnavailable":1},"resources":{"limits":{"cpu":"300m","memory":"0.5G"},"requests":{"cpu":"300m","memory":"0.5G"}},"expose":{"exposeType":"ClusterIP"}}},"mongod":{"net":{"port":27017,"hostPort":0},"security":{"redactClientLogData":false,"enableEncryption":true,"encryptionKeySecret":"my-cluster-name-mongodb-encryption-key","encryptionCipherMode":"AES256-CBC"},"setParameter":{"ttlMonitorSleepSecs":60,"wiredTigerConcurrentReadTransactions":128,"wiredTigerConcurrentWriteTransactions":128},"storage":{"engine":"wiredTiger","inMemory":{"engineConfig":{"inMemorySizeRatio":0.9}},"wiredTiger":{"engineConfig":{"cacheSizeRatio":0.5,"directoryForIndexes":false,"journalCompressor":"snappy"},"collectionConfig":{"blockCompressor":"snappy"},"indexConfig":{"prefixCompression":true}}},"operationProfiling":{"mode":"slowOp","slowOpThresholdMs":100,"rateLimit":100}},"backup":{"enabled":true,"restartOnFailure":true,"image":"percona/percona-server-mongodb-operator:1.10.0-backup","serviceAccountName":"percona-server-mongodb-operator","storages":null,"pitr":{"enabled":false},"tasks":null}}},{"apiVersion":"psmdb.percona.com/v1","kind":"PerconaServerMongoDBBackup","metadata":{"name":"backup1"},"spec":{"psmdbCluster":"my-cluster-name","storageName":"s3-us-west"}},{"apiVersion":"psmdb.percona.com/v1","kind":"PerconaServerMongoDBRestore","metadata":{"name":"restore1"},"spec":{"backupName":"backup1","clusterName":"my-cluster-name"}}]
     categories: Database
     certified: 'true'
-    createdAt: 2021-12-30T10:35:26.000Z
+    createdAt: 2021-10-13T10:35:26.000Z
     description: >-
       Percona Distribution for MongoDB Operator automates the creation, modification, or deletion of items in your Percona Server for MongoDB environment
-    containerImage: 'percona/percona-server-mongodb-operator:1.11.0'
+    containerImage: 'percona/percona-server-mongodb-operator:1.10.0'
     support: Percona
     capabilities: Deep Insights
     repository: 'https://github.com/percona/percona-server-mongodb-operator'
@@ -256,10 +22,7 @@ spec:
     ## Percona is Cloud Native
 
 
-    The Percona Distribution for MongoDB Kubernetes Operator automates the creation, modification, or deletion of items in your Percona Server for MongoDB environment.
-    The Operator contains the necessary Kubernetes settings to maintain a consistent Percona Server for MongoDB
-    instance modification, or deletion of items in your Percona Server for MongoDB environment.
-    The Operator contains the necessary Kubernetes settings to maintain a consistent Percona Server for MongoDB instance.
+    The Percona Distribution for MongoDB Kubernetes Operator automates the creation, modification, or deletion of items in your Percona Server for MongoDB environment. The Operator contains the necessary Kubernetes settings to maintain a consistent Percona Server for MongoDB instance. modification, or deletion of items in your Percona Server for MongoDB environment. The Operator contains the necessary Kubernetes settings to maintain a consistent Percona Server for MongoDB instance.
 
 
     Consult the
@@ -351,22 +114,15 @@ spec:
     ### Release Highlights
 
 
-    * In addition to S3-compatible storage, you can now configure backups to use Microsoft Azure Blob storage.
-      This feature makes the Operator fully compatible with Azure Cloud.
-    * Custom sidecar containers allow users to customize Percona Distribution for MongoDB and other Operator components without changing the container images.
-      In this release, we enable even more customization, by allowing users to mount volumes into the sidecar containers.
-    * It is now possible to set annotations to backup cron jobs (Thanks to Aliaksandr Karavai for contribution)
-    * Mongos readiness probe now avoids running listDatabases command for all databases in the cluster to avoid unneeded delays on
-      clusters with an extremely large amount of databases
-    * Timeout parameters for liveness and readiness probes can be customized to avoid false-positives for heavy-loaded clusters
-    * Update backup status as error if it`s not started for a long time
-    * New backup.pitr.oplogSpanMin option controls how often oplogs are uploaded to the cloud storage
+    * Starting from this release, the Operator implements as a technical preview the possibility to include non-voting replica set members into the cluster, which do not participate in the primary election process. This feature enables users to deploy non-voting members with the Operator through a Custom Resource object without manual configuration.
+
+    * The technical preview of the cross-site replication feature allows users to add external replica set nodes into the cluster managed by the Operator, including scenarios when one of the clusters is outside of the Kubernetes environment. External nodes can be run by another Operator or can be regular MongoDB deployment. The feature is intended for the following use cases:
+        * provide migrations of your regular MongoDB database to the Percona Server for MongoDB cluster under the Operator control, or carry on backward migration,
+        * deploy cross-regional clusters for Disaster Recovery.
 
 
   maturity: stable
-  version: 1.11.0
-  replaces: 'percona-server-mongodb-operator.v1.10.0'
-  skips: []
+  version: 1.10.0
   minKubeVersion: ''
   keywords:
     - mongodb
@@ -401,7 +157,7 @@ spec:
         displayName: PerconaServerMongoDB
         kind: PerconaServerMongoDB
         name: perconaservermongodbs.psmdb.percona.com
-        version: v1-11-0
+        version: v1-10-0
         specDescriptors: []
         statusDescriptors: []
         resources:
@@ -481,93 +237,93 @@ spec:
     spec:
       permissions:
         - rules:
-          - apiGroups:
-            - psmdb.percona.com
-            resources:
-            - perconaservermongodbs
-            - perconaservermongodbs/status
-            - perconaservermongodbbackups
-            - perconaservermongodbbackups/status
-            - perconaservermongodbrestores
-            - perconaservermongodbrestores/status
-            verbs:
-            - get
-            - list
-            - watch
-            - create
-            - update
-            - patch
-            - delete
-          - apiGroups:
-            - ""
-            resources:
-            - pods
-            - pods/exec
-            - services
-            - persistentvolumeclaims
-            - secrets
-            - configmaps
-            verbs:
-            - get
-            - list
-            - watch
-            - create
-            - update
-            - patch
-            - delete
-          - apiGroups:
-            - apps
-            resources:
-            - deployments
-            - replicasets
-            - statefulsets
-            verbs:
-            - get
-            - list
-            - watch
-            - create
-            - update
-            - patch
-            - delete
-          - apiGroups:
-            - batch
-            resources:
-            - cronjobs
-            verbs:
-            - get
-            - list
-            - watch
-            - create
-            - update
-            - patch
-            - delete
-          - apiGroups:
-            - policy
-            resources:
-            - poddisruptionbudgets
-            verbs:
-            - get
-            - list
-            - watch
-            - create
-            - update
-            - patch
-            - delete
-          - apiGroups:
-            - certmanager.k8s.io
-            - cert-manager.io
-            resources:
-            - issuers
-            - certificates
-            verbs:
-            - get
-            - list
-            - watch
-            - create
-            - update
-            - patch
-            - delete
-            - deletecollection
+            - apiGroups:
+              - psmdb.percona.com
+              resources:
+              - perconaservermongodbs
+              - perconaservermongodbs/status
+              - perconaservermongodbbackups
+              - perconaservermongodbbackups/status
+              - perconaservermongodbrestores
+              - perconaservermongodbrestores/status
+              verbs:
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
+            - apiGroups:
+              - ""
+              resources:
+              - pods
+              - pods/exec
+              - services
+              - persistentvolumeclaims
+              - secrets
+              - configmaps
+              verbs:
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
+            - apiGroups:
+              - apps
+              resources:
+              - deployments
+              - replicasets
+              - statefulsets
+              verbs:
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
+            - apiGroups:
+              - batch
+              resources:
+              - cronjobs
+              verbs:
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
+            - apiGroups:
+              - policy
+              resources:
+              - poddisruptionbudgets
+              verbs:
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
+            - apiGroups:
+              - certmanager.k8s.io
+              - cert-manager.io
+              resources:
+              - issuers
+              - certificates
+              verbs:
+              - get
+              - list
+              - watch
+              - create
+              - update
+              - patch
+              - delete
+              - deletecollection
           serviceAccountName: percona-server-mongodb-operator
       clusterPermissions: []
       deployments:
@@ -601,7 +357,7 @@ spec:
                         value: 5s
                       - name: LOG_VERBOSE
                         value: 'false'
-                    image: 'percona/percona-server-mongodb-operator:1.11.0'
+                    image: 'percona/percona-server-mongodb-operator:1.10.0'
                     imagePullPolicy: Always
                     name: percona-server-mongodb-operator
                     ports:

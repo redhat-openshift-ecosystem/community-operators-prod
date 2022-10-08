@@ -29,7 +29,7 @@ metadata:
     categories: Integration & Delivery,OpenShift Optional
     certified: "false"
     containerImage: quay.io/stolostron/multicluster-global-hub-operator:latest
-    createdAt: "2022-09-22T20:00:31Z"
+    createdAt: "2022-10-08T20:00:31Z"
     description: Manages the installation and upgrade of the Multicluster Global Hub.
     operatorframework.io/suggested-namespace: open-cluster-management
     operators.operatorframework.io/builder: operator-sdk-v1.23.0
@@ -58,19 +58,23 @@ spec:
     \\\n  --from-literal=database_uri=<postgresql-uri> \n```\n>_Note:_ There is a
     sample script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/storage)
     to install postgres in `hoh-postgres` namespace and create the secret `storage-secret`
-    in namespace `open-cluster-management` automatically.\n\n- Kafka needs to be installed
-    and two topics `spec` and `status` should be created. A secret named `transport-secret`
-    that contains the kafka access information should be created in `open-cluster-management`
-    namespace, eg.\n\n```\nkubectl create secret generic transport-secret -n open-cluster-management
+    in namespace `open-cluster-management` automatically. To override the secret namespace,
+    set `TARGET_NAMESPACE` environment variable to the RHACM installation namespace
+    before executing the script.\n\n- Kafka needs to be installed and two topics `spec`
+    and `status` should be created. A secret named `transport-secret` that contains
+    the kafka access information should be created in `open-cluster-management` namespace,
+    eg.\n\n```\nkubectl create secret generic transport-secret -n open-cluster-management
     \\\n  --from-literal=bootstrap_server=<kafka-bootstrap-server-address> \\\n  --from-literal=CA=<CA-for-kafka-server>\n```\n
     >_Note:_ There is a sample script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/transport)
     to install kafka in `kafka` namespace and create the secret `transport-secret`
-    in namespace `open-cluster-management` automatically.\n\n## How to Install\n\n-
-    Install `Multicluster Global Hub Operator` by following instructions in top right
-    button `Install`, the operator must be installed in the same namespace as Red
-    Hat Advanced Cluster Management for Kubernetes (RHACM), by default, in `open-cluster-management`
-    namespace.\n\nA pod will be created in `open-cluster-management` namespace\n\n```\n$
-    kubectl get pods -n open-cluster-management\nNAME                                                             READY
+    in namespace `open-cluster-management` automatically. To override the secret namespace,
+    set `TARGET_NAMESPACE` environment variable to the RHACM installation namespace
+    before executing the script.\n\n## How to Install\n\n- Install `Multicluster Global
+    Hub Operator` by following instructions in top right button `Install`, the operator
+    must be installed in the same namespace as Red Hat Advanced Cluster Management
+    for Kubernetes (RHACM), by default, in `open-cluster-management` namespace.\n\nA
+    pod will be created in `open-cluster-management` namespace\n\n```\n$ kubectl get
+    pods -n open-cluster-management\nNAME                                                             READY
     \  STATUS    RESTARTS   AGE\nmulticluster-global-hub-operator-5ccbbc878d-98fdp
     \               1/1     Running   0          19s\n```\n\nThe operator is now providing
     new Custom Resources Definitions: `multiclusterglobalhubs.operator.open-cluster-management.io`\n\n##
@@ -277,6 +281,17 @@ spec:
           - get
           - list
           - patch
+          - update
+          - watch
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - mutatingwebhookconfigurations
+          verbs:
+          - create
+          - delete
+          - get
+          - list
           - update
           - watch
         - apiGroups:
@@ -538,8 +553,6 @@ spec:
                   value: quay.io/stolostron/multicluster-global-hub-manager:latest
                 - name: OPERAND_IMAGE_MULTICLUSTER_GLOBAL_HUB_AGENT
                   value: quay.io/stolostron/multicluster-global-hub-agent:latest
-                - name: OPERAND_IMAGE_MULTICLUSTER_GLOBAL_HUB_OPERATOR
-                  value: quay.io/stolostron/multicluster-global-hub-operator:latest
                 image: quay.io/stolostron/multicluster-global-hub-operator:latest
                 livenessProbe:
                   httpGet:

@@ -51,30 +51,31 @@ spec:
   description: "Multicluster Global Hub Operator defines the configuration for multicluster
     global hub installation and upgrade with one custom resource.\n\n## Prerequisites\n\n-
     Red Hat Advanced Cluster Management for Kubernetes (RHACM) 2.5 or later needs
-    to be installed.\n- PostgreSQL needs to be installed and a database is created
-    for multicluster global hub. A secret named `storage-secret` that contains the
-    database access credential should be created in `open-cluster-management` namespace,
-    eg.\n\n```\nkubectl create secret generic storage-secret -n open-cluster-management
-    \\\n  --from-literal=database_uri=<postgresql-uri> \n```\n>_Note:_ There is a
-    sample script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/storage)
+    to be installed.\n- PostgreSQL needs to be installed and you must create database
+    for the multicluster global hub. You must create a secret named postgresql-secret
+    that contains the database access credential in `open-cluster-management` namespace.
+    You can run the following command to create the secret: \n\n```\nkubectl create
+    secret generic storage-secret -n open-cluster-management \\\n  --from-literal=database_uri=<postgresql-uri>
+    \n```\n>_Note:_ There is a sample script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/storage)
     to install postgres in `hoh-postgres` namespace and create the secret `storage-secret`
     in namespace `open-cluster-management` automatically. To override the secret namespace,
     set `TARGET_NAMESPACE` environment variable to the RHACM installation namespace
-    before executing the script.\n\n- Kafka needs to be installed and two topics `spec`
-    and `status` should be created. A secret named `transport-secret` that contains
-    the kafka access information should be created in `open-cluster-management` namespace,
-    eg.\n\n```\nkubectl create secret generic transport-secret -n open-cluster-management
-    \\\n  --from-literal=bootstrap_server=<kafka-bootstrap-server-address> \\\n  --from-literal=CA=<CA-for-kafka-server>\n```\n
-    >_Note:_ There is a sample script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/transport)
+    before executing the script.\n\n- Kafka needs to be installed, and you must create
+    two sections, `spec` and `status`. You need to create a secret named kafka-secret
+    that contains the kafka access information should be created in `open-cluster-management`
+    namespace. You can run the following command to create the secret: \n\n```\nkubectl
+    create secret generic transport-secret -n open-cluster-management \\\n  --from-literal=bootstrap_server=<kafka-bootstrap-server-address>
+    \\\n  --from-literal=CA=<CA-for-kafka-server>\n```\n >_Note:_ There is a sample
+    script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/transport)
     to install kafka in `kafka` namespace and create the secret `transport-secret`
     in namespace `open-cluster-management` automatically. To override the secret namespace,
     set `TARGET_NAMESPACE` environment variable to the RHACM installation namespace
-    before executing the script.\n\n## How to Install\n\n- Install `Multicluster Global
-    Hub Operator` by following instructions in top right button `Install`, the operator
-    must be installed in the same namespace as Red Hat Advanced Cluster Management
-    for Kubernetes (RHACM), by default, in `open-cluster-management` namespace.\n\nA
-    pod will be created in `open-cluster-management` namespace\n\n```\n$ kubectl get
-    pods -n open-cluster-management\nNAME                                                             READY
+    before executing the script.\n\n## How to Install\n\nInstall the Multicluster
+    Global Hub Operator by following the instructions that are displayed after you
+    select the Install button. The operator must be installed in the same namespace
+    as Red Hat Advanced Cluster Management for Kubernetes (RHACM), by default, in
+    `open-cluster-management` namespace.\n\nA pod will be created in `open-cluster-management`
+    namespace\n\n```\n$ kubectl get pods -n open-cluster-management\nNAME                                                             READY
     \  STATUS    RESTARTS   AGE\nmulticluster-global-hub-operator-5ccbbc878d-98fdp
     \               1/1     Running   0          19s\n```\n\nThe operator is now providing
     new Custom Resources Definitions: `multiclusterglobalhubs.operator.open-cluster-management.io`\n\n##

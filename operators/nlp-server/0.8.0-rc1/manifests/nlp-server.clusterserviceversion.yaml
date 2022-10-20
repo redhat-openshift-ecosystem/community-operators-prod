@@ -176,7 +176,7 @@ spec:
           - subjectaccessreviews
           verbs:
           - create
-        serviceAccountName: nlp-server-operator
+        serviceAccountName: nlp-server-controller-manager
       deployments:
       - label:
           control-plane: controller-manager
@@ -278,7 +278,7 @@ spec:
           verbs:
           - create
           - patch
-        serviceAccountName: nlp-server-operator
+        serviceAccountName: nlp-server-controller-manager
     strategy: deployment
   installModes:
   - supported: false

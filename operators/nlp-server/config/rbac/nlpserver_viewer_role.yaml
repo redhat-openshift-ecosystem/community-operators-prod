@@ -1,0 +1,20 @@
+# permissions for end users to view nlpservers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nlpserver-viewer-role
+rules:
+- apiGroups:
+  - apps.johnsnowlabs.com
+  resources:
+  - nlpservers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps.johnsnowlabs.com
+  resources:
+  - nlpservers/status
+  verbs:
+  - get

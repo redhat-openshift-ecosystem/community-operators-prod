@@ -1,0 +1,63 @@
+apiVersion: apps.johnsnowlabs.com/v1
+kind: Nlpserver
+metadata:
+  name: nlpserver-sample
+spec:
+  # Default values copied from <project_dir>/helm-charts/nlp-server/values.yaml
+  ExtraEnv:
+    johnsnowlabs_client_id: sI4MKSmLHOX2Pg7XhM3McJS2oyKG5PHcp0BlANEW
+    nb_uid: "1000"
+    nb_user: johnsnowlabs
+    pyspark_version: 3.0.2
+    spark_nlp_version: 3.4.4
+  affinity: {}
+  fullnameOverride: ""
+  image:
+    pullPolicy: Always
+    repository: johnsnowlabs/nlp-server
+    tag: 0.8.0rc1
+  imagePullSecrets: []
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    enabled: false
+    hosts:
+    - host: nlp-server.jsl.aiplatform.eks.test.johnsnowlabs.com
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - nlp-server.jsl.aiplatform.eks.test.johnsnowlabs.com
+      secretName: annotationlab-tls-secret
+  livenessProbe: |
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 15
+    timeoutSeconds: 3
+  nameOverride: ""
+  nodeSelector: {}
+  podAnnotations: {}
+  podSecurityContext: {}
+  readinessProbe: |
+    httpGet:
+      path: /
+      port: http
+    initialDelaySeconds: 15
+    timeoutSeconds: 3
+  replicaCount: 1
+  resources: {}
+  securityContext: {}
+  service:
+    port: 5000
+    portName: http
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    create: true
+    name: nlp-server-sa
+  tolerations: []
+  
+  

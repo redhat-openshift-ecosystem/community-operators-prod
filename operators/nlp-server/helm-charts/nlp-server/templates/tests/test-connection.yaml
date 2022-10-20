@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "nlp-server.fullname" . }}-test-connection"
+  labels:
+    {{- include "nlp-server.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "nlp-server.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

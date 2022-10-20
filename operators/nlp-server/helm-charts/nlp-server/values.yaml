@@ -1,0 +1,101 @@
+# Default values for nlp-server.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: johnsnowlabs/nlp-server
+  pullPolicy: Always
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.8.0rc1"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: "nlp-server-sa"
+
+podAnnotations: {}
+
+livenessProbe: |
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 15
+  timeoutSeconds: 3
+readinessProbe: |
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 15
+  timeoutSeconds: 3
+
+podSecurityContext: {}
+#  fsGroup: 1000
+#  runAsUser: 1000
+#  runAsNonRoot: true
+#  seccompProfile:
+#    type: RuntimeDefault
+
+securityContext: {}
+#  capabilities:
+#    drop:
+#    - ALL
+#  readOnlyRootFilesystem: true
+#  allowPrivilegeEscalation: false
+
+service:
+  portName: http
+  type: ClusterIP
+  port: 5000
+
+ingress:
+
+  enabled: false
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: "nlp-server.jsl.aiplatform.eks.test.johnsnowlabs.com"
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - secretName: annotationlab-tls-secret
+      hosts:
+        - nlp-server.jsl.aiplatform.eks.test.johnsnowlabs.com
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+ExtraEnv:
+  nb_user: "johnsnowlabs"
+  nb_uid: "1000"
+  spark_nlp_version: "3.4.4"
+  pyspark_version: "3.0.2"
+  johnsnowlabs_client_id: sI4MKSmLHOX2Pg7XhM3McJS2oyKG5PHcp0BlANEW
+

@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nlp-server.fullname" . }}
+  labels:
+    {{- include "nlp-server.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "nlp-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "nlp-server.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "nlp-server.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: PATH
+            value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          - name: NB_USER
+            value: "{{ .Values.ExtraEnv.nb_user }}"
+          - name: NB_UID
+            value: "{{ .Values.ExtraEnv.nb_uid }}"
+          - name: HOME
+            value: "/home/johnsnowlabs"
+          - name: LICENSES_FOLDER
+            value: "/home/johnsnowlabs"
+          - name: PYSPARK_PYTHON
+            value: "python3"
+          - name: PYSPARK_DRIVER_PYTHON
+            value: "python3"
+          - name: DEBIAN_FRONTEND
+            value: "noninteractive"
+          - name: JAVA_HOME
+            value: "/usr/lib/jvm/java-8-openjdk-amd64/"
+          - name: LC_ALL
+            value: "C.UTF-8"
+          - name: LANG
+            value: "C.UTF-8"
+          - name: PYSPARK
+            value: "{{ .Values.ExtraEnv.pyspark_version }}"
+          - name: SPARKNLP_VERSION
+            value: "{{ .Values.ExtraEnv.spark_nlp_version }}"
+          - name: MYJSL_CLIENT_ID
+            value: "{{ .Values.ExtraEnv.johnsnowlabs_client_id }}"
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- tpl . $ | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- tpl . $ | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

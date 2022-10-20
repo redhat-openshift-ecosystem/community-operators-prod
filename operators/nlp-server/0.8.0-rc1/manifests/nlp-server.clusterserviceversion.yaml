@@ -77,10 +77,10 @@ metadata:
       ]
     capabilities: Basic Install
     categories: AI/Machine Learning
-    containerImage: registry.johnsnowlabs.com/nlp-server/nlp-server-operator:0.8.0-rc1 
+    containerImage: registry.johnsnowlabs.com/nlp-server/nlp-server-operator:0.8.0-rc1
     operators.operatorframework.io/builder: operator-sdk-v1.23.0
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-  name: nlp-server-operator.v0.8.0rc1
+  name: nlp-server.v0.8.0-rc1
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -176,11 +176,11 @@ spec:
           - subjectaccessreviews
           verbs:
           - create
-        serviceAccountName: nlp-server-operator-controller-manager
+        serviceAccountName: nlp-server-controller-manager
       deployments:
       - label:
           control-plane: controller-manager
-        name: nlp-server-operator-controller-manager
+        name: nlp-server-controller-manager
         spec:
           replicas: 1
           selector:
@@ -217,7 +217,7 @@ spec:
                 - --health-probe-bind-address=:8081
                 - --metrics-bind-address=127.0.0.1:8080
                 - --leader-elect
-                - --leader-election-id=nlp-server-operator
+                - --leader-election-id=nlp-server
                 image: registry.johnsnowlabs.com/nlp-server/nlp-server-operator:0.8.0-rc1
                 livenessProbe:
                   httpGet:
@@ -243,7 +243,7 @@ spec:
                   allowPrivilegeEscalation: false
               securityContext:
                 runAsNonRoot: true
-              serviceAccountName: nlp-server-operator-controller-manager
+              serviceAccountName: nlp-server-controller-manager
               terminationGracePeriodSeconds: 10
       permissions:
       - rules:
@@ -278,7 +278,7 @@ spec:
           verbs:
           - create
           - patch
-        serviceAccountName: nlp-server-operator-controller-manager
+        serviceAccountName: nlp-server-controller-manager
     strategy: deployment
   installModes:
   - supported: false
@@ -292,8 +292,8 @@ spec:
   keywords:
   - nlp-server
   links:
-  - name: Nlp Server Operator
-    url: https://nlp-server-operator.domain
+  - name: Nlp Server
+    url: https://johnsnowlabs.com
   maturity: alpha
   provider:
     name: JohnSnowLabs

@@ -29,7 +29,7 @@ metadata:
     categories: Integration & Delivery,OpenShift Optional
     certified: "false"
     containerImage: quay.io/stolostron/multicluster-global-hub-operator:latest
-    createdAt: "2022-10-20T20:00:31Z"
+    createdAt: "2022-10-24T20:00:31Z"
     description: Manages the installation and upgrade of the Multicluster Global Hub.
     operatorframework.io/suggested-namespace: open-cluster-management
     operators.operatorframework.io/builder: operator-sdk-v1.23.0
@@ -224,8 +224,23 @@ spec:
           verbs:
           - create
           - delete
+          - deletecollection
           - get
           - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - delete
+          - deletecollection
+          - get
+          - list
+          - patch
           - update
           - watch
         - apiGroups:
@@ -275,10 +290,36 @@ spec:
         - apiGroups:
           - addon.open-cluster-management.io
           resources:
+          - addondeploymentconfigs
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - addon.open-cluster-management.io
+          resources:
           - clustermanagementaddons
           verbs:
           - create
           - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - addon.open-cluster-management.io
+          resources:
+          - clustermanagementaddons/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - addon.open-cluster-management.io
+          resources:
+          - managedclusteraddons
+          verbs:
+          - create
+          - delete
+          - deletecollection
           - get
           - list
           - patch
@@ -287,15 +328,16 @@ spec:
         - apiGroups:
           - addon.open-cluster-management.io
           resources:
-          - managedclusteraddons
+          - managedclusteraddons/finalizers
           verbs:
-          - create
-          - delete
-          - get
-          - list
+          - update
+        - apiGroups:
+          - addon.open-cluster-management.io
+          resources:
+          - managedclusteraddons/status
+          verbs:
           - patch
           - update
-          - watch
         - apiGroups:
           - admissionregistration.k8s.io
           resources:
@@ -355,13 +397,40 @@ spec:
           - patch
           - update
         - apiGroups:
-          - cluster.open-cluster-management.io
+          - authorization.k8s.io
           resources:
-          - hypershiftdeployments
+          - subjectaccessreviews
           verbs:
+          - create
+          - get
+        - apiGroups:
+          - certificates.k8s.io
+          resources:
+          - certificatesigningrequests
+          verbs:
+          - create
           - get
           - list
+          - patch
+          - update
           - watch
+        - apiGroups:
+          - certificates.k8s.io
+          resources:
+          - certificatesigningrequests/approval
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - certificates.k8s.io
+          resources:
+          - signers
+          verbs:
+          - approve
         - apiGroups:
           - cluster.open-cluster-management.io
           resources:
@@ -369,7 +438,6 @@ spec:
           verbs:
           - get
           - list
-          - update
           - watch
         - apiGroups:
           - cluster.open-cluster-management.io
@@ -403,6 +471,17 @@ spec:
           - list
           - patch
           - update
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - operator.open-cluster-management.io
           resources:

@@ -214,7 +214,7 @@ jobs:
           OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPP_IIB_INSTALL: 0
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-          OPERATOR_INDEX_TAG: "orange_v4.6 orange_v4.7 orange_v4.8 orange_v4.9 orange_v4.10 orange_v4.11 orange_v4.12"
+          OPERATOR_INDEX_TAG: "orange_v4.8 orange_v4.9 orange_v4.10 orange_v4.11 orange_v4.12"
 
           OPP_INDEX_CHECK_ONLY: 1
         run: |
@@ -228,8 +228,6 @@ jobs:
       - name: Index check
         run: |
           echo "Operators : ${{ steps.operators.outputs.opp_uncomplete_operators }}"
-          echo "Operators (v4.6) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_6 }}"
-          echo "Operators (v4.7) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_7 }}"
           echo "Operators (v4.8) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_8 }}"
           echo "Operators (v4.9) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_9 }}"
           echo "Operators (v4.10) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"
@@ -266,8 +264,6 @@ jobs:
           [ -f /tmp/operator-test/op_info.yaml ] && cat /tmp/operator-test/op_info.yaml || echo "::set-output name=opp_uncomplete_operators::"          
     outputs:
       opp_uncomplete_operators: "${{ steps.operators.outputs.opp_uncomplete_operators }}"
-      opp_uncomplete_operators_v4_6: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_6 }}"
-      opp_uncomplete_operators_v4_7: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_7 }}"
       opp_uncomplete_operators_v4_8: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_8 }}"
       opp_uncomplete_operators_v4_9: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_9 }}"
       opp_uncomplete_operators_v4_10: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"

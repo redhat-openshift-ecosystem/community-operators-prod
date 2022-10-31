@@ -23,7 +23,7 @@ metadata:
             "image": {
               "pullPolicy": "Always",
               "repository": "johnsnowlabs/nlp-server",
-              "tag": "0.8.0-rc1"
+              "tag": "0.8.0rc1"
             },
             "imagePullSecrets": [],
             "ingress": {
@@ -77,10 +77,10 @@ metadata:
       ]
     capabilities: Basic Install
     categories: AI/Machine Learning
-    containerImage: registry.johnsnowlabs.com/nlp-server/nlp-server-operator:0.8.0-rc1
+    containerImage: registry.johnsnowlabs.com/nlp-server/nlp-server-operator:0.8.6
     operators.operatorframework.io/builder: operator-sdk-v1.23.0
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-  name: nlp-server.v0.8.0-rc1
+  name: nlp-server.v0.8.6
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -133,6 +133,7 @@ spec:
         - apiGroups:
           - ""
           resources:
+          - deployments
           - pods
           - services
           - services/finalizers
@@ -141,6 +142,21 @@ spec:
           - events
           - configmaps
           - secrets
+          - serviceaccounts
+          - jobs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - roles
+          - rolebindings
           verbs:
           - create
           - delete
@@ -218,7 +234,7 @@ spec:
                 - --metrics-bind-address=127.0.0.1:8080
                 - --leader-elect
                 - --leader-election-id=nlp-server
-                image: registry.johnsnowlabs.com/nlp-server/nlp-server-operator:0.8.0-rc1
+                image: registry.johnsnowlabs.com/nlp-server/nlp-server-operator:0.8.6
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -297,4 +313,4 @@ spec:
   maturity: alpha
   provider:
     name: JohnSnowLabs
-  version: 0.8.0-rc1
+  version: 0.8.6

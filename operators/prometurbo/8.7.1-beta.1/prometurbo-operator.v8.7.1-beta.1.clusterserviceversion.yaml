@@ -6,7 +6,7 @@ metadata:
     capabilities: Basic Install
     categories: Monitoring
     certified: 'false'
-    containerImage: turbonomic/prometurbo-operator:8.6.5
+    containerImage: turbonomic/prometurbo-operator:8.7.1-SNAPSHOT
     createdAt: 2019-05-01 00:00:00
     description: Turbonomic Workload Automation for Multicloud simultaneously optimizes performance, compliance, and cost in real-time. Workloads are precisely resourced, automatically, to perform while satisfying business constraints.
     repository: https://github.com/turbonomic/prometurbo/tree/master/deploy/prometurbo-operator
@@ -16,7 +16,7 @@ metadata:
     operatorframework.io/arch.arm64: supported
     operatorframework.io/arch.ppc64le: supported
     operatorframework.io/arch.s390x: supported
-  name: prometurbo-operator.v8.6.5-beta.1
+  name: prometurbo-operator.v8.7.1-beta.1
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -113,7 +113,7 @@ spec:
               spec:
                 containers:
                 - name: prometurbo-operator
-                  image: turbonomic/prometurbo-operator:8.6.5
+                  image: turbonomic/prometurbo-operator:8.7.1-SNAPSHOT
                   args:
                   - --leader-elect
                   - --leader-election-id=prometurbo-operator
@@ -175,4 +175,4 @@ spec:
   maturity: alpha
   provider:
     name: Turbonomic, Inc.
-  version: 8.6.5-beta.1
+  version: 8.7.1-beta.1

@@ -401,90 +401,43 @@ jobs:
           # skopeo inspect docker://$MANIFEST_LIST > /dev/null # error out if needed
           # OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://$MANIFEST_LIST | jq -r ".Digest")
           #OPERATOR_INDEX_RESOLVED="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}@${OPERATOR_INDEX_DIGEST}"
-          
-          
-      # - name: Prepare variables for the sign process
-      #   id: openshift-vars
-      #   env:
-      #     OPERATOR_INDEX_TAG_RAW: ${{ matrix.index-tag }}
-      #     OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
-      #   run: |
-      #     docker login ${OPP_MIRROR_INDEX_REGISTRY} -u $OPP_REGISTRY_MIRROR_USER -p $REGISTRY_MIRROR_PW
-      #     OPERATOR_INDEX_TAG=$(echo ${OPERATOR_INDEX_TAG_RAW} |cut -d'-' -f1)
-      #     skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} > /dev/null # error out if needed
-      #     OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG} | jq -r ".Digest")
-      #     OPERATOR_INDEX_RESOLVED="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}@${OPERATOR_INDEX_DIGEST}"
-      #     OPERATOR_INDEX="${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG}"
-      #     echo $OPERATOR_INDEX_RESOLVED
-      #     echo $OPERATOR_INDEX
-      #     echo "::set-output name=operator_index_resolved::${OPERATOR_INDEX_RESOLVED}"
-      #     echo "::set-output name=operator_index::${OPERATOR_INDEX}"
-      # - name: Initialize sign process
-      #   uses: operator-framework/community-operators@webhook
-      #   continue-on-error: true
-      #   env:
-      #     INDEX_SHA: "${{ steps.openshift-vars.outputs.index_sha }}"
-      #     webhook_type: 'json-extended'
-      #     webhook_url: 'https://api.enterprise.redhat.com/hydra/umb-bridge/v1/publish'
-      #     webhook_secret: ${{ secrets.SIGNATURE_WEBHOOK_SECRET }}
-      #     data: "{\"index_image\": \"${{ steps.openshift-vars.outputs.operator_index }}\", \"index_image_resolved\": \"${{ steps.openshift-vars.outputs.operator_index_resolved }}\"}"
- 
-#   push-to-quay-ocp:
-#     name: "Push to quay / ocp"
-# 
-#     needs: pr-check
-#     if: needs.pr-check.outputs.opp_release_ready == '1' && needs.pr-check.outputs.opp_name != '' && needs.pr-check.outputs.opp_version != ''
-#     runs-on: ubuntu-latest
-#     env:
-#       DELETE_APPREG: "${{ needs.pr-check.outputs.opp_release_delete_appreg }}"
-#       OPP_VERSION: "${{ needs.pr-check.outputs.opp_version }}"
-#     steps:
-#       - name: Push to quay
-#         run: |
-#           echo "push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH"
-#           bash <(curl -sL $OPP_SCRIPT_URL) push_to_quay operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH || true
+  index-verify-ocp:
+    name: "Index Verify / ocp"
+    needs: [ pr-check, operators-ocp, bundles-ocp, release-ocp]
+    if: needs.pr-check.outputs.opp_release_ready == '1' && needs.operators-ocp.outputs.opp_uncomplete_operators != ''
 
-# #   release-sha-ocp:
-#     name: "Index production / ocp"
-#     needs: [ pr-check, release-ocp ]
-# 
-#     if: needs.pr-check.outputs.opp_release_ready == '1' && ( github.event.inputs.mirror_index_to_final_location == '' || github.event.inputs.mirror_index_to_final_location != '0')
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-# # # # 
-#         index-tag: ['${{ github.event.inputs.index }}']
-# # # 
-#       fail-fast: false
-#     steps:
-      # - name: Download operator_info
-      #   uses: actions/download-artifact@v2
-      #   with:
-      #     name: operator_info
-      #     path: /tmp/operator-test/
-      # - name: Download converted operators
-      #   uses: actions/download-artifact@v2
-      #   with:
-      #     name: operators_converted
-      #     path: /tmp/operator-test/operators
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
 
-      # - name: Release final index
-      #   env:
-      #     OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
-      #     IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-      #     IIB_OUTPUT_REGISTRY_TOKEN: ${{ secrets.IIB_OUTPUT_REGISTRY_TOKEN }}
-      #   run: |
-      #     FAKE_RC=false
-      #     FAKE_TYPE=$(echo $OPERATOR_INDEX_TAG | cut -d '-' -f 2)
-      #     [[ $FAKE_TYPE == *rc* ]] && FAKE_RC=true || true
+        index-tag: ['${{ github.event.inputs.index }}']
 
-      #     echo "openshift: $OPERATOR_INDEX_TAG"
-      #     bash <(curl -sL $OPP_SCRIPT_ISS_URL) openshift $OPERATOR_INDEX_TAG || $FAKE_RC
-# 
+      fail-fast: false
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip yq
+      - name: Index verify
+        id: index-verify
+        env:
+          OPP_CONTAINER_TOOL: podman
+        run: |
+          MY_TAG=${{ matrix.index-tag }}
+          MY_TAG=$(echo $MY_TAG | cut -d '-' -f 1)
+          MY_INDEXES="quay.io/openshift-community-operators/catalog_tmp:${MY_TAG}"
+          MY_INDEXES="$MY_INDEXES,quay.io/openshift-community-operators/catalog_tmp:${MY_TAG}s"
+          MY_INDEXES="$MY_INDEXES,quay.io/redhat/redhat----community-operator-index:${MY_TAG}"
+
+          echo "MY_INDEXES=$MY_INDEXES"
+          echo "$REGISTRY_MIRROR_PW" | $OPP_CONTAINER_TOOL login $OPP_MIRROR_INDEX_REGISTRY -u $OPP_REGISTRY_MIRROR_USER --password-stdin || { echo "Problem to login to '$OPP_MIRROR_INDEX_REGISTRY' !!!"; exit 1; }
+          ansible-pull -U $OPP_ANSIBLE_PULL_REPO -C $OPP_ANSIBLE_PULL_BRANCH -i localhost, -e run_upstream=true -e run_prepare_catalog_repo_upstream=false -e container_tool=$OPP_CONTAINER_TOOL upstream/local.yml --tags reset_tools,index_verify  -e iv_indexes="$MY_INDEXES"
 
   slack-notification:
     name: "Slack notification"
-    needs: [ pr-check, remove-ocp, operators-ocp, bundles-ocp, release-ocp ]
+    needs: [ pr-check, remove-ocp, operators-ocp, bundles-ocp, release-ocp , index-verify-ocp ]
 
     if: failure()
     runs-on: ubuntu-latest

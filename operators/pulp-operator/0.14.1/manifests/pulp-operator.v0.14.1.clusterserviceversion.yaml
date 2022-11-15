@@ -1072,9 +1072,9 @@ spec:
                 - name: RELATED_IMAGE_PULP_WEB
                   value: quay.io/pulp/pulp-web:stable
                 - name: RELATED_IMAGE_PULP_REDIS
-                  value: redis:latest
+                  value: docker.io/library/redis:latest
                 - name: RELATED_IMAGE_PULP_POSTGRES
-                  value: postgres:13
+                  value: docker.io/library/postgres:13
                 image: quay.io/pulp/pulp-operator:v0.14.1
                 livenessProbe:
                   httpGet:
@@ -1289,9 +1289,9 @@ spec:
     name: pulp
   - image: quay.io/pulp/pulp-web:stable
     name: pulp-web
-  - image: redis:latest
+  - image: docker.io/library/redis:latest
     name: pulp-redis
-  - image: postgres:13
+  - image: docker.io/library/postgres:13
     name: pulp-postgres
   version: 0.14.1
   replaces: pulp-operator.v0.14.0

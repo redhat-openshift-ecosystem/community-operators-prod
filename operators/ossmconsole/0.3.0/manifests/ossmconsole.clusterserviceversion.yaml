@@ -1,22 +1,22 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: ossmconsole-operator.v0.2.0
+  name: ossmconsole-operator.v0.3.0
   namespace: placeholder
   labels:
     operatorframework.io/arch.amd64: supported
     operatorframework.io/arch.s390x: supported
     operatorframework.io/arch.ppc64le: supported
   annotations:
-    olm.skipRange: '>=0.1.0 <0.2.0'
+    olm.skipRange: '>=0.1.0 <0.3.0'
     categories: Monitoring,Logging & Tracing
     certified: "false"
-    containerImage: quay.io/kiali/ossmconsole-operator:v0.2.0
+    containerImage: quay.io/kiali/ossmconsole-operator:v0.3.0
     capabilities: Basic Install
     support: Kiali
     description: "Adds Kiali observability, configuration and validation into the OpenShift Console"
     repository: https://github.com/kiali/openshift-servicemesh-plugin
-    createdAt: 2022-09-27T14:03:53Z
+    createdAt: 2022-11-18T14:17:23Z
     alm-examples: |-
       [
         {
@@ -36,9 +36,9 @@ metadata:
         }
       ]
 spec:
-  version: 0.2.0
+  version: 0.3.0
   maturity: alpha
-  replaces: ossmconsole-operator.v0.1.0
+  replaces: ossmconsole-operator.v0.2.0
   displayName: OpenShift Service Mesh Console
   description: |-
     ## About the managed application
@@ -129,10 +129,10 @@ spec:
                 app: ossmconsole-operator
                 # required for the operator SDK metric service selector
                 name: ossmconsole-operator
-                version: v0.2.0
+                version: v0.3.0
                 app.kubernetes.io/name: ossmconsole-operator
                 app.kubernetes.io/instance: ossmconsole-operator
-                app.kubernetes.io/version: v0.2.0
+                app.kubernetes.io/version: v0.3.0
                 app.kubernetes.io/part-of: ossmconsole-operator
               annotations:
                 prometheus.io/scrape: "true"
@@ -140,7 +140,7 @@ spec:
               serviceAccountName: ossmconsole-operator
               containers:
               - name: operator
-                image: quay.io/kiali/ossmconsole-operator:v0.2.0
+                image: quay.io/kiali/ossmconsole-operator:v0.3.0
                 imagePullPolicy: IfNotPresent
                 args:
                 - "--zap-log-level=info"

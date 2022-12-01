@@ -17,7 +17,7 @@ metadata:
               "extraVolumes": "",
               "image": {
                 "repository": "johnsnowlabs/annotationlab",
-                "tag": "active-learning-4.3.0"
+                "tag": "active-learning-4.4.0"
               },
               "lifecycleHooks": ""
             },
@@ -157,7 +157,7 @@ metadata:
                 "airflow": {
                   "pullPolicy": "IfNotPresent",
                   "repository": "johnsnowlabs/annotationlab",
-                  "tag": "dataflows-4.3.0"
+                  "tag": "dataflows-4.4.0"
                 },
                 "gitSync": {
                   "pullPolicy": "IfNotPresent",
@@ -612,7 +612,7 @@ metadata:
                 "kubernetesdockerhub"
               ],
               "repository": "johnsnowlabs/annotationlab",
-              "tag": "4.3.0"
+              "tag": "4.4.0"
             },
             "ingress": {
               "annotations": {},
@@ -642,7 +642,7 @@ metadata:
               "extraContainers": "",
               "extraEnv": "- name: PROXY_ADDRESS_FORWARDING\n  value: \"true\"\n- name: KEYCLOAK_USER_FILE\n  value: /secrets/admincreds/user\n- name: KEYCLOAK_PASSWORD_FILE\n  value: /secrets/admincreds/password\n",
               "extraEnvFrom": "",
-              "extraInitContainers": "- name: theme-provider\n  image: johnsnowlabs/annotationlab:auth-theme-4.3.0\n  imagePullPolicy: IfNotPresent\n  command:\n    - sh\n  args:\n    - -c\n    - |\n      echo \"Copying theme...\"\n      cp -R /johnsnowlabs/* /theme\n  volumeMounts:\n    - name: theme\n      mountPath: /theme\n",
+              "extraInitContainers": "- name: theme-provider\n  image: johnsnowlabs/annotationlab:auth-theme-4.4.0\n  imagePullPolicy: IfNotPresent\n  command:\n    - sh\n  args:\n    - -c\n    - |\n      echo \"Copying theme...\"\n      cp -R /johnsnowlabs/* /theme\n  volumeMounts:\n    - name: theme\n      mountPath: /theme\n",
               "extraPorts": [],
               "extraVolumeMounts": "- name: admincreds\n  mountPath: /secrets/admincreds\n  readOnly: true\n- name: theme\n  mountPath: /opt/jboss/keycloak/themes/johnsnowlabs\n",
               "extraVolumes": "- name: admincreds\n  secret:\n    secretName: '{{ include \"annotationlab.keycloak.fullname\" . }}-admincreds'\n- name: theme\n  emptyDir: {}\n",

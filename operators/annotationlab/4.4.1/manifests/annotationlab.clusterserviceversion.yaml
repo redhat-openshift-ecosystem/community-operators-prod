@@ -81,7 +81,7 @@ metadata:
                   "statsd_prefix": "airflow"
                 },
                 "scheduler": {
-                  "run_duration": 4.4.1,
+                  "run_duration": 41460,
                   "scheduler_heartbeat_sec": 5,
                   "statsd_host": "{{ printf \"%s-statsd\" .Release.Name }}",
                   "statsd_on": "{{ ternary \"True\" \"False\" .Values.statsd.enabled }}",
@@ -1465,7 +1465,7 @@ spec:
                 - --upstream=http://127.0.0.1:8080/
                 - --logtostderr=true
                 - --v=0
-                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.11.0
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.0
                 name: kube-rbac-proxy
                 ports:
                 - containerPort: 8443

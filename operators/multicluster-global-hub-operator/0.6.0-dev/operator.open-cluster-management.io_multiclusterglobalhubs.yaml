@@ -100,6 +100,14 @@ spec:
               imagePullSecret:
                 description: Pull secret of the multicluster global hub images
                 type: string
+              messageCompressionType:
+                default: gzip
+                description: MessageCompressionType specifies the compression type
+                  of transport message between global hub and regional hubs
+                enum:
+                - gzip
+                - no-op
+                type: string
               nodeSelector:
                 additionalProperties:
                   type: string

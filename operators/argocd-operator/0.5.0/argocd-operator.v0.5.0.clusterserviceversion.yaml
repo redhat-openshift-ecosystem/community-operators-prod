@@ -134,8 +134,8 @@ metadata:
     operators.operatorframework.io/builder: operator-sdk-v1.10.0+git
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/argoproj-labs/argocd-operator
+    containerImage: quay.io/argoprojlabs/argocd-operator@sha256:2f5c0d4567607266ccacb91d8c2e3b18c2afe0edaf55855dcb1a06b02173b520
     support: Argo CD
-  containerImage: quay.io/argoprojlabs/argocd-operator@sha256:2f5c0d4567607266ccacb91d8c2e3b18c2afe0edaf55855dcb1a06b02173b520
   name: argocd-operator.v0.5.0
   namespace: placeholder
 spec:
@@ -1062,12 +1062,12 @@ spec:
           replicas: 1
           selector:
             matchLabels:
-              control-plane: argocd-operator
+              control-plane: controller-manager
           strategy: {}
           template:
             metadata:
               labels:
-                control-plane: argocd-operator
+                control-plane: controller-manager
             spec:
               containers:
               - args:

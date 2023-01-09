@@ -27,16 +27,15 @@ metadata:
           }
         }
       ]
-    capabilities: Full Lifecycle
+    capabilities: Deep Insights
     categories: Monitoring
-    certified: "false"
-    containerImage: docker.io/eginnovations/universal-agent-operator:0.0.3
-    createdAt: "2022-11-21T13:28:40+00:00"
+    certified: "true"
+    containerImage: docker.io/eginnovations/universal-agent-operator:0.0.4
+    createdAt: "2023-01-06T17:45:40+00:00"
     operators.operatorframework.io/builder: operator-sdk-v1.16.0+git
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/eginnovations/universal-agent-operator
-    "olm.properties": '[{"type": "olm.maxOpenShiftVersion", "value": "4.11"}]'
-  name: eginnovations-operator.v0.0.3
+  name: eginnovations-operator.v0.0.4
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -215,7 +214,7 @@ spec:
                 - --leader-elect
                 command:
                 - /manager
-                image: docker.io/eginnovations/universal-agent-operator:0.0.3
+                image: docker.io/eginnovations/universal-agent-operator:0.0.4
                 imagePullPolicy: Always
                 livenessProbe:
                   httpGet:
@@ -314,7 +313,7 @@ spec:
   provider:
     name: eG Innovations
     url: https://www.eginnovations.com
-  version: 0.0.3
+  version: 0.0.4
   webhookdefinitions:
   - admissionReviewVersions:
     - v1

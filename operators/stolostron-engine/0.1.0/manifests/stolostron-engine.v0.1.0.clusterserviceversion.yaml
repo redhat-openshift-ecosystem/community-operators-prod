@@ -7,15 +7,16 @@ metadata:
     capabilities: Seamless Upgrades
     categories: Integration & Delivery
     certified: 'false'
-    createdAt: '2023-01-17T16:35:04Z'
+    createdAt: '2023-01-25T19:21:32Z'
     description: Foundational components for central management of multiple OpenShift Container Platform
       and Kubernetes clusters
     operatorframework.io/suggested-namespace: stolostron-engine
     operatorframework.io/initialization-resource: '{"apiVersion":"multicluster.openshift.io/v1", "kind":"MultiClusterEngine","metadata":{"name":"engine"},"spec":
       {}}'
     operators.openshift.io/infrastructure-features: '["disconnected", "proxy-aware", "fips"]'
+    repository: https://github.com/stolostron/stolostron
     operators.operatorframework.io/internal-objects: '[]'
-    containerImage: quay.io/stolostron/backplane-operator@sha256:a92fe7d3f5135be203ed50776dec0ec4d196af23d8c9a1e23e4dddf6561a22e5
+    containerImage: quay.io/stolostron/backplane-operator@sha256:4fce1721c54e6e96386f75c2e090d1021ad691d63f2eed4778cb9d5f27d34c52
   name: stolostron-engine.v0.1.0
   namespace: placeholder
   labels:
@@ -32,7 +33,7 @@ spec:
   maintainers:
   - email: acm-contact@redhat.com
     name: Red Hat
-  maturity: stable
+  maturity: pre-release
   description: 'Stolostron Engine provides the foundational components that are necessary for the centralized
     management of multiple Kubernetes-based clusters across data centers, public clouds, and private clouds.
     You can use the engine to create Red Hat OpenShift Container Platform clusters on selected providers,
@@ -49,7 +50,7 @@ spec:
     app: stolostron-engine
   links:
   - name: Documentation
-    url: https://github.com/stolostron-engine/stolostron-engine
+    url: https://github.com/stolostron/stolostron
   selector:
     matchLabels:
       app: stolostron-engine
@@ -2315,23 +2316,23 @@ spec:
                 - name: OPERAND_IMAGE_APISERVER_NETWORK_PROXY
                   value: quay.io/stolostron/apiserver-network-proxy@sha256:dc74c7c67ca851f50b83d7a03f91d028214fd8a941f12edd4411b860dc7b763d
                 - name: OPERAND_IMAGE_ASSISTED_IMAGE_SERVICE
-                  value: quay.io/stolostron/assisted-image-service@sha256:bd9ee55a94c63b717dca6cc1632ec1b497647b0edbec7051a51bbd7d704fbeb9
+                  value: quay.io/stolostron/assisted-image-service@sha256:93026bfe40126f29b07500e40e98f5f40201d032bd7611f828043a738bcd2ebb
                 - name: OPERAND_IMAGE_ASSISTED_INSTALLER
-                  value: quay.io/stolostron/assisted-installer@sha256:6fab655ca75dd8f4477694070d8fae7a0656bf8a9f6268e23f5df7bd9f810606
+                  value: quay.io/stolostron/assisted-installer@sha256:6f36ea00a66d648888521ee909fdc4231aa0e49d5e490af9088f0776b8ea22a6
                 - name: OPERAND_IMAGE_ASSISTED_INSTALLER_AGENT
-                  value: quay.io/stolostron/assisted-installer-agent@sha256:5ffcb4366b333166fb48614d0af20376946885bf953df51a16cfc849ea672880
+                  value: quay.io/stolostron/assisted-installer-agent@sha256:ff6118b8d5ecc6d3b3e32baec983e139952ffd38460d55b61f5c952829898ea2
                 - name: OPERAND_IMAGE_ASSISTED_INSTALLER_CONTROLLER
-                  value: quay.io/stolostron/assisted-installer-controller@sha256:47ed8ebf5692cb7fe821eaca6d135b4f56e58bd3b28374f85baf0ee66848b441
+                  value: quay.io/stolostron/assisted-installer-controller@sha256:59a3061d2b488a0530a117255f8eb2e8fefdd81999c882607dbb7ac424b7172b
                 - name: OPERAND_IMAGE_ASSISTED_SERVICE
-                  value: quay.io/stolostron/assisted-service@sha256:c6c8ee2bdee0b8dde8b7b11f38530deeedd8ddf0d0758ede14bc3dd2fec9fed5
+                  value: quay.io/stolostron/assisted-service@sha256:d7c53fb5dc34e0f103a3b624864b8bfbaf50d751f7420d14fdb13a8dba3655a0
                 - name: OPERAND_IMAGE_AWS_ENCRYPTION_PROVIDER
                   value: quay.io/stolostron/aws-encryption-provider@sha256:83f11e28004fcbb31d7ec6c34ef2d2ec7dd8fc175c5e0135f6ace9894c65bfd0
                 - name: OPERAND_IMAGE_BACKPLANE_MUST_GATHER
                   value: quay.io/stolostron/backplane-must-gather@sha256:0cc7abc01243395c5eec06c75b173ee74aba641433e5a29d640affc477ba465d
                 - name: OPERAND_IMAGE_BACKPLANE_OPERATOR
-                  value: quay.io/stolostron/backplane-operator@sha256:a92fe7d3f5135be203ed50776dec0ec4d196af23d8c9a1e23e4dddf6561a22e5
+                  value: quay.io/stolostron/backplane-operator@sha256:4fce1721c54e6e96386f75c2e090d1021ad691d63f2eed4778cb9d5f27d34c52
                 - name: OPERAND_IMAGE_BACKPLANE_OPERATOR_TEST
-                  value: quay.io/stolostron/backplane-operator-test@sha256:25a42b0a6762a98f3a06e8eaa97bdf65992ecaf20d83fcdc6ef2d578e5197939
+                  value: quay.io/stolostron/backplane-operator-test@sha256:57843143e7e3d0822d13f962ba7134fdadc018164d390e14eb85b4b44d9cf2b7
                 - name: OPERAND_IMAGE_CLUSTER_API
                   value: quay.io/stolostron/cluster-api@sha256:7a04ac4e5bdaf29498af75b2b7c4ff19cb6223f2076c9373a3a955553243ddda
                 - name: OPERAND_IMAGE_CLUSTER_API_PROVIDER_AWS
@@ -2353,9 +2354,9 @@ spec:
                 - name: OPERAND_IMAGE_CLUSTERCLAIMS_CONTROLLER
                   value: quay.io/stolostron/clusterclaims-controller@sha256:4fa90082db2153dfd7853f8720480161ff5dd42899b3be51cc78a98f89c21c1d
                 - name: OPERAND_IMAGE_CLUSTERLIFECYCLE_STATE_METRICS
-                  value: quay.io/stolostron/clusterlifecycle-state-metrics@sha256:28ecefcb37dc1fa12b812b352bd1b695e6e3d0ab7385334b794489b50187861e
+                  value: quay.io/stolostron/clusterlifecycle-state-metrics@sha256:2efb6c397d8f8354dbeef97ef45662e09f17785220183951a6918bb4c4052576
                 - name: OPERAND_IMAGE_CONSOLE_MCE
-                  value: quay.io/stolostron/console-mce@sha256:9d15c619f7ff3c14907aaafb85c0a27006f48d5596638c8c6a905e901425e775
+                  value: quay.io/stolostron/console-mce@sha256:bcd61daf8dd08eabab7ebb89364ec61a0f30a5bc3224b269461daa36340c27a5
                 - name: OPERAND_IMAGE_DISCOVERY_OPERATOR
                   value: quay.io/stolostron/discovery-operator@sha256:bd3e72a69969eb3b05fc8584f8e89f09b05853fcfb34b7eaa7fba7e9488ba765
                 - name: OPERAND_IMAGE_DISCOVERY_OPERATOR_TESTS
@@ -2365,13 +2366,13 @@ spec:
                 - name: OPERAND_IMAGE_HELLOPROW_GO
                   value: quay.io/stolostron/helloprow-go@sha256:e055ab3773a248c22dbde9847a3289e8512ccc85c6e9015544fc4f59d14b9cad
                 - name: OPERAND_IMAGE_HELLOWORLD
-                  value: quay.io/stolostron/helloworld@sha256:2d52b608870a3a4f7ed9fa52bbaa368c1741db8a4aca95ca11af0f90e858d3b0
+                  value: quay.io/stolostron/helloworld@sha256:f9802347decb1c103da53173746af0722501f627596057434658d38d97cb60dc
                 - name: OPERAND_IMAGE_OPENSHIFT_HIVE
                   value: quay.io/stolostron/hive@sha256:f9f260fe268fd52f03879b3c0b4531696da610b4154efb1aadc6f991766184d3
                 - name: OPERAND_IMAGE_HYPERSHIFT_ADDON_OPERATOR
-                  value: quay.io/stolostron/hypershift-addon-operator@sha256:57d54823249cab16df371eaaa438d15b341ff9d4957ae9c3aed81be332a79d67
+                  value: quay.io/stolostron/hypershift-addon-operator@sha256:0be118feae42c75450f08fd2a599d345e7596acf1cd3c90b1b41b64b674a07a7
                 - name: OPERAND_IMAGE_HYPERSHIFT_OPERATOR
-                  value: quay.io/stolostron/hypershift-operator@sha256:f70b8ab5da530dde23313c8a062e3d2c730c6ab3d5aa300243b84a3f337e15e2
+                  value: quay.io/stolostron/hypershift-operator@sha256:02d01d388d8aa206c9865f9efe10c93582dac46e1028454474d485f08b80d67d
                 - name: OPERAND_IMAGE_MANAGED_SERVICEACCOUNT
                   value: quay.io/stolostron/managed-serviceaccount@sha256:d73e14fce2e6e12628f5d2e5523c0abd3095906dba785488894e8f2164d193be
                 - name: OPERAND_IMAGE_MANAGED_SERVICEACCOUNT_E2E
@@ -2396,7 +2397,7 @@ spec:
                   value: 0.1.0
                 - name: OPERATOR_PACKAGE
                   value: stolostron-engine
-                image: quay.io/stolostron/backplane-operator@sha256:a92fe7d3f5135be203ed50776dec0ec4d196af23d8c9a1e23e4dddf6561a22e5
+                image: quay.io/stolostron/backplane-operator@sha256:4fce1721c54e6e96386f75c2e090d1021ad691d63f2eed4778cb9d5f27d34c52
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -2436,21 +2437,21 @@ spec:
   - name: apiserver_network_proxy
     image: quay.io/stolostron/apiserver-network-proxy@sha256:dc74c7c67ca851f50b83d7a03f91d028214fd8a941f12edd4411b860dc7b763d
   - name: assisted_image_service
-    image: quay.io/stolostron/assisted-image-service@sha256:bd9ee55a94c63b717dca6cc1632ec1b497647b0edbec7051a51bbd7d704fbeb9
+    image: quay.io/stolostron/assisted-image-service@sha256:93026bfe40126f29b07500e40e98f5f40201d032bd7611f828043a738bcd2ebb
   - name: assisted_installer
-    image: quay.io/stolostron/assisted-installer@sha256:6fab655ca75dd8f4477694070d8fae7a0656bf8a9f6268e23f5df7bd9f810606
+    image: quay.io/stolostron/assisted-installer@sha256:6f36ea00a66d648888521ee909fdc4231aa0e49d5e490af9088f0776b8ea22a6
   - name: assisted_installer_agent
-    image: quay.io/stolostron/assisted-installer-agent@sha256:5ffcb4366b333166fb48614d0af20376946885bf953df51a16cfc849ea672880
+    image: quay.io/stolostron/assisted-installer-agent@sha256:ff6118b8d5ecc6d3b3e32baec983e139952ffd38460d55b61f5c952829898ea2
   - name: assisted_installer_controller
-    image: quay.io/stolostron/assisted-installer-controller@sha256:47ed8ebf5692cb7fe821eaca6d135b4f56e58bd3b28374f85baf0ee66848b441
+    image: quay.io/stolostron/assisted-installer-controller@sha256:59a3061d2b488a0530a117255f8eb2e8fefdd81999c882607dbb7ac424b7172b
   - name: assisted_service
-    image: quay.io/stolostron/assisted-service@sha256:c6c8ee2bdee0b8dde8b7b11f38530deeedd8ddf0d0758ede14bc3dd2fec9fed5
+    image: quay.io/stolostron/assisted-service@sha256:d7c53fb5dc34e0f103a3b624864b8bfbaf50d751f7420d14fdb13a8dba3655a0
   - name: aws_encryption_provider
     image: quay.io/stolostron/aws-encryption-provider@sha256:83f11e28004fcbb31d7ec6c34ef2d2ec7dd8fc175c5e0135f6ace9894c65bfd0
   - name: backplane_must_gather
     image: quay.io/stolostron/backplane-must-gather@sha256:0cc7abc01243395c5eec06c75b173ee74aba641433e5a29d640affc477ba465d
   - name: backplane_operator_test
-    image: quay.io/stolostron/backplane-operator-test@sha256:25a42b0a6762a98f3a06e8eaa97bdf65992ecaf20d83fcdc6ef2d578e5197939
+    image: quay.io/stolostron/backplane-operator-test@sha256:57843143e7e3d0822d13f962ba7134fdadc018164d390e14eb85b4b44d9cf2b7
   - name: cluster_api
     image: quay.io/stolostron/cluster-api@sha256:7a04ac4e5bdaf29498af75b2b7c4ff19cb6223f2076c9373a3a955553243ddda
   - name: cluster_api_provider_aws
@@ -2472,9 +2473,9 @@ spec:
   - name: clusterclaims_controller
     image: quay.io/stolostron/clusterclaims-controller@sha256:4fa90082db2153dfd7853f8720480161ff5dd42899b3be51cc78a98f89c21c1d
   - name: clusterlifecycle_state_metrics
-    image: quay.io/stolostron/clusterlifecycle-state-metrics@sha256:28ecefcb37dc1fa12b812b352bd1b695e6e3d0ab7385334b794489b50187861e
+    image: quay.io/stolostron/clusterlifecycle-state-metrics@sha256:2efb6c397d8f8354dbeef97ef45662e09f17785220183951a6918bb4c4052576
   - name: console_mce
-    image: quay.io/stolostron/console-mce@sha256:9d15c619f7ff3c14907aaafb85c0a27006f48d5596638c8c6a905e901425e775
+    image: quay.io/stolostron/console-mce@sha256:bcd61daf8dd08eabab7ebb89364ec61a0f30a5bc3224b269461daa36340c27a5
   - name: discovery_operator
     image: quay.io/stolostron/discovery-operator@sha256:bd3e72a69969eb3b05fc8584f8e89f09b05853fcfb34b7eaa7fba7e9488ba765
   - name: discovery_operator_tests
@@ -2484,13 +2485,13 @@ spec:
   - name: helloprow_go
     image: quay.io/stolostron/helloprow-go@sha256:e055ab3773a248c22dbde9847a3289e8512ccc85c6e9015544fc4f59d14b9cad
   - name: helloworld
-    image: quay.io/stolostron/helloworld@sha256:2d52b608870a3a4f7ed9fa52bbaa368c1741db8a4aca95ca11af0f90e858d3b0
+    image: quay.io/stolostron/helloworld@sha256:f9802347decb1c103da53173746af0722501f627596057434658d38d97cb60dc
   - name: openshift_hive
     image: quay.io/stolostron/hive@sha256:f9f260fe268fd52f03879b3c0b4531696da610b4154efb1aadc6f991766184d3
   - name: hypershift_addon_operator
-    image: quay.io/stolostron/hypershift-addon-operator@sha256:57d54823249cab16df371eaaa438d15b341ff9d4957ae9c3aed81be332a79d67
+    image: quay.io/stolostron/hypershift-addon-operator@sha256:0be118feae42c75450f08fd2a599d345e7596acf1cd3c90b1b41b64b674a07a7
   - name: hypershift_operator
-    image: quay.io/stolostron/hypershift-operator@sha256:f70b8ab5da530dde23313c8a062e3d2c730c6ab3d5aa300243b84a3f337e15e2
+    image: quay.io/stolostron/hypershift-operator@sha256:02d01d388d8aa206c9865f9efe10c93582dac46e1028454474d485f08b80d67d
   - name: managed_serviceaccount
     image: quay.io/stolostron/managed-serviceaccount@sha256:d73e14fce2e6e12628f5d2e5523c0abd3095906dba785488894e8f2164d193be
   - name: managed_serviceaccount_e2e

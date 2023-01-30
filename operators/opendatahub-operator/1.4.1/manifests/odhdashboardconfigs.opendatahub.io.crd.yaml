@@ -41,6 +41,10 @@ spec:
                       type: boolean
                     disableUserManagement:
                       type: boolean
+                    disableProjects:
+                      type: boolean
+                    disableModelServing:
+                      type: boolean
                 groupsConfig:
                   type: object
                   required:
@@ -78,6 +82,33 @@ spec:
                                 type: string
                               memory:
                                 type: string
+                modelServerSizes:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - resources
+                    properties:
+                      name:
+                        type: string
+                      resources:
+                        type: object
+                        properties:
+                          requests:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                          limits:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
                 notebookController:
                   type: object
                   required:
@@ -88,6 +119,9 @@ spec:
                     notebookNamespace:
                       type: string
                     pvcSize:
+                      type: string
+                    gpuSetting:
+                      description: Configure how the GPU field works on the Jupyter tile. One of 'autodetect' (default, fetches for information), 'hidden' (remove the field) or a number-string (eg '5') to specify a hardcoded 0 to that number options
                       type: string
                     notebookTolerationSettings:
                       type: object

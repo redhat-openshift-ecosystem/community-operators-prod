@@ -28,15 +28,15 @@ metadata:
     capabilities: Seamless Upgrades
     categories: Integration & Delivery,OpenShift Optional
     certified: "false"
-    containerImage: quay.io/stolostron/multicluster-global-hub-operator:latest
-    createdAt: "2022-12-19T20:00:31Z"
+    containerImage: quay.io/stolostron/multicluster-global-hub-operator:v0.6.0
+    createdAt: "2023-02-09T20:00:31Z"
     description: Manages the installation and upgrade of the Multicluster Global Hub.
     operatorframework.io/suggested-namespace: open-cluster-management
     operators.operatorframework.io/builder: operator-sdk-v1.23.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/stolostron/multicluster-global-hub
     support: Red Hat
-  name: multicluster-global-hub-operator.v0.6.0-dev
+  name: multicluster-global-hub-operator.v0.6.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -631,12 +631,12 @@ spec:
                     fieldRef:
                       fieldPath: metadata.namespace
                 - name: OPERAND_IMAGE_MULTICLUSTER_GLOBAL_HUB_MANAGER
-                  value: quay.io/stolostron/multicluster-global-hub-manager:latest
+                  value: quay.io/stolostron/multicluster-global-hub-manager:v0.6.0
                 - name: OPERAND_IMAGE_MULTICLUSTER_GLOBAL_HUB_AGENT
-                  value: quay.io/stolostron/multicluster-global-hub-agent:latest
+                  value: quay.io/stolostron/multicluster-global-hub-agent:v0.6.0
                 - name: OPERAND_IMAGE_OAUTH_PROXY
                   value: quay.io/stolostron/origin-oauth-proxy:4.9
-                image: quay.io/stolostron/multicluster-global-hub-operator:latest
+                image: quay.io/stolostron/multicluster-global-hub-operator:v0.6.0
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -778,4 +778,4 @@ spec:
   provider:
     name: Red Hat, Inc
     url: https://github.com/stolostron/multicluster-global-hub
-  version: 0.6.0-dev
+  version: 0.6.0

@@ -1,0 +1,110 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: amlens.eclipse.org
+spec:
+  group: eclipse.org
+  names:
+    kind: Amlen
+    listKind: AmlenList
+    plural: amlens
+    singular: amlen
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: The version of the Amlen Operator
+      jsonPath: .status.versions.reconciled
+      name: version
+      type: string
+    - description: Are the systems configured for High Availability
+      jsonPath: .spec.ha.enabled
+      name: HA
+      type: string
+    - description: Number of systems
+      jsonPath: .spec.size
+      name: systems
+      type: string
+    - description: Amlen Operator reconciling state
+      jsonPath: .status.conditions[?(@.type=='Running')].reason
+      name: reconcile
+      type: string
+    - description: Overall status message of the Amlen systems
+      jsonPath: .status.conditions[?(@.type=='Ready')].message
+      name: message
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: Amlen is the Schema for the amlens API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Spec defines the desired state of Amlen
+            properties:
+              device_cert_issuer:
+                properties:
+                  mode:
+                    enum:
+                    - automatic
+                    - manual
+                    type: string
+                required:
+                - mode
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              ha:
+                properties:
+                  cert_issuer:
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  enabled:
+                    type: boolean
+                required:
+                - enabled
+                - cert_issuer
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              ldap:
+                properties:
+                  cert_issuer:
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  enabled:
+                    type: boolean
+                required:
+                - enabled
+                - cert_issuer
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+          status:
+            description: Status defines the observed state of Amlen
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

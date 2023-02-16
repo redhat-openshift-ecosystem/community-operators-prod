@@ -19,6 +19,8 @@ env:
   OPP_ANSIBLE_PULL_BRANCH: "upstream-community"
   OPP_THIS_REPO_BASE: "https://github.com"
   OPP_THIS_REPO: "redhat-openshift-ecosystem/community-operators-prod"
+  OPP_THIS_REPO_NAME: "community-operators-prod"
+  OPP_THIS_REPO_ORG: "redhat-openshift-ecosystem"
   OPP_THIS_BRANCH: "main"
   OPP_RELEASE_BUNDLE_REGISTRY: "quay.io"
   OPP_RELEASE_BUNDLE_ORGANIZATION: "openshift-community-operators"
@@ -140,7 +142,7 @@ jobs:
             $ cat <path-to-operator>/ci.yaml
             packagemanifestClusterVersionLabel: auto
             ```
-            More info [here](https://redhat-openshift-ecosystem.github.io/community-operators-pipeline/operator-ci-yaml/#automatic-cluster-version-label-ocp-packagemanifest-only).
+            More info [here](https://${OPP_THIS_REPO_ORG}.github.io/${OPP_THIS_REPO_NAME}/operator-ci-yaml/#automatic-cluster-version-label-ocp-packagemanifest-only).
 
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
@@ -308,7 +310,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11']
+        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12']
 
       fail-fast: false
     steps:
@@ -349,7 +351,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11']
+        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12']
 
       fail-fast: false
     steps:

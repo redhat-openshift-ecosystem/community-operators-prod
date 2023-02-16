@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/created-by: gitwebhook-operator
+    app.kubernetes.io/instance: gitwebhook-operator-metrics-monitor
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: servicemonitor
+    app.kubernetes.io/part-of: gitwebhook-operator
+    control-plane: gitwebhook-operator
+  name: gitwebhook-operator-controller-manager-metrics-monitor
+spec:
+  endpoints:
+  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    interval: 30s
+    path: /metrics
+    port: https
+    scheme: https
+    tlsConfig:
+      ca:
+        secret:
+          key: tls.crt
+          name: gitwebhook-operator-certs
+          optional: false
+      serverName: gitwebhook-operator-controller-manager-metrics-service.gitwebhook-operator.svc
+  selector:
+    matchLabels:
+      control-plane: gitwebhook-operator

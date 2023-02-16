@@ -195,7 +195,6 @@ jobs:
           echo "OPP_LABELS=$OPP_LABELS"
           FAKE_RC=false
           FAKE_TYPE=$(echo $OPERATOR_INDEX_TAG | cut -d '-' -f 2)
-          [[ $FAKE_TYPE == *rc* ]] && FAKE_RC=true || true
 
           echo "op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH"
           bash <(curl -sL $OPP_SCRIPT_URL) op_delete_${OPERATOR_INDEX_TAG} operators/${{ needs.pr-check.outputs.opp_name }}/${{ needs.pr-check.outputs.opp_version }} $OPP_THIS_REPO $OPP_THIS_BRANCH || $FAKE_RC
@@ -214,7 +213,7 @@ jobs:
           OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPP_IIB_INSTALL: 0
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-          OPERATOR_INDEX_TAG: "orange_v4.8 orange_v4.9 orange_v4.10 orange_v4.11"
+          OPERATOR_INDEX_TAG: "orange_v4.8 orange_v4.9 orange_v4.10 orange_v4.11 orange_v4.12"
 
           OPP_INDEX_CHECK_ONLY: 1
         run: |
@@ -232,12 +231,15 @@ jobs:
           echo "Operators (v4.9) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_9 }}"
           echo "Operators (v4.10) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"
           echo "Operators (v4.11) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_11 }}"
+          echo "Operators (v4.12) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_12 }}"
 
       - name: Operator info
         id: op-info
         env:
 
           OPP_FORCE_OPERATORS: "${{ github.event.inputs.list_of_operators }}"
+          OPP_OP_INFO_PARALLEL: 1
+          OPP_OP_INFO_PARALLEL_BATCH: 20
 
           OPP_AUTO_LABEL: 1
           ANSIBLE_FORCE_COLOR: 1
@@ -247,7 +249,12 @@ jobs:
           OPP_FORCE_OPERATORS=${OPP_FORCE_OPERATORS// /,}
           echo $OPP_FORCE_OPERATORS
           [ "$OPP_AUTO_LABEL" = '1' ] && ANSIBLE_ARGS="-e automatic_cluster_version_label=true" || ANSIBLE_ARGS="-e automatic_cluster_version_label=false"
-          ansible-pull -U $OPP_ANSIBLE_PULL_REPO -C $OPP_ANSIBLE_PULL_BRANCH -i localhost, -e run_upstream=true -e run_prepare_catalog_repo_upstream=true -e catalog_repo=$OPP_THIS_REPO_BASE/$OPP_THIS_REPO -e catalog_repo_branch=$OPP_THIS_BRANCH upstream/local.yml --tags reset_tools,operator_info -e operator_base_dir=/tmp/community-operators-for-catalog/operators -e operators=$OPP_FORCE_OPERATORS -e cluster_type=$OPP_PRODUCTION_TYPE -e strict_cluster_version_labels=true -e stream_kind=openshift_upstream -e production_registry_namespace=$OPP_RELEASE_BUNDLE_REGISTRY/$OPP_RELEASE_BUNDLE_ORGANIZATION $ANSIBLE_ARGS
+          [ "$OPP_OP_INFO_PARALLEL" = '1' ] && ANSIBLE_ARGS="$ANSIBLE_ARGS -e op_info_parallel=true -e op_info_parallel_batch=$OPP_OP_INFO_PARALLEL_BATCH" || ANSIBLE_ARGS="$ANSIBLE_ARGS -e op_info_parallel=false"
+          echo $ANSIBLE_ARGS
+          git clone $OPP_ANSIBLE_PULL_REPO -b $OPP_ANSIBLE_PULL_BRANCH operator-test-playbooks
+          cd operator-test-playbooks
+          ansible-playbook -i localhost, -e ansible_connection=local -e run_upstream=true -e run_prepare_catalog_repo_upstream=true -e catalog_repo=$OPP_THIS_REPO_BASE/$OPP_THIS_REPO -e catalog_repo_branch=$OPP_THIS_BRANCH upstream/local.yml --tags reset_tools,operator_info -e operator_base_dir=/tmp/community-operators-for-catalog/operators -e operators=$OPP_FORCE_OPERATORS -e cluster_type=$OPP_PRODUCTION_TYPE -e strict_cluster_version_labels=true -e stream_kind=openshift_upstream -e production_registry_namespace=$OPP_RELEASE_BUNDLE_REGISTRY/$OPP_RELEASE_BUNDLE_ORGANIZATION $ANSIBLE_ARGS
+
       - name: Upload operator_info
         uses: actions/upload-artifact@v2
         with:
@@ -267,6 +274,7 @@ jobs:
       opp_uncomplete_operators_v4_9: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_9 }}"
       opp_uncomplete_operators_v4_10: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"
       opp_uncomplete_operators_v4_11: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_11 }}"
+      opp_uncomplete_operators_v4_12: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_12 }}"
 
   bundles-ocp:
     name: "Bundles / ocp"
@@ -293,6 +301,7 @@ jobs:
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
           OPERATOR_INDEX_TAG: latest
           OPP_SKIP_INDEX: 1
+          OPP_SKIP_BUNDLES: 0
           OPP_FORCE_OPERATORS: "${{ needs.operators-ocp.outputs.opp_uncomplete_operators }}"
 
         run: |
@@ -300,7 +309,7 @@ jobs:
           echo "OPP_FORCE_OPERATORS=$OPP_FORCE_OPERATORS"
           FAKE_RC=false
           FAKE_TYPE=$(echo $OPERATOR_INDEX_TAG | cut -d '-' -f 2)
-          [[ $FAKE_TYPE == *rc* ]] && FAKE_RC=true || true
+
           echo "orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH"
           bash <(curl -sL $OPP_SCRIPT_URL) orange_${OPERATOR_INDEX_TAG} operators/sync $OPP_THIS_REPO $OPP_THIS_BRANCH || $FAKE_RC
 
@@ -342,6 +351,7 @@ jobs:
           OPP_MIRROR_INDEX_ENABLED: ${{ github.event.inputs.mirror_index_to_final_location }}
 
           OPP_FORCE_INDEX_UPDATE: 1
+          OPP_SKIP_BUNDLES: 1
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
           IIB_OUTPUT_REGISTRY_TOKEN: ${{ secrets.IIB_OUTPUT_REGISTRY_TOKEN }}
           OPERATOR_INDEX_TAG: ${{ matrix.index-tag }}
@@ -352,7 +362,7 @@ jobs:
           echo "OPP_LABELS=$OPP_LABELS"
           FAKE_RC=false
           FAKE_TYPE=$(echo $OPERATOR_INDEX_TAG | cut -d '-' -f 2)
-          [[ $FAKE_TYPE == *rc* ]] && FAKE_RC=true || true
+
 
           TARGET_INDEX_RAW=${{ github.event.inputs.index }}
           TARGET_INDEX_RAW=$(echo $TARGET_INDEX_RAW|cut -d '-' -f1)

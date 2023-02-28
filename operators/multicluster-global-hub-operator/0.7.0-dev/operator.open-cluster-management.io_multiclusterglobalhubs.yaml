@@ -13,6 +13,7 @@ spec:
     plural: multiclusterglobalhubs
     shortNames:
     - mgh
+    - mcgh
     singular: multiclusterglobalhub
   scope: Namespaced
   versions:
@@ -55,14 +56,14 @@ spec:
                       use postgres as data layer This is for a large scale environment.
                     properties:
                       kafka:
-                        description: KafkaConfig is the config of kafka
+                        description: KafkaConfig defines the desired state of kafka
                         properties:
                           name:
                             type: string
                           transportFormat:
                             default: cloudEvents
-                            description: This flag tells the controller to using the
-                              cloudEvents or message format
+                            description: TransportFormat defines the transport format
+                              for kafka, which is either cloudEvents or kafka message
                             enum:
                             - message
                             - cloudEvents

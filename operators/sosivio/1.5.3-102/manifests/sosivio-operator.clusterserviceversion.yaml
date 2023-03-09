@@ -2,8 +2,8 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    operatorhub.io/ui-metadata-max-k8s-version: "1.25"
-    com.redhat.openshift.versions: "v4.1-v4.1"
+    operatorhub.io/ui-metadata-max-k8s-version: "1.26"
+    com.redhat.openshift.versions: "v4.6-v4.12"
     alm-examples: |-
       [
         {
@@ -31,7 +31,7 @@ metadata:
       ]
     capabilities: Auto Pilot
     categories: Monitoring,Integration & Delivery,Logging & Tracing,Developer Tools
-    containerImage: quay.io/sosivio/sosivio-operator:v1.5.1-97
+    containerImage: quay.io/sosivio/sosivio-operator:v1.5.3-82
     createdAt: "2021-10-28 01:01:01"
     description: "Sosivio | Predictive Troubleshooting for Kubernetes"
     operators.operatorframework.io/builder: operator-sdk-v1.13.0+git
@@ -40,7 +40,7 @@ metadata:
     support: Sosivio
   operators.openshift.io/valid-subscription: []
   operators.openshift.io/infrastructure-features: ["disconnected"]
-  name: sosivio-operator.v1.5.1-97
+  name: sosivio-operator.v1.5.3-82
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
@@ -136,7 +136,7 @@ spec:
                       - --leader-elect
                     command:
                       - /manager
-                    image: quay.io/sosivio/sosivio-operator:v1.5.1-97
+                    image: quay.io/sosivio/sosivio-operator:v1.5.3-82
                     livenessProbe:
                       httpGet:
                         path: /healthz
@@ -189,6 +189,13 @@ spec:
                 - update
                 - patch
                 - delete
+            - apiGroups:
+                - "events.k8s.io/v1"
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
           serviceAccountName: sosivio-operator-controller-manager
     strategy: deployment
   installModes:
@@ -203,61 +210,64 @@ spec:
   keywords:
     - sosivio
     - kubernetes
-    - observanility
+    - observabillity
     - monitoring
     - root cause
+    - predictive troubleshooting
   links:
     - name: Sosivio
       url: https://www.sosiv.io
     - name: Documentation
       url: https://docs.sosiv.io
+    - name: Release Notes
+      url: https://docs.sosiv.io/releasenotes
   maintainers:
     - email: info@sosiv.io
       name: Sosivio
   maturity: stable
-  minKubeVersion: "1.11.0"
+  minKubeVersion: "1.19.0"
   provider:
     name: sosivio
     url: https://www.sosiv.io
   relatedImages:
-    - image: quay.io/sosivio/sosivio-operator@sha256:11bc627773bb5e08b629e0b013e7f600fcb4aaefbd97f2de337d339475616763
+    - image: quay.io/sosivio/sosivio-operator@sha256:73851c372a790299dbd37c6d68d278197ea40c4c4c1703c8217c607e9a85a238
       name: operator
     - image: quay.io/sosivio/kube-rbac-proxy@sha256:34e8724e0f47e31eb2ec3279ac398b657db5f60f167426ee73138e2e84af6486
       name: kube-rbac-proxy
-    - image: quay.io/sosivio/nsq@sha256:781aac23ef0a1ed0af2b8e93d625ae49bd11dbdd98787d3c79dde8d128f3810d
+    - image: quay.io/sosivio/nsq@sha256:56a3e21c921047cac9e931e641531fbc1097913664d089e57d5cae466e7ed5c4
       name: nsq
-    - image: quay.io/sosivio/crud-manager@sha256:38289a28829fa737917d76dd4810ba6140e123061ead0a4b79fa79b2e246a293
+    - image: quay.io/sosivio/crud-manager@sha256:a2e9965371b9fa1f1251201a2a97d29f3c390e5147c4df961ac8dced751bac41
       name: crud-manager
-    - image: quay.io/sosivio/sosivio-node-collector@sha256:61ed8dd52de5edc09d16a31b18f2f65ad9344c0b6c9cfab323c3eb3d7e7ed060
+    - image: quay.io/sosivio/sosivio-node-collector@sha256:2c4e855c32119e44a87e437aea97cf1eac06a3133c9d9e4041cf592ebd35de1e
       name: sosivio-node-collector
-    - image: quay.io/sosivio/sosivio-node-pinger@sha256:937de52ad7b76e6cff4ad5197de9705988d61f285ebadac5ebadb5856f59ee58
+    - image: quay.io/sosivio/sosivio-node-pinger@sha256:6204691efe8d6179d7a0f356ddc70cbf799ac73db56d1ac9324e1978596b66a2
       name: sosivio-node-pinger
-    - image: quay.io/sosivio/classifier@sha256:dd8bf145524db23ff333efa1bcdff258dab116d3534f95f73775d8dd339e6963
+    - image: quay.io/sosivio/classifier@sha256:e1870dbc9ffa1caf7ab906aebb4c4cfdcadd4ceb003bd1a1938c636afae9c35c
       name: classifier
-    - image: quay.io/sosivio/communicator@sha256:fffec9a6c66594fde5f05e2dfb84361544ca9d53a345188c197a0ea6f53bc4b9
+    - image: quay.io/sosivio/communicator@sha256:f1b88ffeb728f39a97813693f47ae61a55c9ef0739a4f9f7f4488a7cb23ec9e6
       name: communicator
-    - image: quay.io/sosivio/analyzer@sha256:3825608fe7c43ef059108e76665acc99fe72bea77d4d9e3852f6ad45e74379b1
+    - image: quay.io/sosivio/analyzer@sha256:44b80d4e9ae32811bff1b5a46540cb34cfdb46648c1cd4c4f709b5a48cf01476
       name: analyzer
-    - image: quay.io/sosivio/sosivio-dashboard@sha256:fdfca5bb2123d1008cec2b656cde73c7e9364f84c5ff4f4a6fee5751b1bfb2f8
+    - image: quay.io/sosivio/sosivio-dashboard@sha256:a58413797f15bf1c6ebcd806ed5a6238e618fc7f47ccf9b2d83e94627a812392
       name: sosivio-dashboard
-    - image: quay.io/sosivio/authentication@sha256:0ea6025f333576792f5b1fc4d96d9ab1a404749f185830410e71248683004da2
+    - image: quay.io/sosivio/authentication@sha256:476af4e016e8cd549e592f8c5b359ae3c0562ddf16e1d321a50212be097ea401
       name: authentication
-    - image: quay.io/sosivio/actuator@sha256:a9abe9730800ca2b0a1bbd7a361b2ab3a818cbf127798314e5477fb1cb16ba4c
+    - image: quay.io/sosivio/actuator@sha256:268cdae17ad72b2d84c1555c47e1323a8fab735aca3951780a874d3d801a4338
       name: actuator
-    - image: quay.io/sosivio/sequence-recognition@sha256:7335cf8f3e40bc46e8ca0de525d99f0655833b7c52d36dc273aa7b096eb70fa2
+    - image: quay.io/sosivio/sequence-recognition@sha256:522de7be2b2f0b1e2e5075dcfff4f30d8804d0671a93308a8b1f35236ab46580
       name: sequence-recognition
-    - image: quay.io/sosivio/correlation-entities@sha256:c00af09b2589bad4740fd44d7a81c69b2e29138c360939b2a45f65edd44b6901
+    - image: quay.io/sosivio/correlation-entities@sha256:24e4c9a1b849b307c2022f4e04c69e61f7c1fa50e09348368bf290ee16584513
       name: correlation-entities
-    - image: quay.io/sosivio/contract-testing@sha256:cad6fac6ed3fdf2597ceb09ba5dbb7d81f70cf45f483a7064e3968215dd982e3
+    - image: quay.io/sosivio/contract-testing@sha256:8587170d9208f9ba8063873211d7f69d6e08960c3ae129cb66f49b0fdf701444
       name: contract-testing
-    - image: quay.io/sosivio/sosiviodb@sha256:a3c6c3975bc2b0316135ee5c547f1eb215f3a1f9c8b0a9c8eceff23415f93597
+    - image: quay.io/sosivio/sosiviodb@sha256:b6b3925e9041e607961e5f5cc780d069afaab882a209837317efdca41c48a565
       name: sosiviodb
-    - image: quay.io/sosivio/discovery-engine@sha256:b87b3f7c9ed3aed80d0a77788fd8925789450d9dc05d25017e89dff611cd82da
+    - image: quay.io/sosivio/discovery-engine@sha256:1b21e0d595f29bb19e43628faf3806af5d2565080aac38e1d1e751f2ac30a46d
       name: discovery-engine
-    - image: quay.io/sosivio/notifier@sha256:35f5f3e8e5ccad914fcfe34fb4b4a1b044ee87f5a6141284cd5273f0b2b3bf22
+    - image: quay.io/sosivio/notifier@sha256:d597c12cfe730a73608557ba5628cf79ec56367af2a3cb9c50fee95beb8db1ff
       name: notifier
-    - image: quay.io/sosivio/sosivio-node-netpacket@sha256:84dd159b1dfdb52dee3eb1c4c93f323bae49ce517ff44663b69978e14bdd8390
+    - image: quay.io/sosivio/sosivio-node-netpacket@sha256:bf044bdbb2125cc2d8ce79759651cabaf93e0c17a6f2b8c1c33b38a426e1aac8
       name: netpacket
-    - image: quay.io/sosivio/network-aggregator@sha256:e59d937f4d9c52acad0adadab39c6849d20b4ee72a83e239a33ea137f08323f4
+    - image: quay.io/sosivio/network-aggregator@sha256:1d68e29880051d84c00e5c744d47cc64b4736e57e1a91c9876e36db868f8b44d
       name: network-aggregator
-  version: "1.5.1"
+  version: "1.5.3-102"

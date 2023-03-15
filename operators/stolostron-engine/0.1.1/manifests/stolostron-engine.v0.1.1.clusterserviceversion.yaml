@@ -10,6 +10,7 @@ metadata:
     createdAt: '2023-03-10T16:13:44Z'
     description: Foundational components for central management of multiple OpenShift Container Platform
       and Kubernetes clusters
+    olm.skipRange: '>=0.1.0 <0.1.1'
     operatorframework.io/suggested-namespace: stolostron-engine
     operatorframework.io/initialization-resource: '{"apiVersion":"multicluster.openshift.io/v1", "kind":"MultiClusterEngine","metadata":{"name":"engine"},"spec":
       {}}'
@@ -31,6 +32,7 @@ spec:
   - email: acm-contact@redhat.com
     name: Red Hat
   maturity: pre-release
+  replaces: stolostron-engine.v0.1.0
   description: 'Stolostron Engine provides the foundational components that are necessary for the centralized
     management of multiple Kubernetes-based clusters across data centers, public clouds, and private clouds.
     You can use the engine to create Red Hat OpenShift Container Platform clusters on selected providers,

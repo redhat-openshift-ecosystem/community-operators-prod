@@ -42,7 +42,7 @@ env:
   OPP_MIRROR_INDEX_MULTIARCH_BASE: "registry.redhat.io/openshift4/ose-operator-registry"
   OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11"
   OPP_MIRROR_INDEX_MULTIARCH_POSTFIX: "s"
-  IIB_INPUT_REGISTRY_USER: "mavala"
+  IIB_INPUT_REGISTRY_USER: "12742415|community-operators-pipeline"
   OPP_REGISTRY_MIRROR_USER: "redhat+iib_community"
   OPP_THIS_REPO_BASE: "https://github.com"
   OPP_THIS_REPO: "redhat-openshift-ecosystem/community-operators-prod"
@@ -70,16 +70,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - id: files
-        uses: jitterbit/get-changed-files@v1
+        uses: masesgroup/retrieve-changed-files@v2
         continue-on-error: true
       - id: prinfo
         uses: actions-ecosystem/action-get-merged-pull-request@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
       - name: Install dependencies
@@ -402,7 +402,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
       - name: Install dependencies
@@ -441,7 +441,27 @@ jobs:
                       "header": {
                           "title": "Release pipeline failed: ${{ needs.pr-check.outputs.opp_pr_title }}",
                           "subtitle": "failure"
-                      }
+                      },
+                      "sections": [
+                          {
+                              "widgets": [
+                                  {
+                                      "buttons": [
+                                          {
+                                              "textButton": {
+                                                  "text": "Open the release queue",
+                                                  "onClick": {
+                                                      "openLink": {
+                                                          "url": "https://github.com/${{ github.repository }}/actions/workflows/operator_release.yaml"
+                                                      }
+                                                  }
+                                              }
+                                          }
+                                      ]
+                                  }
+                              ]
+                          }
+                      ]
                   }
               ]
           }'

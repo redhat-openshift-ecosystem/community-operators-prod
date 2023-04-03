@@ -382,7 +382,7 @@ jobs:
             echo "OPERATOR_INDEX_DIGEST=$OPERATOR_INDEX_DIGEST"
             SIGNATURE_PAYLOAD="{\"manifest_digest\": \"${OPERATOR_INDEX_DIGEST}\", \"reference\": \"${OPERATOR_INDEX}\",\"requester\": \"${{ secrets.SIGNATURE_WEBHOOK_REQUESTER_EMAIL }}\"}"
             echo ${SIGNATURE_PAYLOAD}
-            curl --connect-timeout 10 --max-time 20 --retry 5 --retry-delay 0 --retry-max-time 100 \
+            curl --connect-timeout 10 --max-time 20 --fail --retry-all-errors --retry 5 --retry-delay 3 \
             ${SIGNATURE_ENDPOINT} -d "${SIGNATURE_PAYLOAD}" -u "community-op-cert:${{ secrets.SIGNATURE_WEBHOOK_PASSWD }}"
           done
 

@@ -30,7 +30,7 @@ metadata:
     categories: Integration & Delivery,OpenShift Optional
     certified: "false"
     containerImage: quay.io/stolostron/multicluster-global-hub-operator:latest
-    createdAt: "2023-02-28T20:00:36Z"
+    createdAt: "2023-03-31T20:00:36Z"
     description: Manages the installation and upgrade of the Multicluster Global Hub.
     operatorframework.io/suggested-namespace: open-cluster-management
     operators.operatorframework.io/builder: operator-sdk-v1.23.0
@@ -52,12 +52,24 @@ spec:
   description: "Multicluster Global Hub Operator defines the configuration for multicluster
     global hub installation and upgrade with one custom resource.\n\n## Prerequisites\n\n-
     Red Hat Advanced Cluster Management for Kubernetes (RHACM) 2.7 or later needs
-    to be installed.\n- PostgreSQL needs to be installed and you must create database
-    for the multicluster global hub. You must create a secret named postgresql-secret
-    that contains the database access credential in `open-cluster-management` namespace.
-    You can run the following command to create the secret: \n\n```\nkubectl create
-    secret generic storage-secret -n open-cluster-management \\\n  --from-literal=database_uri=<postgresql-uri>
-    \n```\n>_Note:_ There is a sample script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/storage)(Note:
+    to be installed.\n## How to Install\n\nInstall the Multicluster Global Hub Operator
+    by following the instructions that are displayed after you select the Install
+    button. The operator must be installed in the same namespace as Red Hat Advanced
+    Cluster Management for Kubernetes (RHACM), by default, in `open-cluster-management`
+    namespace.\n\nA pod will be created in `open-cluster-management` namespace\n\n```\n$
+    kubectl get pods -n open-cluster-management\nNAME                                                             READY
+    \  STATUS    RESTARTS   AGE\nmulticluster-global-hub-operator-5ccbbc878d-98fdp
+    \               1/1     Running   0          19s\n```\n\nThe operator is now providing
+    new Custom Resources Definitions: `multiclusterglobalhubs.operator.open-cluster-management.io`\n\n##
+    Using the Multicluster Global Hub Operator\n\nAfter installed the operator, create
+    an instance of the MulticlusterGlobalHub resource to instantiate the Multicluster
+    Global Hub.\n\nYou need to prepare:\n\n- PostgreSQL needs to be installed and
+    you must create database for the multicluster global hub. You must create a secret
+    named postgresql-secret that contains the database access credential in `open-cluster-management`
+    namespace. You can run the following command to create the secret: \n\n```\nkubectl
+    create secret generic storage-secret -n open-cluster-management \\\n  --from-literal=database_uri=<postgresql-uri>
+    \\\n --from-file=ca.crt=<CA-for-postgres-server> \n```\n>_Note:_ There is a sample
+    script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/storage)(Note:
     the client version of kubectl must be v1.21+) to install postgres in `hoh-postgres`
     namespace and create the secret `storage-secret` in namespace `open-cluster-management`
     automatically. To override the secret namespace, set `TARGET_NAMESPACE` environment
@@ -72,20 +84,11 @@ spec:
     to install kafka in `kafka` namespace and create the secret `transport-secret`
     in namespace `open-cluster-management` automatically. To override the secret namespace,
     set `TARGET_NAMESPACE` environment variable to the RHACM installation namespace
-    before executing the script.\n\n## How to Install\n\nInstall the Multicluster
-    Global Hub Operator by following the instructions that are displayed after you
-    select the Install button. The operator must be installed in the same namespace
-    as Red Hat Advanced Cluster Management for Kubernetes (RHACM), by default, in
-    `open-cluster-management` namespace.\n\nA pod will be created in `open-cluster-management`
-    namespace\n\n```\n$ kubectl get pods -n open-cluster-management\nNAME                                                             READY
-    \  STATUS    RESTARTS   AGE\nmulticluster-global-hub-operator-5ccbbc878d-98fdp
-    \               1/1     Running   0          19s\n```\n\nThe operator is now providing
-    new Custom Resources Definitions: `multiclusterglobalhubs.operator.open-cluster-management.io`\n\n##
-    Using the Multicluster Global Hub Operator\n\nAfter installing the operator, create
-    an instance of the MulticlusterGlobalHub resource to install the Multicluster
-    Global Hub.\n\nThe pods of Multicluster Global Hub are created in the `open-cluster-management`
-    namespace:\n\n```\n$ kubectl get pods -n open-cluster-management\nNAME                                                             READY
-    \  STATUS    RESTARTS   AGE\nmulticluster-global-hub-operator-5ccbbc878d-98fdp
+    before executing the script.\n\nOnce an instance of the MulticlusterGlobalHub
+    is created, the following pods are created in the `open-cluster-management` namespace:\n\n```\n$
+    kubectl get pods -n open-cluster-management\nNAME                                                             READY
+    \  STATUS    RESTARTS   AGE\nmulticluster-global-hub-grafana-79f8d59f58-qwcjl
+    \                1/1     Running   0          22s\nmulticluster-global-hub-operator-5ccbbc878d-98fdp
     \               1/1     Running   0          56s\nmulticluster-global-hub-manager-7c55644568-mth8f
     \                1/1     Running   0          11s\n```\n"
   displayName: Multicluster Global Hub Operator
@@ -636,6 +639,8 @@ spec:
                   value: quay.io/stolostron/multicluster-global-hub-manager:latest
                 - name: OPERAND_IMAGE_MULTICLUSTER_GLOBAL_HUB_AGENT
                   value: quay.io/stolostron/multicluster-global-hub-agent:latest
+                - name: OPERAND_IMAGE_GRAFANA
+                  value: quay.io/stolostron/grafana:2.8.0-SNAPSHOT-2023-03-06-01-52-34
                 - name: OPERAND_IMAGE_OAUTH_PROXY
                   value: quay.io/stolostron/origin-oauth-proxy:4.9
                 image: quay.io/stolostron/multicluster-global-hub-operator:latest

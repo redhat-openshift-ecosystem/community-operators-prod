@@ -142,6 +142,7 @@ spec:
           - services
           verbs:
           - create
+          - delete
           - get
           - list
           - update
@@ -158,6 +159,16 @@ spec:
           - update
           - watch
         - apiGroups:
+          - agent.open-cluster-management.io
+          resources:
+          - klusterletaddonconfigs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - watch
+        - apiGroups:
           - apiextensions.k8s.io
           resources:
           - customresourcedefinitions
@@ -171,6 +182,7 @@ spec:
           - deployments
           verbs:
           - create
+          - delete
           - get
           - list
           - update
@@ -201,7 +213,6 @@ spec:
           - managedclustersets/join
           verbs:
           - create
-          - delete
         - apiGroups:
           - clustertemplate.openshift.io
           resources:
@@ -266,6 +277,7 @@ spec:
           - consoleplugins
           verbs:
           - create
+          - delete
           - get
           - list
           - update
@@ -300,6 +312,12 @@ spec:
           - list
           - update
           - watch
+        - apiGroups:
+          - register.open-cluster-management.io
+          resources:
+          - managedclusters/accept
+          verbs:
+          - update
         - apiGroups:
           - authentication.k8s.io
           resources:

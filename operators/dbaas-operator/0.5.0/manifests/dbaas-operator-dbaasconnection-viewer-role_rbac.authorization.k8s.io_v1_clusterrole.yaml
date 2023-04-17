@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    servicebinding.io/controller: "true"
+  name: dbaas-operator-dbaasconnection-viewer-role
+rules:
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - dbaasconnections
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - dbaas.redhat.com
+  resources:
+  - dbaasconnections/status
+  verbs:
+  - get

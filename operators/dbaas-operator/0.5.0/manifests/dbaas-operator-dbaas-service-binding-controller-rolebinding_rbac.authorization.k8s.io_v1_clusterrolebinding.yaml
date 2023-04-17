@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  creationTimestamp: null
+  name: dbaas-operator-dbaas-service-binding-controller-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: service-binding-controller-role
+subjects:
+- kind: ServiceAccount
+  name: service-binding-operator
+  namespace: openshift-dbaas-operator

@@ -13,6 +13,7 @@ production:
       - v4.10-db
       - v4.11
       - v4.12
+      - v4.13-rc
     latest: "v4.6"
     signature:
       enabled: 1
@@ -30,6 +31,7 @@ production:
         - v4.9
         - v4.10
         - v4.11
+        - v4.12
       postfix: s
     registry: quay.io
 #    organization: community-operators-backup
@@ -44,7 +46,7 @@ production:
     installation_skip:
       - ack-
       - community-windows-machine-config-operator
-      
+
 pipeline:
   base: https://github.com
   repo: redhat-openshift-ecosystem/community-operators-prod
@@ -72,6 +74,6 @@ operatorhubio:
 #  project: operator-test-playbooks
 #  tag: master
 tools:
-  kind_version: v0.16.0
-  kind_kube_version: v1.22.7
+  kind_version: v0.18.0
+  kind_kube_version: v1.26.3
   operator_sdk_version: v1.8.0

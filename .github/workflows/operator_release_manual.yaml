@@ -57,7 +57,7 @@ env:
   OPP_MIRROR_INDEX_NAME: "redhat----community-operator-index"
   OPP_MIRROR_INDEX_ENABLED: "1"
   OPP_MIRROR_INDEX_MULTIARCH_BASE: "registry.redhat.io/openshift4/ose-operator-registry"
-  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11"
+  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11 v4.12"
   OPP_MIRROR_INDEX_MULTIARCH_POSTFIX: "s"
   IIB_INPUT_REGISTRY_USER: "12742415|community-operators-pipeline"
   OPP_REGISTRY_MIRROR_USER: "redhat+iib_community"
@@ -213,7 +213,7 @@ jobs:
           OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPP_IIB_INSTALL: 0
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-          OPERATOR_INDEX_TAG: "orange_v4.8 orange_v4.9 orange_v4.10 orange_v4.11 orange_v4.12"
+          OPERATOR_INDEX_TAG: "orange_v4.8 orange_v4.9 orange_v4.10 orange_v4.11 orange_v4.12 orange_v4.13"
 
           OPP_INDEX_CHECK_ONLY: 1
         run: |
@@ -232,6 +232,7 @@ jobs:
           echo "Operators (v4.10) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"
           echo "Operators (v4.11) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_11 }}"
           echo "Operators (v4.12) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_12 }}"
+          echo "Operators (v4.13) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_13 }}"
 
       - name: Operator info
         id: op-info
@@ -275,6 +276,7 @@ jobs:
       opp_uncomplete_operators_v4_10: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"
       opp_uncomplete_operators_v4_11: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_11 }}"
       opp_uncomplete_operators_v4_12: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_12 }}"
+      opp_uncomplete_operators_v4_13: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_13 }}"
 
   bundles-ocp:
     name: "Bundles / ocp"

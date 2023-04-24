@@ -28,15 +28,15 @@ env:
   OPP_RELEASE_INDEX_ORGANIZATION: "openshift-community-operators"
   OPP_RELEASE_INDEX_NAME: "catalog_tmp"
   OPP_MIRROR_INDEX_MULTIARCH_BASE: "registry.redhat.io/openshift4/ose-operator-registry"
-  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11"
+  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11 v4.12"
   OPP_MIRROR_INDEX_MULTIARCH_POSTFIX: "s"
   IIB_INPUT_REGISTRY_USER: "12742415|community-operators-pipeline"
   OPP_PROD: 0
   OPP_DRY_RUN: 0
   # TODO handle config
   OPP_PACKAGEMANIFEST_DISABLED: "0"
-  KIND_VERSION: "v0.16.0"
-  KIND_KUBE_VERSION_LATEST: "v1.22.7"
+  KIND_VERSION: "v0.18.0"
+  KIND_KUBE_VERSION_LATEST: "v1.26.3"
   OPP_PRODUCTION_TYPE: "ocp"
   OPP_REVIEWERS_ENABLED: 1
   OPP_FORCE_DEPLOY_ON_K8S_OPENSHIFT_VERSION: 4.8
@@ -335,7 +335,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12']
+        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13-rc']
 
       fail-fast: false
     steps:
@@ -376,7 +376,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12']
+        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13-rc']
 
       fail-fast: false
     steps:

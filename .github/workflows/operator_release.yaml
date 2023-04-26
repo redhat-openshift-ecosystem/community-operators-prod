@@ -40,7 +40,7 @@ env:
   OPP_MIRROR_INDEX_NAME: "redhat----community-operator-index"
   OPP_MIRROR_INDEX_ENABLED: "1"
   OPP_MIRROR_INDEX_MULTIARCH_BASE: "registry.redhat.io/openshift4/ose-operator-registry"
-  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11 v4.12 v4.13"
+  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11"
   OPP_MIRROR_INDEX_MULTIARCH_POSTFIX: "s"
   IIB_INPUT_REGISTRY_USER: "12742415|community-operators-pipeline"
   OPP_REGISTRY_MIRROR_USER: "redhat+iib_community"
@@ -145,7 +145,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13-rc']
+        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13-maintenance']
 
       fail-fast: false
     steps:
@@ -304,7 +304,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13-rc']
+        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13-maintenance']
 
       fail-fast: false
     steps:
@@ -400,7 +400,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13-rc']
+        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13-maintenance']
 
       fail-fast: false
     steps:

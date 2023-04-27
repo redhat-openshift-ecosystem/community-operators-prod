@@ -393,20 +393,31 @@ jobs:
           OPERATOR_INDEX="${INDEX_PATH_TO_SIGN}:${OPERATOR_INDEX_TAG}"
           MANIFEST_LIST=${OPP_MIRROR_INDEX_REGISTRY}/${OPP_MIRROR_INDEX_ORGANIZATION}/${OPP_MIRROR_INDEX_NAME}:${OPERATOR_INDEX_TAG}
           echo "MANIFEST_LIST=$MANIFEST_LIST"
-          INDIVIDUAL_IMAGE_MANIFESTS=$(docker manifest inspect $MANIFEST_LIST|jq '.manifests[]|.digest'|tr -d '"')
-          echo "INDIVIDUAL_IMAGE_MANIFESTS=$INDIVIDUAL_IMAGE_MANIFESTS"
-          INDIVIDUAL_IMAGE_MANIFESTS_COUNT=$(echo $INDIVIDUAL_IMAGE_MANIFESTS| sed 's/[^ ]//g' | wc -c)
-          echo "INDIVIDUAL_IMAGE_MANIFESTS_COUNT=$INDIVIDUAL_IMAGE_MANIFESTS_COUNT"
-          
-          for ITERATE_OVER_MANIFESTS in $(seq 1 $INDIVIDUAL_IMAGE_MANIFESTS_COUNT); do
-            echo $ITERATE_OVER_MANIFESTS
-            OPERATOR_INDEX_DIGEST=$(echo $INDIVIDUAL_IMAGE_MANIFESTS|cut -d " " -f${ITERATE_OVER_MANIFESTS})
-            echo "OPERATOR_INDEX_DIGEST=$OPERATOR_INDEX_DIGEST"
-            SIGNATURE_PAYLOAD="{\"manifest_digest\": \"${OPERATOR_INDEX_DIGEST}\", \"reference\": \"${OPERATOR_INDEX}\",\"requester\": \"${{ secrets.SIGNATURE_WEBHOOK_REQUESTER_EMAIL }}\"}"
-            echo ${SIGNATURE_PAYLOAD}
-            curl --connect-timeout 10 --max-time 20 --fail --retry-all-errors --retry 5 --retry-delay 3 \
+
+          SIGNATURE_PAYLOAD=$(
+            docker manifest inspect ${MANIFEST_LIST} | jq -r '.manifests[]|.digest' \
+            | awk -v pullspec=${OPERATOR_INDEX} \
+              -v requester=${{ secrets.SIGNATURE_WEBHOOK_REQUESTER_EMAIL }} \
+              -v 'body={"manifest_digest": "@DIGESTS@", "reference": "@REFERENCES@", "requester": "@REQUESTER@"}' \
+              '
+              /^sha/ {
+                  digests=digests "," $1;
+                  references=references "," pullspec
+              }
+              END {
+                  sub(/^,/, "", digests);
+                  sub(/^,/, "", references);
+                  sub(/@DIGESTS@/, digests, body);
+                  sub(/@REFERENCES@/, references, body);
+                  sub(/@REQUESTER@/, requester, body);
+                  print body
+              }
+              '
+          )
+          echo "SIGNATURE_PAYLOAD=$SIGNATURE_PAYLOAD"
+
+          curl --connect-timeout 10 --max-time 20 --fail --retry-all-errors --retry 5 --retry-delay 3 \
             ${SIGNATURE_ENDPOINT} -d "${SIGNATURE_PAYLOAD}" -u "community-op-cert:${{ secrets.SIGNATURE_WEBHOOK_PASSWD }}"
-          done
 
           # skopeo inspect docker://$MANIFEST_LIST > /dev/null # error out if needed
           # OPERATOR_INDEX_DIGEST=$(skopeo inspect docker://$MANIFEST_LIST | jq -r ".Digest")

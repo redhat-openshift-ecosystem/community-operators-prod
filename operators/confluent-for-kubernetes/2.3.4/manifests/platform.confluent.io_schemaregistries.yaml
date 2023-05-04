@@ -1,0 +1,2866 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.7.0
+  creationTimestamp: null
+  name: schemaregistries.platform.confluent.io
+spec:
+  group: platform.confluent.io
+  names:
+    categories:
+      - all
+      - confluent-platform
+      - confluent
+    kind: SchemaRegistry
+    listKind: SchemaRegistryList
+    plural: schemaregistries
+    shortNames:
+      - schemaregistry
+      - sr
+    singular: schemaregistry
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .status.replicas
+          name: Replicas
+          type: string
+        - jsonPath: .status.readyReplicas
+          name: Ready
+          type: string
+        - jsonPath: .status.phase
+          name: Status
+          type: string
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+        - jsonPath: .status.kafka.bootstrapEndpoint
+          name: Kafka
+          priority: 1
+          type: string
+      name: v1beta1
+      schema:
+        openAPIV3Schema:
+          description: ""
+          properties:
+            apiVersion:
+              description: ""
+              type: string
+            kind:
+              description: ""
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: ""
+              properties:
+                authentication:
+                  description: ""
+                  properties:
+                    basic:
+                      description: ""
+                      properties:
+                        debug:
+                          description: ""
+                          type: boolean
+                        directoryPathInContainer:
+                          description: ""
+                          minLength: 1
+                          type: string
+                        restrictedRoles:
+                          description: ""
+                          items:
+                            type: string
+                          minItems: 1
+                          type: array
+                        roles:
+                          description: ""
+                          items:
+                            type: string
+                          type: array
+                        secretRef:
+                          description: ""
+                          maxLength: 30
+                          minLength: 1
+                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                          type: string
+                      type: object
+                    type:
+                      description: ""
+                      enum:
+                        - basic
+                        - mtls
+                      type: string
+                  required:
+                    - type
+                  type: object
+                authorization:
+                  description: ""
+                  properties:
+                    kafkaRestClassRef:
+                      description: ""
+                      properties:
+                        name:
+                          description: ""
+                          minLength: 1
+                          type: string
+                        namespace:
+                          description: ""
+                          type: string
+                      required:
+                        - name
+                      type: object
+                    type:
+                      description: ""
+                      enum:
+                        - rbac
+                      type: string
+                  required:
+                    - type
+                  type: object
+                configOverrides:
+                  description: ""
+                  properties:
+                    jvm:
+                      description: ""
+                      items:
+                        type: string
+                      type: array
+                    log4j:
+                      description: ""
+                      items:
+                        type: string
+                      type: array
+                    server:
+                      description: ""
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                dependencies:
+                  description: ""
+                  properties:
+                    kafka:
+                      description: ""
+                      properties:
+                        authentication:
+                          description: ""
+                          properties:
+                            jaasConfig:
+                              description: ""
+                              properties:
+                                secretRef:
+                                  description: ""
+                                  maxLength: 30
+                                  minLength: 1
+                                  pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                  type: string
+                              required:
+                                - secretRef
+                              type: object
+                            jaasConfigPassThrough:
+                              description: ""
+                              properties:
+                                directoryPathInContainer:
+                                  description: ""
+                                  minLength: 1
+                                  type: string
+                                secretRef:
+                                  description: ""
+                                  maxLength: 30
+                                  minLength: 1
+                                  pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                  type: string
+                              type: object
+                            oauthbearer:
+                              description: ""
+                              properties:
+                                directoryPathInContainer:
+                                  description: ""
+                                  minLength: 1
+                                  type: string
+                                secretRef:
+                                  description: ""
+                                  maxLength: 30
+                                  minLength: 1
+                                  pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                  type: string
+                              type: object
+                            type:
+                              description: ""
+                              enum:
+                                - plain
+                                - oauthbearer
+                                - digest
+                                - mtls
+                              type: string
+                          required:
+                            - type
+                          type: object
+                        bootstrapEndpoint:
+                          description: ""
+                          minLength: 1
+                          pattern: .+:[0-9]+
+                          type: string
+                        discovery:
+                          description: ""
+                          properties:
+                            name:
+                              description: ""
+                              type: string
+                            namespace:
+                              description: ""
+                              type: string
+                            secretRef:
+                              description: ""
+                              maxLength: 30
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          required:
+                            - name
+                          type: object
+                        tls:
+                          description: ""
+                          properties:
+                            directoryPathInContainer:
+                              description: ""
+                              minLength: 1
+                              type: string
+                            enabled:
+                              description: ""
+                              type: boolean
+                            ignoreTrustStoreConfig:
+                              description: ""
+                              type: boolean
+                            jksPassword:
+                              description: ""
+                              properties:
+                                secretRef:
+                                  description: ""
+                                  maxLength: 30
+                                  minLength: 1
+                                  pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                  type: string
+                              required:
+                                - secretRef
+                              type: object
+                            secretRef:
+                              description: ""
+                              maxLength: 30
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          required:
+                            - enabled
+                          type: object
+                      type: object
+                    mds:
+                      description: ""
+                      properties:
+                        authentication:
+                          description: ""
+                          properties:
+                            bearer:
+                              description: ""
+                              properties:
+                                directoryPathInContainer:
+                                  description: ""
+                                  minLength: 1
+                                  type: string
+                                secretRef:
+                                  description: ""
+                                  maxLength: 30
+                                  minLength: 1
+                                  pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                  type: string
+                              type: object
+                            type:
+                              description: ""
+                              enum:
+                                - bearer
+                              type: string
+                          required:
+                            - bearer
+                            - type
+                          type: object
+                        endpoint:
+                          description: ""
+                          minLength: 1
+                          pattern: ^https?://.*
+                          type: string
+                        tls:
+                          description: ""
+                          properties:
+                            directoryPathInContainer:
+                              description: ""
+                              minLength: 1
+                              type: string
+                            enabled:
+                              description: ""
+                              type: boolean
+                            ignoreTrustStoreConfig:
+                              description: ""
+                              type: boolean
+                            jksPassword:
+                              description: ""
+                              properties:
+                                secretRef:
+                                  description: ""
+                                  maxLength: 30
+                                  minLength: 1
+                                  pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                  type: string
+                              required:
+                                - secretRef
+                              type: object
+                            secretRef:
+                              description: ""
+                              maxLength: 30
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          required:
+                            - enabled
+                          type: object
+                        tokenKeyPair:
+                          description: ""
+                          properties:
+                            directoryPathInContainer:
+                              description: ""
+                              minLength: 1
+                              type: string
+                            secretRef:
+                              description: ""
+                              maxLength: 30
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          type: object
+                      required:
+                        - authentication
+                        - endpoint
+                        - tokenKeyPair
+                      type: object
+                  type: object
+                enableSchemaExporter:
+                  description: ""
+                  type: boolean
+                externalAccess:
+                  description: ""
+                  properties:
+                    loadBalancer:
+                      description: ""
+                      properties:
+                        advertisedURL:
+                          description: ""
+                          properties:
+                            enabled:
+                              description: ""
+                              type: boolean
+                            prefix:
+                              description: ""
+                              minLength: 1
+                              type: string
+                          required:
+                            - enabled
+                          type: object
+                        annotations:
+                          additionalProperties:
+                            type: string
+                          description: ""
+                          type: object
+                          x-kubernetes-map-type: granular
+                        domain:
+                          description: ""
+                          minLength: 1
+                          type: string
+                        externalTrafficPolicy:
+                          description: ""
+                          enum:
+                            - Local
+                            - Cluster
+                          type: string
+                        labels:
+                          additionalProperties:
+                            type: string
+                          description: ""
+                          type: object
+                          x-kubernetes-map-type: granular
+                        loadBalancerSourceRanges:
+                          description: ""
+                          items:
+                            type: string
+                          type: array
+                        port:
+                          description: ""
+                          format: int32
+                          type: integer
+                        prefix:
+                          description: ""
+                          minLength: 1
+                          type: string
+                        servicePorts:
+                          description: ""
+                          items:
+                            description: ""
+                            properties:
+                              appProtocol:
+                                description: ""
+                                type: string
+                              name:
+                                description: ""
+                                type: string
+                              nodePort:
+                                description: ""
+                                format: int32
+                                type: integer
+                              port:
+                                description: ""
+                                format: int32
+                                type: integer
+                              protocol:
+                                default: TCP
+                                description: ""
+                                type: string
+                              targetPort:
+                                anyOf:
+                                  - type: integer
+                                  - type: string
+                                description: ""
+                                x-kubernetes-int-or-string: true
+                            required:
+                              - port
+                            type: object
+                          type: array
+                        sessionAffinity:
+                          description: ""
+                          enum:
+                            - ClientIP
+                            - None
+                          type: string
+                        sessionAffinityConfig:
+                          description: ""
+                          properties:
+                            clientIP:
+                              description: ""
+                              properties:
+                                timeoutSeconds:
+                                  description: ""
+                                  format: int32
+                                  type: integer
+                              type: object
+                          type: object
+                      required:
+                        - domain
+                      type: object
+                    nodePort:
+                      description: ""
+                      properties:
+                        advertisedURL:
+                          description: ""
+                          properties:
+                            enabled:
+                              description: ""
+                              type: boolean
+                            prefix:
+                              description: ""
+                              minLength: 1
+                              type: string
+                          required:
+                            - enabled
+                          type: object
+                        annotations:
+                          additionalProperties:
+                            type: string
+                          description: ""
+                          type: object
+                          x-kubernetes-map-type: granular
+                        externalTrafficPolicy:
+                          description: ""
+                          enum:
+                            - Local
+                            - Cluster
+                          type: string
+                        host:
+                          description: ""
+                          minLength: 1
+                          type: string
+                        labels:
+                          additionalProperties:
+                            type: string
+                          description: ""
+                          type: object
+                          x-kubernetes-map-type: granular
+                        nodePortOffset:
+                          description: ""
+                          format: int32
+                          minimum: 0
+                          type: integer
+                        servicePorts:
+                          description: ""
+                          items:
+                            description: ""
+                            properties:
+                              appProtocol:
+                                description: ""
+                                type: string
+                              name:
+                                description: ""
+                                type: string
+                              nodePort:
+                                description: ""
+                                format: int32
+                                type: integer
+                              port:
+                                description: ""
+                                format: int32
+                                type: integer
+                              protocol:
+                                default: TCP
+                                description: ""
+                                type: string
+                              targetPort:
+                                anyOf:
+                                  - type: integer
+                                  - type: string
+                                description: ""
+                                x-kubernetes-int-or-string: true
+                            required:
+                              - port
+                            type: object
+                          type: array
+                        sessionAffinity:
+                          description: ""
+                          enum:
+                            - ClientIP
+                            - None
+                          type: string
+                        sessionAffinityConfig:
+                          description: ""
+                          properties:
+                            clientIP:
+                              description: ""
+                              properties:
+                                timeoutSeconds:
+                                  description: ""
+                                  format: int32
+                                  type: integer
+                              type: object
+                          type: object
+                      required:
+                        - host
+                        - nodePortOffset
+                      type: object
+                    route:
+                      description: ""
+                      properties:
+                        annotations:
+                          additionalProperties:
+                            type: string
+                          description: ""
+                          type: object
+                          x-kubernetes-map-type: granular
+                        domain:
+                          description: ""
+                          minLength: 1
+                          type: string
+                        labels:
+                          additionalProperties:
+                            type: string
+                          description: ""
+                          type: object
+                          x-kubernetes-map-type: granular
+                        prefix:
+                          description: ""
+                          minLength: 1
+                          type: string
+                        wildcardPolicy:
+                          description: ""
+                          enum:
+                            - Subdomain
+                            - None
+                          type: string
+                      required:
+                        - domain
+                      type: object
+                    type:
+                      description: ""
+                      enum:
+                        - loadBalancer
+                        - nodePort
+                        - route
+                      minLength: 1
+                      type: string
+                  required:
+                    - type
+                  type: object
+                headlessService:
+                  description: ""
+                  properties:
+                    annotations:
+                      additionalProperties:
+                        type: string
+                      description: ""
+                      type: object
+                      x-kubernetes-map-type: granular
+                    labels:
+                      additionalProperties:
+                        type: string
+                      description: ""
+                      type: object
+                      x-kubernetes-map-type: granular
+                    publishNotReadyAddresses:
+                      description: ""
+                      type: boolean
+                  type: object
+                image:
+                  description: ""
+                  properties:
+                    application:
+                      description: ""
+                      pattern: .+:.+
+                      type: string
+                    init:
+                      description: ""
+                      pattern: .+:.+
+                      type: string
+                    pullPolicy:
+                      description: ""
+                      enum:
+                        - Always
+                        - Never
+                        - IfNotPresent
+                      type: string
+                    pullSecretRef:
+                      description: ""
+                      items:
+                        type: string
+                      type: array
+                  required:
+                    - application
+                    - init
+                  type: object
+                injectAnnotations:
+                  additionalProperties:
+                    type: string
+                  description: ""
+                  type: object
+                  x-kubernetes-map-type: granular
+                injectLabels:
+                  additionalProperties:
+                    type: string
+                  description: ""
+                  type: object
+                  x-kubernetes-map-type: granular
+                internalTopicReplicatorFactor:
+                  description: ""
+                  format: int32
+                  minimum: 1
+                  type: integer
+                k8sClusterDomain:
+                  description: ""
+                  type: string
+                license:
+                  description: ""
+                  properties:
+                    directoryPathInContainer:
+                      description: ""
+                      minLength: 1
+                      type: string
+                    globalLicense:
+                      description: ""
+                      type: boolean
+                    secretRef:
+                      description: ""
+                      maxLength: 30
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                      type: string
+                  type: object
+                metrics:
+                  description: ""
+                  properties:
+                    authentication:
+                      description: ""
+                      properties:
+                        type:
+                          description: ""
+                          enum:
+                            - mtls
+                          type: string
+                      required:
+                        - type
+                      type: object
+                    prometheus:
+                      description: ""
+                      properties:
+                        blacklist:
+                          items:
+                            type: string
+                          type: array
+                        rules:
+                          items:
+                            description: ""
+                            properties:
+                              attrNameSnakeCase:
+                                type: boolean
+                              cache:
+                                type: boolean
+                              help:
+                                minLength: 1
+                                type: string
+                              labels:
+                                additionalProperties:
+                                  type: string
+                                type: object
+                                x-kubernetes-map-type: granular
+                              name:
+                                minLength: 1
+                                type: string
+                              pattern:
+                                minLength: 1
+                                type: string
+                              type:
+                                minLength: 1
+                                type: string
+                              value:
+                                minLength: 1
+                                type: string
+                              valueFactor:
+                                anyOf:
+                                  - type: integer
+                                  - type: string
+                                default: 1
+                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                x-kubernetes-int-or-string: true
+                            type: object
+                          type: array
+                        whitelist:
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    tls:
+                      description: ""
+                      properties:
+                        directoryPathInContainer:
+                          description: ""
+                          minLength: 1
+                          type: string
+                        enabled:
+                          description: ""
+                          type: boolean
+                        ignoreTrustStoreConfig:
+                          description: ""
+                          type: boolean
+                        jksPassword:
+                          description: ""
+                          properties:
+                            secretRef:
+                              description: ""
+                              maxLength: 30
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          required:
+                            - secretRef
+                          type: object
+                        secretRef:
+                          description: ""
+                          maxLength: 30
+                          minLength: 1
+                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                          type: string
+                      required:
+                        - enabled
+                      type: object
+                  type: object
+                mountedSecrets:
+                  description: ""
+                  items:
+                    description: ""
+                    properties:
+                      keyItems:
+                        description: ""
+                        items:
+                          description: ""
+                          properties:
+                            key:
+                              description: ""
+                              type: string
+                            mode:
+                              description: ""
+                              format: int32
+                              type: integer
+                            path:
+                              description: ""
+                              type: string
+                          required:
+                            - key
+                            - path
+                          type: object
+                        type: array
+                      secretRef:
+                        description: ""
+                        maxLength: 30
+                        minLength: 1
+                        pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                        type: string
+                    required:
+                      - secretRef
+                    type: object
+                  type: array
+                mountedVolumes:
+                  description: ""
+                  properties:
+                    volumeMounts:
+                      description: ""
+                      items:
+                        description: ""
+                        properties:
+                          mountPath:
+                            description: ""
+                            type: string
+                          mountPropagation:
+                            description: ""
+                            type: string
+                          name:
+                            description: ""
+                            type: string
+                          readOnly:
+                            description: ""
+                            type: boolean
+                          subPath:
+                            description: ""
+                            type: string
+                          subPathExpr:
+                            description: ""
+                            type: string
+                        required:
+                          - mountPath
+                          - name
+                        type: object
+                      type: array
+                    volumes:
+                      description: ""
+                      items:
+                        description: ""
+                        properties:
+                          awsElasticBlockStore:
+                            description: ""
+                            properties:
+                              fsType:
+                                description: ""
+                                type: string
+                              partition:
+                                description: ""
+                                format: int32
+                                type: integer
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              volumeID:
+                                description: ""
+                                type: string
+                            required:
+                              - volumeID
+                            type: object
+                          azureDisk:
+                            description: ""
+                            properties:
+                              cachingMode:
+                                description: ""
+                                type: string
+                              diskName:
+                                description: ""
+                                type: string
+                              diskURI:
+                                description: ""
+                                type: string
+                              fsType:
+                                description: ""
+                                type: string
+                              kind:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                            required:
+                              - diskName
+                              - diskURI
+                            type: object
+                          azureFile:
+                            description: ""
+                            properties:
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              secretName:
+                                description: ""
+                                type: string
+                              shareName:
+                                description: ""
+                                type: string
+                            required:
+                              - secretName
+                              - shareName
+                            type: object
+                          cephfs:
+                            description: ""
+                            properties:
+                              monitors:
+                                description: ""
+                                items:
+                                  type: string
+                                type: array
+                              path:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              secretFile:
+                                description: ""
+                                type: string
+                              secretRef:
+                                description: ""
+                                properties:
+                                  name:
+                                    description: ""
+                                    type: string
+                                type: object
+                              user:
+                                description: ""
+                                type: string
+                            required:
+                              - monitors
+                            type: object
+                          cinder:
+                            description: ""
+                            properties:
+                              fsType:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              secretRef:
+                                description: ""
+                                properties:
+                                  name:
+                                    description: ""
+                                    type: string
+                                type: object
+                              volumeID:
+                                description: ""
+                                type: string
+                            required:
+                              - volumeID
+                            type: object
+                          configMap:
+                            description: ""
+                            properties:
+                              defaultMode:
+                                description: ""
+                                format: int32
+                                type: integer
+                              items:
+                                description: ""
+                                items:
+                                  description: ""
+                                  properties:
+                                    key:
+                                      description: ""
+                                      type: string
+                                    mode:
+                                      description: ""
+                                      format: int32
+                                      type: integer
+                                    path:
+                                      description: ""
+                                      type: string
+                                  required:
+                                    - key
+                                    - path
+                                  type: object
+                                type: array
+                              name:
+                                description: ""
+                                type: string
+                              optional:
+                                description: ""
+                                type: boolean
+                            type: object
+                          csi:
+                            description: ""
+                            properties:
+                              driver:
+                                description: ""
+                                type: string
+                              fsType:
+                                description: ""
+                                type: string
+                              nodePublishSecretRef:
+                                description: ""
+                                properties:
+                                  name:
+                                    description: ""
+                                    type: string
+                                type: object
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              volumeAttributes:
+                                additionalProperties:
+                                  type: string
+                                description: ""
+                                type: object
+                            required:
+                              - driver
+                            type: object
+                          downwardAPI:
+                            description: ""
+                            properties:
+                              defaultMode:
+                                description: ""
+                                format: int32
+                                type: integer
+                              items:
+                                description: ""
+                                items:
+                                  description: ""
+                                  properties:
+                                    fieldRef:
+                                      description: ""
+                                      properties:
+                                        apiVersion:
+                                          description: ""
+                                          type: string
+                                        fieldPath:
+                                          description: ""
+                                          type: string
+                                      required:
+                                        - fieldPath
+                                      type: object
+                                    mode:
+                                      description: ""
+                                      format: int32
+                                      type: integer
+                                    path:
+                                      description: ""
+                                      type: string
+                                    resourceFieldRef:
+                                      description: ""
+                                      properties:
+                                        containerName:
+                                          description: ""
+                                          type: string
+                                        divisor:
+                                          anyOf:
+                                            - type: integer
+                                            - type: string
+                                          description: ""
+                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          x-kubernetes-int-or-string: true
+                                        resource:
+                                          description: ""
+                                          type: string
+                                      required:
+                                        - resource
+                                      type: object
+                                  required:
+                                    - path
+                                  type: object
+                                type: array
+                            type: object
+                          emptyDir:
+                            description: ""
+                            properties:
+                              medium:
+                                description: ""
+                                type: string
+                              sizeLimit:
+                                anyOf:
+                                  - type: integer
+                                  - type: string
+                                description: ""
+                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                x-kubernetes-int-or-string: true
+                            type: object
+                          ephemeral:
+                            description: ""
+                            properties:
+                              volumeClaimTemplate:
+                                description: ""
+                                properties:
+                                  metadata:
+                                    description: ""
+                                    type: object
+                                  spec:
+                                    description: ""
+                                    properties:
+                                      accessModes:
+                                        description: ""
+                                        items:
+                                          type: string
+                                        type: array
+                                      dataSource:
+                                        description: ""
+                                        properties:
+                                          apiGroup:
+                                            description: ""
+                                            type: string
+                                          kind:
+                                            description: ""
+                                            type: string
+                                          name:
+                                            description: ""
+                                            type: string
+                                        required:
+                                          - kind
+                                          - name
+                                        type: object
+                                      dataSourceRef:
+                                        description: ""
+                                        properties:
+                                          apiGroup:
+                                            description: ""
+                                            type: string
+                                          kind:
+                                            description: ""
+                                            type: string
+                                          name:
+                                            description: ""
+                                            type: string
+                                        required:
+                                          - kind
+                                          - name
+                                        type: object
+                                      resources:
+                                        description: ""
+                                        properties:
+                                          limits:
+                                            additionalProperties:
+                                              anyOf:
+                                                - type: integer
+                                                - type: string
+                                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                              x-kubernetes-int-or-string: true
+                                            description: ""
+                                            type: object
+                                          requests:
+                                            additionalProperties:
+                                              anyOf:
+                                                - type: integer
+                                                - type: string
+                                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                              x-kubernetes-int-or-string: true
+                                            description: ""
+                                            type: object
+                                        type: object
+                                      selector:
+                                        description: ""
+                                        properties:
+                                          matchExpressions:
+                                            description: ""
+                                            items:
+                                              description: ""
+                                              properties:
+                                                key:
+                                                  description: ""
+                                                  type: string
+                                                operator:
+                                                  description: ""
+                                                  type: string
+                                                values:
+                                                  description: ""
+                                                  items:
+                                                    type: string
+                                                  type: array
+                                              required:
+                                                - key
+                                                - operator
+                                              type: object
+                                            type: array
+                                          matchLabels:
+                                            additionalProperties:
+                                              type: string
+                                            description: ""
+                                            type: object
+                                        type: object
+                                      storageClassName:
+                                        description: ""
+                                        type: string
+                                      volumeMode:
+                                        description: ""
+                                        type: string
+                                      volumeName:
+                                        description: ""
+                                        type: string
+                                    type: object
+                                required:
+                                  - spec
+                                type: object
+                            type: object
+                          fc:
+                            description: ""
+                            properties:
+                              fsType:
+                                description: ""
+                                type: string
+                              lun:
+                                description: ""
+                                format: int32
+                                type: integer
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              targetWWNs:
+                                description: ""
+                                items:
+                                  type: string
+                                type: array
+                              wwids:
+                                description: ""
+                                items:
+                                  type: string
+                                type: array
+                            type: object
+                          flexVolume:
+                            description: ""
+                            properties:
+                              driver:
+                                description: ""
+                                type: string
+                              fsType:
+                                description: ""
+                                type: string
+                              options:
+                                additionalProperties:
+                                  type: string
+                                description: ""
+                                type: object
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              secretRef:
+                                description: ""
+                                properties:
+                                  name:
+                                    description: ""
+                                    type: string
+                                type: object
+                            required:
+                              - driver
+                            type: object
+                          flocker:
+                            description: ""
+                            properties:
+                              datasetName:
+                                description: ""
+                                type: string
+                              datasetUUID:
+                                description: ""
+                                type: string
+                            type: object
+                          gcePersistentDisk:
+                            description: ""
+                            properties:
+                              fsType:
+                                description: ""
+                                type: string
+                              partition:
+                                description: ""
+                                format: int32
+                                type: integer
+                              pdName:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                            required:
+                              - pdName
+                            type: object
+                          gitRepo:
+                            description: ""
+                            properties:
+                              directory:
+                                description: ""
+                                type: string
+                              repository:
+                                description: ""
+                                type: string
+                              revision:
+                                description: ""
+                                type: string
+                            required:
+                              - repository
+                            type: object
+                          glusterfs:
+                            description: ""
+                            properties:
+                              endpoints:
+                                description: ""
+                                type: string
+                              path:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                            required:
+                              - endpoints
+                              - path
+                            type: object
+                          hostPath:
+                            description: ""
+                            properties:
+                              path:
+                                description: ""
+                                type: string
+                              type:
+                                description: ""
+                                type: string
+                            required:
+                              - path
+                            type: object
+                          iscsi:
+                            description: ""
+                            properties:
+                              chapAuthDiscovery:
+                                description: ""
+                                type: boolean
+                              chapAuthSession:
+                                description: ""
+                                type: boolean
+                              fsType:
+                                description: ""
+                                type: string
+                              initiatorName:
+                                description: ""
+                                type: string
+                              iqn:
+                                description: ""
+                                type: string
+                              iscsiInterface:
+                                description: ""
+                                type: string
+                              lun:
+                                description: ""
+                                format: int32
+                                type: integer
+                              portals:
+                                description: ""
+                                items:
+                                  type: string
+                                type: array
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              secretRef:
+                                description: ""
+                                properties:
+                                  name:
+                                    description: ""
+                                    type: string
+                                type: object
+                              targetPortal:
+                                description: ""
+                                type: string
+                            required:
+                              - iqn
+                              - lun
+                              - targetPortal
+                            type: object
+                          name:
+                            description: ""
+                            type: string
+                          nfs:
+                            description: ""
+                            properties:
+                              path:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              server:
+                                description: ""
+                                type: string
+                            required:
+                              - path
+                              - server
+                            type: object
+                          persistentVolumeClaim:
+                            description: ""
+                            properties:
+                              claimName:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                            required:
+                              - claimName
+                            type: object
+                          photonPersistentDisk:
+                            description: ""
+                            properties:
+                              fsType:
+                                description: ""
+                                type: string
+                              pdID:
+                                description: ""
+                                type: string
+                            required:
+                              - pdID
+                            type: object
+                          portworxVolume:
+                            description: ""
+                            properties:
+                              fsType:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              volumeID:
+                                description: ""
+                                type: string
+                            required:
+                              - volumeID
+                            type: object
+                          projected:
+                            description: ""
+                            properties:
+                              defaultMode:
+                                description: ""
+                                format: int32
+                                type: integer
+                              sources:
+                                description: ""
+                                items:
+                                  description: ""
+                                  properties:
+                                    configMap:
+                                      description: ""
+                                      properties:
+                                        items:
+                                          description: ""
+                                          items:
+                                            description: ""
+                                            properties:
+                                              key:
+                                                description: ""
+                                                type: string
+                                              mode:
+                                                description: ""
+                                                format: int32
+                                                type: integer
+                                              path:
+                                                description: ""
+                                                type: string
+                                            required:
+                                              - key
+                                              - path
+                                            type: object
+                                          type: array
+                                        name:
+                                          description: ""
+                                          type: string
+                                        optional:
+                                          description: ""
+                                          type: boolean
+                                      type: object
+                                    downwardAPI:
+                                      description: ""
+                                      properties:
+                                        items:
+                                          description: ""
+                                          items:
+                                            description: ""
+                                            properties:
+                                              fieldRef:
+                                                description: ""
+                                                properties:
+                                                  apiVersion:
+                                                    description: ""
+                                                    type: string
+                                                  fieldPath:
+                                                    description: ""
+                                                    type: string
+                                                required:
+                                                  - fieldPath
+                                                type: object
+                                              mode:
+                                                description: ""
+                                                format: int32
+                                                type: integer
+                                              path:
+                                                description: ""
+                                                type: string
+                                              resourceFieldRef:
+                                                description: ""
+                                                properties:
+                                                  containerName:
+                                                    description: ""
+                                                    type: string
+                                                  divisor:
+                                                    anyOf:
+                                                      - type: integer
+                                                      - type: string
+                                                    description: ""
+                                                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                                    x-kubernetes-int-or-string: true
+                                                  resource:
+                                                    description: ""
+                                                    type: string
+                                                required:
+                                                  - resource
+                                                type: object
+                                            required:
+                                              - path
+                                            type: object
+                                          type: array
+                                      type: object
+                                    secret:
+                                      description: ""
+                                      properties:
+                                        items:
+                                          description: ""
+                                          items:
+                                            description: ""
+                                            properties:
+                                              key:
+                                                description: ""
+                                                type: string
+                                              mode:
+                                                description: ""
+                                                format: int32
+                                                type: integer
+                                              path:
+                                                description: ""
+                                                type: string
+                                            required:
+                                              - key
+                                              - path
+                                            type: object
+                                          type: array
+                                        name:
+                                          description: ""
+                                          type: string
+                                        optional:
+                                          description: ""
+                                          type: boolean
+                                      type: object
+                                    serviceAccountToken:
+                                      description: ""
+                                      properties:
+                                        audience:
+                                          description: ""
+                                          type: string
+                                        expirationSeconds:
+                                          description: ""
+                                          format: int64
+                                          type: integer
+                                        path:
+                                          description: ""
+                                          type: string
+                                      required:
+                                        - path
+                                      type: object
+                                  type: object
+                                type: array
+                            type: object
+                          quobyte:
+                            description: ""
+                            properties:
+                              group:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              registry:
+                                description: ""
+                                type: string
+                              tenant:
+                                description: ""
+                                type: string
+                              user:
+                                description: ""
+                                type: string
+                              volume:
+                                description: ""
+                                type: string
+                            required:
+                              - registry
+                              - volume
+                            type: object
+                          rbd:
+                            description: ""
+                            properties:
+                              fsType:
+                                description: ""
+                                type: string
+                              image:
+                                description: ""
+                                type: string
+                              keyring:
+                                description: ""
+                                type: string
+                              monitors:
+                                description: ""
+                                items:
+                                  type: string
+                                type: array
+                              pool:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              secretRef:
+                                description: ""
+                                properties:
+                                  name:
+                                    description: ""
+                                    type: string
+                                type: object
+                              user:
+                                description: ""
+                                type: string
+                            required:
+                              - image
+                              - monitors
+                            type: object
+                          scaleIO:
+                            description: ""
+                            properties:
+                              fsType:
+                                description: ""
+                                type: string
+                              gateway:
+                                description: ""
+                                type: string
+                              protectionDomain:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              secretRef:
+                                description: ""
+                                properties:
+                                  name:
+                                    description: ""
+                                    type: string
+                                type: object
+                              sslEnabled:
+                                description: ""
+                                type: boolean
+                              storageMode:
+                                description: ""
+                                type: string
+                              storagePool:
+                                description: ""
+                                type: string
+                              system:
+                                description: ""
+                                type: string
+                              volumeName:
+                                description: ""
+                                type: string
+                            required:
+                              - gateway
+                              - secretRef
+                              - system
+                            type: object
+                          secret:
+                            description: ""
+                            properties:
+                              defaultMode:
+                                description: ""
+                                format: int32
+                                type: integer
+                              items:
+                                description: ""
+                                items:
+                                  description: ""
+                                  properties:
+                                    key:
+                                      description: ""
+                                      type: string
+                                    mode:
+                                      description: ""
+                                      format: int32
+                                      type: integer
+                                    path:
+                                      description: ""
+                                      type: string
+                                  required:
+                                    - key
+                                    - path
+                                  type: object
+                                type: array
+                              optional:
+                                description: ""
+                                type: boolean
+                              secretName:
+                                description: ""
+                                type: string
+                            type: object
+                          storageos:
+                            description: ""
+                            properties:
+                              fsType:
+                                description: ""
+                                type: string
+                              readOnly:
+                                description: ""
+                                type: boolean
+                              secretRef:
+                                description: ""
+                                properties:
+                                  name:
+                                    description: ""
+                                    type: string
+                                type: object
+                              volumeName:
+                                description: ""
+                                type: string
+                              volumeNamespace:
+                                description: ""
+                                type: string
+                            type: object
+                          vsphereVolume:
+                            description: ""
+                            properties:
+                              fsType:
+                                description: ""
+                                type: string
+                              storagePolicyID:
+                                description: ""
+                                type: string
+                              storagePolicyName:
+                                description: ""
+                                type: string
+                              volumePath:
+                                description: ""
+                                type: string
+                            required:
+                              - volumePath
+                            type: object
+                        required:
+                          - name
+                        type: object
+                      type: array
+                  required:
+                    - volumeMounts
+                    - volumes
+                  type: object
+                oneReplicaPerNode:
+                  description: ""
+                  type: boolean
+                passwordEncoder:
+                  description: ""
+                  properties:
+                    directoryPathInContainer:
+                      description: ""
+                      type: string
+                    secretRef:
+                      description: ""
+                      maxLength: 30
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                      type: string
+                  type: object
+                podTemplate:
+                  description: ""
+                  properties:
+                    affinity:
+                      description: ""
+                      properties:
+                        nodeAffinity:
+                          description: ""
+                          properties:
+                            preferredDuringSchedulingIgnoredDuringExecution:
+                              description: ""
+                              items:
+                                description: ""
+                                properties:
+                                  preference:
+                                    description: ""
+                                    properties:
+                                      matchExpressions:
+                                        description: ""
+                                        items:
+                                          description: ""
+                                          properties:
+                                            key:
+                                              description: ""
+                                              type: string
+                                            operator:
+                                              description: ""
+                                              type: string
+                                            values:
+                                              description: ""
+                                              items:
+                                                type: string
+                                              type: array
+                                          required:
+                                            - key
+                                            - operator
+                                          type: object
+                                        type: array
+                                      matchFields:
+                                        description: ""
+                                        items:
+                                          description: ""
+                                          properties:
+                                            key:
+                                              description: ""
+                                              type: string
+                                            operator:
+                                              description: ""
+                                              type: string
+                                            values:
+                                              description: ""
+                                              items:
+                                                type: string
+                                              type: array
+                                          required:
+                                            - key
+                                            - operator
+                                          type: object
+                                        type: array
+                                    type: object
+                                  weight:
+                                    description: ""
+                                    format: int32
+                                    type: integer
+                                required:
+                                  - preference
+                                  - weight
+                                type: object
+                              type: array
+                            requiredDuringSchedulingIgnoredDuringExecution:
+                              description: ""
+                              properties:
+                                nodeSelectorTerms:
+                                  description: ""
+                                  items:
+                                    description: ""
+                                    properties:
+                                      matchExpressions:
+                                        description: ""
+                                        items:
+                                          description: ""
+                                          properties:
+                                            key:
+                                              description: ""
+                                              type: string
+                                            operator:
+                                              description: ""
+                                              type: string
+                                            values:
+                                              description: ""
+                                              items:
+                                                type: string
+                                              type: array
+                                          required:
+                                            - key
+                                            - operator
+                                          type: object
+                                        type: array
+                                      matchFields:
+                                        description: ""
+                                        items:
+                                          description: ""
+                                          properties:
+                                            key:
+                                              description: ""
+                                              type: string
+                                            operator:
+                                              description: ""
+                                              type: string
+                                            values:
+                                              description: ""
+                                              items:
+                                                type: string
+                                              type: array
+                                          required:
+                                            - key
+                                            - operator
+                                          type: object
+                                        type: array
+                                    type: object
+                                  type: array
+                              required:
+                                - nodeSelectorTerms
+                              type: object
+                          type: object
+                        podAffinity:
+                          description: ""
+                          properties:
+                            preferredDuringSchedulingIgnoredDuringExecution:
+                              description: ""
+                              items:
+                                description: ""
+                                properties:
+                                  podAffinityTerm:
+                                    description: ""
+                                    properties:
+                                      labelSelector:
+                                        description: ""
+                                        properties:
+                                          matchExpressions:
+                                            description: ""
+                                            items:
+                                              description: ""
+                                              properties:
+                                                key:
+                                                  description: ""
+                                                  type: string
+                                                operator:
+                                                  description: ""
+                                                  type: string
+                                                values:
+                                                  description: ""
+                                                  items:
+                                                    type: string
+                                                  type: array
+                                              required:
+                                                - key
+                                                - operator
+                                              type: object
+                                            type: array
+                                          matchLabels:
+                                            additionalProperties:
+                                              type: string
+                                            description: ""
+                                            type: object
+                                        type: object
+                                      namespaceSelector:
+                                        description: ""
+                                        properties:
+                                          matchExpressions:
+                                            description: ""
+                                            items:
+                                              description: ""
+                                              properties:
+                                                key:
+                                                  description: ""
+                                                  type: string
+                                                operator:
+                                                  description: ""
+                                                  type: string
+                                                values:
+                                                  description: ""
+                                                  items:
+                                                    type: string
+                                                  type: array
+                                              required:
+                                                - key
+                                                - operator
+                                              type: object
+                                            type: array
+                                          matchLabels:
+                                            additionalProperties:
+                                              type: string
+                                            description: ""
+                                            type: object
+                                        type: object
+                                      namespaces:
+                                        description: ""
+                                        items:
+                                          type: string
+                                        type: array
+                                      topologyKey:
+                                        description: ""
+                                        type: string
+                                    required:
+                                      - topologyKey
+                                    type: object
+                                  weight:
+                                    description: ""
+                                    format: int32
+                                    type: integer
+                                required:
+                                  - podAffinityTerm
+                                  - weight
+                                type: object
+                              type: array
+                            requiredDuringSchedulingIgnoredDuringExecution:
+                              description: ""
+                              items:
+                                description: ""
+                                properties:
+                                  labelSelector:
+                                    description: ""
+                                    properties:
+                                      matchExpressions:
+                                        description: ""
+                                        items:
+                                          description: ""
+                                          properties:
+                                            key:
+                                              description: ""
+                                              type: string
+                                            operator:
+                                              description: ""
+                                              type: string
+                                            values:
+                                              description: ""
+                                              items:
+                                                type: string
+                                              type: array
+                                          required:
+                                            - key
+                                            - operator
+                                          type: object
+                                        type: array
+                                      matchLabels:
+                                        additionalProperties:
+                                          type: string
+                                        description: ""
+                                        type: object
+                                    type: object
+                                  namespaceSelector:
+                                    description: ""
+                                    properties:
+                                      matchExpressions:
+                                        description: ""
+                                        items:
+                                          description: ""
+                                          properties:
+                                            key:
+                                              description: ""
+                                              type: string
+                                            operator:
+                                              description: ""
+                                              type: string
+                                            values:
+                                              description: ""
+                                              items:
+                                                type: string
+                                              type: array
+                                          required:
+                                            - key
+                                            - operator
+                                          type: object
+                                        type: array
+                                      matchLabels:
+                                        additionalProperties:
+                                          type: string
+                                        description: ""
+                                        type: object
+                                    type: object
+                                  namespaces:
+                                    description: ""
+                                    items:
+                                      type: string
+                                    type: array
+                                  topologyKey:
+                                    description: ""
+                                    type: string
+                                required:
+                                  - topologyKey
+                                type: object
+                              type: array
+                          type: object
+                        podAntiAffinity:
+                          description: ""
+                          properties:
+                            preferredDuringSchedulingIgnoredDuringExecution:
+                              description: ""
+                              items:
+                                description: ""
+                                properties:
+                                  podAffinityTerm:
+                                    description: ""
+                                    properties:
+                                      labelSelector:
+                                        description: ""
+                                        properties:
+                                          matchExpressions:
+                                            description: ""
+                                            items:
+                                              description: ""
+                                              properties:
+                                                key:
+                                                  description: ""
+                                                  type: string
+                                                operator:
+                                                  description: ""
+                                                  type: string
+                                                values:
+                                                  description: ""
+                                                  items:
+                                                    type: string
+                                                  type: array
+                                              required:
+                                                - key
+                                                - operator
+                                              type: object
+                                            type: array
+                                          matchLabels:
+                                            additionalProperties:
+                                              type: string
+                                            description: ""
+                                            type: object
+                                        type: object
+                                      namespaceSelector:
+                                        description: ""
+                                        properties:
+                                          matchExpressions:
+                                            description: ""
+                                            items:
+                                              description: ""
+                                              properties:
+                                                key:
+                                                  description: ""
+                                                  type: string
+                                                operator:
+                                                  description: ""
+                                                  type: string
+                                                values:
+                                                  description: ""
+                                                  items:
+                                                    type: string
+                                                  type: array
+                                              required:
+                                                - key
+                                                - operator
+                                              type: object
+                                            type: array
+                                          matchLabels:
+                                            additionalProperties:
+                                              type: string
+                                            description: ""
+                                            type: object
+                                        type: object
+                                      namespaces:
+                                        description: ""
+                                        items:
+                                          type: string
+                                        type: array
+                                      topologyKey:
+                                        description: ""
+                                        type: string
+                                    required:
+                                      - topologyKey
+                                    type: object
+                                  weight:
+                                    description: ""
+                                    format: int32
+                                    type: integer
+                                required:
+                                  - podAffinityTerm
+                                  - weight
+                                type: object
+                              type: array
+                            requiredDuringSchedulingIgnoredDuringExecution:
+                              description: ""
+                              items:
+                                description: ""
+                                properties:
+                                  labelSelector:
+                                    description: ""
+                                    properties:
+                                      matchExpressions:
+                                        description: ""
+                                        items:
+                                          description: ""
+                                          properties:
+                                            key:
+                                              description: ""
+                                              type: string
+                                            operator:
+                                              description: ""
+                                              type: string
+                                            values:
+                                              description: ""
+                                              items:
+                                                type: string
+                                              type: array
+                                          required:
+                                            - key
+                                            - operator
+                                          type: object
+                                        type: array
+                                      matchLabels:
+                                        additionalProperties:
+                                          type: string
+                                        description: ""
+                                        type: object
+                                    type: object
+                                  namespaceSelector:
+                                    description: ""
+                                    properties:
+                                      matchExpressions:
+                                        description: ""
+                                        items:
+                                          description: ""
+                                          properties:
+                                            key:
+                                              description: ""
+                                              type: string
+                                            operator:
+                                              description: ""
+                                              type: string
+                                            values:
+                                              description: ""
+                                              items:
+                                                type: string
+                                              type: array
+                                          required:
+                                            - key
+                                            - operator
+                                          type: object
+                                        type: array
+                                      matchLabels:
+                                        additionalProperties:
+                                          type: string
+                                        description: ""
+                                        type: object
+                                    type: object
+                                  namespaces:
+                                    description: ""
+                                    items:
+                                      type: string
+                                    type: array
+                                  topologyKey:
+                                    description: ""
+                                    type: string
+                                required:
+                                  - topologyKey
+                                type: object
+                              type: array
+                          type: object
+                      type: object
+                    annotations:
+                      additionalProperties:
+                        type: string
+                      description: ""
+                      type: object
+                      x-kubernetes-map-type: granular
+                    envVars:
+                      description: ""
+                      items:
+                        description: ""
+                        properties:
+                          name:
+                            description: ""
+                            type: string
+                          value:
+                            description: ""
+                            type: string
+                          valueFrom:
+                            description: ""
+                            properties:
+                              configMapKeyRef:
+                                description: ""
+                                properties:
+                                  key:
+                                    description: ""
+                                    type: string
+                                  name:
+                                    description: ""
+                                    type: string
+                                  optional:
+                                    description: ""
+                                    type: boolean
+                                required:
+                                  - key
+                                type: object
+                              fieldRef:
+                                description: ""
+                                properties:
+                                  apiVersion:
+                                    description: ""
+                                    type: string
+                                  fieldPath:
+                                    description: ""
+                                    type: string
+                                required:
+                                  - fieldPath
+                                type: object
+                              resourceFieldRef:
+                                description: ""
+                                properties:
+                                  containerName:
+                                    description: ""
+                                    type: string
+                                  divisor:
+                                    anyOf:
+                                      - type: integer
+                                      - type: string
+                                    description: ""
+                                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                    x-kubernetes-int-or-string: true
+                                  resource:
+                                    description: ""
+                                    type: string
+                                required:
+                                  - resource
+                                type: object
+                              secretKeyRef:
+                                description: ""
+                                properties:
+                                  key:
+                                    description: ""
+                                    type: string
+                                  name:
+                                    description: ""
+                                    type: string
+                                  optional:
+                                    description: ""
+                                    type: boolean
+                                required:
+                                  - key
+                                type: object
+                            type: object
+                        required:
+                          - name
+                        type: object
+                      type: array
+                    labels:
+                      additionalProperties:
+                        type: string
+                      description: ""
+                      type: object
+                      x-kubernetes-map-type: granular
+                    podSecurityContext:
+                      description: ""
+                      properties:
+                        fsGroup:
+                          description: ""
+                          format: int64
+                          type: integer
+                        fsGroupChangePolicy:
+                          description: ""
+                          type: string
+                        runAsGroup:
+                          description: ""
+                          format: int64
+                          type: integer
+                        runAsNonRoot:
+                          description: ""
+                          type: boolean
+                        runAsUser:
+                          description: ""
+                          format: int64
+                          type: integer
+                        seLinuxOptions:
+                          description: ""
+                          properties:
+                            level:
+                              description: ""
+                              type: string
+                            role:
+                              description: ""
+                              type: string
+                            type:
+                              description: ""
+                              type: string
+                            user:
+                              description: ""
+                              type: string
+                          type: object
+                        seccompProfile:
+                          description: ""
+                          properties:
+                            localhostProfile:
+                              description: ""
+                              type: string
+                            type:
+                              description: ""
+                              type: string
+                          required:
+                            - type
+                          type: object
+                        supplementalGroups:
+                          description: ""
+                          items:
+                            format: int64
+                            type: integer
+                          type: array
+                        sysctls:
+                          description: ""
+                          items:
+                            description: ""
+                            properties:
+                              name:
+                                description: ""
+                                type: string
+                              value:
+                                description: ""
+                                type: string
+                            required:
+                              - name
+                              - value
+                            type: object
+                          type: array
+                        windowsOptions:
+                          description: ""
+                          properties:
+                            gmsaCredentialSpec:
+                              description: ""
+                              type: string
+                            gmsaCredentialSpecName:
+                              description: ""
+                              type: string
+                            hostProcess:
+                              description: ""
+                              type: boolean
+                            runAsUserName:
+                              description: ""
+                              type: string
+                          type: object
+                      type: object
+                    priorityClassName:
+                      description: ""
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                      type: string
+                    probe:
+                      description: ""
+                      properties:
+                        liveness:
+                          description: ""
+                          properties:
+                            failureThreshold:
+                              description: ""
+                              format: int32
+                              type: integer
+                            initialDelaySeconds:
+                              description: ""
+                              format: int32
+                              type: integer
+                            periodSeconds:
+                              description: ""
+                              format: int32
+                              type: integer
+                            successThreshold:
+                              description: ""
+                              format: int32
+                              type: integer
+                            timeoutSeconds:
+                              description: ""
+                              format: int32
+                              type: integer
+                          type: object
+                        readiness:
+                          description: ""
+                          properties:
+                            failureThreshold:
+                              description: ""
+                              format: int32
+                              type: integer
+                            initialDelaySeconds:
+                              description: ""
+                              format: int32
+                              type: integer
+                            periodSeconds:
+                              description: ""
+                              format: int32
+                              type: integer
+                            successThreshold:
+                              description: ""
+                              format: int32
+                              type: integer
+                            timeoutSeconds:
+                              description: ""
+                              format: int32
+                              type: integer
+                          type: object
+                      type: object
+                    resources:
+                      description: ""
+                      properties:
+                        limits:
+                          additionalProperties:
+                            anyOf:
+                              - type: integer
+                              - type: string
+                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                            x-kubernetes-int-or-string: true
+                          description: ""
+                          type: object
+                        requests:
+                          additionalProperties:
+                            anyOf:
+                              - type: integer
+                              - type: string
+                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                            x-kubernetes-int-or-string: true
+                          description: ""
+                          type: object
+                      type: object
+                    securityContext:
+                      description: ""
+                      properties:
+                        allowPrivilegeEscalation:
+                          description: ""
+                          type: boolean
+                        capabilities:
+                          description: ""
+                          properties:
+                            add:
+                              description: ""
+                              items:
+                                description: ""
+                                type: string
+                              type: array
+                            drop:
+                              description: ""
+                              items:
+                                description: ""
+                                type: string
+                              type: array
+                          type: object
+                        privileged:
+                          description: ""
+                          type: boolean
+                        procMount:
+                          description: ""
+                          type: string
+                        readOnlyRootFilesystem:
+                          description: ""
+                          type: boolean
+                        runAsGroup:
+                          description: ""
+                          format: int64
+                          type: integer
+                        runAsNonRoot:
+                          description: ""
+                          type: boolean
+                        runAsUser:
+                          description: ""
+                          format: int64
+                          type: integer
+                        seLinuxOptions:
+                          description: ""
+                          properties:
+                            level:
+                              description: ""
+                              type: string
+                            role:
+                              description: ""
+                              type: string
+                            type:
+                              description: ""
+                              type: string
+                            user:
+                              description: ""
+                              type: string
+                          type: object
+                        seccompProfile:
+                          description: ""
+                          properties:
+                            localhostProfile:
+                              description: ""
+                              type: string
+                            type:
+                              description: ""
+                              type: string
+                          required:
+                            - type
+                          type: object
+                        windowsOptions:
+                          description: ""
+                          properties:
+                            gmsaCredentialSpec:
+                              description: ""
+                              type: string
+                            gmsaCredentialSpecName:
+                              description: ""
+                              type: string
+                            hostProcess:
+                              description: ""
+                              type: boolean
+                            runAsUserName:
+                              description: ""
+                              type: string
+                          type: object
+                      type: object
+                    serviceAccountName:
+                      description: ""
+                      type: string
+                    terminationGracePeriodSeconds:
+                      description: ""
+                      format: int64
+                      type: integer
+                    tolerations:
+                      description: ""
+                      items:
+                        description: ""
+                        properties:
+                          effect:
+                            description: ""
+                            type: string
+                          key:
+                            description: ""
+                            type: string
+                          operator:
+                            description: ""
+                            type: string
+                          tolerationSeconds:
+                            description: ""
+                            format: int64
+                            type: integer
+                          value:
+                            description: ""
+                            type: string
+                        type: object
+                      type: array
+                    topologySpreadConstraints:
+                      description: ""
+                      items:
+                        description: ""
+                        properties:
+                          labelSelector:
+                            description: ""
+                            properties:
+                              matchExpressions:
+                                description: ""
+                                items:
+                                  description: ""
+                                  properties:
+                                    key:
+                                      description: ""
+                                      type: string
+                                    operator:
+                                      description: ""
+                                      type: string
+                                    values:
+                                      description: ""
+                                      items:
+                                        type: string
+                                      type: array
+                                  required:
+                                    - key
+                                    - operator
+                                  type: object
+                                type: array
+                              matchLabels:
+                                additionalProperties:
+                                  type: string
+                                description: ""
+                                type: object
+                            type: object
+                          maxSkew:
+                            description: ""
+                            format: int32
+                            type: integer
+                          minDomains:
+                            description: ""
+                            format: int32
+                            type: integer
+                          topologyKey:
+                            description: ""
+                            type: string
+                          whenUnsatisfiable:
+                            description: ""
+                            type: string
+                        required:
+                          - maxSkew
+                          - topologyKey
+                          - whenUnsatisfiable
+                        type: object
+                      type: array
+                  type: object
+                replicas:
+                  description: ""
+                  format: int32
+                  type: integer
+                telemetry:
+                  description: ""
+                  properties:
+                    global:
+                      description: ""
+                      type: boolean
+                  type: object
+                tls:
+                  description: ""
+                  properties:
+                    autoGeneratedCerts:
+                      description: ""
+                      type: boolean
+                    directoryPathInContainer:
+                      description: ""
+                      minLength: 1
+                      type: string
+                    ignoreTrustStoreConfig:
+                      description: ""
+                      type: boolean
+                    jksPassword:
+                      description: ""
+                      properties:
+                        secretRef:
+                          description: ""
+                          maxLength: 30
+                          minLength: 1
+                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                          type: string
+                      required:
+                        - secretRef
+                      type: object
+                    secretRef:
+                      description: ""
+                      maxLength: 30
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                      type: string
+                  type: object
+              required:
+                - image
+                - replicas
+              type: object
+            status:
+              description: ""
+              properties:
+                authorizationType:
+                  description: ""
+                  type: string
+                clusterName:
+                  description: ""
+                  type: string
+                clusterNamespace:
+                  description: ""
+                  type: string
+                conditions:
+                  description: ""
+                  items:
+                    description: ""
+                    properties:
+                      lastProbeTime:
+                        description: ""
+                        format: date-time
+                        type: string
+                      lastTransitionTime:
+                        description: ""
+                        format: date-time
+                        type: string
+                      message:
+                        description: ""
+                        type: string
+                      reason:
+                        description: ""
+                        type: string
+                      status:
+                        description: ""
+                        type: string
+                      type:
+                        description: ""
+                        type: string
+                    type: object
+                  type: array
+                currentReplicas:
+                  description: ""
+                  format: int32
+                  type: integer
+                groupId:
+                  description: ""
+                  type: string
+                internalSecrets:
+                  description: ""
+                  items:
+                    type: string
+                  type: array
+                internalTopicNames:
+                  description: ""
+                  items:
+                    type: string
+                  type: array
+                kafka:
+                  description: ""
+                  properties:
+                    authenticationType:
+                      description: ""
+                      type: string
+                    bootstrapEndpoint:
+                      description: ""
+                      type: string
+                    tls:
+                      description: ""
+                      type: boolean
+                  type: object
+                metricPrefix:
+                  description: ""
+                  type: string
+                operatorVersion:
+                  description: ""
+                  type: string
+                phase:
+                  description: ""
+                  type: string
+                rbac:
+                  description: ""
+                  properties:
+                    clusterID:
+                      description: ""
+                      type: string
+                    internalRolebindings:
+                      description: ""
+                      items:
+                        type: string
+                      type: array
+                  type: object
+                readyReplicas:
+                  description: ""
+                  format: int32
+                  type: integer
+                replicas:
+                  description: ""
+                  format: int32
+                  type: integer
+                restConfig:
+                  description: ""
+                  properties:
+                    advertisedExternalEndpoints:
+                      description: ""
+                      items:
+                        type: string
+                      type: array
+                    authenticationType:
+                      description: ""
+                      type: string
+                    externalAccessType:
+                      description: ""
+                      type: string
+                    externalEndpoint:
+                      description: ""
+                      type: string
+                    internalEndpoint:
+                      description: ""
+                      type: string
+                    tls:
+                      description: ""
+                      type: boolean
+                  type: object
+                selector:
+                  description: ""
+                  type: string
+              type: object
+          required:
+            - spec
+          type: object
+      served: true
+      storage: true
+      subresources:
+        scale:
+          labelSelectorPath: .status.selector
+          specReplicasPath: .spec.replicas
+          statusReplicasPath: .status.replicas
+        status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

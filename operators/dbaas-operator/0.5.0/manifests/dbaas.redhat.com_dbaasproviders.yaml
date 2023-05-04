@@ -1,0 +1,482 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: dbaasproviders.dbaas.redhat.com
+spec:
+  conversion:
+    strategy: Webhook
+    webhook:
+      clientConfig:
+        service:
+          name: dbaas-operator-webhook-service
+          namespace: openshift-dbaas-operator
+          path: /convert
+          port: 443
+      conversionReviewVersions:
+      - v1alpha1
+      - v1beta1
+  group: dbaas.redhat.com
+  names:
+    kind: DBaaSProvider
+    listKind: DBaaSProviderList
+    plural: dbaasproviders
+    singular: dbaasprovider
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: DBaaSProvider defines the schema for the DBaaSProvider API.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DBaaSProviderSpec defines the desired state of a DBaaSProvider
+              object.
+            properties:
+              allowsFreeTrial:
+                description: Indicates whether the provider offers free trials.
+                type: boolean
+              connectionKind:
+                description: The name of the connection's custom resource definition
+                  (CRD) as defined by the provider.
+                type: string
+              credentialFields:
+                description: Indicates what information to collect from the user interface
+                  and how to display fields in a form.
+                items:
+                  description: CredentialField defines the attributes.
+                  properties:
+                    displayName:
+                      description: A user-friendly name for this field.
+                      type: string
+                    helpText:
+                      description: Additional information about the field.
+                      type: string
+                    key:
+                      description: The name for this field.
+                      type: string
+                    required:
+                      description: Defines if the field is required or not.
+                      type: boolean
+                    type:
+                      description: 'The type of field: string, maskedstring, integer,
+                        or boolean.'
+                      type: string
+                  required:
+                  - displayName
+                  - key
+                  - required
+                  - type
+                  type: object
+                type: array
+              externalProvisionDescription:
+                description: Instructions on how to provision instances by using the
+                  database provider's web portal.
+                type: string
+              externalProvisionURL:
+                description: The URL for provisioning instances by using the database
+                  provider's web portal.
+                type: string
+              instanceKind:
+                description: The name of the instance's custom resource definition
+                  (CRD) as defined by the provider for provisioning.
+                type: string
+              instanceParameterSpecs:
+                description: Indicates what parameters to collect from the user interface,
+                  and how to display those fields in a form to provision a database
+                  instance.
+                items:
+                  description: InstanceParameterSpec indicates what parameters to
+                    collect from the user interface, and how to display those fields
+                    in a form to provision a database instance.
+                  properties:
+                    defaultValue:
+                      description: Default value for this field.
+                      type: string
+                    displayName:
+                      description: A user-friendly name for this parameter.
+                      type: string
+                    name:
+                      description: The name for this field.
+                      type: string
+                    required:
+                      description: Define if this field is required or not.
+                      type: boolean
+                    type:
+                      description: 'The type of field: string, maskedstring, integer,
+                        or boolean.'
+                      type: string
+                  required:
+                  - displayName
+                  - name
+                  - required
+                  - type
+                  type: object
+                type: array
+              inventoryKind:
+                description: The name of the inventory custom resource definition
+                  (CRD) as defined by the database provider.
+                type: string
+              provider:
+                description: Contains information about database provider and platform.
+                properties:
+                  displayDescription:
+                    description: Indicates the description text shown for a database
+                      provider within the user interface. For example, the catalog
+                      tile description.
+                    type: string
+                  displayName:
+                    description: A user-friendly name for this database provider.
+                      For example, 'MongoDB Atlas'.
+                    type: string
+                  icon:
+                    description: Indicates what icon to display on the catalog tile.
+                    properties:
+                      base64data:
+                        type: string
+                      mediatype:
+                        type: string
+                    required:
+                    - base64data
+                    - mediatype
+                    type: object
+                  name:
+                    description: The name used to specify the service binding origin
+                      parameter. For example, 'OpenShift Database Access / MongoDB
+                      Atlas'.
+                    type: string
+                required:
+                - displayDescription
+                - displayName
+                - icon
+                - name
+                type: object
+            required:
+            - allowsFreeTrial
+            - connectionKind
+            - credentialFields
+            - externalProvisionDescription
+            - externalProvisionURL
+            - instanceKind
+            - instanceParameterSpecs
+            - inventoryKind
+            - provider
+            type: object
+          status:
+            description: DBaaSProviderStatus defines the observed state of a DBaaSProvider
+              object.
+            type: object
+        type: object
+    served: true
+    storage: false
+    subresources:
+      status: {}
+  - name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: DBaaSProvider defines the schema for the DBaaSProvider API.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DBaaSProviderSpec defines the desired state of a DBaaSProvider
+              object.
+            properties:
+              allowsFreeTrial:
+                description: Indicates whether the provider offers free trials.
+                type: boolean
+              connectionKind:
+                description: The name of the connection's custom resource definition
+                  (CRD) as defined by the provider.
+                type: string
+              credentialFields:
+                description: Indicates what information to collect from the user interface
+                  and how to display fields in a form.
+                items:
+                  description: CredentialField defines the CredentialField object
+                    attributes.
+                  properties:
+                    displayName:
+                      description: A user-friendly name for this field.
+                      type: string
+                    helpText:
+                      description: Additional information about the field.
+                      type: string
+                    key:
+                      description: The name for this field.
+                      type: string
+                    required:
+                      description: Defines if the field is required or not.
+                      type: boolean
+                    type:
+                      description: 'The type of field: string, maskedstring, integer,
+                        or boolean.'
+                      type: string
+                  required:
+                  - displayName
+                  - key
+                  - required
+                  - type
+                  type: object
+                type: array
+              externalProvisionDescription:
+                description: Instructions on how to provision instances by using the
+                  database provider's web portal.
+                type: string
+              externalProvisionURL:
+                description: The URL for provisioning instances by using the database
+                  provider's web portal.
+                type: string
+              groupVersion:
+                default: dbaas.redhat.com/v1alpha1
+                description: The DBaaS API group version supported by the provider.
+                type: string
+              instanceKind:
+                description: The name of the instance's custom resource definition
+                  (CRD) as defined by the provider for provisioning.
+                type: string
+              inventoryKind:
+                description: The name of the inventory custom resource definition
+                  (CRD) as defined by the database provider.
+                type: string
+              provider:
+                description: Contains information about database provider and platform.
+                properties:
+                  displayDescription:
+                    description: Indicates the description text shown for a database
+                      provider within the user interface. For example, the catalog
+                      tile description.
+                    type: string
+                  displayName:
+                    description: A user-friendly name for this database provider.
+                      For example, 'Crunchy Bridge managed PostgreSQL'.
+                    type: string
+                  icon:
+                    description: Indicates what icon to display on the catalog tile.
+                    properties:
+                      base64data:
+                        type: string
+                      mediatype:
+                        type: string
+                    required:
+                    - base64data
+                    - mediatype
+                    type: object
+                  name:
+                    description: The name used to specify the service binding origin
+                      parameter. For example, 'OpenShift Database Access / Crunchy
+                      Bridge'.
+                    type: string
+                required:
+                - displayDescription
+                - displayName
+                - icon
+                - name
+                type: object
+              provisioningParameters:
+                additionalProperties:
+                  description: ProvisioningParameter provides information for a ProvisioningParameter
+                    object.
+                  properties:
+                    conditionalData:
+                      description: Lists of additional data containing the options
+                        or default values for the field.
+                      items:
+                        description: 'ConditionalProvisioningParameterData provides
+                          a list of available options with default values for a dropdown
+                          menu, or a list of default values entered by the user within
+                          the user interface (UI) based on the dependencies. A provisioning
+                          parameter can have many options lists and default values,
+                          depending on the dependency parameters. If options lists
+                          are present, the field displays a dropdown menu in the UI,
+                          otherwise it displays an empty field for user input. For
+                          example, you can have four different options lists for different
+                          regions: one for dedicated clusters on Google Cloud Platform
+                          (GCP), one for dedicated clusters on Amazon Web Services
+                          (AWS), one for serverless on GCP, and one for serverless
+                          on AWS.'
+                        properties:
+                          defaultValue:
+                            description: Set a default value.
+                            type: string
+                          dependencies:
+                            description: List of the dependent fields and values.
+                            items:
+                              description: FieldDependency defines the name and value
+                                of a dependency field.
+                              properties:
+                                field:
+                                  description: Name of the dependency field.
+                                  enum:
+                                  - name
+                                  - plan
+                                  - cloudProvider
+                                  - regions
+                                  - availabilityZones
+                                  - nodes
+                                  - machineType
+                                  - storageGib
+                                  - spendLimit
+                                  - teamProject
+                                  - databaseType
+                                  - dedicatedLocationLabel
+                                  - serverlessLocationLabel
+                                  - hardwareLabel
+                                  - planLabel
+                                  - spendLimitLabel
+                                  type: string
+                                value:
+                                  description: Value of the dependency field.
+                                  type: string
+                              type: object
+                            type: array
+                          options:
+                            description: Options displayed in the UI.
+                            items:
+                              description: Option defines the value and display value
+                                for an option in a dropdown menu, radio button, or
+                                checkbox.
+                              properties:
+                                displayValue:
+                                  description: Corresponding display value.
+                                  type: string
+                                value:
+                                  description: Value of the option.
+                                  type: string
+                              type: object
+                            type: array
+                        type: object
+                      type: array
+                    displayName:
+                      description: A user-friendly name for this field.
+                      type: string
+                    helpText:
+                      description: Additional information about the field.
+                      type: string
+                  required:
+                  - displayName
+                  type: object
+                description: Parameter specifications used by the user interface (UI)
+                  for provisioning a database instance.
+                type: object
+            required:
+            - allowsFreeTrial
+            - connectionKind
+            - credentialFields
+            - externalProvisionDescription
+            - externalProvisionURL
+            - groupVersion
+            - instanceKind
+            - inventoryKind
+            - provider
+            type: object
+          status:
+            description: DBaaSProviderStatus defines the observed state of DBaaSProvider
+              object.
+            properties:
+              conditions:
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource. --- This struct is intended for direct
+                    use as an array at the field path .status.conditions.  For example,
+                    \n \ttype FooStatus struct{ \t    // Represents the observations
+                    of a foo's current state. \t    // Known .status.conditions.type
+                    are: \"Available\", \"Progressing\", and \"Degraded\" \t    //
+                    +patchMergeKey=type \t    // +patchStrategy=merge \t    // +listType=map
+                    \t    // +listMapKey=type \t    Conditions []metav1.Condition
+                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
+                    protobuf:\"bytes,1,rep,name=conditions\"` \n \t    // other fields
+                    \t}"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition
+                        transitioned from one status to another. This should be when
+                        the underlying condition changed.  If that is not known, then
+                        using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating
+                        details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating
+                        the reason for the condition's last transition. Producers
+                        of specific condition types may define expected values and
+                        meanings for this field, and whether the values are considered
+                        a guaranteed API. The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        --- Many .condition.type values are consistent across resources
+                        like Available, but because arbitrary conditions can be useful
+                        (see .node.status.conditions), the ability to deconflict is
+                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

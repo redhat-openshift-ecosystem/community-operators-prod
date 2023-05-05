@@ -1,15 +1,15 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: aqua-operator.v2022.4.11
+  name: aqua-operator.v2022.4.12
   namespace: placeholder
   annotations:
     capabilities: Seamless Upgrades
     categories: Security
-    olm.skipRange: ">=1.0.2 <2022.4.11"
+    olm.skipRange: ">=1.0.2 <2022.4.12"
     description: The Aqua Security Operator runs within a Openshift cluster and provides a means to deploy and manage Aqua Security cluster and components.
     certified: "false"
-    containerImage: aquadev.azurecr.io/operator-bundle:2022.4-kbimage
+    containerImage: aquadev.azurecr.io/operator-bundle:2022.4-kbimage1
     createdAt: 2020-03-25T08:00:00Z
     support: Aqua Security, Inc.
     repository: https://github.com/aquasecurity/aqua-operator
@@ -350,8 +350,8 @@ metadata:
     operators.operatorframework.io/internal-objects: '["aquastarboards.aquasecurity.github.io","configauditreports.aquasecurity.github.io", "clusterconfigauditreports.aquasecurity.github.io"]'
 spec:
   displayName: Aqua Security Operator
-  version: 2022.4.11
-  replaces: aqua-operator.v2022.4.10
+  version: 2022.4.12
+  replaces: aqua-operator.v2022.4.11
   description: |-
     The Aqua Security Operator runs within an OpenShift cluster and provides a means to deploy and manage the Aqua Security cluster and components :
     * Server (aka “console”)
@@ -552,7 +552,7 @@ spec:
                 serviceAccountName: aqua-operator
                 containers:
                   - name: aqua-operator
-                    image: aquadev.azurecr.io/operator-bundle:2022.4-kbimage
+                    image: aquadev.azurecr.io/operator-bundle:2022.4-kbimage1
                     imagePullPolicy: Always
                     command:
                       - /manager

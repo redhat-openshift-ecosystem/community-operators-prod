@@ -8,7 +8,7 @@ metadata:
           "apiVersion": "apps.johnsnowlabs.com/v1",
           "kind": "Annotationlab",
           "metadata": {
-            "name": "annotationlab-sample"
+            "name": "annotationlab"
           },
           "spec": {
             "activelearning": {
@@ -17,7 +17,7 @@ metadata:
               "extraVolumes": "",
               "image": {
                 "repository": "johnsnowlabs/annotationlab",
-                "tag": "active-learning-4.9.0"
+                "tag": "active-learning-4.9.2"
               },
               "lifecycleHooks": ""
             },
@@ -157,7 +157,7 @@ metadata:
                 "airflow": {
                   "pullPolicy": "IfNotPresent",
                   "repository": "johnsnowlabs/annotationlab",
-                  "tag": "dataflows-4.9.0"
+                  "tag": "dataflows-4.9.2"
                 },
                 "gitSync": {
                   "pullPolicy": "IfNotPresent",
@@ -391,7 +391,8 @@ metadata:
                   "create": false
                 },
                 "rbac": {
-                  "create": false
+                  "create": false,
+                  "name": "annotationlab-postgresql"
                 },
                 "readinessProbe": {
                   "enabled": true,
@@ -478,8 +479,8 @@ metadata:
               },
               "quotas": {},
               "rbac": {
-                "create": true,
-                "createSCCRoleBinding": true
+                "create": false,
+                "createSCCRoleBinding": false
               },
               "rbacEnabled": true,
               "redis": {
@@ -493,6 +494,10 @@ metadata:
                 },
                 "resources": {},
                 "safeToEvict": true,
+                "serviceAccount": {
+                  "create": false,
+                  "name": "annotationlab-redis"
+                },
                 "terminationGracePeriodSeconds": 600
               },
               "registry": {
@@ -512,6 +517,10 @@ metadata:
                 "replicas": 1,
                 "resources": {},
                 "safeToEvict": true,
+                "serviceAccount": {
+                  "create": false,
+                  "name": "annotationlab-scheduler"
+                },
                 "serviceAccountAnnotations": {}
               },
               "secret": [],
@@ -521,6 +530,10 @@ metadata:
                 "resources": {},
                 "service": {
                   "extraAnnotations": {}
+                },
+                "serviceAccount": {
+                  "create": false,
+                  "name": "annotationlab-statsd"
                 }
               },
               "tolerations": [],
@@ -557,6 +570,10 @@ metadata:
                   "annotations": {},
                   "type": "ClusterIP"
                 },
+                "serviceAccount": {
+                  "create": false,
+                  "name": "annotationlab-webserver"
+                },
                 "serviceAccountAnnotations": {},
                 "webserverConfig": null
               },
@@ -583,6 +600,10 @@ metadata:
                 "resources": {},
                 "safeToEvict": true,
                 "serviceAccountAnnotations": {},
+                "serviceAccount": {
+                  "create": false,
+                  "name": "annotationlab-worker"
+                },
                 "terminationGracePeriodSeconds": 600
               }
             },
@@ -612,7 +633,7 @@ metadata:
                 "kubernetesdockerhub"
               ],
               "repository": "johnsnowlabs/annotationlab",
-              "tag": "4.9.0"
+              "tag": "4.9.2"
             },
             "ingress": {
               "annotations": {},
@@ -642,7 +663,7 @@ metadata:
               "extraContainers": "",
               "extraEnv": "- name: PROXY_ADDRESS_FORWARDING\n  value: \"true\"\n- name: KEYCLOAK_USER_FILE\n  value: /secrets/admincreds/user\n- name: KEYCLOAK_PASSWORD_FILE\n  value: /secrets/admincreds/password\n",
               "extraEnvFrom": "",
-              "extraInitContainers": "- name: theme-provider\n  image: johnsnowlabs/annotationlab:auth-theme-4.9.0\n  imagePullPolicy: IfNotPresent\n  command:\n    - sh\n  args:\n    - -c\n    - |\n      echo \"Copying theme...\"\n      cp -R /johnsnowlabs/* /theme\n  volumeMounts:\n    - name: theme\n      mountPath: /theme\n",
+              "extraInitContainers": "- name: theme-provider\n  image: johnsnowlabs/annotationlab:auth-theme-4.9.2\n  imagePullPolicy: IfNotPresent\n  command:\n    - sh\n  args:\n    - -c\n    - |\n      echo \"Copying theme...\"\n      cp -R /johnsnowlabs/* /theme\n  volumeMounts:\n    - name: theme\n      mountPath: /theme\n",
               "extraPorts": [],
               "extraVolumeMounts": "- name: admincreds\n  mountPath: /secrets/admincreds\n  readOnly: true\n- name: theme\n  mountPath: /opt/jboss/keycloak/themes/johnsnowlabs\n",
               "extraVolumes": "- name: admincreds\n  secret:\n    secretName: '{{ include \"annotationlab.keycloak.fullname\" . }}-admincreds'\n- name: theme\n  emptyDir: {}\n",
@@ -875,7 +896,7 @@ metadata:
                 },
                 "serviceAccount": {
                   "enabled": true,
-                  "name": "annotationlab-operator"
+                  "name": "annotationlab-postgresql"
                 },
                 "shmVolume": {
                   "chmod": {
@@ -1301,11 +1322,11 @@ metadata:
     operators.operatorframework.io/builder: operator-sdk-v1.25.3
     operatorframework.io/suggested-namespace: johnsnowlabs-operator
     categories: AI/Machine Learning
-    containerImage: registry.johnsnowlabs.com/annotationlab/annotationlab-operator:v4.9.0
+    containerImage: registry.johnsnowlabs.com/annotationlab/annotationlab-operator:v4.9.2
     marketplace.openshift.io/remote-workflow: https://marketplace.redhat.com/en-us/operators/annotationlab/pricing?utm_source=openshift_console
     marketplace.openshift.io/support-workflow: https://marketplace.redhat.com/en-us/operators/annotationlab/support?utm_source=openshift_console
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-  name: annotationlab.v4.9.0
+  name: annotationlab.v4.9.2
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -1495,7 +1516,7 @@ spec:
                 - --metrics-bind-address=127.0.0.1:8080
                 - --leader-elect
                 - --leader-election-id=annotationlab
-                image: registry.johnsnowlabs.com/annotationlab/annotationlab-operator:v4.9.0
+                image: registry.johnsnowlabs.com/annotationlab/annotationlab-operator:v4.9.2
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -1578,5 +1599,5 @@ spec:
   provider:
     name: John Snow LABS
     url: johnsnowlabs.com
-  version: 4.9.0
+  version: 4.9.2
   replaces: annotationlab.v4.8.5

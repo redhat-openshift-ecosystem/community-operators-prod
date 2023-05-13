@@ -28,7 +28,7 @@ env:
   OPP_RELEASE_INDEX_ORGANIZATION: "openshift-community-operators"
   OPP_RELEASE_INDEX_NAME: "catalog_tmp"
   OPP_MIRROR_INDEX_MULTIARCH_BASE: "registry.redhat.io/openshift4/ose-operator-registry"
-  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11"
+  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11 v4.12"
   OPP_MIRROR_INDEX_MULTIARCH_POSTFIX: "s"
   IIB_INPUT_REGISTRY_USER: "12742415|community-operators-pipeline"
   OPP_PROD: 0
@@ -251,25 +251,17 @@ jobs:
         id: op-kiwi-test-err-bundle-validate
         if: always()
         run: |
-          #echo "opp_check_err_bundle_validate=" >> $GITHUB_OUTPUT
-          echo "::set-output name=opp_check_err_bundle_validate::"
           echo "operator_sdk_version=na" >> $GITHUB_OUTPUT
           echo "operator_sdk_args=na" >> $GITHUB_OUTPUT
 
           OPP_BUNDLE_VALIDATE_FILE=/tmp/operator_sdk_bundle_validate_warnings_and_errors.txt
           if [ -f $OPP_BUNDLE_VALIDATE_FILE ] ;then
-            OPP_BUNDLE_VALIDATE_FILE_OUTPUT=$(cat $OPP_BUNDLE_VALIDATE_FILE)
-            echo $OPP_BUNDLE_VALIDATE_FILE_OUTPUT
-
-            #echo "opp_check_err_bundle_validate=<<EOF" >> $GITHUB_OUTPUT
-            #echo "$OPP_BUNDLE_VALIDATE_FILE_OUTPUT" >> $GITHUB_OUTPUT
-            #echo "EOF" >> $GITHUB_OUTPUT
-
-            OPP_BUNDLE_VALIDATE_FILE_OUTPUT="${OPP_BUNDLE_VALIDATE_FILE_OUTPUT//'%'/'%25'}"
-            OPP_BUNDLE_VALIDATE_FILE_OUTPUT="${OPP_BUNDLE_VALIDATE_FILE_OUTPUT//$'\n'/'%0A'}"
-            OPP_BUNDLE_VALIDATE_FILE_OUTPUT="${OPP_BUNDLE_VALIDATE_FILE_OUTPUT//$'\r'/'%0D'}"
-            echo "::set-output name=opp_check_err_bundle_validate::$OPP_BUNDLE_VALIDATE_FILE_OUTPUT"
-
+            delimiter="===EOF-${RANDOM}==="
+            echo "opp_check_err_bundle_validate<<${delimiter}" >> $GITHUB_OUTPUT
+            cat "$OPP_BUNDLE_VALIDATE_FILE" >> $GITHUB_OUTPUT
+            echo "${delimiter}" >> $GITHUB_OUTPUT
+          else
+            echo "opp_check_err_bundle_validate=" >> $GITHUB_OUTPUT
           fi
 
           OPP_BUNDLE_VALIDATE_INFO_FILE=/tmp/operator_sdk_bundle_validate_info.txt
@@ -335,7 +327,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13-maintenance']
+        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13']
 
       fail-fast: false
     steps:
@@ -376,7 +368,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13-maintenance']
+        index-tag: ['v4.8-db', 'v4.9-db', 'v4.10-db', 'v4.11', 'v4.12', 'v4.13']
 
       fail-fast: false
     steps:

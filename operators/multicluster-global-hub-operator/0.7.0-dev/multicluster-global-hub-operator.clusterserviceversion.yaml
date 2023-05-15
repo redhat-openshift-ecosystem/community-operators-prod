@@ -30,7 +30,7 @@ metadata:
     categories: Integration & Delivery,OpenShift Optional
     certified: "false"
     containerImage: quay.io/stolostron/multicluster-global-hub-operator:latest
-    createdAt: "2023-03-31T20:00:36Z"
+    createdAt: "2023-05-10T20:00:36Z"
     description: Manages the installation and upgrade of the Multicluster Global Hub.
     operatorframework.io/suggested-namespace: open-cluster-management
     operators.operatorframework.io/builder: operator-sdk-v1.23.0
@@ -74,11 +74,11 @@ spec:
     namespace and create the secret `storage-secret` in namespace `open-cluster-management`
     automatically. To override the secret namespace, set `TARGET_NAMESPACE` environment
     variable to the RHACM installation namespace before executing the script.\n\n-
-    Kafka needs to be installed, and you must create two sections, `spec` and `status`.
-    You need to create a secret named kafka-secret that contains the kafka access
-    information should be created in `open-cluster-management` namespace. You can
-    run the following command to create the secret: \n\n```\nkubectl create secret
-    generic transport-secret -n open-cluster-management \\\n  --from-literal=bootstrap_server=<kafka-bootstrap-server-address>
+    Kafka needs to be installed, and you must create three topics, `spec` `status`
+    and `event`. You need to create a secret named kafka-secret that contains the
+    kafka access information should be created in `open-cluster-management` namespace.
+    You can run the following command to create the secret: \n\n```\nkubectl create
+    secret generic transport-secret -n open-cluster-management \\\n  --from-literal=bootstrap_server=<kafka-bootstrap-server-address>
     \\\n  --from-literal=CA=<CA-for-kafka-server>\n```\n >_Note:_ There is a sample
     script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/transport)
     to install kafka in `kafka` namespace and create the secret `transport-secret`

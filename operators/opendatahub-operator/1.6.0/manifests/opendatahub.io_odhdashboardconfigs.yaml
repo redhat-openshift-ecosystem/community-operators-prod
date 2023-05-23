@@ -1,0 +1,136 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: odhdashboardconfigs.opendatahub.io
+spec:
+  group: opendatahub.io
+  scope: Namespaced
+  names:
+    plural: odhdashboardconfigs
+    singular: odhdashboardconfig
+    kind: OdhDashboardConfig
+  versions:
+    - name: v1alpha
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              properties:
+                dashboardConfig:
+                  type: object
+                  properties:
+                    enablement:
+                      type: boolean
+                    disableInfo:
+                      type: boolean
+                    disableSupport:
+                      type: boolean
+                    disableClusterManager:
+                      type: boolean
+                    disableTracking:
+                      type: boolean
+                    disableBYONImageStream:
+                      type: boolean
+                    disableISVBadges:
+                      type: boolean
+                    disableUserManagement:
+                      type: boolean
+                    disableProjects:
+                      type: boolean
+                    disableModelServing:
+                      type: boolean
+                    modelMetricsNamespace:
+                      type: string
+                groupsConfig:
+                  type: object
+                  required:
+                    - adminGroups
+                    - allowedGroups
+                  properties:
+                    adminGroups:
+                      type: string
+                    allowedGroups:
+                      type: string
+                notebookSizes:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - resources
+                    properties:
+                      name:
+                        type: string
+                      resources:
+                        type: object
+                        properties:
+                          requests:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                          limits:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                modelServerSizes:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - resources
+                    properties:
+                      name:
+                        type: string
+                      resources:
+                        type: object
+                        properties:
+                          requests:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                          limits:
+                            type: object
+                            properties:
+                              cpu:
+                                type: string
+                              memory:
+                                type: string
+                notebookController:
+                  type: object
+                  required:
+                    - enabled
+                  properties:
+                    enabled:
+                      type: boolean
+                    notebookNamespace:
+                      type: string
+                    pvcSize:
+                      type: string
+                    gpuSetting:
+                      description: Configure how the GPU field works on the Jupyter tile. One of 'autodetect' (default, fetches for information), 'hidden' (remove the field) or a number-string (eg '5') to specify a hardcoded 0 to that number options
+                      type: string
+                    notebookTolerationSettings:
+                      type: object
+                      properties:
+                        enabled:
+                          type: boolean
+                        key:
+                          type: string
+                    storageClassName:
+                      type: string

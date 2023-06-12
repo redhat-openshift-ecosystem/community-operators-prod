@@ -5,7 +5,7 @@ metadata:
     alm-examples: |-
       [
         {
-          "apiVersion": "operator.open-cluster-management.io/v1alpha2",
+          "apiVersion": "operator.open-cluster-management.io/v1alpha3",
           "kind": "MulticlusterGlobalHub",
           "metadata": {
             "name": "multiclusterglobalhub"
@@ -14,11 +14,7 @@ metadata:
             "dataLayer": {
               "largeScale": {
                 "kafka": {
-                  "name": "transport-secret",
                   "transportFormat": "cloudEvents"
-                },
-                "postgres": {
-                  "name": "storage-secret"
                 }
               },
               "type": "largeScale"
@@ -30,7 +26,7 @@ metadata:
     categories: Integration & Delivery,OpenShift Optional
     certified: "false"
     containerImage: quay.io/stolostron/multicluster-global-hub-operator:latest
-    createdAt: "2023-05-10T20:00:36Z"
+    createdAt: "2023-06-12T02:01:09Z"
     description: Manages the installation and upgrade of the Multicluster Global Hub.
     operatorframework.io/suggested-namespace: open-cluster-management
     operators.operatorframework.io/builder: operator-sdk-v1.23.0
@@ -43,12 +39,9 @@ spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
-    - description: MulticlusterGlobalHub is the Schema for the multiclusterglobalhubs
-        API
-      displayName: Multicluster Global Hub
-      kind: MulticlusterGlobalHub
+    - kind: MulticlusterGlobalHub
       name: multiclusterglobalhubs.operator.open-cluster-management.io
-      version: v1alpha2
+      version: v1alpha3
   description: "Multicluster Global Hub Operator defines the configuration for multicluster
     global hub installation and upgrade with one custom resource.\n\n## Prerequisites\n\n-
     Red Hat Advanced Cluster Management for Kubernetes (RHACM) 2.7 or later needs
@@ -65,23 +58,25 @@ spec:
     an instance of the MulticlusterGlobalHub resource to instantiate the Multicluster
     Global Hub.\n\nYou need to prepare:\n\n- PostgreSQL needs to be installed and
     you must create database for the multicluster global hub. You must create a secret
-    named postgresql-secret that contains the database access credential in `open-cluster-management`
-    namespace. You can run the following command to create the secret: \n\n```\nkubectl
-    create secret generic storage-secret -n open-cluster-management \\\n  --from-literal=database_uri=<postgresql-uri>
+    named multicluster-global-hub-storage that contains the database access credential
+    in `open-cluster-management` namespace. You can run the following command to create
+    the secret: \n\n```\nkubectl create secret generic multicluster-global-hub-storage
+    -n open-cluster-management \\\n  --from-literal=database_uri=<postgresql-uri>
     \\\n --from-file=ca.crt=<CA-for-postgres-server> \n```\n>_Note:_ There is a sample
     script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/storage)(Note:
     the client version of kubectl must be v1.21+) to install postgres in `hoh-postgres`
-    namespace and create the secret `storage-secret` in namespace `open-cluster-management`
-    automatically. To override the secret namespace, set `TARGET_NAMESPACE` environment
-    variable to the RHACM installation namespace before executing the script.\n\n-
-    Kafka needs to be installed, and you must create three topics, `spec` `status`
-    and `event`. You need to create a secret named kafka-secret that contains the
-    kafka access information should be created in `open-cluster-management` namespace.
-    You can run the following command to create the secret: \n\n```\nkubectl create
-    secret generic transport-secret -n open-cluster-management \\\n  --from-literal=bootstrap_server=<kafka-bootstrap-server-address>
-    \\\n  --from-literal=CA=<CA-for-kafka-server>\n```\n >_Note:_ There is a sample
-    script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/transport)
-    to install kafka in `kafka` namespace and create the secret `transport-secret`
+    namespace and create the secret `multicluster-global-hub-storage` in namespace
+    `open-cluster-management` automatically. To override the secret namespace, set
+    `TARGET_NAMESPACE` environment variable to the RHACM installation namespace before
+    executing the script.\n\n- Kafka needs to be installed, and you must create three
+    topics, `spec` `status` and `event`. You need to create a secret named multicluster-global-hub-transport
+    that contains the kafka access information should be created in `open-cluster-management`
+    namespace. You can run the following command to create the secret: \n\n```\nkubectl
+    create secret generic multicluster-global-hub-transport -n open-cluster-management
+    \\\n  --from-literal=bootstrap_server=<kafka-bootstrap-server-address> \\\n      --from-file=ca.crt=<CA-cert-for-kafka-server>
+    --from-file=client.crt=<Client-cert-for-kafka-server> --from-file=client.key=<Client-key-for-kafka-server>
+    \n```\n >_Note:_ There is a sample script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/transport)
+    to install kafka in `kafka` namespace and create the secret `multicluster-global-hub-transport`
     in namespace `open-cluster-management` automatically. To override the secret namespace,
     set `TARGET_NAMESPACE` environment variable to the RHACM installation namespace
     before executing the script.\n\nOnce an instance of the MulticlusterGlobalHub
@@ -514,6 +509,16 @@ spec:
           - patch
           - update
         - apiGroups:
+          - operator.open-cluster-management.io
+          resources:
+          - multiclusterhubs
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
           - packages.operators.coreos.com
           resources:
           - packagemanifests
@@ -635,13 +640,13 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.namespace
-                - name: OPERAND_IMAGE_MULTICLUSTER_GLOBAL_HUB_MANAGER
+                - name: RELATED_IMAGE_MULTICLUSTER_GLOBAL_HUB_MANAGER
                   value: quay.io/stolostron/multicluster-global-hub-manager:latest
-                - name: OPERAND_IMAGE_MULTICLUSTER_GLOBAL_HUB_AGENT
+                - name: RELATED_IMAGE_MULTICLUSTER_GLOBAL_HUB_AGENT
                   value: quay.io/stolostron/multicluster-global-hub-agent:latest
-                - name: OPERAND_IMAGE_GRAFANA
+                - name: RELATED_IMAGE_GRAFANA
                   value: quay.io/stolostron/grafana:2.8.0-SNAPSHOT-2023-03-06-01-52-34
-                - name: OPERAND_IMAGE_OAUTH_PROXY
+                - name: RELATED_IMAGE_OAUTH_PROXY
                   value: quay.io/stolostron/origin-oauth-proxy:4.9
                 image: quay.io/stolostron/multicluster-global-hub-operator:latest
                 livenessProbe:

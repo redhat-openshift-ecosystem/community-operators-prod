@@ -1,0 +1,281 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.1
+  creationTimestamp: null
+  name: machinepools.ocm.mobb.redhat.com
+spec:
+  group: ocm.mobb.redhat.com
+  names:
+    kind: MachinePool
+    listKind: MachinePoolList
+    plural: machinepools
+    singular: machinepool
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: MachinePool is the Schema for the machinepools API.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: MachinePoolSpec defines the desired state of MachinePool.
+            properties:
+              aws:
+                description: Represents the AWS provider specific configuration options.
+                properties:
+                  spotInstances:
+                    description: Configuration of AWS Spot Instances for this MachinePool.  This
+                      section is not valid and is ignored if the cluster is using
+                      hosted control plane.
+                    properties:
+                      enabled:
+                        description: Request spot instances when scaling up this MachinePool.  If
+                          enabled a maximum price for the spot instances may be set
+                          in spec.aws.spotInstances.maximumPrice.
+                        type: boolean
+                        x-kubernetes-validations:
+                        - message: aws.spotInstances.enabled is immutable
+                          rule: (self == oldSelf)
+                      maximumPrice:
+                        description: Maximum price to pay for spot instance. To be
+                          used with spec.aws.spotInstances.enabled. If no maximum
+                          price is set, the spot instance configuration defaults to
+                          on-demand pricing.
+                        type: integer
+                        x-kubernetes-validations:
+                        - message: aws.spotInstances.maximumPrice is immutable
+                          rule: (self == oldSelf)
+                    type: object
+                type: object
+              clusterName:
+                description: Cluster ID in OpenShift Cluster Manager by which this
+                  should be managed for.  The cluster ID can be obtained on the Clusters
+                  page for the individual cluster.  It may also be known as the 'External
+                  ID' in some CLI clients.  It shows up in the format of 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                  where the 'x' represents any alphanumeric character.
+                type: string
+                x-kubernetes-validations:
+                - message: clusterName is immutable
+                  rule: (self == oldSelf)
+              displayName:
+                description: Friendly display name as displayed in the OpenShift Cluster
+                  Manager console.  If this is empty, the metadata.name field of the
+                  parent resource is used to construct the display name.  This is
+                  limited to 15 characters as per the backend API limitation.
+                maxLength: 15
+                minLength: 4
+                type: string
+                x-kubernetes-validations:
+                - message: displayName is immutable
+                  rule: (self == oldSelf)
+              instanceType:
+                default: m5.xlarge
+                description: "Instance type to use for all nodes within this MachinePool.
+                  \ Please see the following for a list of supported instance types
+                  based on the provider type (ROSA/OSD only supported for now): \n
+                  *ROSA/OSD: https://docs.openshift.com/rosa/rosa_architecture/rosa_policy_service_definition/rosa-service-definition.html"
+                type: string
+                x-kubernetes-validations:
+                - message: instanceType is immutable
+                  rule: (self == oldSelf)
+              labels:
+                additionalProperties:
+                  type: string
+                description: Additional labels to apply to this MachinePool.  It should
+                  be noted that 'ocm.mobb.redhat.com/managed' = 'true' is automatically
+                  applied as well as 'ocm.mobb.redhat.com/name' = spec.displayName.  Both
+                  of these labels are reserved and cannot be used as part of the spec.labels
+                  field.
+                type: object
+                x-kubernetes-validations:
+                - message: ocm.mobb.redhat.com/name is a reserved label
+                  rule: '!(''ocm.mobb.redhat.com/name'' in self)'
+                - message: ocm.mobb.redhat.com/managed is a reserved label
+                  rule: '!(''ocm.mobb.redhat.com/managed'' in self)'
+              maximumNodesPerZone:
+                description: Maximum amount of nodes allowed per availability zone.  Must
+                  be greater than or equal to spec.minimumNodesPerZone.  If this field
+                  is set, autoscaling will be enabled for this machine pool.
+                type: integer
+              minimumNodesPerZone:
+                description: Minimum amount of nodes allowed per availability zone.  For
+                  single availability zone clusters, the minimum allowed is 2 per
+                  zone.  For multiple availability zone clusters, the minimum allowed
+                  is 1 per zone.  If spec.maximumNodesPerZone is also set, autoscaling
+                  will be enabled for this machine pool.
+                type: integer
+              taints:
+                description: Taints that should be applied to this machine pool.  For
+                  information please see https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/.
+                items:
+                  description: The node this Taint is attached to has the "effect"
+                    on any pod that does not tolerate the Taint.
+                  properties:
+                    effect:
+                      description: Required. The effect of the taint on pods that
+                        do not tolerate the taint. Valid effects are NoSchedule, PreferNoSchedule
+                        and NoExecute.
+                      type: string
+                    key:
+                      description: Required. The taint key to be applied to a node.
+                      type: string
+                    timeAdded:
+                      description: TimeAdded represents the time at which the taint
+                        was added. It is only written for NoExecute taints.
+                      format: date-time
+                      type: string
+                    value:
+                      description: The taint value corresponding to the taint key.
+                      type: string
+                  required:
+                  - effect
+                  - key
+                  type: object
+                type: array
+              wait:
+                default: true
+                description: Wait for the machine pool to enter a ready state.  If
+                  this is set to true, it is assumed that the operator is running
+                  in the cluster that machine pools are being controlled for.  This
+                  is due to a limitation in the OCM API which does not expose the
+                  ready state of a machine pool.  If this is set to false, the reconciler
+                  will perform a "fire and forget" approach and assume if the object
+                  is created, it will eventually be correctly reconciled.
+                type: boolean
+            type: object
+            x-kubernetes-validations:
+            - message: maximumNodesPerZone must be greater than or equal to minimumNodesPerZone
+              rule: (self.maximumNodesPerZone == 0 || self.minimumNodesPerZone <=
+                self.maximumNodesPerZone)
+          status:
+            description: MachinePoolStatus defines the observed state of MachinePool.
+            properties:
+              availabilityZones:
+                description: Represents the number of availability zones that the
+                  cluster resides in.  Used to calculate the total number of replicas.
+                items:
+                  type: string
+                type: array
+                x-kubernetes-validations:
+                - message: status.AvailabilityZoneCount is immutable
+                  rule: (self == oldSelf)
+              clusterID:
+                description: Represents the programmatic cluster ID of the cluster,
+                  as determined during reconciliation.  This is used to reduce the
+                  number of API calls to look up a cluster ID based on the cluster
+                  name.
+                type: string
+                x-kubernetes-validations:
+                - message: status.clusterID is immutable
+                  rule: (self == oldSelf)
+              conditions:
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource. --- This struct is intended for direct
+                    use as an array at the field path .status.conditions.  For example,
+                    \n type FooStatus struct{ // Represents the observations of a
+                    foo's current state. // Known .status.conditions.type are: \"Available\",
+                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
+                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
+                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
+                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition
+                        transitioned from one status to another. This should be when
+                        the underlying condition changed.  If that is not known, then
+                        using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating
+                        details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating
+                        the reason for the condition's last transition. Producers
+                        of specific condition types may define expected values and
+                        meanings for this field, and whether the values are considered
+                        a guaranteed API. The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        --- Many .condition.type values are consistent across resources
+                        like Available, but because arbitrary conditions can be useful
+                        (see .node.status.conditions), the ability to deconflict is
+                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              hosted:
+                description: Whether this cluster is using a hosted control plane.
+                type: boolean
+                x-kubernetes-validations:
+                - message: status.Hosted is immutable
+                  rule: (self == oldSelf)
+              subnets:
+                description: Represents the subnets where the cluster is provisioned.
+                items:
+                  type: string
+                type: array
+                x-kubernetes-validations:
+                - message: status.Subnets is immutable
+                  rule: (self == oldSelf)
+            type: object
+        type: object
+        x-kubernetes-validations:
+        - message: metadata.name limited to 15 characters
+          rule: (self.metadata.name.size() <= 15)
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

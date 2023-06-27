@@ -145,7 +145,7 @@ metadata:
               "gateway_address": "aqua-gateway.aqua:8443",
               "cluster_name": "aqua-secure",
               "imagePullSecret": "aqua-registry",
-              "kubebench_image": "docker.io/aquasec/kube-bench:v0.6.12"
+              "kubebench_image": "docker.io/aquasec/kube-bench:v0.6.17"
             },
             "deploy": {
               "service": "ClusterIP",
@@ -345,6 +345,63 @@ metadata:
             },
             "runAsNonRoot": false
           }
+        },
+        {
+            "apiVersion": "operator.aquasec.com/v1alpha1",
+            "kind": "AquaCloudConnector",
+            "metadata": {
+              "name": "aqua"
+            },
+            "spec": {
+              "infra": {
+                "serviceAccount": "aqua-sa",
+                "version": "2022.4"
+              },
+              "common": {
+                "imagePullSecret": "aqua -registry"
+              },
+              "deploy": {
+                "image": {
+                  "repository": "aqua-cloud-connector",
+                  "registry": "registry.aquasec.com",
+                  "tag": "<<IMAGE TAG>>"
+                },
+                "replicas": 1
+              },
+              "runAsNonRoot": false,
+              "gateway": {
+                "host": "aqua-gateway",
+                "port": "8443"
+              },
+              "login": {
+                "host": "aqua-gateway:8443",
+                "password": "<<YOUR AQUA USER PASSWORD>>",
+                "token": "<<YOUR AQUA CLOUD CONNECTOR TOKEN>>",
+                "username": "<<YOUR AQUA USER NAME>>"
+              },
+              "tunnels": [
+                {
+                  "host": "<account>.azurecr.io",
+                  "port": "443"
+                },
+                {
+                  "host": "gke.gcr.io",
+                  "port": "443"
+                },
+                {
+                  "host": "<account>.jfrog.io",
+                  "port": "443"
+                },
+                {
+                  "host": "1.1.1.1",
+                  "port": "443"
+                },
+                {
+                  "region": "us-east1",
+                  "type": "ecr"
+                }
+              ]
+            }
         }
       ]
     operators.operatorframework.io/internal-objects: '["aquastarboards.aquasecurity.github.io","configauditreports.aquasecurity.github.io", "clusterconfigauditreports.aquasecurity.github.io"]'
@@ -378,7 +435,7 @@ spec:
     Follow instructions and exmaples
     [here](https://github.com/aquasecurity/aqua-operator/blob/2022.4.0/docs/DeployOpenShiftOperator.md)
 
-  keywords: ['aqua-security', 'scanning', 'security', 'runtime-security']
+  keywords: [ 'aqua-security', 'scanning', 'security', 'runtime-security' ]
   maintainers:
     - email: support@aquasec.com
       name: Aqua Support, Aqua Security
@@ -664,3 +721,8 @@ spec:
         displayName: ConfigAuditReport
         description: For Aqua Starboard.
         group: aquakubeenforcers.operator.aquasec.com
+      - description: Aqua Security Cloud Connector Deployment with Aqua Operator
+        displayName: AquaCloudConnector
+        kind: AquaCloudConnector
+        name: aquacloudconnector.operator.aquasec.com
+        version: v1alpha1

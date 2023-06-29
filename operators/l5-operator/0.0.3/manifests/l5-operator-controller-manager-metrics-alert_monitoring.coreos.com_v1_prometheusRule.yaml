@@ -1,0 +1,12 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: bestie-alert
+spec:
+  groups:
+  - name: example
+    rules:
+    - alert: BestieImageFailureAlert
+      expr: bestie_upgrade_failure{job="l5-operator-controller-manager-metrics-service"} == 1
+      labels:
+        severity: critical

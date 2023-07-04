@@ -40,8 +40,8 @@ spec:
             properties:
               dataLayer:
                 description: 'DataLayer can be configured to use a different data
-                  layer. native: use the native data layer (default). largeScale:
-                  large scale data layer served by kafka and postgres.'
+                  layer, only support largeScale now. largeScale: large scale data
+                  layer served by kafka and postgres.'
                 properties:
                   largeScale:
                     description: LargeScale is to use kafka as transport layer and
@@ -64,7 +64,6 @@ spec:
                     description: DataLayerType specifies the type of data layer that
                       global hub stores and transports the data.
                     enum:
-                    - native
                     - largeScale
                     type: string
                 required:

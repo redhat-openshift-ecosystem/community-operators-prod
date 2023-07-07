@@ -168,7 +168,7 @@ metadata:
                   "value": "/opt/rt_tables"
                 }
               ],
-              "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.1.0",
+              "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.0.5",
               "mounts": [
                 {
                   "hostpath": "/var/lib/cni/bin",
@@ -231,7 +231,7 @@ metadata:
                   "value": "/opt/rt_tables"
                 }
               ],
-              "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.1.0",
+              "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.0.5",
               "mounts": [
                 {
                   "hostpath": "/var/lib/cni/bin",
@@ -465,11 +465,11 @@ metadata:
       ]
     capabilities: Basic Install
     categories: Networking
-    containerImage: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.1.0
-    createdAt: "2023-07-24T13:41:35Z"
+    containerImage: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.0.5
+    createdAt: "2023-07-24T13:42:54Z"
     operators.operatorframework.io/builder: operator-sdk-v1.28.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
-  name: multi-nic-cni-operator.v1.1.0
+  name: multi-nic-cni-operator.v1.0.5
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -780,7 +780,7 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.name
-                image: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.1.0
+                image: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.0.5
                 imagePullPolicy: Always
                 livenessProbe:
                   httpGet:
@@ -859,4 +859,5 @@ spec:
   maturity: alpha
   provider:
     name: Foundation Model Stack
-  version: 1.1.0
+  replaces: multi-nic-cni-operator.v1.0.4
+  version: 1.0.5

@@ -17,7 +17,7 @@ spec:
     singular: multiclusterglobalhub
   scope: Namespaced
   versions:
-  - name: v1alpha2
+  - name: v1alpha3
     schema:
       openAPIV3Schema:
         description: MulticlusterGlobalHub is the Schema for the multiclusterglobalhubs
@@ -38,18 +38,10 @@ spec:
           spec:
             description: MulticlusterGlobalHubSpec defines the desired state of MulticlusterGlobalHub
             properties:
-              aggregationLevel:
-                default: full
-                description: AggregationLevel specifies the level of aggregation leaf
-                  hubs should do before sending the information
-                enum:
-                - full
-                - minimal
-                type: string
               dataLayer:
                 description: 'DataLayer can be configured to use a different data
-                  layer. native: use the native data layer (default). largeScale:
-                  large scale data layer served by kafka and postgres.'
+                  layer, only support largeScale now. largeScale: large scale data
+                  layer served by kafka and postgres.'
                 properties:
                   largeScale:
                     description: LargeScale is to use kafka as transport layer and
@@ -58,8 +50,6 @@ spec:
                       kafka:
                         description: KafkaConfig defines the desired state of kafka
                         properties:
-                          name:
-                            type: string
                           transportFormat:
                             default: cloudEvents
                             description: TransportFormat defines the transport format
@@ -69,49 +59,21 @@ spec:
                             - cloudEvents
                             type: string
                         type: object
-                      postgres:
-                        description: LocalObjectReference contains enough information
-                          to let you locate the referenced object inside the same
-                          namespace.
-                        properties:
-                          name:
-                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                              TODO: Add other useful fields. apiVersion, kind, uid?'
-                            type: string
-                        type: object
-                    type: object
-                  native:
-                    description: Native may use a syncer to sync data from the regional
-                      hub cluster to the global hub cluster. The data is stored in
-                      the global hub kubernetes api server backed by etcd. This is
-                      not for a large scale environment.
                     type: object
                   type:
                     description: DataLayerType specifies the type of data layer that
                       global hub stores and transports the data.
                     enum:
-                    - native
                     - largeScale
                     type: string
                 required:
                 - type
                 type: object
-              enableLocalPolicies:
-                default: true
-                type: boolean
               imagePullPolicy:
                 description: Pull policy of the multicluster global hub images
                 type: string
               imagePullSecret:
                 description: Pull secret of the multicluster global hub images
-                type: string
-              messageCompressionType:
-                default: gzip
-                description: MessageCompressionType specifies the compression type
-                  of transport message between global hub and regional hubs
-                enum:
-                - gzip
-                - no-op
                 type: string
               nodeSelector:
                 additionalProperties:

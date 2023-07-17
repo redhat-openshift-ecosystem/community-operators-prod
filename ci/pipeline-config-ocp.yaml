@@ -8,12 +8,11 @@ production:
     organization: openshift-community-operators
     name: catalog_tmp
     tags:
-      - v4.8-db
-      - v4.9-db
       - v4.10-db
       - v4.11
       - v4.12
       - v4.13
+      - v4.14-rc
     latest: "v4.6"
     signature:
       enabled: 1
@@ -65,7 +64,7 @@ pipeline:
     enabled: 1
   notifications:
     slack: 1
-  package_manifest_disabled: 0
+  package_manifest_disabled: 1
 operatorhubio:
   enabled: 0
 
@@ -74,6 +73,6 @@ operatorhubio:
 #  project: operator-test-playbooks
 #  tag: master
 tools:
-  kind_version: v0.18.0
-  kind_kube_version: v1.26.3
-  operator_sdk_version: v1.8.0
+  kind_version: v0.19.0
+  kind_kube_version: v1.27.1
+  operator_sdk_version: v1.29.0

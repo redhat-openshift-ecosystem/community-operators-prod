@@ -26,23 +26,20 @@ metadata:
     categories: Integration & Delivery,OpenShift Optional
     certified: "false"
     containerImage: quay.io/stolostron/multicluster-global-hub-operator:latest
-    createdAt: "2023-06-28T07:53:07Z"
+    createdAt: "2023-06-16T07:53:07Z"
     description: Manages the installation and upgrade of the Multicluster Global Hub.
     operatorframework.io/suggested-namespace: open-cluster-management
     operators.operatorframework.io/builder: operator-sdk-v1.28.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/stolostron/multicluster-global-hub
     support: Red Hat
-  name: multicluster-global-hub-operator.v0.7.0-dev
+  name: multicluster-global-hub-operator.v1.0.0-dev
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
-    - description: MulticlusterGlobalHub is the Schema for the multiclusterglobalhubs
-        API
-      displayName: Multicluster Global Hub
-      kind: MulticlusterGlobalHub
+    - kind: MulticlusterGlobalHub
       name: multiclusterglobalhubs.operator.open-cluster-management.io
       version: v1alpha3
   description: "Multicluster Global Hub Operator defines the configuration for multicluster
@@ -803,4 +800,4 @@ spec:
   provider:
     name: Red Hat, Inc
     url: https://github.com/stolostron/multicluster-global-hub
-  version: 0.7.0-dev
+  version: 1.0.0-dev

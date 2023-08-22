@@ -168,7 +168,7 @@ metadata:
                   "value": "/opt/rt_tables"
                 }
               ],
-              "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.0.4",
+              "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.2.0",
               "mounts": [
                 {
                   "hostpath": "/var/lib/cni/bin",
@@ -231,7 +231,7 @@ metadata:
                   "value": "/opt/rt_tables"
                 }
               ],
-              "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.0.4",
+              "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.2.0",
               "mounts": [
                 {
                   "hostpath": "/var/lib/cni/bin",
@@ -465,11 +465,11 @@ metadata:
       ]
     capabilities: Basic Install
     categories: Networking
-    containerImage: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.0.4
-    createdAt: "2023-08-22T12:55:21Z"
+    containerImage: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.2.0
+    createdAt: "2023-08-22T12:37:53Z"
     operators.operatorframework.io/builder: operator-sdk-v1.28.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
-  name: multi-nic-cni-operator.v1.0.4
+  name: multi-nic-cni-operator.v1.2.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -662,6 +662,17 @@ spec:
           - patch
           - update
         - apiGroups:
+          - mellanox.com
+          resources:
+          - hostdevicenetworks
+          - nicclusterpolicies
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - watch
+        - apiGroups:
           - ""
           resources:
           - pods
@@ -780,7 +791,7 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.name
-                image: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.0.4
+                image: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.2.0
                 imagePullPolicy: Always
                 livenessProbe:
                   httpGet:
@@ -836,9 +847,9 @@ spec:
         serviceAccountName: multi-nic-cni-operator-controller-manager
     strategy: deployment
   installModes:
-  - supported: false
+  - supported: true
     type: OwnNamespace
-  - supported: false
+  - supported: true
     type: SingleNamespace
   - supported: false
     type: MultiNamespace
@@ -859,5 +870,5 @@ spec:
   maturity: alpha
   provider:
     name: Foundation Model Stack
-  replaces: multi-nic-cni-operator.v1.0.3
-  version: 1.0.4
+  replaces: multi-nic-cni-operator.v1.1.0
+  version: 1.2.0

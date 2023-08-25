@@ -21,7 +21,7 @@ on:
       index:
         description: 'Target index (as a JSON list, e.g. ["v4.10-db", "v4.11"])'
         required: true
-        default: '["v4.10-db", "v4.11", "v4.12", "v4.13", "v4.14-rc"]'
+        default: '["v4.10-db", "v4.11", "v4.12", "v4.13", "v4.14-rc", "v4.15-rc"]'
 
       list_of_operators:
         description: 'List of operators to be synced in the index, list has to be devided by spaces (e.g. aqua ripsaw)'
@@ -57,7 +57,7 @@ env:
   OPP_MIRROR_INDEX_NAME: "redhat----community-operator-index"
   OPP_MIRROR_INDEX_ENABLED: "1"
   OPP_MIRROR_INDEX_MULTIARCH_BASE: "registry.redhat.io/openshift4/ose-operator-registry"
-  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11 v4.12"
+  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11 v4.12 v4.13"
   OPP_MIRROR_INDEX_MULTIARCH_POSTFIX: "s"
   IIB_INPUT_REGISTRY_USER: "12742415|community-operators-pipeline"
   OPP_REGISTRY_MIRROR_USER: "redhat+iib_community"
@@ -208,7 +208,7 @@ jobs:
           OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPP_IIB_INSTALL: 0
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-          OPERATOR_INDEX_TAG: "orange_v4.10 orange_v4.11 orange_v4.12 orange_v4.13 orange_v4.14"
+          OPERATOR_INDEX_TAG: "orange_v4.10 orange_v4.11 orange_v4.12 orange_v4.13 orange_v4.14 orange_v4.15"
 
           OPP_INDEX_CHECK_ONLY: 1
         run: |
@@ -229,6 +229,7 @@ jobs:
           echo "Operators (v4.12) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_12 }}"
           echo "Operators (v4.13) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_13 }}"
           echo "Operators (v4.14) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_14 }}"
+          echo "Operators (v4.15) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_15 }}"
 
       - name: Operator info
         id: op-info
@@ -272,6 +273,7 @@ jobs:
       opp_uncomplete_operators_v4_12: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_12 }}"
       opp_uncomplete_operators_v4_13: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_13 }}"
       opp_uncomplete_operators_v4_14: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_14 }}"
+      opp_uncomplete_operators_v4_15: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_15 }}"
 
   bundles-ocp:
     name: "Bundles / ocp"

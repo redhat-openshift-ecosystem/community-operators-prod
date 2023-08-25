@@ -21,7 +21,7 @@ env:
   OPP_MIRROR_LATEST_TAG: "v4.6"
   OPP_PRODUCTION_TYPE: "ocp"
   OPP_MIRROR_INDEX_MULTIARCH_BASE: "registry.redhat.io/openshift4/ose-operator-registry"
-  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11 v4.12"
+  OPP_MULTIARCH_SUPPORTED_VERSIONS: "v4.5 v4.6 v4.7 v4.8 v4.9 v4.10 v4.11 v4.12 v4.13"
   OPP_MIRROR_INDEX_MULTIARCH_POSTFIX: "s"
   OPP_MIRROR_INDEX_REGISTRY: "quay.io"
   OPP_MIRROR_INDEX_ORGANIZATION: "redhat"
@@ -51,7 +51,7 @@ jobs:
     timeout-minutes: 3600
     strategy:
       matrix:
-        index-tag: [ v4.10-db, v4.11, v4.12, v4.13, v4.14-rc ]
+        index-tag: [ v4.10-db, v4.11, v4.12, v4.13, v4.14-rc, v4.15-rc ]
 
       fail-fast: false
     steps:

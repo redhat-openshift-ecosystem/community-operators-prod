@@ -539,6 +539,138 @@ spec:
           - update
           - patch
         serviceAccountName: forklift-operator
+      - rules:
+        - apiGroups:
+          - forklift.konveyor.io
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - secrets
+          - namespaces
+          - events
+          - configmaps
+          - persistentvolumes
+          - persistentvolumeclaims
+          - services
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - batch
+          resources:
+          - jobs
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        - apiGroups:
+          - k8s.cni.cncf.io
+          resources:
+          - network-attachment-definitions
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - storage.k8s.io
+          resources:
+          - storageclasses
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - kubevirt.io
+          resources:
+          - virtualmachines
+          - virtualmachines/finalizers
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - cdi.kubevirt.io
+          resources:
+          - datavolumes
+          - datavolumes/finalizers
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - anyuid
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        - apiGroups:
+          - template.openshift.io
+          resources:
+          - templates
+          verbs:
+          - get
+          - list
+        - apiGroups:
+          - export.kubevirt.io
+          resources:
+          - virtualmachineexports
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        serviceAccountName: forklift-populator-controller
       deployments:
       - label:
           control-plane: controller-manager

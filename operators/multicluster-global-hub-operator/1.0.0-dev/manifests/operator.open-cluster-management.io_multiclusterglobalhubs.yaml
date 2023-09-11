@@ -17,7 +17,7 @@ spec:
     singular: multiclusterglobalhub
   scope: Namespaced
   versions:
-  - name: v1alpha3
+  - name: v1alpha4
     schema:
       openAPIV3Schema:
         description: MulticlusterGlobalHub is the Schema for the multiclusterglobalhubs
@@ -36,38 +36,56 @@ spec:
           metadata:
             type: object
           spec:
+            default:
+              dataLayer:
+                kafka:
+                  transportFormat: cloudEvents
+                postgres:
+                  retention: 18m
             description: MulticlusterGlobalHubSpec defines the desired state of MulticlusterGlobalHub
             properties:
+              availabilityConfig:
+                default: High
+                description: 'Specifies deployment replication for improved availability.
+                  Options are: Basic and High (default)'
+                type: string
               dataLayer:
-                description: 'DataLayer can be configured to use a different data
-                  layer, only support largeScale now. largeScale: large scale data
-                  layer served by kafka and postgres.'
+                default:
+                  kafka:
+                    transportFormat: cloudEvents
+                  postgres:
+                    retention: 18m
+                description: DataLayer can be configured to use a different data layer.
                 properties:
-                  largeScale:
-                    description: LargeScale is to use kafka as transport layer and
-                      use postgres as data layer This is for a large scale environment.
+                  kafka:
+                    default:
+                      transportFormat: cloudEvents
+                    description: KafkaConfig defines the desired state of kafka
                     properties:
-                      kafka:
-                        description: KafkaConfig defines the desired state of kafka
-                        properties:
-                          transportFormat:
-                            default: cloudEvents
-                            description: TransportFormat defines the transport format
-                              for kafka, which is either cloudEvents or kafka message
-                            enum:
-                            - message
-                            - cloudEvents
-                            type: string
-                        type: object
+                      transportFormat:
+                        default: cloudEvents
+                        description: TransportFormat defines the transport format
+                          for kafka, which is either cloudEvents or kafka message
+                        enum:
+                        - message
+                        - cloudEvents
+                        type: string
                     type: object
-                  type:
-                    description: DataLayerType specifies the type of data layer that
-                      global hub stores and transports the data.
-                    enum:
-                    - largeScale
-                    type: string
-                required:
-                - type
+                  postgres:
+                    default:
+                      retention: 18m
+                    description: PostgresConfig defines the desired state of postgres
+                    properties:
+                      retention:
+                        default: 18m
+                        description: Retention is a duration string. Which defines
+                          how long to keep the data in the database. Recommended minimum
+                          value is 1 month, default value is 18 months. A duration
+                          string is a possibly signed sequence of decimal numbers,
+                          each with optional fraction and a unit suffix, such as "1y6m".
+                          Valid time units are "m" and "y".
+                        type: string
+                    type: object
                 type: object
               imagePullPolicy:
                 description: Pull policy of the multicluster global hub images

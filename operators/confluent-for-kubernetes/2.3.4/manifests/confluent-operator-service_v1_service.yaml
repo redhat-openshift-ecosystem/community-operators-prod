@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: confluent-for-kubernetes
+    app.kubernetes.io/name: confluent-for-kubernetes
+    app.kubernetes.io/instance: confluent-operator
+    app.kubernetes.io/component: "confluent-operator"
+  name: confluent-operator
+spec:
+  ports:
+    - name: http-metric
+      port: 7778
+      protocol: TCP
+      targetPort: 7778
+  selector:
+    app: "confluent-operator"
+    app.kubernetes.io/name: "confluent-operator"
+  type: ClusterIP

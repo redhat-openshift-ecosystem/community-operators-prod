@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    control-plane: cert-utils-operator
+  name: cert-utils-operator-controller-manager-metrics-monitor
+spec:
+  endpoints:
+  - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    interval: 30s
+    port: https
+    scheme: https
+    tlsConfig:
+      ca:
+        secret:
+          key: tls.crt
+          name: cert-utils-operator-certs
+          optional: false
+      serverName: cert-utils-operator-controller-manager-metrics-service.cert-utils-operator.svc
+  selector:
+    matchLabels:
+      control-plane: cert-utils-operator

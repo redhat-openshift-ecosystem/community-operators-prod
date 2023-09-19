@@ -8,11 +8,12 @@ production:
     organization: openshift-community-operators
     name: catalog_tmp
     tags:
-      - v4.8-db
-      - v4.9-db
       - v4.10-db
       - v4.11
       - v4.12
+      - v4.13
+      - v4.14-rc
+      - v4.15-rc
     latest: "v4.6"
     signature:
       enabled: 1
@@ -30,6 +31,8 @@ production:
         - v4.9
         - v4.10
         - v4.11
+        - v4.12
+        - v4.13
       postfix: s
     registry: quay.io
 #    organization: community-operators-backup
@@ -37,14 +40,14 @@ production:
     organization: redhat
     name: redhat----community-operator-index
     username:
-      in: mavala
+      in: 12742415|community-operators-pipeline
 #      out: framework_automation
       out: redhat+iib_community
   test:
     installation_skip:
       - ack-
       - community-windows-machine-config-operator
-      
+
 pipeline:
   base: https://github.com
   repo: redhat-openshift-ecosystem/community-operators-prod
@@ -54,13 +57,16 @@ pipeline:
   playbooks:
     repo: https://github.com/redhat-openshift-ecosystem/operator-test-playbooks
     branch: "upstream-community"
+  assignees:
+    - mporrato
+    - Allda
   automerge:
     enabled: 1
   reviewers:
     enabled: 1
   notifications:
     slack: 1
-
+  package_manifest_disabled: 1
 operatorhubio:
   enabled: 0
 
@@ -69,6 +75,6 @@ operatorhubio:
 #  project: operator-test-playbooks
 #  tag: master
 tools:
-  kind_version: v0.16.0
-  kind_kube_version: v1.22.7
-  operator_sdk_version: v1.8.0
+  kind_version: v0.20.0
+  kind_kube_version: v1.27.2
+  operator_sdk_version: v1.31.0

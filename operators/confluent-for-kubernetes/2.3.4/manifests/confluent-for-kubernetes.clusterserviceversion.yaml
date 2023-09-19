@@ -1,0 +1,605 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    olm.skipRange: ">=2.2.0 <2.3.4"
+    operators.openshift.io/infrastructure-features: '["disconnected"]'
+    operators.openshift.io/valid-subscription: '["Confluent Platform License"]'
+    capabilities: Auto Pilot
+    categories: "Streaming & Messaging"
+    containerImage: docker.io/confluentinc/confluent-operator@sha256:b5b278a043c79b2da86acfa9bd60dd4d6e3d8989caf24f303af9a05b916c519f
+    support: Confluent, Inc.
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "platform.confluent.io/v1beta1",
+          "kind": "Zookeeper",
+          "metadata": {
+            "name": "zookeeper"
+          },
+          "spec": {
+            "replicas": 3,
+            "image": {
+              "application": "confluentinc/cp-zookeeper@sha256:71c476d6c5d6a82b1e1b42055f6693f1f4789a95ecbb5c8bb2b437655742c819",
+              "init": "confluentinc/confluent-init-container@sha256:12d8c4ece587e5671602bca9b6c109f919771649eb8bb53d8cd0e2ff83abc185"
+            },
+            "dataVolumeCapacity": "10Gi",
+            "logVolumeCapacity": "10Gi"
+          }
+        },
+        {
+          "apiVersion": "platform.confluent.io/v1beta1",
+          "kind": "Kafka",
+          "metadata": {
+            "name": "kafka"
+          },
+          "spec": {
+            "replicas": 3,
+            "image": {
+              "application": "confluentinc/docker.io/confluentinc/cp-server@sha256:89ae87a6a366ba2aea2d95388e33f09fde2eda33eb4f55bf3f256aa0c661240f",
+              "init": "confluentinc/confluent-init-container@sha256:12d8c4ece587e5671602bca9b6c109f919771649eb8bb53d8cd0e2ff83abc185"
+            },
+            "dataVolumeCapacity": "10Gi",
+            "metricReporter": {"enabled": true}
+          }
+        },
+        {
+          "apiVersion": "platform.confluent.io/v1beta1",
+          "kind": "KafkaRestProxy",
+          "metadata": {
+            "name": "kafkarestproxy"
+          },
+          "spec": {
+            "replicas": 3,
+            "image": {
+              "application": "confluentinc/cp-kafka-rest@sha256:b797b1e3baa7075f7322c785319edc68596cad5f834cc5c44a5d9d58d7bb66bb",
+              "init": "confluentinc/confluent-init-container@sha256:12d8c4ece587e5671602bca9b6c109f919771649eb8bb53d8cd0e2ff83abc185"
+            },
+            "metricReporter": {"enabled": true}
+          }
+        },
+        {
+          "apiVersion": "platform.confluent.io/v1beta1",
+          "kind": "Connect",
+          "metadata": {
+            "name": "connect"
+          },
+          "spec": {
+            "replicas": 1,
+            "image": {
+              "application": "confluentinc/cp-server-connect@sha256:90cece568a8502135c9c808cca9b73d087ee6ee9ab20e8024b7b2556d4dfd68e",
+              "init": "confluentinc/confluent-init-container@sha256:12d8c4ece587e5671602bca9b6c109f919771649eb8bb53d8cd0e2ff83abc185"
+            },
+            "dependencies": {
+              "kafka": {
+                "bootstrapEndpoint": "kafka:9071"
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "platform.confluent.io/v1beta1",
+          "kind": "KsqlDB",
+          "metadata": {
+            "name": "ksqldb"
+          },
+          "spec": {
+            "replicas": 1,
+            "image": {
+              "application": "confluentinc/cp-ksqldb-server@sha256:cf47fd558d55a28134e6ff8fa314cbfcafd625127eb505125f15d7b54531fa54",
+              "init": "confluentinc/confluent-init-container@sha256:12d8c4ece587e5671602bca9b6c109f919771649eb8bb53d8cd0e2ff83abc185"
+            },
+            "dataVolumeCapacity": "10Gi"
+          }
+        },
+        {
+          "apiVersion": "platform.confluent.io/v1beta1",
+          "kind": "ControlCenter",
+          "metadata": {
+            "name": "controlcenter"
+          },
+          "spec": {
+            "replicas": 1,
+            "image": {
+              "application": "confluentinc/cp-enterprise-control-center@sha256:ef7ccb79a03fe80c654881e607fe0f606407de0282927cbf768326d1b78b50a9",
+              "init": "confluentinc/confluent-init-container@sha256:12d8c4ece587e5671602bca9b6c109f919771649eb8bb53d8cd0e2ff83abc185"
+            },
+            "dataVolumeCapacity": "10Gi",
+            "dependencies": {
+              "schemaRegistry": {
+                "url": "http://schemaregistry.confluent.svc.cluster.local:8081"
+              },
+              "ksqldb": [
+                {
+                  "name": "ksqldb",
+                  "url": "http://ksqldb.confluent.svc.cluster.local:8088"
+                }
+              ],
+              "connect": [
+                {
+                  "name": "connect",
+                  "url": "http://connect.confluent.svc.cluster.local:8083"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "apiVersion": "platform.confluent.io/v1beta1",
+          "kind": "SchemaRegistry",
+          "metadata": {
+            "name": "schemaregistry"
+          },
+          "spec": {
+            "replicas": 1,
+            "image": {
+              "application": "confluentinc/cp-schema-registry@sha256:f868c489323760a971923fd26b35657da7612a54b1d2594550714db7548405f3",
+              "init": "confluentinc/confluent-init-container@sha256:12d8c4ece587e5671602bca9b6c109f919771649eb8bb53d8cd0e2ff83abc185"
+            }
+          }
+        }
+      ]
+  name: confluent-for-kubernetes.v2.3.4
+spec:
+  displayName: Confluent for Kubernetes
+  description: >-
+    Confluent for Kubernetes (CFK) is a cloud-native control plane for deploying and managing
+    Confluent in your private cloud environment. It provides standard and simple interface to
+    customize, deploy, and manage Confluent Platform through declarative API.
+
+    The 2.3.3 version of the package installs CFK 2.3.4 and 7.1.x CP. It has been minified to
+    remove less-commonly-used CRDs to fit into the OLM max bundle size for OpenShift <=4.8:
+    https://github.com/redhat-openshift-ecosystem/certified-operators/issues/552. Field
+    descriptions have also all been removed; these are documented here:
+    https://docs.confluent.io/operator/2.3/co-api.html
+
+    Confluent for Kubernetes runs on Kubernetes, the runtime for private cloud architectures.
+  keywords:
+    - Confluent
+    - Kafka
+    - Kubernetes
+    - Private Cloud
+    - Cloud-Native
+    - Event Streaming
+    - Data in Motion
+  maintainers:
+    - email: jlee@confluent.io
+      name: Justin Lee
+  provider:
+    name: Confluent, Inc.
+    url: https://confluent.io
+  version: "2.3.4"
+  links:
+  - name: Documentation
+    url: https://docs.confluent.io/operator/current/overview.html
+  - name: Examples and Tutorials
+    url: https://github.com/confluentinc/confluent-kubernetes-examples
+  - name: Product Overview (Blog)
+    url: https://www.confluent.io/blog/confluent-for-kubernetes-offers-cloud-native-kafka-automation/
+  maturity: stable
+  relatedImages:
+    - name: confluent-operator
+      image: docker.io/confluentinc/confluent-operator@sha256:b5b278a043c79b2da86acfa9bd60dd4d6e3d8989caf24f303af9a05b916c519f
+    - name: confluent-init-container
+      image: docker.io/confluentinc/confluent-init-container@sha256:12d8c4ece587e5671602bca9b6c109f919771649eb8bb53d8cd0e2ff83abc185
+    - name: cp-zookeeper
+      image: docker.io/confluentinc/cp-zookeeper@sha256:71c476d6c5d6a82b1e1b42055f6693f1f4789a95ecbb5c8bb2b437655742c819
+    - name: cp-server
+      image: docker.io/confluentinc/docker.io/confluentinc/cp-server@sha256:89ae87a6a366ba2aea2d95388e33f09fde2eda33eb4f55bf3f256aa0c661240f
+    - name: cp-kafka-rest
+      image: docker.io/confluentinc/cp-kafka-rest@sha256:b797b1e3baa7075f7322c785319edc68596cad5f834cc5c44a5d9d58d7bb66bb
+    - name: cp-ksqldb-server
+      image: docker.io/confluentinc/cp-ksqldb-server@sha256:cf47fd558d55a28134e6ff8fa314cbfcafd625127eb505125f15d7b54531fa54
+    - name: cp-schema-registry
+      image: docker.io/confluentinc/cp-schema-registry@sha256:f868c489323760a971923fd26b35657da7612a54b1d2594550714db7548405f3
+    - name: cp-server-connect
+      image: docker.io/confluentinc/cp-server-connect@sha256:90cece568a8502135c9c808cca9b73d087ee6ee9ab20e8024b7b2556d4dfd68e
+    - name: cp-enterprise-control-center
+      image: docker.io/confluentinc/cp-enterprise-control-center@sha256:ef7ccb79a03fe80c654881e607fe0f606407de0282927cbf768326d1b78b50a9
+  customresourcedefinitions:
+    owned:
+    - description: >-
+        Placeholder; removed for Openshift <= 4.8
+      displayName: Schema Exporter
+      kind: SchemaExporter
+      name: schemaexporters.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        Cluster Links are lightweight, persistent bridges that enable you to
+        seamlessly move data between clusters.
+      displayName: Cluster Link
+      kind: ClusterLink
+      name: clusterlinks.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        Placeholder; removed for Openshift <= 4.8
+      displayName: Confluent Role Binding
+      kind: ConfluentRolebinding
+      name: confluentrolebindings.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        Placeholder; removed for Openshift <= 4.8
+      displayName: Connector
+      kind: Connector
+      name: connectors.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        Connect enables you to easily stream data from common data sources to Confluent
+        and to stream data from Confluent to common data stores
+      displayName: Connect
+      kind: Connect
+      name: connects.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        Confluent Control Center is a web-based UI for managing and monitoring Confluent
+      displayName: Control Center
+      kind: ControlCenter
+      name: controlcenters.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        Kafka REST Class encapsulates authentication information for any Confluent Kafka
+        REST API. Instances of Kafka REST Class are referenced in other Confluent resources
+        such as Topics, to control how and where Topics are created when using Confluent for
+        Kubernetes to manage topics.
+      displayName: Kafka REST Class
+      kind: KafkaRestClass
+      name: kafkarestclasses.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        Placeholder; removed for Openshift <= 4.8
+      displayName: Confluent REST Proxy
+      kind: KafkaRestProxy
+      name: kafkarestproxies.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        A Kafka cluster is the central component of the Confluent data streaming platform,
+        enabling you to easily access, store, and manage data as continuous, real-time streams.
+      displayName: Kafka
+      kind: Kafka
+      name: kafkas.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        The primary unit of data in Kafka is the Event or Message. Events are organized and
+        durably stored into Topics.
+      displayName: Topic
+      kind: KafkaTopic
+      name: kafkatopics.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        Placeholder; removed for Openshift <= 4.8
+      displayName: ksqlDB
+      kind: KsqlDB
+      name: ksqldbs.platform.confluent.io
+      version: v1beta1
+    - description: Placeholder; removed for Openshift <= 4.8
+      displayName: Migration Job
+      kind: MigrationJob
+      name: migrationjobs.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        Confluent Schema Registry provides a serving layer for your metadata. It provides a
+        RESTful interface for storing and retrieving your Avro®, JSON Schema, and Protobuf
+        schemas, so that you can work with structured Event data in your Kafka Topics.
+      displayName: Schema Registry
+      kind: SchemaRegistry
+      name: schemaregistries.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        Placeholder; removed for Openshift <= 4.8
+      displayName: Schema
+      kind: Schema
+      name: schemas.platform.confluent.io
+      version: v1beta1
+    - description: >-
+        A ZooKeeper cluster is a dependency for deploying a Kafka cluster, and is used to store
+        metadata about the Kafka cluster and its clients.
+      displayName: ZooKeeper
+      kind: Zookeeper
+      name: zookeepers.platform.confluent.io
+      version: v1beta1
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: true
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  icon:
+  - base64data: "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"
+    mediatype: "image/png"
+  install:
+    strategy: deployment
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - cluster.confluent.com
+          resources:
+          - zookeeperclusters
+          - zookeeperclusters/status
+          - zookeeperclusters/scale
+          - zookeeperclusters/finalizers
+          - kafkaclusters
+          - kafkaclusters/status
+          - kafkaclusters/scale
+          - kafkaclusters/finalizers
+          verbs:
+          - '*'
+        - apiGroups:
+          - operator.confluent.cloud
+          resources:
+          - physicalstatefulclusters
+          - physicalstatefulclusters/scale
+          - physicalstatefulclusters/status
+          - physicalstatefulclusters/finalizers
+          verbs:
+          - '*'
+        - apiGroups:
+          - platform.confluent.io
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - policy
+          resources:
+          - poddisruptionbudgets
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          - routes/custom-host
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - apps
+          resources:
+          - statefulsets
+          - statefulsets/scale
+          - statefulsets/status
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - persistentvolumeclaims
+          - secrets
+          - secrets/finalizers
+          - pods
+          - services
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingresses
+          - ingresses/status
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+        serviceAccountName: confluent-for-kubernetes
+      deployments:
+      - name: confluent-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: "confluent-operator"
+              app.kubernetes.io/instance: confluent-operator
+          strategy:
+            rollingUpdate:
+              maxSurge: 1
+              maxUnavailable: 0
+            type: RollingUpdate
+          template:
+            metadata:
+              annotations:
+                prometheus.io/path: "/metrics"
+                prometheus.io/port: "7778"
+                prometheus.io/scrape: "true"
+              labels:
+                app: "confluent-operator"
+                app.kubernetes.io/name: "confluent-operator"
+                app.kubernetes.io/instance: confluent-operator
+                confluent-platform: "true"
+                version: "0.435.67"
+            spec:
+              containers:
+              - args:
+                - --debug=false
+                name: confluent-operator
+                image: docker.io/confluentinc/confluent-operator@sha256:b5b278a043c79b2da86acfa9bd60dd4d6e3d8989caf24f303af9a05b916c519f
+                imagePullPolicy: IfNotPresent
+                terminationMessagePath: /dev/termination-log
+                terminationMessagePolicy: File
+                readinessProbe:
+                  httpGet:
+                    port: 8080
+                    path: /readyz
+                livenessProbe:
+                  httpGet:
+                    port: 8080
+                    path: /healthz
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 100m
+                    memory: 256Mi
+                env:
+                  - name: NAMESPACE
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.namespace
+                  - name: NODEIP
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: status.hostIP
+                  - name: DD_ENTITY_ID
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.uid
+              serviceAccountName: confluent-for-kubernetes
+              restartPolicy: Always
+              terminationGracePeriodSeconds: 30
+      permissions:
+      - rules:
+        - apiGroups:
+          - cluster.confluent.com
+          resources:
+          - zookeeperclusters
+          - zookeeperclusters/status
+          - zookeeperclusters/scale
+          - zookeeperclusters/finalizers
+          - kafkaclusters
+          - kafkaclusters/status
+          - kafkaclusters/scale
+          - kafkaclusters/finalizers
+          verbs:
+          - '*'
+        - apiGroups:
+          - operator.confluent.cloud
+          resources:
+          - physicalstatefulclusters
+          - physicalstatefulclusters/scale
+          - physicalstatefulclusters/status
+          - physicalstatefulclusters/finalizers
+          verbs:
+          - '*'
+        - apiGroups:
+          - platform.confluent.io
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - policy
+          resources:
+          - poddisruptionbudgets
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          - routes/custom-host
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - apps
+          resources:
+          - statefulsets
+          - statefulsets/scale
+          - statefulsets/status
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - persistentvolumeclaims
+          - secrets
+          - secrets/finalizers
+          - pods
+          - services
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingresses
+          - ingresses/status
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+        serviceAccountName: confluent-for-kubernetes

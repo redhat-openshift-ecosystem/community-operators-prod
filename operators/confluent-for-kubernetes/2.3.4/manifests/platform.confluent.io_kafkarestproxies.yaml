@@ -1,0 +1,53 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.7.0
+  creationTimestamp: null
+  name: kafkarestproxies.platform.confluent.io
+spec:
+  group: platform.confluent.io
+  names:
+    categories:
+      - all
+      - confluent-platform
+      - confluent
+    kind: KafkaRestProxy
+    listKind: KafkaRestProxyList
+    plural: kafkarestproxies
+    shortNames:
+      - kafkarestproxy
+      - krp
+    singular: kafkarestproxy
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns: []
+      name: v1beta1
+      schema:
+        openAPIV3Schema:
+          description: ""
+          properties:
+            apiVersion:
+              description: ""
+              type: string
+            kind:
+              description: ""
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: ""
+              properties: {}
+              required: []
+              type: object
+            status:
+              description: ""
+              properties: {}
+              type: object
+          required:
+            - spec
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}

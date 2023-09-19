@@ -1,0 +1,406 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "rhsyseng.github.io/v1beta1",
+          "kind": "ClusterRelocation",
+          "metadata": {
+            "name": "cluster"
+          },
+          "spec": {
+            "catalogSources": [
+              {
+                "image": "\u003cmirror_url\u003e:\u003cmirror_port\u003e/redhat/redhat-operator-index:v4.12",
+                "name": "new-catalog-source"
+              }
+            ],
+            "domain": "your.new.domain.com",
+            "imageDigestMirrors": [
+              {
+                "mirrors": [
+                  "\u003cmirror_url\u003e:\u003cmirror_port\u003e/lvms4"
+                ],
+                "source": "registry.redhat.io/lvms4"
+              }
+            ],
+            "pullSecretRef": {
+              "name": "my-new-pull-secret",
+              "namespace": "my-namespace"
+            },
+            "registryCert": {
+              "certificate": "\u003cnew_registry_cert\u003e",
+              "registryHostname": "\u003cmirror_url\u003e",
+              "registryPort": 8443
+            },
+            "sshKeys": [
+              "\u003cnew_ssh_key\u003e"
+            ]
+          }
+        }
+      ]
+    capabilities: Full Lifecycle
+    categories: Integration & Delivery
+    createdAt: "2023-06-23T17:51:21Z"
+    operators.openshift.io/infrastructure-features: '["disconnected"]'
+    operators.operatorframework.io/builder: operator-sdk-v1.28.0-ocp
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    repository: https://github.com/RHsyseng/cluster-relocation-operator
+    support: RHsyseng
+    containerImage: quay.io/rhsysdeseng/operators/cluster-relocation-operator@sha256:8b1df567d15a62120bd2559de64a522401d56797a7c7de07f5847272ee315745
+  name: cluster-relocation-operator.v0.9.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: ClusterRelocation is the Schema for the clusterrelocations API
+        displayName: Cluster Relocation
+        kind: ClusterRelocation
+        name: clusterrelocations.rhsyseng.github.io
+        version: v1beta1
+  description: Reconfigures a cluster after it has been moved to a new location
+  displayName: Cluster Relocation Operator
+  icon:
+    - base64data: iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABM0lEQVR4nO3YP0oDQRQH4E8NFkKsLCxS2FhYWVl5AL2AloJNrmBt5xVs7QQPoIV/MAQLsbSxsbGzMqAiYiILL2AhKiERZ5wPHmyyGzK/Zfft7FAURVEURfHvHeMK86mfiV5UB+syCNKL2sWkBPWiNvAY25eYk2iQygKu4/M9ViUapFLHfnzXxQ4mJBikr4mX2HeCWYkGqSzhNvbfYVmiQSozOIxjXrGFsUH/rP1Jmxx2fWUc23iLYw8wPUiQUYc4/+E4VqKbVb+5weKgQf6Cxocr5DmaQpJBKrVoy90Y1x6mJBikbw0PMbYzmQQ5TTFILYdLqzGMm31U1fqt9tvK5YGYzRRllLKfNDZTn8bXc3ixWsjhVXcTT7HdjudFUrJbDuqkvkB3hIsclkyLoiiKoih87x2cD+ALQSWjjwAAAABJRU5ErkJggg==
+      mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - nodes
+              verbs:
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - config.openshift.io
+              resources:
+                - apiservers
+              verbs:
+                - get
+                - list
+                - patch
+                - watch
+            - apiGroups:
+                - config.openshift.io
+              resources:
+                - clusteroperators
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - config.openshift.io
+              resources:
+                - clusterversions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - config.openshift.io
+              resources:
+                - imagedigestmirrorsets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - config.openshift.io
+              resources:
+                - images
+              verbs:
+                - get
+                - list
+                - patch
+                - watch
+            - apiGroups:
+                - config.openshift.io
+              resources:
+                - ingresses
+              verbs:
+                - get
+                - list
+                - patch
+                - watch
+            - apiGroups:
+                - machineconfiguration.openshift.io
+              resources:
+                - machineconfigs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - operator.openshift.io
+              resources:
+                - imagecontentsourcepolicies
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - operator.openshift.io
+              resources:
+                - ingresscontrollers
+              verbs:
+                - get
+                - list
+                - patch
+                - watch
+            - apiGroups:
+                - operators.coreos.com
+              resources:
+                - catalogsources
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - rhsyseng.github.io
+              resources:
+                - clusterrelocations
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rhsyseng.github.io
+              resources:
+                - clusterrelocations/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - rhsyseng.github.io
+              resources:
+                - clusterrelocations/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - route.openshift.io
+              resources:
+                - routes
+              verbs:
+                - delete
+                - list
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: cluster-relocation-operator-controller-manager
+      deployments:
+        - label:
+            app.kubernetes.io/component: manager
+            app.kubernetes.io/created-by: cluster-relocation-operator
+            app.kubernetes.io/instance: controller-manager
+            app.kubernetes.io/managed-by: kustomize
+            app.kubernetes.io/name: deployment
+            app.kubernetes.io/part-of: cluster-relocation-operator
+            control-plane: controller-manager
+          name: cluster-relocation-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                control-plane: controller-manager
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+              spec:
+                affinity:
+                  nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      nodeSelectorTerms:
+                        - matchExpressions:
+                            - key: kubernetes.io/arch
+                              operator: In
+                              values:
+                                - amd64
+                                - arm64
+                                - ppc64le
+                                - s390x
+                            - key: kubernetes.io/os
+                              operator: In
+                              values:
+                                - linux
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                    image: registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:da5d5061dbc2ec5082cf14b6c600fb5400b83cf91d7ccebfa80680a238d275db
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    image: quay.io/rhsysdeseng/operators/cluster-relocation-operator@sha256:8b1df567d15a62120bd2559de64a522401d56797a7c7de07f5847272ee315745
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 10m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: cluster-relocation-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: cluster-relocation-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - relocation
+  links:
+    - name: Cluster Relocation Operator
+      url: https://github.com/RHsyseng/cluster-relocation-operator
+  maintainers:
+    - email: lmcnaugh@redhat.com
+      name: Logan McNaughton
+    - email: dchavero@redhat.com
+      name: Daniel Chavero
+  maturity: beta
+  minKubeVersion: 1.25.0
+  provider:
+    name: RHsyseng
+  relatedImages:
+    - image: registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:da5d5061dbc2ec5082cf14b6c600fb5400b83cf91d7ccebfa80680a238d275db
+      name: kube-rbac-proxy
+    - image: quay.io/rhsysdeseng/operators/cluster-relocation-operator@sha256:8b1df567d15a62120bd2559de64a522401d56797a7c7de07f5847272ee315745
+      name: manager
+  version: 0.9.0

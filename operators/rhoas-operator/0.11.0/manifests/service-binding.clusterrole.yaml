@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kafkaconnections-sbo-view
+  labels:
+    servicebinding.io/controller: "true"
+rules:
+  - apiGroups:
+      - rhoas.redhat.com
+    resources:
+      - kafkaconnections
+      - serviceregistryconnections
+    verbs:
+      - get
+      - list

@@ -1,0 +1,306 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.7.0
+  creationTimestamp: null
+  name: kafkarestclasses.platform.confluent.io
+spec:
+  group: platform.confluent.io
+  names:
+    categories:
+      - all
+      - confluent-platform
+      - confluent
+    kind: KafkaRestClass
+    listKind: KafkaRestClassList
+    plural: kafkarestclasses
+    shortNames:
+      - krc
+      - kafkarestclass
+    singular: kafkarestclass
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns:
+        - jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      name: v1beta1
+      schema:
+        openAPIV3Schema:
+          description: ""
+          properties:
+            apiVersion:
+              description: ""
+              type: string
+            kind:
+              description: ""
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: ""
+              properties:
+                kafkaClusterRef:
+                  description: ""
+                  properties:
+                    name:
+                      description: ""
+                      type: string
+                    namespace:
+                      description: ""
+                      type: string
+                  required:
+                    - name
+                  type: object
+                kafkaRest:
+                  description: ""
+                  properties:
+                    authentication:
+                      description: ""
+                      properties:
+                        basic:
+                          description: ""
+                          properties:
+                            debug:
+                              description: ""
+                              type: boolean
+                            directoryPathInContainer:
+                              description: ""
+                              minLength: 1
+                              type: string
+                            restrictedRoles:
+                              description: ""
+                              items:
+                                type: string
+                              minItems: 1
+                              type: array
+                            roles:
+                              description: ""
+                              items:
+                                type: string
+                              type: array
+                            secretRef:
+                              description: ""
+                              maxLength: 30
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          type: object
+                        bearer:
+                          description: ""
+                          properties:
+                            directoryPathInContainer:
+                              description: ""
+                              minLength: 1
+                              type: string
+                            secretRef:
+                              description: ""
+                              maxLength: 30
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          type: object
+                        type:
+                          description: ""
+                          enum:
+                            - basic
+                            - bearer
+                            - mtls
+                          type: string
+                      required:
+                        - type
+                      type: object
+                    endpoint:
+                      description: ""
+                      minLength: 1
+                      pattern: ^https?://.*
+                      type: string
+                    kafkaClusterID:
+                      description: ""
+                      minLength: 1
+                      type: string
+                    tls:
+                      description: ""
+                      properties:
+                        directoryPathInContainer:
+                          description: ""
+                          minLength: 1
+                          type: string
+                        jksPassword:
+                          description: ""
+                          properties:
+                            secretRef:
+                              description: ""
+                              maxLength: 30
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          required:
+                            - secretRef
+                          type: object
+                        secretRef:
+                          description: ""
+                          maxLength: 30
+                          minLength: 1
+                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                          type: string
+                      type: object
+                  type: object
+                secondaryKafkaClusterRef:
+                  description: ""
+                  properties:
+                    name:
+                      description: ""
+                      type: string
+                    namespace:
+                      description: ""
+                      type: string
+                  required:
+                    - name
+                  type: object
+                secondaryKafkaRest:
+                  description: ""
+                  properties:
+                    authentication:
+                      description: ""
+                      properties:
+                        basic:
+                          description: ""
+                          properties:
+                            debug:
+                              description: ""
+                              type: boolean
+                            directoryPathInContainer:
+                              description: ""
+                              minLength: 1
+                              type: string
+                            restrictedRoles:
+                              description: ""
+                              items:
+                                type: string
+                              minItems: 1
+                              type: array
+                            roles:
+                              description: ""
+                              items:
+                                type: string
+                              type: array
+                            secretRef:
+                              description: ""
+                              maxLength: 30
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          type: object
+                        bearer:
+                          description: ""
+                          properties:
+                            directoryPathInContainer:
+                              description: ""
+                              minLength: 1
+                              type: string
+                            secretRef:
+                              description: ""
+                              maxLength: 30
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          type: object
+                        type:
+                          description: ""
+                          enum:
+                            - basic
+                            - bearer
+                            - mtls
+                          type: string
+                      required:
+                        - type
+                      type: object
+                    endpoint:
+                      description: ""
+                      minLength: 1
+                      pattern: ^https?://.*
+                      type: string
+                    kafkaClusterID:
+                      description: ""
+                      minLength: 1
+                      type: string
+                    tls:
+                      description: ""
+                      properties:
+                        directoryPathInContainer:
+                          description: ""
+                          minLength: 1
+                          type: string
+                        jksPassword:
+                          description: ""
+                          properties:
+                            secretRef:
+                              description: ""
+                              maxLength: 30
+                              minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                              type: string
+                          required:
+                            - secretRef
+                          type: object
+                        secretRef:
+                          description: ""
+                          maxLength: 30
+                          minLength: 1
+                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                          type: string
+                      type: object
+                  type: object
+              type: object
+            status:
+              description: ""
+              properties:
+                conditions:
+                  description: ""
+                  items:
+                    description: ""
+                    properties:
+                      lastProbeTime:
+                        description: ""
+                        format: date-time
+                        type: string
+                      lastTransitionTime:
+                        description: ""
+                        format: date-time
+                        type: string
+                      message:
+                        description: ""
+                        type: string
+                      reason:
+                        description: ""
+                        type: string
+                      status:
+                        description: ""
+                        type: string
+                      type:
+                        description: ""
+                        type: string
+                    type: object
+                  type: array
+                endpoint:
+                  description: ""
+                  type: string
+                kafkaClusterID:
+                  description: ""
+                  type: string
+              type: object
+          required:
+            - spec
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

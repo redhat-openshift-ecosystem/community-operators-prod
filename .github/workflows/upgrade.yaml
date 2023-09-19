@@ -40,13 +40,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
       - name: Install dependencies
         run: python -m pip install --upgrade pip yq
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           token: ${{ secrets.FRAMEWORK_MERGE }}
           #persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
@@ -57,7 +57,7 @@ jobs:
           REGISTRY_RELEASE_API_TOKEN: ${{ secrets.REGISTRY_RELEASE_API_TOKEN }}
         run: |
           echo "$OPP_INPUT_REPO $OPP_INPUT_BRANCH"
-          echo "::set-output name=index_from::$INDEX_FROM"
+          echo "index_from=$INDEX_FROM" >> $GITHUB_OUTPUT
           bash <(curl -sL $OPP_SCRIPT_UPGRADE_URL) $CLUSTER_TYPE $INDEX_FROM
 
           if [ -f "/tmp/operators_to_recreate.yaml" ];then

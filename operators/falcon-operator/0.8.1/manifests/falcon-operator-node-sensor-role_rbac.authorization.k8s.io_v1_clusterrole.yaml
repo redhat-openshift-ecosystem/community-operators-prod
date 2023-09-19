@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    crowdstrike.com/component: rbac
+    crowdstrike.com/created-by: falcon-operator
+    crowdstrike.com/instance: node-sensor-role
+    crowdstrike.com/managed-by: kustomize
+    crowdstrike.com/name: clusterrole
+    crowdstrike.com/part-of: Falcon
+    crowdstrike.com/provider: crowdstrike
+  name: falcon-operator-node-sensor-role
+rules:
+- apiGroups:
+  - security.openshift.io
+  resourceNames:
+  - privileged
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - use

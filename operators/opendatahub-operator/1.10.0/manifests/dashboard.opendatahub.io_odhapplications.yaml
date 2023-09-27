@@ -1,0 +1,167 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: odhapplications.dashboard.opendatahub.io
+spec:
+  group: dashboard.opendatahub.io
+  names:
+    kind: OdhApplication
+    listKind: OdhApplicationList
+    plural: odhapplications
+    singular: odhapplication
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: OdhApplication is the Schema for the odhapplications API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: OdhApplicationSpec defines the desired state of OdhApplication
+            properties:
+              beta:
+                type: boolean
+              betaText:
+                type: string
+              betaTitle:
+                type: string
+              category:
+                type: string
+              comingSoon:
+                type: boolean
+              consoleLink:
+                type: string
+              csvName:
+                type: string
+              description:
+                type: string
+              displayName:
+                type: string
+              docsLink:
+                type: string
+              enable:
+                properties:
+                  actionLabel:
+                    type: string
+                  description:
+                    type: string
+                  link:
+                    type: string
+                  linkPreface:
+                    type: string
+                  title:
+                    type: string
+                  validationConfigMap:
+                    type: string
+                  validationJob:
+                    type: string
+                  validationSecret:
+                    type: string
+                  variableDisplayText:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  variableHelpText:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  variables:
+                    additionalProperties:
+                      type: string
+                    type: object
+                type: object
+              enableCR:
+                properties:
+                  field:
+                    type: string
+                  group:
+                    type: string
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+                  plural:
+                    type: string
+                  value:
+                    type: string
+                  version:
+                    type: string
+                type: object
+              endpoint:
+                type: string
+              featureFlag:
+                type: string
+              getStartedLink:
+                type: string
+              getStartedMarkDown:
+                type: string
+              img:
+                type: string
+              internalRoute:
+                type: string
+              isEnabled:
+                type: boolean
+              kfdefApplications:
+                description: (Deprecated) Apps do not rely on other deployments, they
+                  are deployed by those components.
+                items:
+                  type: string
+                type: array
+              link:
+                type: string
+              provider:
+                type: string
+              quickStart:
+                type: string
+              route:
+                type: string
+              routeNamespace:
+                type: string
+              routeSuffix:
+                type: string
+              serviceName:
+                type: string
+              support:
+                type: string
+            required:
+            - description
+            - displayName
+            - docsLink
+            - getStartedLink
+            - getStartedMarkDown
+            - img
+            - provider
+            - support
+            type: object
+          status:
+            description: OdhApplicationStatus defines the observed state of OdhApplication
+            properties:
+              enabled:
+                type: boolean
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

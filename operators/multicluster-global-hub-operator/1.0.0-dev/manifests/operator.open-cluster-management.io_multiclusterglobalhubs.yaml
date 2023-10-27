@@ -38,8 +38,6 @@ spec:
           spec:
             default:
               dataLayer:
-                kafka:
-                  transportFormat: cloudEvents
                 postgres:
                   retention: 18m
             description: MulticlusterGlobalHubSpec defines the desired state of MulticlusterGlobalHub
@@ -51,24 +49,15 @@ spec:
                 type: string
               dataLayer:
                 default:
-                  kafka:
-                    transportFormat: cloudEvents
                   postgres:
                     retention: 18m
                 description: DataLayer can be configured to use a different data layer.
                 properties:
                   kafka:
-                    default:
-                      transportFormat: cloudEvents
                     description: KafkaConfig defines the desired state of kafka
                     properties:
-                      transportFormat:
-                        default: cloudEvents
-                        description: TransportFormat defines the transport format
-                          for kafka, which is either cloudEvents or kafka message
-                        enum:
-                        - message
-                        - cloudEvents
+                      storageSize:
+                        description: Specify the size for storage.
                         type: string
                     type: object
                   postgres:
@@ -85,7 +74,13 @@ spec:
                           each with optional fraction and a unit suffix, such as "1y6m".
                           Valid time units are "m" and "y".
                         type: string
+                      storageSize:
+                        description: Specify the size for storage.
+                        type: string
                     type: object
+                  storageClass:
+                    description: Specify the storageClass for storage.
+                    type: string
                 type: object
               imagePullPolicy:
                 description: Pull policy of the multicluster global hub images

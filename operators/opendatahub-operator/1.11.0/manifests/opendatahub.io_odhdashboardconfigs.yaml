@@ -1,0 +1,164 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: odhdashboardconfigs.opendatahub.io
+spec:
+  group: opendatahub.io
+  names:
+    kind: OdhDashboardConfig
+    plural: odhdashboardconfigs
+    singular: odhdashboardconfig
+  scope: Namespaced
+  versions:
+  - name: v1alpha
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              dashboardConfig:
+                properties:
+                  disableBYONImageStream:
+                    type: boolean
+                  disableBiasMetrics:
+                    type: boolean
+                  disableClusterManager:
+                    type: boolean
+                  disableCustomServingRuntimes:
+                    type: boolean
+                  disableISVBadges:
+                    type: boolean
+                  disableInfo:
+                    type: boolean
+                  disableModelServing:
+                    type: boolean
+                  disablePerformanceMetrics:
+                    type: boolean
+                  disablePipelines:
+                    type: boolean
+                  disableProjectSharing:
+                    type: boolean
+                  disableProjects:
+                    type: boolean
+                  disableSupport:
+                    type: boolean
+                  disableTracking:
+                    type: boolean
+                  disableUserManagement:
+                    type: boolean
+                  enablement:
+                    type: boolean
+                  modelMetricsNamespace:
+                    type: string
+                type: object
+              groupsConfig:
+                properties:
+                  adminGroups:
+                    type: string
+                  allowedGroups:
+                    type: string
+                required:
+                - adminGroups
+                - allowedGroups
+                type: object
+              modelServerSizes:
+                items:
+                  properties:
+                    name:
+                      type: string
+                    resources:
+                      properties:
+                        limits:
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                          type: object
+                        requests:
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                          type: object
+                      type: object
+                  required:
+                  - name
+                  - resources
+                  type: object
+                type: array
+              notebookController:
+                properties:
+                  enabled:
+                    type: boolean
+                  gpuSetting:
+                    description: Configure how the GPU field works on the Jupyter
+                      tile. One of 'autodetect' (default, fetches for information),
+                      'hidden' (remove the field) or a number-string (eg '5') to specify
+                      a hardcoded 0 to that number options
+                    type: string
+                  notebookNamespace:
+                    type: string
+                  notebookTolerationSettings:
+                    properties:
+                      enabled:
+                        type: boolean
+                      key:
+                        type: string
+                    type: object
+                  pvcSize:
+                    type: string
+                  storageClassName:
+                    type: string
+                required:
+                - enabled
+                type: object
+              notebookSizes:
+                items:
+                  properties:
+                    name:
+                      type: string
+                    resources:
+                      properties:
+                        limits:
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                          type: object
+                        requests:
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                          type: object
+                      type: object
+                  required:
+                  - name
+                  - resources
+                  type: object
+                type: array
+              templateDisablement:
+                items:
+                  type: string
+                type: array
+              templateOrder:
+                items:
+                  type: string
+                type: array
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

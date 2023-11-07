@@ -12,9 +12,6 @@ metadata:
           },
           "spec": {
             "dataLayer": {
-              "kafka": {
-                "transportFormat": "cloudEvents"
-              },
               "postgres": {
                 "retention": "18m"
               }
@@ -26,7 +23,7 @@ metadata:
     categories: Integration & Delivery,OpenShift Optional
     certified: "false"
     containerImage: quay.io/stolostron/multicluster-global-hub-operator:latest
-    createdAt: "2023-09-05T06:56:06Z"
+    createdAt: "2023-10-16T03:07:33Z"
     description: Manages the installation and upgrade of the Multicluster Global Hub.
     operatorframework.io/suggested-namespace: multicluster-global-hub
     operators.operatorframework.io/builder: operator-sdk-v1.31.0
@@ -39,7 +36,9 @@ spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
-    - description: MulticlusterGlobalHub defines the configuration for an instance of the MultiCluster Global Hub
+    - description: MulticlusterGlobalHub defines the configuration for an instance
+        of the MultiCluster Global Hub
+      displayName: Multicluster Global Hub
       kind: MulticlusterGlobalHub
       name: multiclusterglobalhubs.operator.open-cluster-management.io
       version: v1alpha4
@@ -65,26 +64,24 @@ spec:
     Once an instance of the MulticlusterGlobalHub is created, the following pods are created in the `multicluster-global-hub` namespace:
     ```
     $ kubectl get pods -n multicluster-global-hub
-    NAME                                                             READY   STATUS    RESTARTS    AGE
-    kafka-kafka-0                                                    1/1     Running     0          21h
-    kafka-kafka-1                                                    1/1     Running     0          21h
-    kafka-kafka-2                                                    1/1     Running     0          21h
-    kafka-zookeeper-0                                                1/1     Running     0          21h
-    kafka-zookeeper-1                                                1/1     Running     0          21h
-    kafka-zookeeper-2                                                1/1     Running     0          21h
-    multicluster-global-hub-grafana-579cdf759d-mp7fm                 2/2     Running     0          21h
-    multicluster-global-hub-manager-7bdcdd745f-5np24                 2/2     Running     0          21h
-    multicluster-global-hub-operator-59744b8d75-nrwvd                1/1     Running     0          21h
-    pgo-6b5cbdc5cc-wnct9                                             1/1     Running     0          21h
-    postgres-backup-vrh6-lpjvm                                       0/1     Completed   0          21h
-    postgres-pgha1-8rms-0                                            4/4     Running     0          21h
-    postgres-pgha1-9fgb-0                                            4/4     Running     0          21h
-    postgres-pgha1-mlzf-0                                            4/4     Running     0          21h
-    postgres-repo-host-0                                             2/2     Running     0          21h
-    strimzi-cluster-operator-v0.36.1-684d7cccb7-zjbf9                1/1     Running     0          21h
+    NAME                                                             READY   STATUS    RESTARTS   AGE
+    kafka-entity-operator-54ff95c7dc-cmmwc                           3/3     Running   0          21h
+    kafka-kafka-0                                                    1/1     Running   0          21h
+    kafka-kafka-1                                                    1/1     Running   0          21h
+    kafka-kafka-2                                                    1/1     Running   0          21h
+    kafka-zookeeper-0                                                1/1     Running   0          21h
+    kafka-zookeeper-1                                                1/1     Running   0          21h
+    kafka-zookeeper-2                                                1/1     Running   0          21h
+    multicluster-global-hub-grafana-579cdf759d-mp7fm                 2/2     Running   0          21h
+    multicluster-global-hub-grafana-579cdf759d-4hpcg                 2/2     Running   0          21h
+    multicluster-global-hub-manager-7bdcdd745f-5np24                 2/2     Running   0          21h
+    multicluster-global-hub-manager-7bdcdd745f-n9b9n                 2/2     Running   0          21h
+    multicluster-global-hub-operator-59744b8d75-nrwvd                1/1     Running   0          21h
+    multicluster-global-hub-postgres-0                               1/1     Running   0          21h
+    strimzi-cluster-operator-v0.36.1-684d7cccb7-zjbf9                1/1     Running   0          21h
     ```
 
-    ##Documentation
+    ## Documentation
     For documentation about installing and using the Multicluster GlobalHub Operator with Red Hat Advanced Cluster Management for Kubernetes, see [Multicluser Global Hub Documentation](https://github.com/stolostron/multicluster-global-hub/tree/main/doc#readme).
   displayName: Multicluster Global Hub Operator
   icon:
@@ -370,6 +367,17 @@ spec:
           - update
           - watch
         - apiGroups:
+          - apps
+          resources:
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
           - apps.open-cluster-management.io
           resources:
           - channels
@@ -438,6 +446,7 @@ spec:
           verbs:
           - get
           - list
+          - update
           - watch
         - apiGroups:
           - cluster.open-cluster-management.io
@@ -688,6 +697,8 @@ spec:
                   value: quay.io/stolostron/multicluster-global-hub-agent:latest
                 - name: RELATED_IMAGE_GRAFANA
                   value: quay.io/stolostron/grafana:globalhub-1.0
+                - name: RELATED_IMAGE_POSTGRESQL
+                  value: quay.io/stolostron/postgresql-13:1-101
                 - name: RELATED_IMAGE_OAUTH_PROXY
                   value: quay.io/stolostron/origin-oauth-proxy:4.9
                 image: quay.io/stolostron/multicluster-global-hub-operator:latest
@@ -706,11 +717,10 @@ spec:
                   periodSeconds: 10
                 resources:
                   limits:
-                    cpu: 500m
-                    memory: 512Mi
+                    memory: 200Mi
                   requests:
-                    cpu: 10m
-                    memory: 64Mi
+                    cpu: 1m
+                    memory: 100Mi
                 securityContext:
                   allowPrivilegeEscalation: false
               securityContext:

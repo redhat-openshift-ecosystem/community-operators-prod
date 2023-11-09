@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/name: observability-operator
+    app.kubernetes.io/part-of: observability-operator
+  name: observability-operator
+spec:
+  ports:
+  - name: metrics
+    port: 8080
+    targetPort: 0
+  selector:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/name: observability-operator
+status:
+  loadBalancer: {}

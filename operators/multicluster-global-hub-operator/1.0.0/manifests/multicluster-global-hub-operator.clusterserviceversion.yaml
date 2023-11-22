@@ -22,7 +22,7 @@ metadata:
     capabilities: Seamless Upgrades
     categories: Integration & Delivery,OpenShift Optional
     certified: "false"
-    containerImage: quay.io/stolostron/multicluster-global-hub-operator:latest
+    containerImage: quay.io/stolostron/multicluster-global-hub-operator:v1.0.0
     createdAt: "2023-10-16T03:07:33Z"
     description: Manages the installation and upgrade of the Multicluster Global Hub.
     operatorframework.io/suggested-namespace: multicluster-global-hub
@@ -30,7 +30,7 @@ metadata:
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/stolostron/multicluster-global-hub
     support: Red Hat
-  name: multicluster-global-hub-operator.v1.0.0-dev
+  name: multicluster-global-hub-operator.v1.0.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -692,16 +692,16 @@ spec:
                     fieldRef:
                       fieldPath: metadata.namespace
                 - name: RELATED_IMAGE_MULTICLUSTER_GLOBAL_HUB_MANAGER
-                  value: quay.io/stolostron/multicluster-global-hub-manager:latest
+                  value: quay.io/stolostron/multicluster-global-hub-manager:v1.0.0
                 - name: RELATED_IMAGE_MULTICLUSTER_GLOBAL_HUB_AGENT
-                  value: quay.io/stolostron/multicluster-global-hub-agent:latest
+                  value: quay.io/stolostron/multicluster-global-hub-agent:v1.0.0
                 - name: RELATED_IMAGE_GRAFANA
                   value: quay.io/stolostron/grafana:globalhub-1.0
                 - name: RELATED_IMAGE_POSTGRESQL
                   value: quay.io/stolostron/postgresql-13:1-101
                 - name: RELATED_IMAGE_OAUTH_PROXY
                   value: quay.io/stolostron/origin-oauth-proxy:4.9
-                image: quay.io/stolostron/multicluster-global-hub-operator:latest
+                image: quay.io/stolostron/multicluster-global-hub-operator:v1.0.0
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -838,9 +838,8 @@ spec:
   maintainers:
   - email: acm-contact@redhat.com
     name: acm-contact
-  maturity: alpha
+  maturity: stable
   provider:
     name: Red Hat, Inc
     url: https://github.com/stolostron/multicluster-global-hub
-  version: 1.0.0-dev
-  replaces: multicluster-global-hub-operator.v0.7.0
+  version: 1.0.0

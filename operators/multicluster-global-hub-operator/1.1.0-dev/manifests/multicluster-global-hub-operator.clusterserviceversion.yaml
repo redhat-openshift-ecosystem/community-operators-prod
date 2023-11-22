@@ -5,19 +5,16 @@ metadata:
     alm-examples: |-
       [
         {
-          "apiVersion": "operator.open-cluster-management.io/v1alpha3",
+          "apiVersion": "operator.open-cluster-management.io/v1alpha4",
           "kind": "MulticlusterGlobalHub",
           "metadata": {
             "name": "multiclusterglobalhub"
           },
           "spec": {
             "dataLayer": {
-              "largeScale": {
-                "kafka": {
-                  "transportFormat": "cloudEvents"
-                }
-              },
-              "type": "largeScale"
+              "postgres": {
+                "retention": "18m"
+              }
             }
           }
         }
@@ -25,73 +22,70 @@ metadata:
     capabilities: Seamless Upgrades
     categories: Integration & Delivery,OpenShift Optional
     certified: "false"
-    containerImage: quay.io/stolostron/multicluster-global-hub-operator:v0.7.0
-    createdAt: "2023-07-19T07:53:07Z"
+    containerImage: quay.io/stolostron/multicluster-global-hub-operator:latest
+    createdAt: "2023-10-16T03:07:33Z"
     description: Manages the installation and upgrade of the Multicluster Global Hub.
-    operatorframework.io/suggested-namespace: open-cluster-management
-    operators.operatorframework.io/builder: operator-sdk-v1.28.0
+    operatorframework.io/suggested-namespace: multicluster-global-hub
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/stolostron/multicluster-global-hub
     support: Red Hat
-  name: multicluster-global-hub-operator.v0.7.0
+  name: multicluster-global-hub-operator.v1.1.0-dev
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
-    - description: MulticlusterGlobalHub is the Schema for the multiclusterglobalhubs
-        API
+    - description: MulticlusterGlobalHub defines the configuration for an instance
+        of the MultiCluster Global Hub
       displayName: Multicluster Global Hub
       kind: MulticlusterGlobalHub
       name: multiclusterglobalhubs.operator.open-cluster-management.io
-      version: v1alpha3
-  description: "Multicluster Global Hub Operator defines the configuration for multicluster
-    global hub installation and upgrade with one custom resource.\n\n## Prerequisites\n\n-
-    Red Hat Advanced Cluster Management for Kubernetes (RHACM) 2.7 or later needs
-    to be installed.\n## How to Install\n\nInstall the Multicluster Global Hub Operator
-    by following the instructions that are displayed after you select the Install
-    button. The operator must be installed in the same namespace as Red Hat Advanced
-    Cluster Management for Kubernetes (RHACM), by default, in `open-cluster-management`
-    namespace.\n\nA pod will be created in `open-cluster-management` namespace\n\n```\n$
-    kubectl get pods -n open-cluster-management\nNAME                                                             READY
-    \  STATUS    RESTARTS   AGE\nmulticluster-global-hub-operator-5ccbbc878d-98fdp
-    \               1/1     Running   0          19s\n```\n\nThe operator is now providing
-    new Custom Resources Definitions: `multiclusterglobalhubs.operator.open-cluster-management.io`\n\n##
-    Using the Multicluster Global Hub Operator\n\nAfter installed the operator, create
-    an instance of the MulticlusterGlobalHub resource to instantiate the Multicluster
-    Global Hub.\n\nYou need to prepare:\n\n- PostgreSQL needs to be installed and
-    you must create database for the multicluster global hub. You must create a secret
-    named multicluster-global-hub-storage that contains the database access credential
-    in `open-cluster-management` namespace. You can run the following command to create
-    the secret: \n\n```\nkubectl create secret generic multicluster-global-hub-storage
-    -n open-cluster-management \\\n  --from-literal=database_uri=<postgresql-uri>
-    \\\n --from-file=ca.crt=<CA-for-postgres-server> \n```\n>_Note:_ There is a sample
-    script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/storage)(Note:
-    the client version of kubectl must be v1.21+) to install postgres in `hoh-postgres`
-    namespace and create the secret `multicluster-global-hub-storage` in namespace
-    `open-cluster-management` automatically. To override the secret namespace, set
-    `TARGET_NAMESPACE` environment variable to the RHACM installation namespace before
-    executing the script.\n\n- Kafka needs to be installed, and you must create three
-    topics, `spec` `status` and `event`. You need to create a secret named multicluster-global-hub-transport
-    that contains the kafka access information should be created in `open-cluster-management`
-    namespace. You can run the following command to create the secret: \n\n```\nkubectl
-    create secret generic multicluster-global-hub-transport -n open-cluster-management
-    \\\n  --from-literal=bootstrap_server=<kafka-bootstrap-server-address> \\\n      --from-file=ca.crt=<CA-cert-for-kafka-server>
-    --from-file=client.crt=<Client-cert-for-kafka-server> --from-file=client.key=<Client-key-for-kafka-server>
-    \n```\n >_Note:_ There is a sample script available [here](https://github.com/stolostron/multicluster-global-hub/tree/main/operator/config/samples/transport)
-    to install kafka in `kafka` namespace and create the secret `multicluster-global-hub-transport`
-    in namespace `open-cluster-management` automatically. To override the secret namespace,
-    set `TARGET_NAMESPACE` environment variable to the RHACM installation namespace
-    before executing the script.\n\nOnce an instance of the MulticlusterGlobalHub
-    is created, the following pods are created in the `open-cluster-management` namespace:\n\n```\n$
-    kubectl get pods -n open-cluster-management\nNAME                                                             READY
-    \  STATUS    RESTARTS   AGE\nmulticluster-global-hub-grafana-79f8d59f58-qwcjl
-    \                1/1     Running   0          22s\nmulticluster-global-hub-operator-5ccbbc878d-98fdp
-    \               1/1     Running   0          56s\nmulticluster-global-hub-manager-7c55644568-mth8f
-    \                1/1     Running   0          11s\n```\n"
+      version: v1alpha4
+  description: |
+    The Multicluster Global Hub Operator contains the components of multicluster global hub. The Operator deploys all of the required components for global multicluster management. The components include `multicluster-global-hub-manager` and `multicluster-global-hub-grafana` in the global hub cluster and `multicluster-global-hub-agent` in the managed hub clusters.
+    The Operator also deploys the strimzi kafka and crunchy postgres if you do not bring your own kafka and postgres.
+
+    ## Prerequisites
+    - Red Hat Advanced Cluster Management for Kubernetes (RHACM) 2.7 or later needs to be installed.
+
+    ## How to Install
+    Install the Multicluster Global Hub Operator by following the instructions that are displayed after you select the Install button.
+    A pod will be created in `multicluster-global-hub` namespace:
+    ```
+    $ kubectl get pods -n multicluster-global-hub
+    NAME                                                             READY   STATUS    RESTARTS   AGE
+    multicluster-global-hub-operator-5ccbbc878d-98fdp                1/1     Running   0          19s
+    ```
+    The operator is now providing new Custom Resources Definitions: `multiclusterglobalhubs.operator.open-cluster-management.io`
+
+    ## Using the Multicluster Global Hub Operator
+    After installed the operator, create an instance of the MulticlusterGlobalHub resource to instantiate the Multicluster Global Hub.
+    Once an instance of the MulticlusterGlobalHub is created, the following pods are created in the `multicluster-global-hub` namespace:
+    ```
+    $ kubectl get pods -n multicluster-global-hub
+    NAME                                                             READY   STATUS    RESTARTS   AGE
+    kafka-entity-operator-54ff95c7dc-cmmwc                           3/3     Running   0          21h
+    kafka-kafka-0                                                    1/1     Running   0          21h
+    kafka-kafka-1                                                    1/1     Running   0          21h
+    kafka-kafka-2                                                    1/1     Running   0          21h
+    kafka-zookeeper-0                                                1/1     Running   0          21h
+    kafka-zookeeper-1                                                1/1     Running   0          21h
+    kafka-zookeeper-2                                                1/1     Running   0          21h
+    multicluster-global-hub-grafana-579cdf759d-mp7fm                 2/2     Running   0          21h
+    multicluster-global-hub-grafana-579cdf759d-4hpcg                 2/2     Running   0          21h
+    multicluster-global-hub-manager-7bdcdd745f-5np24                 2/2     Running   0          21h
+    multicluster-global-hub-manager-7bdcdd745f-n9b9n                 2/2     Running   0          21h
+    multicluster-global-hub-operator-59744b8d75-nrwvd                1/1     Running   0          21h
+    multicluster-global-hub-postgres-0                               1/1     Running   0          21h
+    strimzi-cluster-operator-v0.36.1-684d7cccb7-zjbf9                1/1     Running   0          21h
+    ```
+
+    ## Documentation
+    For documentation about installing and using the Multicluster GlobalHub Operator with Red Hat Advanced Cluster Management for Kubernetes, see [Multicluser Global Hub Documentation](https://github.com/stolostron/multicluster-global-hub/tree/main/doc#readme).
   displayName: Multicluster Global Hub Operator
   icon:
-  - base64data: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTguNTEgMjU4LjUxIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2QxZDFkMTt9LmNscy0ye2ZpbGw6IzhkOGQ4Zjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPkFzc2V0IDQ8L3RpdGxlPjxnIGlkPSJMYXllcl8yIiBkYXRhLW5hbWU9IkxheWVyIDIiPjxnIGlkPSJMYXllcl8xLTIiIGRhdGEtbmFtZT0iTGF5ZXIgMSI+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTI5LjI1LDIwQTEwOS4xLDEwOS4xLDAsMCwxLDIwNi40LDIwNi40LDEwOS4xLDEwOS4xLDAsMSwxLDUyLjExLDUyLjExLDEwOC40NSwxMDguNDUsMCwwLDEsMTI5LjI1LDIwbTAtMjBoMEM1OC4xNiwwLDAsNTguMTYsMCwxMjkuMjVIMGMwLDcxLjA5LDU4LjE2LDEyOS4yNiwxMjkuMjUsMTI5LjI2aDBjNzEuMDksMCwxMjkuMjYtNTguMTcsMTI5LjI2LTEyOS4yNmgwQzI1OC41MSw1OC4xNiwyMDAuMzQsMCwxMjkuMjUsMFoiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzcuNTQsMTAzLjQxSDE0MS42NkwxNTQuOSw2NS43NmMxLjI1LTQuNC0yLjMzLTguNzYtNy4yMS04Ljc2SDEwMi45M2E3LjMyLDcuMzIsMCwwLDAtNy40LDZsLTEwLDY5LjYxYy0uNTksNC4xNywyLjg5LDcuODksNy40LDcuODloMzYuOUwxMTUuNTUsMTk3Yy0xLjEyLDQuNDEsMi40OCw4LjU1LDcuMjQsOC41NWE3LjU4LDcuNTgsMCwwLDAsNi40Ny0zLjQ4TDE4NCwxMTMuODVDMTg2Ljg2LDEwOS4yNCwxODMuMjksMTAzLjQxLDE3Ny41NCwxMDMuNDFaIi8+PC9nPjwvZz48L3N2Zz4=
+  - base64data: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjEuMTUgNzIxLjE1Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2RiMzkyNzt9LmNscy0ye2ZpbGw6I2NiMzYyODt9LmNscy0ze2ZpbGw6I2ZmZjt9LmNscy00e2ZpbGw6I2UzZTNlMjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPlByb2R1Y3RfSWNvbi1SZWRfSGF0QWR2YW5jZWRfQ2x1c3Rlcl9NYW5hZ2VtZW50X2Zvcl9LdWJlcm5ldGVzLVJHQjwvdGl0bGU+PGcgaWQ9IkxheWVyXzEiIGRhdGEtbmFtZT0iTGF5ZXIgMSI+PGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSIzNjAuNTciIGN5PSIzNjAuNTciIHI9IjM1OC41OCIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTYxNC4xMywxMDcsMTA3LDYxNC4xM2MxNDAsMTQwLDM2Ny4wNywxNDAsNTA3LjExLDBTNzU0LjE2LDI0Ny4wNiw2MTQuMTMsMTA3WiIvPjxyZWN0IGNsYXNzPSJjbHMtMyIgeD0iMzMwLjg3IiB5PSIyODAuNiIgd2lkdGg9IjIwMy4xNyIgaGVpZ2h0PSIyMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTc4LjkgMzkwLjUyKSByb3RhdGUoLTQ0Ljk2KSIvPjxyZWN0IGNsYXNzPSJjbHMtMyIgeD0iMzA2LjYzIiB5PSIxNjcuODMiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMDQuNDciIHRyYW5zZm9ybT0idHJhbnNsYXRlKC04NS4zMyAxNjIuMjcpIHJvdGF0ZSgtMjUuNDUpIi8+PHJlY3QgY2xhc3M9ImNscy0zIiB4PSIxNjIuOTgiIHk9IjM2NC4xIiB3aWR0aD0iMTk4LjI4IiBoZWlnaHQ9IjIwIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNDIuMzkgMzMuNjEpIHJvdGF0ZSgtNi43OSkiLz48cmVjdCBjbGFzcz0iY2xzLTMiIHg9IjI0NS4xIiB5PSI0NTEuNTQiIHdpZHRoPSIyMDAuNjIiIGhlaWdodD0iMjAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xNjMuMDEgNzMzLjI2KSByb3RhdGUoLTgxLjMxKSIvPjxyZWN0IGNsYXNzPSJjbHMtMyIgeD0iNDQzLjg1IiB5PSIzMDMuNzYiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMDcuMDQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xMDkuOTcgNjM5LjU4KSByb3RhdGUoLTY0LjMpIi8+PGNpcmNsZSBjbGFzcz0iY2xzLTMiIGN4PSI1MDQuMzQiIGN5PSIyMTguODMiIHI9IjQ0LjA4Ii8+PGNpcmNsZSBjbGFzcz0iY2xzLTMiIGN4PSIyNzIuNyIgY3k9IjE3Ny43NSIgcj0iNDQuMDgiLz48Y2lyY2xlIGNsYXNzPSJjbHMtMyIgY3g9IjU0Ny4xMiIgY3k9IjQ1Mi4xNyIgcj0iNDQuMDgiLz48Y2lyY2xlIGNsYXNzPSJjbHMtMyIgY3g9IjE2My42OCIgY3k9IjM4NS44MiIgcj0iNDQuMDgiLz48Y2lyY2xlIGNsYXNzPSJjbHMtMyIgY3g9IjMzMC4yNiIgY3k9IjU2MC43IiByPSI0NC4wOCIvPjxwYXRoIGNsYXNzPSJjbHMtNCIgZD0iTTQ0NC45NCwyNzkuOTIsMjc2LjE5LDQ0OC42N0ExMTkuMzIsMTE5LjMyLDAsMCwwLDQ0NC45NCwyNzkuOTJaIi8+PHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMzc1LjY4LDI0NS43NmExMTkuMzMsMTE5LjMzLDAsMCwwLTk5LjQ5LDIwMi45MUw0NDQuOTQsMjc5LjkyQTExOC44OSwxMTguODksMCwwLDAsMzc1LjY4LDI0NS43NloiLz48L2c+PC9zdmc+
     mediatype: image/svg+xml
   install:
     spec:
@@ -353,16 +347,6 @@ spec:
           - update
           - watch
         - apiGroups:
-          - agent.open-cluster-management.io
-          resources:
-          - klusterletaddonconfigs
-          verbs:
-          - get
-          - list
-          - patch
-          - update
-          - watch
-        - apiGroups:
           - app.k8s.io
           resources:
           - applications
@@ -375,6 +359,17 @@ spec:
           - apps
           resources:
           - deployments
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - statefulsets
           verbs:
           - create
           - delete
@@ -451,6 +446,7 @@ spec:
           verbs:
           - get
           - list
+          - update
           - watch
         - apiGroups:
           - cluster.open-cluster-management.io
@@ -496,6 +492,28 @@ spec:
           - update
           - watch
         - apiGroups:
+          - kafka.strimzi.io
+          resources:
+          - kafkas
+          - kafkatopics
+          - kafkausers
+          verbs:
+          - create
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
           - operator.open-cluster-management.io
           resources:
           - multiclusterglobalhubs
@@ -532,6 +550,17 @@ spec:
           - update
           - watch
         - apiGroups:
+          - operators.coreos.com
+          resources:
+          - subscriptions
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
           - packages.operators.coreos.com
           resources:
           - packagemanifests
@@ -557,6 +586,15 @@ spec:
           - list
           - patch
           - update
+        - apiGroups:
+          - postgres-operator.crunchydata.com
+          resources:
+          - postgresclusters
+          verbs:
+          - create
+          - get
+          - list
+          - watch
         - apiGroups:
           - rbac.authorization.k8s.io
           resources:
@@ -654,14 +692,16 @@ spec:
                     fieldRef:
                       fieldPath: metadata.namespace
                 - name: RELATED_IMAGE_MULTICLUSTER_GLOBAL_HUB_MANAGER
-                  value: quay.io/stolostron/multicluster-global-hub-manager:v0.7.0
+                  value: quay.io/stolostron/multicluster-global-hub-manager:latest
                 - name: RELATED_IMAGE_MULTICLUSTER_GLOBAL_HUB_AGENT
-                  value: quay.io/stolostron/multicluster-global-hub-agent:v0.7.0
+                  value: quay.io/stolostron/multicluster-global-hub-agent:latest
                 - name: RELATED_IMAGE_GRAFANA
-                  value: quay.io/stolostron/grafana:2.8.0-SNAPSHOT-2023-03-06-01-52-34
+                  value: quay.io/stolostron/grafana:globalhub-1.0
+                - name: RELATED_IMAGE_POSTGRESQL
+                  value: quay.io/stolostron/postgresql-13:1-101
                 - name: RELATED_IMAGE_OAUTH_PROXY
                   value: quay.io/stolostron/origin-oauth-proxy:4.9
-                image: quay.io/stolostron/multicluster-global-hub-operator:v0.7.0
+                image: quay.io/stolostron/multicluster-global-hub-operator:latest
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -677,11 +717,10 @@ spec:
                   periodSeconds: 10
                 resources:
                   limits:
-                    cpu: 500m
-                    memory: 512Mi
+                    memory: 200Mi
                   requests:
-                    cpu: 10m
-                    memory: 64Mi
+                    cpu: 1m
+                    memory: 100Mi
                 securityContext:
                   allowPrivilegeEscalation: false
               securityContext:
@@ -799,8 +838,8 @@ spec:
   maintainers:
   - email: acm-contact@redhat.com
     name: acm-contact
-  maturity: beta
+  maturity: planning
   provider:
     name: Red Hat, Inc
     url: https://github.com/stolostron/multicluster-global-hub
-  version: 0.7.0
+  version: 1.1.0-dev

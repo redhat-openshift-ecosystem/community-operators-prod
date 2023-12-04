@@ -5,7 +5,7 @@ metadata:
     alm-examples: |-
       [
         {
-          "apiVersion": "repo-manager.pulpproject.org/v1alpha1",
+          "apiVersion": "repo-manager.pulpproject.org/v1beta2",
           "kind": "Pulp",
           "metadata": {
             "name": "example"
@@ -14,7 +14,9 @@ metadata:
             "api": {
               "replicas": 1
             },
-            "cache_enabled": true,
+            "cache": {
+              "enabled": true
+            },
             "content": {
               "replicas": 2,
               "resource_requirements": {
@@ -28,9 +30,7 @@ metadata:
                 }
               }
             },
-            "file_storage_access_mode": "ReadWriteMany",
-            "file_storage_size": "10Gi",
-            "ingress_type": "Route",
+            "ingress_type": "nodeport",
             "pulp_settings": {
               "allowed_export_paths": [
                 "/tmp"
@@ -40,7 +40,6 @@ metadata:
               ],
               "api_root": "/pulp/"
             },
-            "storage_type": "File",
             "worker": {
               "replicas": 2,
               "resource_requirements": {
@@ -57,52 +56,7 @@ metadata:
           }
         },
         {
-          "apiVersion": "repo-manager.pulpproject.org/v1alpha1",
-          "kind": "Pulp",
-          "metadata": {
-            "name": "example-pulp"
-          },
-          "spec": {
-            "api": {
-              "replicas": 1
-            },
-            "cache": {
-              "enabled": true,
-              "redis_storage_class": "standard"
-            },
-            "content": {
-              "replicas": 1
-            },
-            "database": {
-              "postgres_storage_class": "standard"
-            },
-            "deployment_type": "pulp",
-            "file_storage_access_mode": "ReadWriteOnce",
-            "file_storage_size": "2Gi",
-            "file_storage_storage_class": "standard",
-            "image_version": "nightly",
-            "image_web_version": "nightly",
-            "ingress_type": "nodeport",
-            "pulp_settings": {
-              "allowed_export_paths": [
-                "/tmp"
-              ],
-              "allowed_import_paths": [
-                "/tmp"
-              ],
-              "api_root": "/pulp/",
-              "telemetry": false
-            },
-            "web": {
-              "replicas": 1
-            },
-            "worker": {
-              "replicas": 1
-            }
-          }
-        },
-        {
-          "apiVersion": "repo-manager.pulpproject.org/v1alpha1",
+          "apiVersion": "repo-manager.pulpproject.org/v1beta2",
           "kind": "Pulp",
           "metadata": {
             "name": "galaxy-example"
@@ -133,10 +87,11 @@ metadata:
             "file_storage_size": "10Gi",
             "file_storage_storage_class": "standard",
             "image": "quay.io/pulp/galaxy-minimal",
-            "image_version": "nightly",
+            "image_version": "4.6.3",
             "image_web": "quay.io/pulp/galaxy-web",
-            "image_web_version": "nightly",
+            "image_web_version": "4.6.3",
             "ingress_type": "nodeport",
+            "nodeport_port": 30000,
             "pulp_settings": {
               "allowed_export_paths": [
                 "/tmp"
@@ -144,12 +99,18 @@ metadata:
               "allowed_import_paths": [
                 "/tmp"
               ],
+              "analytics": false,
+              "ansible_api_hostname": "http://nodeport.local:30000",
               "api_root": "/api/galaxy/pulp/",
-              "telemetry": false
+              "content_origin": "http://nodeport.local:30000",
+              "galaxy_feature_flags": {
+                "ai_deny_index": true,
+                "execution_environments": true
+              },
+              "token_server": "http://nodeport.local:30000/token/"
             },
-            "signing_scripts_configmap": "signing-scripts",
+            "signing_scripts": "signing-scripts",
             "signing_secret": "signing-galaxy",
-            "storage_type": "File",
             "web": {
               "replicas": 1,
               "resource_requirements": {
@@ -179,7 +140,7 @@ metadata:
           }
         },
         {
-          "apiVersion": "repo-manager.pulpproject.org/v1alpha1",
+          "apiVersion": "repo-manager.pulpproject.org/v1beta2",
           "kind": "PulpBackup",
           "metadata": {
             "name": "pulpbackup-sample"
@@ -189,12 +150,11 @@ metadata:
             "backup_storage_class": "standard",
             "deployment_name": "galaxy-example",
             "deployment_type": "galaxy",
-            "instance_name": "pulp",
             "postgres_configuration_secret": "galaxy-example-postgres-configuration"
           }
         },
         {
-          "apiVersion": "repo-manager.pulpproject.org/v1alpha1",
+          "apiVersion": "repo-manager.pulpproject.org/v1beta2",
           "kind": "PulpRestore",
           "metadata": {
             "name": "ci-pulprestore"
@@ -205,16 +165,16 @@ metadata:
           }
         }
       ]
-    capabilities: Seamless Upgrades
+    capabilities: Full Lifecycle
     categories: Integration & Delivery
-    containerImage: quay.io/pulp/pulp-operator:v1.0.0-alpha.1
-    createdAt: "2021-03-26 16:57:40"
+    containerImage: quay.io/pulp/pulp-operator:v1.0.0-beta.3
+    createdAt: "2023-12-04T14:48:41Z"
     description: Pulp is a platform for managing repositories of software packages
       and making them available to a large number of consumers.
-    operators.operatorframework.io/builder: operator-sdk-v1.25.0
+    operators.operatorframework.io/builder: operator-sdk-v1.29.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/pulp/pulp-operator
-  name: pulp-operator.v1.0.0-alpha.1
+  name: pulp-operator.v1.0.0-beta.3
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -230,6 +190,11 @@ spec:
         path: admin_password_secret
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
+      - description: Affinity is a group of affinity scheduling rules.
+        displayName: Affinity
+        path: affinity
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Name of the PVC to be used for storing the backup
         displayName: Backup PVC
         path: backup_pvc
@@ -247,18 +212,19 @@ spec:
       - description: Name of the deployment to be backed up
         displayName: Deployment Name
         path: deployment_name
-      - displayName: Deployment Type
+      - description: Name of the deployment type. Can be one of {galaxy,pulp}.
+        displayName: Deployment Type
         path: deployment_type
-      - displayName: Instance Name
-        path: instance_name
       - description: Secret where the database configuration can be found
         displayName: Database configuration
         path: postgres_configuration_secret
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
-      - description: Label selector used to identify postgres pod for executing migration
-        displayName: Postgres Label Selector
-        path: postgres_label_selector
+      - description: Secret where the Django SECRET_KEY configuration can be found
+        displayName: Django SECRET_KEY configuration
+        path: pulp_secret_key
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
       statusDescriptors:
       - description: Administrator password secret used by the deployed instance
         displayName: Admin Password Secret
@@ -276,25 +242,10 @@ spec:
         path: conditions
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes.conditions
-      - description: Container token configuration secret used by the deployed instance
-        displayName: Container Token Secret
-        path: containerTokenSecret
-      - description: Database configuration secret used by the deployed instance
-        displayName: Database Config Secret
-        path: databaseConfigurationSecret
-      - description: DB fields encryption configuration secret used by deployed instance
-        displayName: DBFields Encryption Secret
-        path: dbFieldsEncryptionSecret
       - description: Name of the deployment backed up
         displayName: Deployment Name
         path: deploymentName
-      - description: The deployment storage type
-        displayName: Deployment Storage Type
-        path: deploymentStorageType
-      - description: Objectstorage configuration secret used by the deployed instance
-        displayName: Storage Secret
-        path: storageSecret
-      version: v1alpha1
+      version: v1beta2
     - description: PulpRestore is the Schema for the pulprestores API
       displayName: Pulp Restore
       kind: PulpRestore
@@ -311,34 +262,17 @@ spec:
           the backup object (backupClaim)
         displayName: Backup PVC
         path: backup_pvc
-      - description: Namespace the PVC is in
-        displayName: Backup PVCNamespace
-        path: backup_pvc_namespace
-        x-descriptors:
-        - urn:alm:descriptor:io.kubernetes:Namespace
-      - description: backup source
-        displayName: Backup Source
-        path: backup_source
       - description: Name of the deployment to be restored to
         displayName: Deployment Name
         path: deployment_name
-      - displayName: Deployment Type
+      - description: Name of the deployment type. Can be one of {galaxy,pulp}.
+        displayName: Deployment Type
         path: deployment_type
       - description: KeepBackupReplicasCount allows to define if the restore controller
           should restore the components with the same number of replicas from backup
           or restore only a single replica each.
         displayName: Keep Backup Replicas Count
         path: keep_replicas
-      - description: Label selector used to identify postgres pod for executing migration
-        displayName: Postgres Label Selector
-        path: postgres_label_selector
-      - description: Configuration for the storage type utilized in the backup
-        displayName: Storage Type
-        path: storage_type
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:select:File
-        - urn:alm:descriptor:com.tectonic.ui:select:S3
-        - urn:alm:descriptor:com.tectonic.ui:select:Azure
       statusDescriptors:
       - displayName: Conditions
         path: conditions
@@ -346,18 +280,37 @@ spec:
         - urn:alm:descriptor:io.kubernetes.conditions
       - displayName: Postgres Secret
         path: postgres_secret
-      version: v1alpha1
+      version: v1beta2
     - description: Pulp is the Schema for the pulps API
       displayName: Pulp
       kind: Pulp
       name: pulps.repo-manager.pulpproject.org
       specDescriptors:
+      - description: 'The image name for the container. By default, if not provided,
+          it will use the same image from .Spec.Image. WARN: defining a different
+          image than the one used by API pods can cause unexpected behaviors!'
+        displayName: Image
+        path: admin_password_job.container.image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Resource requirements for pulpcore aux container.
+        displayName: Resource Requirements
+        path: admin_password_job.container.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: 'Secret where the administrator password can be found. Default:
           <operator''s name> + "-admin-password"'
         displayName: Admin Password Secret
         path: admin_password_secret
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: 'List of allowed checksum algorithms used to verify repository''s
+          integrity. Valid options: ["md5","sha1","sha256","sha512"].'
+        displayName: Allowed Content Checksums
+        path: allowed_content_checksums
+        x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Api defines desired state of pulpcore-api resources
         displayName: Api
@@ -379,6 +332,19 @@ spec:
         path: api.gunicorn_workers
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:number
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: 'The image name for the container. By default, if not provided,
+          it will use the same image from .Spec.Image. WARN: defining a different
+          image than the one used by API pods can cause unexpected behaviors!'
+        displayName: Image
+        path: api.init_container.image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Resource requirements for pulpcore aux container.
+        displayName: Resource Requirements
+        path: api.init_container.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Periodic probe of container liveness. Container will be restarted
           if the probe fails.
@@ -556,6 +522,19 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:number
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: 'The image name for the container. By default, if not provided,
+          it will use the same image from .Spec.Image. WARN: defining a different
+          image than the one used by API pods can cause unexpected behaviors!'
+        displayName: Image
+        path: content.init_container.image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Resource requirements for pulpcore aux container.
+        displayName: Resource Requirements
+        path: content.init_container.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Periodic probe of container liveness. Container will be restarted
           if the probe fails.
         displayName: Liveness Probe
@@ -710,9 +689,28 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: 'Define if the operator should or should not deploy the default
+          Execution Environments. Default: false'
+        displayName: Deploy EEDefaults
+        path: deploy_ee_defaults
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
       - description: 'Name of the deployment type. Default: "pulp"'
         displayName: Deployment Type
         path: deployment_type
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: Disable database migrations. Useful for situations in which we
+          don't want to automatically run the database migrations, for example, during
+          restore.
+        displayName: Disable Migrations
+        path: disable_migrations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: 'Name of the ConfigMap with the list of Execution Environments
+          that should be synchronized. Default: ee-default-images'
+        displayName: EEDefaults
+        path: ee_defaults
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:hidden
       - description: The file storage access mode. This field should be used only
@@ -720,19 +718,19 @@ spec:
         displayName: File Storage Access Mode
         path: file_storage_access_mode
         x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:storage_type:File
+        - urn:alm:descriptor:com.tectonic.ui:hidden
         - urn:alm:descriptor:com.tectonic.ui:select:ReadWriteMany
       - description: The size of the file storage; for example 100Gi. This field should
           be used only if file_storage_storage_class is provided
         displayName: File Storage Size
         path: file_storage_size
         x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:storage_type:File
+        - urn:alm:descriptor:com.tectonic.ui:hidden
       - description: Storage class to use for the file persistentVolumeClaim
         displayName: File Storage Class
         path: file_storage_storage_class
         x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:storage_type:File
+        - urn:alm:descriptor:com.tectonic.ui:hidden
         - urn:alm:descriptor:io.kubernetes:StorageClass
       - description: 'The timeout for HAProxy. Default: "180s"'
         displayName: HAProxy Timeout
@@ -777,11 +775,25 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Ingress
+      - description: 'IngressClassName is used to inform the operator which ingressclass
+          should be used to provision the ingress. Default: "" (will use the default
+          ingress class)'
+        displayName: Ingress Class Name
+        path: ingress_class_name
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Ingress
       - description: Ingress DNS host
         displayName: Ingress Host
         path: ingress_host
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Ingress
+      - description: Ingress TLS secret
+        displayName: Ingress TLSSecret
+        path: ingress_tls_secret
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
         - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Ingress
       - description: 'The ingress type to use to reach the deployed instance. Default:
           none (will not expose the service)'
@@ -792,6 +804,56 @@ spec:
         - urn:alm:descriptor:com.tectonic.ui:select:Ingress
         - urn:alm:descriptor:com.tectonic.ui:select:LoadBalancer
         - urn:alm:descriptor:com.tectonic.ui:select:NodePort
+      - description: 'Relax the check of image_version and image_web_version not matching.
+          Default: "false"'
+        displayName: Inhibit Version Constraint
+        path: inhibit_version_constraint
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: 'Define if the IngressClass provided has Nginx as Ingress Controller.
+          If the Ingress Controller is not nginx the operator will automatically provision
+          `pulp-web` pods to redirect the traffic. If it is a nginx controller the
+          traffic will be forwarded to api and content pods. This variable is a workaround
+          to avoid having to grant a ClusterRole (to do a get into the IngressClass
+          and verify the controller). Default: false'
+        displayName: Is Nginx Ingress
+        path: is_nginx_ingress
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Ingress
+      - description: The name of the Secret with the CA chain to connect to ldap server.
+        displayName: CA
+        path: ldap.ca
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: The name of the Secret with ldap config.
+        displayName: Config
+        path: ldap.config
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Port exposed by pulp-web service when ingress_type==loadbalancer
+        displayName: Loadbalancer Port
+        path: loadbalancer_port
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Protocol used by pulp-web service when ingress_type==loadbalancer
+        displayName: Loadbalancer Protocol
+        path: loadbalancer_protocol
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: 'The image name for the container. By default, if not provided,
+          it will use the same image from .Spec.Image. WARN: defining a different
+          image than the one used by API pods can cause unexpected behaviors!'
+        displayName: Image
+        path: migration_job.container.image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Resource requirements for pulpcore aux container.
+        displayName: Resource Requirements
+        path: migration_job.container.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: 'Define if the operator should or should not mount the custom
           CA certificates added to the cluster via cluster-wide proxy config. Default:
           false'
@@ -839,13 +901,19 @@ spec:
         path: object_storage_azure_secret
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
-        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:storage_type:Azure
+        - urn:alm:descriptor:com.tectonic.ui:hidden
       - description: The secret for S3 compliant object storage configuration.
         displayName: S3 secret
         path: object_storage_s3_secret
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
-        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:storage_type:S3
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: 'Name of the Secret to provide Django cryptographic signing.
+          Default: "pulp-secret-key"'
+        displayName: Pulp Secret Key
+        path: pulp_secret_key
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
       - description: Definition of /etc/pulp/settings.py config file.
         displayName: Pulp Settings
         path: pulp_settings
@@ -859,6 +927,13 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: RouteAnnotations will append custom annotation(s) into routes
+          (used by router shard routeSelector).
+        displayName: Route Annotations
+        path: route_annotations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Route
       - description: 'Route DNS host. Default: <operator''s name> + "." + ingress.Spec.Domain'
         displayName: Route Host
         path: route_host
@@ -872,15 +947,52 @@ spec:
         path: route_labels
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: 'ConfigMap where the signing scripts are stored. Default: <operators''s
-          name>-"-signing-scripts"'
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Route
+      - description: Name of the secret with the certificates/keys used by route encryption
+        displayName: Route TLSSecret
+        path: route_tls_secret
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Route
+      - description: ServiceAccount.metadata.annotations that will be used in Pulp
+          pods.
+        displayName: SAAnnotations
+        path: sa_annotations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: ServiceAccount.metadata.labels that will be used in Pulp pods.
+        displayName: SALabels
+        path: sa_labels
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: 'The image name for the container. By default, if not provided,
+          it will use the same image from .Spec.Image. WARN: defining a different
+          image than the one used by API pods can cause unexpected behaviors!'
+        displayName: Image
+        path: signing_job.container.image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Resource requirements for pulpcore aux container.
+        displayName: Resource Requirements
+        path: signing_job.container.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Name of the Secret where the signing scripts are stored.
+        displayName: Signing Scripts
+        path: signing_scripts
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: '[DEPRECATED] ConfigMap where the signing scripts are stored.
+          This field is deprecated and will be removed in the future, use the signing_scripts
+          field instead.'
         displayName: Signing Scripts Configmap
         path: signing_scripts_configmap
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:ConfigMap
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: 'Secret where the signing certificates are stored. Default: <operators''s
-          name>-"-signing-scripts"'
+      - description: Name of the Secret where the gpg key is stored.
         displayName: Signing Secret
         path: signing_secret
         x-descriptors:
@@ -892,13 +1004,12 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:Secret
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Configuration for the storage type utilized in the backup
-        displayName: Storage Type
-        path: storage_type
+      - description: Resource requirements for the sidecar container.
+        displayName: Resource Requirements
+        path: telemetry.resource_requirements
         x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:select:File
-        - urn:alm:descriptor:com.tectonic.ui:select:S3
-        - urn:alm:descriptor:com.tectonic.ui:select:Azure
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: 'Define if the operator should stop managing Pulp resources.
           If set to true, the operator will not execute any task (it will be "disabled").
           Default: false'
@@ -947,6 +1058,23 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Annotations for the service
+        displayName: Service Annotations
+        path: web.service_annotations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: The deployment strategy to use to replace existing pods with
+          new ones.
+        displayName: Strategy
+        path: web.strategy
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:updateStrategy
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: 'The secure TLS termination mechanism to use Default: "edge"'
+        displayName: TLSTermination Mechanism
+        path: web.tls_termination_mechanism
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Worker defines desired state of pulpcore-worker resources
         displayName: Worker
         path: worker
@@ -954,6 +1082,19 @@ spec:
         displayName: Affinity
         path: worker.affinity
         x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: 'The image name for the container. By default, if not provided,
+          it will use the same image from .Spec.Image. WARN: defining a different
+          image than the one used by API pods can cause unexpected behaviors!'
+        displayName: Image
+        path: worker.init_container.image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Resource requirements for pulpcore aux container.
+        displayName: Resource Requirements
+        path: worker.init_container.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Periodic probe of container liveness. Container will be restarted
           if the probe fails.
@@ -1014,7 +1155,7 @@ spec:
         path: conditions
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes.conditions
-      version: v1alpha1
+      version: v1beta2
   description: |-
     [Pulp](https://pulpproject.org/) is a platform for managing repositories of content, such as software packages, and making them available to a large number of consumers.
 
@@ -1080,22 +1221,6 @@ spec:
       clusterPermissions:
       - rules:
         - apiGroups:
-          - config.openshift.io
-          resources:
-          - ingresses
-          verbs:
-          - get
-          - list
-          - watch
-        - apiGroups:
-          - networking.k8s.io
-          resources:
-          - ingressclasses
-          verbs:
-          - get
-          - list
-          - watch
-        - apiGroups:
           - authentication.k8s.io
           resources:
           - tokenreviews
@@ -1137,7 +1262,7 @@ spec:
                 - --upstream=http://127.0.0.1:8080/
                 - --logtostderr=true
                 - --v=0
-                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.0
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.14.4
                 name: kube-rbac-proxy
                 ports:
                 - containerPort: 8443
@@ -1176,7 +1301,7 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.annotations['olm.targetNamespaces']
-                image: quay.io/pulp/pulp-operator:v1.0.0-alpha.1
+                image: quay.io/pulp/pulp-operator:v1.0.0-beta.3
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -1199,6 +1324,9 @@ spec:
                     memory: 64Mi
                 securityContext:
                   allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
               imagePullSecrets:
               - name: redhat-operators-pull-secret
               securityContext:
@@ -1239,19 +1367,23 @@ spec:
           - create
           - patch
         - apiGroups:
-          - ""
-          resources:
-          - events
-          verbs:
-          - create
-          - patch
-        - apiGroups:
           - apps
-          - networking.k8s.io
           resources:
           - deployments
-          - ingresses
           - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - batch
+          resources:
+          - cronjobs
+          - jobs
           verbs:
           - create
           - delete
@@ -1265,7 +1397,10 @@ spec:
           resources:
           - configmaps
           - persistentvolumeclaims
+          - pods
+          - pods/log
           - secrets
+          - serviceaccounts
           - services
           verbs:
           - create
@@ -1275,6 +1410,13 @@ spec:
           - patch
           - update
           - watch
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
         - apiGroups:
           - ""
           resources:
@@ -1292,24 +1434,13 @@ spec:
         - apiGroups:
           - ""
           resources:
-          - pods
-          - pods/log
-          verbs:
-          - get
-          - list
-        - apiGroups:
-          - ""
-          resources:
           - pods/exec
           verbs:
           - create
         - apiGroups:
-          - ""
-          - rbac.authorization.k8s.io
+          - networking.k8s.io
           resources:
-          - rolebindings
-          - roles
-          - serviceaccounts
+          - ingresses
           verbs:
           - create
           - delete
@@ -1322,6 +1453,19 @@ spec:
           - policy
           resources:
           - poddisruptionbudgets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - rolebindings
+          - roles
           verbs:
           - create
           - delete
@@ -1469,4 +1613,5 @@ spec:
     name: pulp-redis
   - image: docker.io/library/postgres:13
     name: pulp-postgres
-  version: 1.0.0-alpha.1
+  version: 1.0.0-beta.3
+  replaces: pulp-operator.v1.0.0-beta.2

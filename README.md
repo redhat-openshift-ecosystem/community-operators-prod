@@ -9,6 +9,10 @@ This repo is the canonical source for Kubernetes Operators that appear on [OpenS
 consumed by Openshift and OKD to create their sources and built their catalog. To know more about how
 Openshift catalog are built see the [documentation](https://docs.openshift.com/container-platform/4.6/operators/understanding/olm-rh-catalogs.html#olm-rh-catalogs_olm-rh-catalogs).
 
+## Testing and release process for the Operator
+
+Refer to the [Community operator pipeline documentation](docs/community-operator-pipeline.md) .
+
 ## Documentation
 
 Full documentation is generated via [mkdoc](https://www.mkdocs.org/) and is located at [https://redhat-openshift-ecosystem.github.io/community-operators-prod/](https://redhat-openshift-ecosystem.github.io/community-operators-prod/)

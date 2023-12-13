@@ -21,7 +21,7 @@ on:
       index:
         description: 'Target index (as a JSON list, e.g. ["v4.10-db", "v4.11"])'
         required: true
-        default: '["v4.10-db", "v4.11", "v4.12", "v4.13", "v4.14-rc", "v4.15-rc"]'
+        default: '["v4.11", "v4.12", "v4.13", "v4.14", "v4.15-rc"]'
 
       list_of_operators:
         description: 'List of operators to be synced in the index, list has to be devided by spaces (e.g. aqua ripsaw)'
@@ -208,7 +208,7 @@ jobs:
           OPP_AUTO_PACKAGEMANIFEST_CLUSTER_VERSION_LABEL: "${{ needs.pr-check.outputs.opp_auto_packagemanifest_cluster_version_label }}"
           OPP_IIB_INSTALL: 0
           IIB_INPUT_REGISTRY_TOKEN: ${{ secrets.IIB_INPUT_REGISTRY_TOKEN }}
-          OPERATOR_INDEX_TAG: "orange_v4.10 orange_v4.11 orange_v4.12 orange_v4.13 orange_v4.14 orange_v4.15"
+          OPERATOR_INDEX_TAG: "orange_v4.11 orange_v4.12 orange_v4.13 orange_v4.14 orange_v4.15"
 
           OPP_INDEX_CHECK_ONLY: 1
         run: |
@@ -224,7 +224,6 @@ jobs:
       - name: Index check
         run: |
           echo "Operators : ${{ steps.operators.outputs.opp_uncomplete_operators }}"
-          echo "Operators (v4.10) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"
           echo "Operators (v4.11) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_11 }}"
           echo "Operators (v4.12) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_12 }}"
           echo "Operators (v4.13) : ${{ steps.operators.outputs.opp_uncomplete_operators_v4_13 }}"
@@ -268,7 +267,6 @@ jobs:
           [ -f /tmp/operator-test/op_info.yaml ] && cat /tmp/operator-test/op_info.yaml || echo "opp_uncomplete_operators=" >> $GITHUB_OUTPUT    
     outputs:
       opp_uncomplete_operators: "${{ steps.operators.outputs.opp_uncomplete_operators }}"
-      opp_uncomplete_operators_v4_10: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_10 }}"
       opp_uncomplete_operators_v4_11: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_11 }}"
       opp_uncomplete_operators_v4_12: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_12 }}"
       opp_uncomplete_operators_v4_13: "${{ steps.operators.outputs.opp_uncomplete_operators_v4_13 }}"

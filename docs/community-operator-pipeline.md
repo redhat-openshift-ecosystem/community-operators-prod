@@ -5,8 +5,12 @@ The community operator pipeline provides a platform for openshift community cont
 **community-hosted-pipeline**
 
 The community hosted pipeline is used to certify the Operator bundles.
-It’s an additional layer of validation that has to run within the Red Hat infrastructure. It is intended to be triggered upon the creation of a bundle pull request and successfully completes with merging it (configurable).
 
+It’s an additional layer of validation that has to run within the Red Hat infrastructure. It is intended to be triggered upon the creation of a bundle pull request and successfully completes with merging it. As part of the community hosted pipeline, the operator submitted in the PR will be tested via preflight trigger. 
+
+The community hosted pipeline run results will be posted in the github PR comment.
+
+![community-hosted-pipeline](images/op_test_pr.png)
 
 **community-release-pipeline**
 
@@ -15,7 +19,12 @@ It's intended to be triggered by the merge of a bundle pull request by the hoste
 It successfully completes once the bundle has been distributed to all relevant Operator catalogs
 and appears in the Red Hat Ecosystem Catalog.
 
-There are new github pull request labels introduced for the community operator pipeline.
+The community release pipeline run results will be posted in the github PR comment.
+
+![community-hosted-pipeline](images/op_release.png)
+
+
+### There are new github pull request labels introduced for the community operator pipeline.
 
 | Label Name                               | Label Description                                                                           |
 |------------------------------------------|---------------------------------------------------------------------------------------------|

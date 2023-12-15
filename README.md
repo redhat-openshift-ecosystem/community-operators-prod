@@ -9,9 +9,24 @@ This repo is the canonical source for Kubernetes Operators that appear on [OpenS
 consumed by Openshift and OKD to create their sources and built their catalog. To know more about how
 Openshift catalog are built see the [documentation](https://docs.openshift.com/container-platform/4.6/operators/understanding/olm-rh-catalogs.html#olm-rh-catalogs_olm-rh-catalogs).
 
-## Documentation
+## Add your Operator
 
-Full documentation is generated via [mkdoc](https://www.mkdocs.org/) and is located at [https://redhat-openshift-ecosystem.github.io/community-operators-prod/](https://redhat-openshift-ecosystem.github.io/community-operators-prod/)
+We would love to see your Operator added to this collection. We currently use automated vetting via continuous integration plus manual review to curate a list of high-quality, well-documented Operators. If you are new to Kubernetes Operators start [here](https://sdk.operatorframework.io/build/).
+
+If you have an existing Operator read our contribution guidelines on how to [package](docs/packaging-operator.md). Then the community operator pipeline will be triggered to test your Operator and merge a Pull Request.
+
+## Contributing Guide
+
+- [Prerequisites](docs/contributing-prerequisites.md)
+- [Where to place operator](docs/contributing-where-to.md)
+- [Creating pull request (PR)](docs/contributing-via-pr.md)
+- [Accepted Bundle Format](docs/accepted_bundle_formats.md)
+- [Operator Publishing / Review settings](docs/operator-ci-yaml.md)
+- [OKD/OpenShift Catalogs criteria and options](docs/packaging-required-criteria-ocp.md)
+
+## Test and release process for the Operator
+
+Refer to the [Community operator pipeline documentation](docs/community-operator-pipeline.md) .
 
 ## IMPORTANT NOTICE
 

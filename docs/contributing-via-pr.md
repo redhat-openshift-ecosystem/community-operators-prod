@@ -3,11 +3,10 @@
 ## Overview
 To submit an operator one has to do these steps
 
-1. Fork project `https://github.com/operator-framework/community-operators`
+1. Fork project `https://github.com/redhat-openshift-ecosystem/community-operators-prod`
 1. Make a pull request
 1. Place the operator in the target directory. [More info](./contributing-where-to.md)
-    - community-operators (Openshift operator)
-    - upstream-community-operators (Kubernetes operator)
+    - operators
 1. Configure `ci.yaml` file. [More info](./operator-ci-yaml.md)
     - Setup reviewers
     - Operator versioning strategy
@@ -36,7 +35,5 @@ You can post the following comment/command:
 
 Command | Functionality |
 --- | --- | 
-`/hold` | Setting PR on hold to prevent merging |
-`/hold cancel` | Tests will be triggered again and merged if possible |
-`/pipeline restart community-hosted-pipeline` | Tests will be triggered again and merged if possible |
-`/pipeline restart community-release-pipeline` | The release process will be triggered again
+`/pipeline restart community-hosted-pipeline` | The hosted pipeline will be re-triggered and PR will be merged if possible. |
+`/pipeline restart community-release-pipeline` | The release pipeline will be re-triggered.

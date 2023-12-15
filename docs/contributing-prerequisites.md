@@ -2,10 +2,9 @@
 
 > **Important:** "First off, thanks for taking the time to contribute your Operator!"
 
-## A primer to Kubernetes Community Operators
+## A primer to Openshift Community Operators
 
-This project collects Operators and publishes them to OperatorHub.io, a central registry for community-powered Kubernetes Operators. For OperatorHub.io your Operator needs to work with vanilla Kubernetes.
-This project also collects Community Operators that work with OpenShift to be displayed in the embedded OperatorHub. If you are new to Operators, start [here](https://github.com/operator-framework/getting-started).
+This project collects Community Operators that work with OpenShift to be displayed in the embedded OperatorHub. If you are new to Operators, start [here](https://operatorframework.io/).
 
 ## Sign Your Work
 

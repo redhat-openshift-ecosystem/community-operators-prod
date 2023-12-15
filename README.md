@@ -20,8 +20,8 @@ If you have an existing Operator read our contribution guidelines on how to [pac
 - [Prerequisites](docs/contributing-prerequisites.md)
 - [Where to place operator](docs/contributing-where-to.md)
 - [Creating pull request (PR)](docs/contributing-via-pr.md)
+- [Accepted Bundle Format](docs/accepted_bundle_formats.md)
 - [Operator Publishing / Review settings](docs/operator-ci-yaml.md)
-- [Updating existing Operators](docs/operator-version-update.md)
 - [OKD/OpenShift Catalogs criteria and options](docs/packaging-required-criteria-ocp.md)
 
 ## Test and release process for the Operator

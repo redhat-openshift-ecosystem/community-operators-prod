@@ -50,9 +50,9 @@ The logo for your Operator is inlined into the CSV as a base64-encoded string. T
 
 ### Categories
 
-For the best user experience, choose from the [categories](https://github.com/operator-framework/community-operators/blob/master/categories.json).
+For the best user experience, choose from the [categories](https://github.com/redhat-openshift-ecosystem/community-operators-prod/blob/main/categories.json).
 
-If none of these categories fit your operator, please open a separate PR against [categories.json](https://github.com/operator-framework/community-operators/blob/master/categories.json). Once merged, you can open a PR with your operator assigned to your new category.
+If none of these categories fit your operator, please open a separate PR against [categories.json](https://github.com/redhat-openshift-ecosystem/community-operators-prod/blob/main/categories.json). Once merged, you can open a PR with your operator assigned to your new category.
 
 ## Example CSV
 

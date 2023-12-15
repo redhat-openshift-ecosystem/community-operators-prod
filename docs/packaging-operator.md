@@ -18,7 +18,7 @@ For more information about the advanced features of the Operator metadata format
 
 ##### Categories #####
 
-An Operator's CSV must contain the fields mentioned [here](https://github.com/operator-framework/community-operators/blob/master/docs/packaging-required-fields.md#packaging-required-fields-for-operatorhub) for it to be displayed properly within the various platforms. If your operator needs a new category, follow the instructions about [categories](https://github.com/operator-framework/community-operators/blob/master/docs/packaging-required-fields.md#categories).
+An Operator's CSV must contain the fields mentioned [here](./packaging-required-fields.md#packaging-required-fields-for-operatorhub) for it to be displayed properly within the various platforms. If your operator needs a new category, follow the instructions about [categories](./packaging-required-fields.md#categories).
 
 There is one CSV per version of your Operator alongside the CRDs.
 

@@ -2,27 +2,19 @@ Thanks for submitting your Operator. Please check the below list before you crea
 
 ### New Submissions
 
-* [ ] Are you familiar with our [contribution guidelines](https://github.com/operator-framework/community-operators/blob/master/docs/contributing-via-pr.md)?
-* [ ] Have you [packaged and deployed](https://github.com/operator-framework/community-operators/blob/master/docs/testing-operators.md) your Operator for Operator Framework?
-* [ ] Have you tested your Operator with all Custom Resource Definitions?
-* [ ] Have you tested your Operator in all supported [installation modes](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/doc/design/building-your-csv.md#operator-metadata)?
+* [ ] Are you familiar with our [contribution guidelines](contributing-via-pr.md)?
+* [ ] Are you familiar with our [operator pipeline](community-operator-pipeline.md)?
+* [ ] Have you tested your Operator with all Custom Resource Definitions [packaging](packaging-operator.md)?
+* [ ] Have you tested your Operator in all supported [installation modes](operator-ci-yaml.md##Operator-versioning)?
 * [ ] Have you considered whether you want to use [semantic versioning order](https://github.com/operator-framework/community-operators/blob/master/docs/operator-ci-yaml.md#semver-mode)?
-* [ ] Is your submission [signed](https://github.com/operator-framework/community-operators/blob/master/docs/contributing-prerequisites.md#sign-your-work)?
-* [ ] Is operator [icon](https://github.com/operator-framework/community-operators/blob/master/docs/packaging-operator.md#operator-icon) set?
-
-### Updates to existing Operators
-
-* [ ] Did you create a `ci.yaml` file according to the [update instructions](https://github.com/operator-framework/community-operators/blob/master/docs/operator-ci-yaml.md)?
-* [ ] Is your new CSV pointing to the previous version with the `replaces` property if you chose `replaces-mode` via the `updateGraph` property in `ci.yaml`?
-* [ ] Is your new CSV referenced in the [appropriate channel](https://github.com/operator-framework/community-operators/blob/master/docs/packaging-operator.md#channels) defined in the `package.yaml` or `annotations.yaml` ?
-* [ ] Have you tested an update to your Operator when deployed via OLM?
-* [ ] Is your submission [signed](https://github.com/operator-framework/community-operators/blob/master/docs/contributing-prerequisites.md#sign-your-work)?
+* [ ] Is your submission [signed](contributing-prerequisites.md#sign-your-work)?
+* [ ] Is operator [icon](packaging-operator.md#operator-icon) set?
 
 ### Your submission should not
 
-* [ ] Modify more than one operator
-* [ ] Modify an Operator you don't own
-* [ ] Rename an operator - please remove and add with a different name instead
+* [ ] Add more than one operator bundle per PR
+* [ ] Modify any operator
+* [ ] Rename an operator
 * [ ] Modify any files outside the above mentioned folders
 * [ ] Contain more than one commit. **Please squash your commits.**
 
@@ -35,7 +27,7 @@ Thanks for submitting your Operator. Please check the below list before you crea
 ### Operator Metadata should contain
 
 * [ ] Human readable name and 1-liner description about your Operator
-* [ ] Valid [category name](https://github.com/operator-framework/community-operators/blob/master/docs/packaging-operator.md#categories)<sup>1</sup>
+* [ ] Valid [category name](./packaging-operator.md#categories)<sup>1</sup>
 * [ ] One of the pre-defined [capability levels](https://github.com/operator-framework/operator-courier/blob/4d1a25d2c8d52f7de6297ec18d8afd6521236aa2/operatorcourier/validate.py#L556)<sup>2</sup>
 * [ ] Links to the maintainer, source code and documentation
 * [ ] Example templates for all Custom Resource Definitions intended to be used

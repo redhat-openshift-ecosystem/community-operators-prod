@@ -1,0 +1,66 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.6.1
+  creationTimestamp: null
+  name: demoresources.tools.opdev.io
+spec:
+  group: tools.opdev.io
+  names:
+    kind: DemoResource
+    listKind: DemoResourceList
+    plural: demoresources
+    singular: demoresource
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.specMessage
+      name: Message
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: DemoResource is the Schema for the demoresources API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DemoResourceSpec defines the desired state of DemoResource
+            properties:
+              message:
+                description: Message is a random string.
+                type: string
+            required:
+            - message
+            type: object
+          status:
+            description: DemoResourceStatus defines the observed state of DemoResource
+            properties:
+              specMessage:
+                description: SpecMessage reflects the message passed by the user in
+                  the spec.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

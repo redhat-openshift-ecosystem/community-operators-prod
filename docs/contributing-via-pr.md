@@ -34,6 +34,6 @@ In case of failures, please have a look at the logs of specific tests. If an err
 You can post the following comment/command:
 
 Command | Functionality |
---- | --- | 
+--- | --- |
 `/pipeline restart community-hosted-pipeline` | The hosted pipeline will be re-triggered and PR will be merged if possible. |
 `/pipeline restart community-release-pipeline` | The release pipeline will be re-triggered.

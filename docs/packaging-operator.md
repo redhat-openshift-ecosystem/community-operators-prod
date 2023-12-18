@@ -4,7 +4,7 @@ This repository makes use of the [Operator Framework](https://github.com/operato
 
 ### Packaging format
 
-Your Operator submission can be formatted following the `bundle` or `packagemanifest` format. The `packagemanifest` format is a legacy format that is kept for backward compatibility only and then, it strongly recommended to use `bundle` format. The former allows shipping your entire Operator with all its versions in one single directory. The latter allows shipping individual releases in container images. 
+Your Operator submission can be formatted following the `bundle` or `packagemanifest` format. The `packagemanifest` format is a legacy format that is kept for backward compatibility only and then, it strongly recommended to use `bundle` format. The former allows shipping your entire Operator with all its versions in one single directory. The latter allows shipping individual releases in container images.
 
 In general, a released version of your Operator is described in a `ClusterServiceVersion` manifest alongside the `CustomResourceDefinitions` of your Operator and additional metadata describing your Operator listing.
 
@@ -22,13 +22,13 @@ An Operator's CSV must contain the fields mentioned [here](./packaging-required-
 
 There is one CSV per version of your Operator alongside the CRDs.
 
-#### Create a release 
+#### Create a release
 
 The `bundle` format has a top-level directory named after your Operator name in the `ClusterServiceVersion` directory. Inside are sub-directories for the individual bundle, named after the [semantic versioning](https://semver.org) release of your Operator.
 
 All metadata is defined within the individual release of the Operator. That is, inside each bundle. This includes the channel definitions. The default channel is also defined within the bundle and overwritten by every new bundle you add (this is a known limitation and is being worked on).
 
-Within each version, you have your `CustomResourceDefinitions`, `ClusterServiceVersion` file (containing the same name and version of your Operator as defined inside the YAML structure) and some metadata about the bundle. You can [learn more about the bundle format here](https://olm.operatorframework.io/docs/tasks/creating-operator-bundle/) and also see an [example](https://github.com/operator-framework/bundle-example). 
+Within each version, you have your `CustomResourceDefinitions`, `ClusterServiceVersion` file (containing the same name and version of your Operator as defined inside the YAML structure) and some metadata about the bundle. You can [learn more about the bundle format here](https://olm.operatorframework.io/docs/tasks/creating-operator-bundle/) and also see an [example](https://github.com/operator-framework/bundle-example).
 
 Note that this community project only requires you to submit your bundle in the form of metadata. The integrated release pipeline of this repository will take care of publishing your bundle as a container image and maintaining it in a public catalog.
 
@@ -117,7 +117,7 @@ operator-sdk bundle validate /tmp/my-operator-2.0.0-bundle/ --select-optional na
 #### About the Dockerfile
 
 A `Dockerfile` is typically part of the bundle metadata used to build the bundle image. For security reasons, our release process is generating an internal `Dockerfile` that is used to build and publish the bundle image. Existing `Dockerfile` or `bundle.Dockerfile` will be ignored.  You can leverage the `annotations.yaml` file to control custom labels the resulting image should have. For example:
- 
+
 ```
 annotations:
   # Core bundle annotations.
@@ -170,7 +170,7 @@ The icon is defined in a CSV as `spec.icon`. If you don't have an own icon, you 
     - base64data: "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTguNTEgMjU4LjUxIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2QxZDFkMTt9LmNscy0ye2ZpbGw6IzhkOGQ4Zjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPkFzc2V0IDQ8L3RpdGxlPjxnIGlkPSJMYXllcl8yIiBkYXRhLW5hbWU9IkxheWVyIDIiPjxnIGlkPSJMYXllcl8xLTIiIGRhdGEtbmFtZT0iTGF5ZXIgMSI+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTI5LjI1LDIwQTEwOS4xLDEwOS4xLDAsMCwxLDIwNi40LDIwNi40LDEwOS4xLDEwOS4xLDAsMSwxLDUyLjExLDUyLjExLDEwOC40NSwxMDguNDUsMCwwLDEsMTI5LjI1LDIwbTAtMjBoMEM1OC4xNiwwLDAsNTguMTYsMCwxMjkuMjVIMGMwLDcxLjA5LDU4LjE2LDEyOS4yNiwxMjkuMjUsMTI5LjI2aDBjNzEuMDksMCwxMjkuMjYtNTguMTcsMTI5LjI2LTEyOS4yNmgwQzI1OC41MSw1OC4xNiwyMDAuMzQsMCwxMjkuMjUsMFoiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzcuNTQsMTAzLjQxSDE0MS42NkwxNTQuOSw2NS43NmMxLjI1LTQuNC0yLjMzLTguNzYtNy4yMS04Ljc2SDEwMi45M2E3LjMyLDcuMzIsMCwwLDAtNy40LDZsLTEwLDY5LjYxYy0uNTksNC4xNywyLjg5LDcuODksNy40LDcuODloMzYuOUwxMTUuNTUsMTk3Yy0xLjEyLDQuNDEsMi40OCw4LjU1LDcuMjQsOC41NWE3LjU4LDcuNTgsMCwwLDAsNi40Ny0zLjQ4TDE4NCwxMTMuODVDMTg2Ljg2LDEwOS4yNCwxODMuMjksMTAzLjQxLDE3Ny41NCwxMDMuNDFaIi8+PC9nPjwvZz48L3N2Zz4="
       mediatype: "image/svg+xml"
 ```
-Supported formats: svg, jpg, png 
+Supported formats: svg, jpg, png
 
 ### Updating your existing Operator
 
@@ -192,36 +192,6 @@ Works like `semver` with slightly different behavior of OLM on the cluster, wher
 Each Operator bundle not only contains `spec.version` but also points to an older version it can upgrade from via `spec.replaces` key in the CSV file, e.g. `replaces: my-operator.v1.0.0`. From this chain of back pointers, OLM computes the *update graph* at runtime. This allows us to omit some versions from the *update graph* or release special leaf versions.
 
 Regardless of which mode you choose to have OLM create update paths for your Operator, it continuously update your Operator often as new features are added and bugs are fixed.
-
-
-#### (Legacy) Create a release using the `packagemanifest` format
-
-**NOTE** It is recommended to use the `bundle` format instead. This format is still valid for backward compatibility only and at some point will no longer be supported.
-
-The `packagemanifest` format is a directory structure in which the top-level directory represents your Operator as a `package`. Below that top-level directory is versioned sub-directories, one for each released version of your Operator. The sub-directory names follow [a semantic version](https://semver.org) of your Operator and contain the `CustomResourceDefinition`s and `ClusterServiceVersion`.
-
-The exact version is the one of your Operator as defined in `spec.version` inside the CSV. The version should also be reflected in the CSV file name for ease of use. It is required that the `spec.name` field in the CSV is also the same as the package name. Follow the example below, assuming your Operator package is called `my-operator`:
-
-```sh
-$ tree my-operator/
-my-operator
-├── 0.1.0
-│   ├── my-operator-crd1.crd.yaml
-│   ├── my-operator-crd2.crd.yaml
-│   └── my-operator.v0.1.0.clusterserviceversion.yaml
-├── 0.5.0
-│   ├── my-operator-crd1.crd.yaml
-│   ├── my-operator-crd2.crd.yaml
-│   ├── my-operator-crd3.crd.yaml
-│   └── my-operator.v0.5.0.clusterserviceversion.yaml
-├── 1.0.0
-│   ├── my-operator-crd1.crd.yaml
-│   ├── my-operator-crd2.crd.yaml
-│   ├── my-operator-crd3.crd.yaml
-│   └── my-operator.v1.0.0.clusterserviceversion.yaml
-└── my-operator.package.yaml
-```
-The `package.yaml` is a YAML file at the root level of the package directory. It provides the package name, a selection of channels pointing to potentially different Operator Versions/CSVs and a default channel. The package name is what users on the cluster see when they discover Operators available to install. 
 
 ##### Channels #####
 

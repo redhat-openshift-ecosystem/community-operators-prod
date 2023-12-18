@@ -3,11 +3,11 @@
 Each operator might have `ci.yaml` configuration file to be present in an operator directory (for example `operators/aqua/ci.yaml`). This configuration file is used by [community-operators](https://github.com/redhat-openshift-ecosystem/community-operators-prod) pipeline to setup various features like `reviewers` or `operator versioning`.
 
 > **Note:**
-    One can create or modify `ci.yaml` file with a new operator version. This operation can be done in the same PR with other operator changes. 
+    One can create or modify `ci.yaml` file with a new operator version. This operation can be done in the same PR with other operator changes.
 
 ## Reviewers
 
-If you want to accelerate publishing your changes, consider adding yourself and others you trust to the `reviewers` list. If the author of PR will be in that list, changes she/he made will be taken as authorized changes. This will be the indicator for our pipeline that the PR is ready to merge automatically. 
+If you want to accelerate publishing your changes, consider adding yourself and others you trust to the `reviewers` list. If the author of PR will be in that list, changes she/he made will be taken as authorized changes. This will be the indicator for our pipeline that the PR is ready to merge automatically.
 
 > **Note:**
     If an author of PR is not in `reviewers` list or not in `ci.yaml` on `main` branch, PR will not be merged automatically.
@@ -22,7 +22,7 @@ For this to work, it is required to setup reviewers in `ci.yaml` file. It can be
 $ cat <path-to-operator>/ci.yaml
 ---
 reviewers:
-  - user1 
+  - user1
   - user2
 
 ```

@@ -37,3 +37,4 @@ Command | Functionality |
 --- | --- |
 `/pipeline restart community-hosted-pipeline` | The hosted pipeline will be re-triggered and PR will be merged if possible. |
 `/pipeline restart community-release-pipeline` | The release pipeline will be re-triggered.
+`/test skip {test_case_name}` | *test_case_name* test will be skipped. Please consider that only a subset of tests (*currently only pruned graph test*) can be skipped.

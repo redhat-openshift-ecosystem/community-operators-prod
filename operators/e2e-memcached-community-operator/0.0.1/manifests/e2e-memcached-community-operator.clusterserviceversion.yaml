@@ -1,0 +1,259 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "cache.quay.io/v1alpha1",
+          "kind": "Memcached",
+          "metadata": {
+            "name": "memcached-demoresource-sample"
+          },
+          "spec": {
+            "message": "Hello, World!"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2023-05-08T05:15:50Z"
+    operators.operatorframework.io/builder: operator-sdk-v1.28.1
+    operators.operatorframework.io/project_layout: ansible.sdk.operatorframework.io/v1
+    support: ACME Ltd.
+    containerImage: quay.io/rhn_apal/memcached-operator@sha256:ebbfedd514944e1a2a140f785f900d482eecbfff2e3d67bf76f6ee54569a49bc
+  name: e2e-memcached-community-operator.0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: Memcached
+      name: memcacheds.cache.quay.io
+      version: v1alpha1
+  description: A e2e-memcached-community-operator with a minimal reconciliation function, for testing basic operator installation and validation workflows.
+  minKubeVersion: 1.20.0
+  displayName: memcached
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          - pods
+          - pods/exec
+          - pods/log
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - cache.quay.io
+          resources:
+          - memcacheds
+          - memcacheds/status
+          - memcacheds/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: e2e-memcached-community-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/component: manager
+          app.kubernetes.io/created-by: e2e-memcached-community-operator
+          app.kubernetes.io/instance: controller-manager
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: deployment
+          app.kubernetes.io/part-of: e2e-memcached-community-operator
+          control-plane: controller-manager
+        name: e2e-memcached-community-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - amd64
+                        - arm64
+                        - ppc64le
+                        - s390x
+                      - key: kubernetes.io/os
+                        operator: In
+                        values:
+                        - linux
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: gcr.io/kubebuilder/kube-rbac-proxy@sha256:d4883d7c622683b3319b5e6b3a7edfbf2594c18060131a8bf64504805f875522
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 5m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              - args:
+                - --health-probe-bind-address=:6789
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                - --leader-election-id=e2e-memcached-community-operator
+                env:
+                - name: ANSIBLE_GATHERING
+                  value: explicit
+                image: quay.io/rhn_apal/memcached-operator@sha256:ebbfedd514944e1a2a140f785f900d482eecbfff2e3d67bf76f6ee54569a49bc
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 6789
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 6789
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 768Mi
+                  requests:
+                    cpu: 10m
+                    memory: 256Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: e2e-memcached-community-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: e2e-memcached-community-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - ai
+  - ml
+  links:
+  - name: Memcached Operator
+    url: https://e2e-memcached-community-operator.domain
+  maintainers:
+  - email: apal@redhat.com
+    name: avnish
+  maturity: alpha
+  provider:
+    name: RedHat
+    url: www.redhat.com
+  version: 0.0.1

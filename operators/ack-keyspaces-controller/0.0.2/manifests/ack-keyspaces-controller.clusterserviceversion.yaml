@@ -2,7 +2,25 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    alm-examples: '[]'
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "keyspaces.services.k8s.aws/v1alpha1",
+          "kind": "Keyspace",
+          "metadata": {
+            "name": "example"
+          },
+          "spec": {}
+        },
+        {
+          "apiVersion": "keyspaces.services.k8s.aws/v1alpha1",
+          "kind": "Table",
+          "metadata": {
+            "name": "example"
+          },
+          "spec": {}
+        }
+      ]
     capabilities: Basic Install
     categories: Cloud Provider
     certified: "false"

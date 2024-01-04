@@ -2,7 +2,17 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    alm-examples: '[]'
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "pipes.services.k8s.aws/v1alpha1",
+          "kind": "Pipe",
+          "metadata": {
+            "name": "example"
+          },
+          "spec": {}
+        }
+      ]
     capabilities: Basic Install
     categories: Cloud Provider
     certified: "false"

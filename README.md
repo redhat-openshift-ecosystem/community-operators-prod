@@ -5,9 +5,11 @@
 
 This repo is the canonical source for Kubernetes Operators that appear on [OpenShift Container Platform](https://openshift.com) and [OKD](https://www.okd.io/).
 
-**NOTE** The index catalog `registry.redhat.io/redhat/redhat-operator-index:v<OCP Version>` is built from this repository and it is
+**NOTE** The index catalog `registry.redhat.io/redhat/community-operator-index:v<OCP Version>` is built from this repository and it is
 consumed by Openshift and OKD to create their sources and built their catalog. To know more about how
-Openshift catalog are built see the [documentation](https://docs.openshift.com/container-platform/4.6/operators/understanding/olm-rh-catalogs.html#olm-rh-catalogs_olm-rh-catalogs).
+Openshift catalog are built see the [documentation](https://docs.openshift.com/container-platform/4.14/operators/understanding/olm-rh-catalogs.html#olm-rh-catalogs_olm-rh-catalogs).
+
+See our [documentation](https://redhat-openshift-ecosystem.github.io/community-operators-prod/) to find out more about Community operators and contribution.
 
 ## Add your Operator
 
@@ -20,7 +22,6 @@ If you have an existing Operator read our contribution guidelines on how to [pac
 - [Prerequisites](docs/contributing-prerequisites.md)
 - [Where to place operator](docs/contributing-where-to.md)
 - [Creating pull request (PR)](docs/contributing-via-pr.md)
-- [Accepted Bundle Format](docs/accepted_bundle_formats.md)
 - [Operator Publishing / Review settings](docs/operator-ci-yaml.md)
 - [OKD/OpenShift Catalogs criteria and options](docs/packaging-required-criteria-ocp.md)
 

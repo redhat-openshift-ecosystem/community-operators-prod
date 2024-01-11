@@ -13,7 +13,7 @@ If you want to accelerate publishing your changes, consider adding yourself and 
     If an author of PR is not in `reviewers` list or not in `ci.yaml` on `main` branch, PR will not be merged automatically.
 
 > **Note:**
-    If an auhor of PR is not in `reviewers` list and `reviewers` are present in `ci.yaml` file. All `reviewers` will be mentioned in PR comment to check for upcoming changes.
+    If an author of PR is not in `reviewers` list and `reviewers` are present in `ci.yaml` file. All `reviewers` will be mentioned in PR comment to check for upcoming changes.
 
 For this to work, it is required to setup reviewers in `ci.yaml` file. It can be done by adding `reviewers` tag with a list of GitHub usernames. For example
 

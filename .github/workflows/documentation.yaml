@@ -1,43 +1,27 @@
 name: "Documentation"
-# This workflow is outdated and needs to be replaced with a one that
-# uses the new documntation location.
 
 on:
-  schedule:
-    - cron: "0 0 * * *"
+  push:
+    paths:
+      - docs/**
+      - mkdocs.yml
+      - README.md
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      number-of-prs:
-        description: 'Number of PRs'
-        required: true
-        default: '100'
-
-env:
-  OPP_THIS_REPO: "redhat-openshift-ecosystem/community-operators-prod"
 
 jobs:
   documentation:
     runs-on: ubuntu-latest
-    container: quay.io/operator_testing/community-operators-mkdocs
     steps:
     - uses: actions/checkout@v3
-      with:
-        repository: redhat-openshift-ecosystem/community-operators-pipeline
-        ref: documentation
-
     - name: Generate docs
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        NPR: ${{ github.event.inputs.number-of-prs || 100 }}
       run: |
-        OPP_THIS_REPO_SED="https://github.com/$OPP_THIS_REPO"
-        OPP_THIS_REPO_SED=${OPP_THIS_REPO_SED//\//\\/}
-        sed -i 's/repo_url.*/repo_url: '$OPP_THIS_REPO_SED'/g' mkdocs.yml
+        pip install mkdocs mkdocs-material pymdown-extensions
 
-        sed -i 's/  cluster_type:.*/  cluster_type: ocp/g' mkdocs.yml
-
-        cat mkdocs.yml
-        ci/operator-flow/doc.sh ${NPR} ${OPP_THIS_REPO}
+        # Replace relatives links from root folder to docs folder
+        #  - remove docs/ from links
+        sed -i -e "s/(docs\//(/g" README.md
 
         mkdocs build
     - name: Deploy

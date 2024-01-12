@@ -1,0 +1,941 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+    
+    
+      
+        <title>Automate testing your Operator locally - Community operators</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.975780f9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.2505c338.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="None" data-md-color-accent="None">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#automate-testing-your-operator-locally" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Community operators" class="md-header__button md-logo" aria-label="Community operators" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Community operators
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Automate testing your Operator locally
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/redhat-openshift-ecosystem/community-operators-prod" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    community-operators
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../.." class="md-tabs__link">
+      Overview
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../packaging-operator/" class="md-tabs__link">
+        Packaging your Operator for OperatorHub
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../testing-operators/" class="md-tabs__link">
+        Testing
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../contributing-prerequisites/" class="md-tabs__link">
+        Contributing
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../operator-release-process/" class="md-tabs__link">
+      Release process
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../action/" class="md-tabs__link">
+      Github Action
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../best-practices/" class="md-tabs__link">
+      Best practices
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../troubleshooting/" class="md-tabs__link">
+      Troubleshooting
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../maintainer-documentation/" class="md-tabs__link">
+      Maintainer
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../stats/" class="md-tabs__link">
+      Statistics
+    </a>
+  </li>
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Community operators" class="md-nav__button md-logo" aria-label="Community operators" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Community operators
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/redhat-openshift-ecosystem/community-operators-prod" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    community-operators
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2">
+          Packaging your Operator for OperatorHub
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Packaging your Operator for OperatorHub" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Packaging your Operator for OperatorHub
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packaging-operator/" class="md-nav__link">
+        Operator structure
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packaging-required-fields/" class="md-nav__link">
+        Required fields
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Testing
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Testing" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Testing
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing-operators/" class="md-nav__link">
+        Explained
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operator-test-suite/" class="md-nav__link">
+        Via test suite
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Contributing
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Contributing" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Contributing
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing-prerequisites/" class="md-nav__link">
+        Prerequisites
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing-where-to/" class="md-nav__link">
+        Where to place operator
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing-via-pr/" class="md-nav__link">
+        Creating pull request (PR)
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operator-ci-yaml/" class="md-nav__link">
+        Operator Publishing / Review settings
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tests-in-pr/" class="md-nav__link">
+        Tests in PR explained
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operator-version-update/" class="md-nav__link">
+        Updating existing Operators
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operator-overwrite/" class="md-nav__link">
+        Updating published Operator version
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../self-merge-updates/" class="md-nav__link">
+        How do i deploy operator faster?
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../packaging-required-criteria-ocp/" class="md-nav__link">
+        OKD/OpenShift Catalogs criteria and options
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../operator-release-process/" class="md-nav__link">
+        Release process
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../action/" class="md-nav__link">
+        Github Action
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../best-practices/" class="md-nav__link">
+        Best practices
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        Troubleshooting
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../maintainer-documentation/" class="md-nav__link">
+        Maintainer
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../stats/" class="md-nav__link">
+        Statistics
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/redhat-openshift-ecosystem/community-operators-prod/edit/master/docs/legacy/using-obsolete-scripts.md" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="automate-testing-your-operator-locally">Automate testing your Operator locally</h1>
+<p>For convenience, in addition to the <a href="./testing-operators.md">manual test instructions</a> we provide a <code>Makefile</code> based test automation. This will automate all the manual steps referred to in <a href="./testing-operators.md#testing-operator-deployment-on-kubernetes">Testing Operator Deployment on Kubernetes</a>. In addition the <a href="https://github.com/operator-framework/operator-sdk/blob/master/doc/test-framework/scorecard.md"><code>scorecard</code></a> test from the Operator-SDK will be executed.
+This is currently tested on <a href="https://github.com/kubernetes-sigs/kind">Kubernetes in Docker</a> but should work on other Kubernetes systems as well.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>You need the following installed on your local machine:</p>
+<ul>
+<li>Linux or macOS host</li>
+<li>Docker</li>
+<li>make</li>
+<li>KIND (if no existing Kubernetes cluster is available via <code>KUBECONFIG</code> or in <code>~/.kube/config</code>)</li>
+</ul>
+<p><strong>Important:</strong> Notice, that this script uses a container to execute the test. Your <code>KUBECONFIG</code> will be bind mounted into the container. Therefore no config-helpers or references to files on your host machine are allowed. This is usually the case for <code>minikube</code> or GKE clusters.</p>
+<p>All further dependencies are encapsulated in a container image that this <code>Makefile</code> will execute as a test driver.</p>
+<h2 id="available-test-modes">Available test modes</h2>
+<p>The <code>Makefile</code> supports two test modes. Both have these supported options:</p>
+<h3 id="options">Options:</h3>
+<p><code>OP_PATH</code> - relative path to your operator (required)</p>
+<p><code>OP_VER</code> - version of operator (if not provided the latest will be determined from your <code>package.yaml</code>)</p>
+<p><code>OP_CHANNEL</code> - channel of operator if is not provided it will be parsed by operator package yaml or use the default ones</p>
+<p><code>VERBOSE</code> - enable verbose output of executed subcommands</p>
+<h3 id="deploying-and-testing-your-operator">Deploying and Testing your Operator</h3>
+<p>Using the <a href="https://github.com/operator-framework/operator-lifecycle-manager">Operator Lifecycle Manager</a> (OLM) your Operator will be packaged into a temporary catalog, containing all currently published community operators and yours. OLM will be installed for you if not present.</p>
+<p>Using the current community catalog as a base allows you to test with dependencies on Operators currently published in this catalog. If you have dependencies outside of this catalog, you need to prepare your own cluster, install OLM, and ship a catalog with these dependencies present; otherwise installation will fail. 
+You can provide a Kubernetes cluster as a testbed via <code>KUBECONFIG</code> or <code>~/.kube/confg</code>. If you have multiple cluster contexts configured in your <code>KUBECONFIG</code> you will be able to select one. If you have no cluster configured or reachable the Makefile will install a <code>kind</code> cluster named <code>operator-test</code> for you.</p>
+<p>For this type of test, additionally the following options exist:</p>
+<p><code>NO_KIND</code> - if set to <code>1</code> no attempt to bring up a kind cluster will be made. In this case you need to specify <code>CATALOG_IMAGE</code></p>
+<p><code>CATALOG_IMAGE</code> - when <code>NO_KIND</code> is set to <code>1</code> you need to specify a container registry image location you have push privileges for and from which the image can be pulled again later by OLM without authentication. This parameter is ignored when <code>NO_KIND</code> is absent or set to <code>0</code> since the catalog image can be loaded directly into a KIND cluster.</p>
+<p><code>CLEAN_MODE</code> - any of <code>NORMAL</code>, <code>NONE</code> and <code>FORCE</code>. As the test installs OLM components in your Kubernetes cluster this controls the clean up of those. In <code>NORMAL</code> clean up will happen if no errors occured. When set to <code>NONE</code> clean up is omitted. When set to <code>FORCE</code> clean up will always be done. Default is <code>NORMAL</code>.</p>
+<p><code>INSTALL_MODE</code> - any of <code>OwnNamespace</code>, <code>SingleNamespace</code>, <code>AllNamespaces</code>. this controls the installation mode of the Operator and should be set according to what your Operator states as supported in the <code>installModes</code> section of the CSV. Default is <code>SingleNamepsace</code>.</p>
+<p>You can start by just deploying your Operator:</p>
+<div class="highlight"><pre><span></span><code>make operator.install OP_PATH=upstream-community-operators/cockroachdb
+
+Pulling docker image                              [  Processing  ]
+Pulling docker image                              [  OK  ]
+Find kube config                                  [  /home/dmesser/.kube/config  ]
+Find kube cluster                                 [  Not found  ]
+Start KIND                                        [  Processing  ]
+Start KIND                                        [  OK  ]
+Building catalog image                            [  Processing  ]
+Building catalog image                            [  OK  ]
+Operator version detected                         [  1.7.2  ]
+Creating namespace                                [  Processing  ]
+Creating namespace                                [  OK  ]
+Verify operator                                   [  Processing  ]
+Verify operator                                   [  OK  ]
+Install OLM                                       [  Processing  ]
+Install OLM                                       [  OK  ]
+Building manifests                                [  Processing  ]
+Building manifests                                [  OK  ]
+Operator Deployment                               [  Processing  ]
+    Applying object to cluster                    [  Processing  ]
+    Applying object to cluster                    [  OK  ]
+    Checking if subscriptions passes              [  Processing  ]
+    Checking if subscriptions passes              [  OK  ]
+    Checking if CSV passes                        [  Processing  ]
+    Checking if CSV passes                        [  OK  ]
+Operator Deployment                               [  OK  ]
+</code></pre></div>
+<p>This way you can test if your Operator is packaged correctly.</p>
+<p>You can also run a test that will deploy your Operator and checks if it behaves correctly according to <code>scorecard</code> (which is part of the Operator-SDK). <code>scorecard</code> will use the example CRs defined in <code>metadata.annotations.alm-examples</code> in the CSV to try to use your Operator and observe its behavior.</p>
+<p>Example, run from the top-level directory of this repository:</p>
+<div class="highlight"><pre><span></span><code>[...]
+
+make operator.test OP_PATH=upstream-community-operators/cockroachdb
+
+[...]
+Instrumenting Operator for test                   [  Processing  ]
+    creating CR files                             [  Processing  ]
+    creating CR files                             [  OK  ]
+    injecting scorecard proxy                     [  Processing  ]
+    injecting scorecard proxy                     [  OK  ]
+Instrumenting Operator for test                   [  OK  ]
+Running scorecard trough all supplied CRs         [  Processing  ]
+    Running required tests                        [  Processing  ]
+    Running required tests                        [  OK  ]
+    Running recommended tests                     [  Processing  ]
+    Running recommended tests                     [  OK  ]
+    Running required tests                        [  Processing  ]
+    Running required tests                        [  OK  ]
+    Running recommended tests                     [  Processing  ]
+    Running recommended tests                     [  OK  ]
+Running scorecard trough all supplied CRs         [  OK  ]
+Cleaning up Operator resources                    [  Processing  ]
+Cleaning up Operator resources                    [  OK  ]
+Cleaning up Operator definition                   [  Processing  ]
+Cleaning up Operator definition                   [  OK  ]
+Cleaning up namespace                             [  Processing  ]
+Cleaning up namespace                             [  OK  ]
+</code></pre></div>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<p>Here are some common scenarios, why your test can fail:</p>
+<h3 id="failures-when-linting-operator-metadata">Failures when linting Operator metadata</h3>
+<p><code>ERROR: metadata.annotations.alm-examples contains invalid json string [1.4.4/my-operator.v1.4.4.clusterserviceversion.yaml]</code></p>
+<p>The linter checks for valid JSON in <code>metadata.annotations.alm-examples</code>. The rest of the CSV is supposed to be YAML.</p>
+<h3 id="failures-when-loading-the-operator-into-the-community-catalog">Failures when loading the Operator into the Community Catalog</h3>
+<p><code>my-operator.v2.1.11 specifies replacement that couldn't be found</code></p>
+<p>Explanation: This happens because the catalog cannot load your Operator since it's pointing to a non-existent previous version of your Operator using <code>spec.replaces</code>. For updates, it is important that this property points to another, older version of your Operator that is already in the catalog.</p>
+<p><code>error adding operator bundle : error decoding CRD: no kind \"CustomResourceDefinition\" is registered for version \"apiextensions.k8s.io/v1\" in scheme \"pkg/registry/bundle.go</code></p>
+<p>Explanation: Currently OLM does not yet support handling CRDs using <code>apiextensions.k8s.io/v1</code>. This will improve soon. Until then you need to resort back to <code>apiextensions.k8s.io/v1beta</code>.</p>
+<p><code>error loading manifests from directory: error checking provided apis in bundle : couldn't find charts.someapi.k8s.io/v1alpha1/myapi (my-custom-resource) in bundle. found: map[]</code></p>
+<p>Explanation: Your Operator claims ownership of a CRD that it does not ship. Check for spelling of Group/Version/Kind in <code>spec.customresourcedefinitions.owned</code> in the CSV.</p>
+<p><code>error loading package into db: [FOREIGN KEY constraint failed, no default channel specified for my-operator]</code></p>
+<p>Explanation: This happens when either
+- Your Operator package defines more than one channel in <code>package.yaml</code> but does not define <code>defaultChannel</code>.
+- The package just defines a single channel (in which case you can omit <code>defaultChannel</code>) but the catalog couldn't load the CSV that this channel points to using <code>currentCSV</code>. This can happen when in the CSV the specified name in <code>metadata.name</code> is actually different from what <code>currentCSV</code> points to.</p>
+<h3 id="failures-when-deploying-via-olm">Failures when deploying via OLM</h3>
+<p><code>Check if subscription passes</code> times out</p>
+<p>Explanation: In this case the <code>Subscription</code> object created by the test suite did not transition to the state <code>AtLatestKnown</code> before hitting a timeout. There are various reasons for this, ranging from the catalog pod crashing to problems with the <code>catalog-operator</code> pod of OLM itself. In any case, the logs of either pod will likely help troubleshooting and finding the root cause.</p>
+<p><code>Check if CSV passes</code> times out</p>
+<p>Explanation: OLM could not install the Operator's <code>Deployment</code> from its CSV before hitting a timeout. This is usually due to <code>Deployment</code> reaching its expected replica count, likely because the pod is crash-looping.</p>
+<h3 id="failures-during-tests-of-the-operator-with-operator-sdk-scorecard">Failures during tests of the Operator with Operator-SDK scorecard</h3>
+<p><code>failed to get proxyPod: timed out waiting for the condition:</code></p>
+<p>Explanation: If this happened it is likely the Operator pod crashed in the middle of the scorecard test suite. For example, when it failed to parse a Custom Resource fed to scorecard from the list in <code>metadata.annotations.alm-examples</code>. OLM will wait for the <code>Deployment</code> of the Operator to recover before re-installing the Operator. Re-installation changes the Operator pod's name and hence scorecard fails to reach the logs of scorecard proxy using its old name.</p>
+<p><code>failed to create cr resource: object is being deleted: someapi.k8s.io "myCRD" already exists:</code></p>
+<p>Explanation: This can happen when your Operator automatically creates a CR on startup, with the same name of an example for that CR provided in the CSV <code>metadata.annotations.alm-examples</code> section. Simply use a different name in the example. Otherwise, your Operator could be slow to delete a CR due to a finalizer.</p>
+<h2 id="additional-shortcuts">Additional shortcuts</h2>
+<h3 id="clean-up-after-a-failed-test">Clean up after a failed test</h3>
+<p>As explained above, the default <code>CLEAN_MODE</code> of <code>NORMAL</code> will delete anything that got installed on your cluster if all tests run correctly.. If something fails, the deployed resources will not be deleted in order to give you a chance to debug.
+After you have finished debugging you can use the following command to clean up any residual resources as part of a test of a particular Operator:</p>
+<div class="highlight"><pre><span></span><code>make operator.cleanup OP_PATH=upstream-community-operators/cockroachdb
+</code></pre></div>
+<h3 id="install-a-kind-cluster">Install a KIND cluster</h3>
+<p>Install a <code>kind</code> cluster as a testbed for the Operator deployment.</p>
+<div class="highlight"><pre><span></span><code>$ kind create cluster --name operator-test
+</code></pre></div>
+<p>This command will create a Kubernetes in Docker cluster:</p>
+<div class="highlight"><pre><span></span><code>$ kind get clusters                     
+operator-test
+
+$ kind get nodes --name operator-test
+operator-test-control-plane
+</code></pre></div>
+<h3 id="install-operator-lifecycle-manager">Install Operator Lifecycle Manager</h3>
+<p>Install OLM to an existing cluster (determined via <code>KUBECONFIG</code> or <code>~/.kube/config</code>).
+<div class="highlight"><pre><span></span><code>make olm.install
+</code></pre></div></p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "toc.integrate"], "search": "../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": 0.1}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      
+    
+    
+  </body>
+</html>

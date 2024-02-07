@@ -1,0 +1,997 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[{"apiVersion": "operator.open-cluster-management.io/v1", "kind": "MultiClusterHub",
+      "metadata": {"name": "multiclusterhub", "namespace": "open-cluster-management"}, "spec": {}}]'
+    capabilities: Seamless Upgrades
+    categories: Integration & Delivery
+    certified: 'false'
+    support: Stolostron Community
+    createdAt: '2024-01-24T02:02:32Z'
+    description: Advanced management of OpenShift and Kubernetes clusters
+    operatorframework.io/suggested-namespace: stolostron
+    operatorframework.io/initialization-resource: '{"apiVersion":"operator.open-cluster-management.io/v1",
+      "kind":"MultiClusterHub","metadata":{"name":"multiclusterhub","namespace":"stolostron"}, "spec":
+      {}}'
+    operators.openshift.io/infrastructure-features: '["disconnected", "proxy-aware", "fips"]'
+    features.operators.openshift.io/disconnected: 'true'
+    features.operators.openshift.io/proxy-aware: 'true'
+    features.operators.openshift.io/fips-compliant: 'true'
+    features.operators.openshift.io/tls-profiles: 'false'
+    features.operators.openshift.io/token-auth-aws: 'false'
+    features.operators.openshift.io/token-auth-azure: 'false'
+    features.operators.openshift.io/token-auth-gcp: 'false'
+    repository: https://github.com/stolostron/stolostron
+    operators.operatorframework.io/internal-objects: '[]'
+    olm.skipRange: '>=0.3.0 <0.3.1'
+    containerImage: quay.io/stolostron/multiclusterhub-operator@sha256:e71cfeb7422519111dc51e35a131be139bd060b55b41bcee92b10378ed897d9e
+  name: stolostron.v0.3.1
+  namespace: placeholder
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/os.linux: supported
+spec:
+  displayName: Stolostron
+  version: 0.3.1
+  provider:
+    name: Red Hat
+  maintainers:
+  - email: acm-contact@redhat.com
+    name: Red Hat
+  maturity: pre-release
+  description: 'Stolostron provides the multicluster hub, a central management console for managing multiple
+    Kubernetes-based clusters across data centers, public clouds, and private clouds. You can use the
+    hub to create Red Hat OpenShift Container Platform clusters on selected providers, or import existing
+    Kubernetes-based clusters. After the clusters are managed, you can set compliance requirements to
+    ensure that the clusters maintain the specified security requirements. You can also deploy business
+    applications across your clusters. '
+  icon:
+  - base64data: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjEuMTUgNzIxLjE1Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2RiMzkyNzt9LmNscy0ye2ZpbGw6I2NiMzYyODt9LmNscy0ze2ZpbGw6I2ZmZjt9LmNscy00e2ZpbGw6I2UzZTNlMjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPlByb2R1Y3RfSWNvbi1SZWRfSGF0QWR2YW5jZWRfQ2x1c3Rlcl9NYW5hZ2VtZW50X2Zvcl9LdWJlcm5ldGVzLVJHQjwvdGl0bGU+PGcgaWQ9IkxheWVyXzEiIGRhdGEtbmFtZT0iTGF5ZXIgMSI+PGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSIzNjAuNTciIGN5PSIzNjAuNTciIHI9IjM1OC41OCIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTYxNC4xMywxMDcsMTA3LDYxNC4xM2MxNDAsMTQwLDM2Ny4wNywxNDAsNTA3LjExLDBTNzU0LjE2LDI0Ny4wNiw2MTQuMTMsMTA3WiIvPjxyZWN0IGNsYXNzPSJjbHMtMyIgeD0iMzMwLjg3IiB5PSIyODAuNiIgd2lkdGg9IjIwMy4xNyIgaGVpZ2h0PSIyMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTc4LjkgMzkwLjUyKSByb3RhdGUoLTQ0Ljk2KSIvPjxyZWN0IGNsYXNzPSJjbHMtMyIgeD0iMzA2LjYzIiB5PSIxNjcuODMiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMDQuNDciIHRyYW5zZm9ybT0idHJhbnNsYXRlKC04NS4zMyAxNjIuMjcpIHJvdGF0ZSgtMjUuNDUpIi8+PHJlY3QgY2xhc3M9ImNscy0zIiB4PSIxNjIuOTgiIHk9IjM2NC4xIiB3aWR0aD0iMTk4LjI4IiBoZWlnaHQ9IjIwIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNDIuMzkgMzMuNjEpIHJvdGF0ZSgtNi43OSkiLz48cmVjdCBjbGFzcz0iY2xzLTMiIHg9IjI0NS4xIiB5PSI0NTEuNTQiIHdpZHRoPSIyMDAuNjIiIGhlaWdodD0iMjAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xNjMuMDEgNzMzLjI2KSByb3RhdGUoLTgxLjMxKSIvPjxyZWN0IGNsYXNzPSJjbHMtMyIgeD0iNDQzLjg1IiB5PSIzMDMuNzYiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMDcuMDQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xMDkuOTcgNjM5LjU4KSByb3RhdGUoLTY0LjMpIi8+PGNpcmNsZSBjbGFzcz0iY2xzLTMiIGN4PSI1MDQuMzQiIGN5PSIyMTguODMiIHI9IjQ0LjA4Ii8+PGNpcmNsZSBjbGFzcz0iY2xzLTMiIGN4PSIyNzIuNyIgY3k9IjE3Ny43NSIgcj0iNDQuMDgiLz48Y2lyY2xlIGNsYXNzPSJjbHMtMyIgY3g9IjU0Ny4xMiIgY3k9IjQ1Mi4xNyIgcj0iNDQuMDgiLz48Y2lyY2xlIGNsYXNzPSJjbHMtMyIgY3g9IjE2My42OCIgY3k9IjM4NS44MiIgcj0iNDQuMDgiLz48Y2lyY2xlIGNsYXNzPSJjbHMtMyIgY3g9IjMzMC4yNiIgY3k9IjU2MC43IiByPSI0NC4wOCIvPjxwYXRoIGNsYXNzPSJjbHMtNCIgZD0iTTQ0NC45NCwyNzkuOTIsMjc2LjE5LDQ0OC42N0ExMTkuMzIsMTE5LjMyLDAsMCwwLDQ0NC45NCwyNzkuOTJaIi8+PHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMzc1LjY4LDI0NS43NmExMTkuMzMsMTE5LjMzLDAsMCwwLTk5LjQ5LDIwMi45MUw0NDQuOTQsMjc5LjkyQTExOC44OSwxMTguODksMCwwLDAsMzc1LjY4LDI0NS43NloiLz48L2c+PC9zdmc+
+    mediatype: image/svg+xml
+  keywords:
+  - install
+  - multiclusterhub
+  labels:
+    app: stolostron
+  links:
+  - name: Documentation
+    url: https://github.com/stolostron/stolostron
+  selector:
+    matchLabels:
+      app: stolostron
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: false
+    type: AllNamespaces
+  customresourcedefinitions:
+    owned:
+    - description: MultiClusterHub defines the configuration for an instance of the MultiCluster Hub
+      displayName: MultiClusterHub
+      kind: MultiClusterHub
+      name: multiclusterhubs.operator.open-cluster-management.io
+      specDescriptors:
+      - description: 'Specifies deployment replication for improved availability. Options are: Basic and
+          High (default)'
+        displayName: Availability Configuration
+        path: availabilityConfig
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:select:High
+        - urn:alm:descriptor:com.tectonic.ui:select:Basic
+      - description: (Deprecated) Provide the customized OpenShift default ingress CA certificate to RHACM
+        displayName: Custom CA Configmap
+        path: customCAConfigmap
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:ConfigMap
+      - description: Disable automatic import of the hub cluster as a managed cluster
+        displayName: Disable Hub Self Management
+        path: disableHubSelfManagement
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Disable automatic update of ClusterImageSets
+        displayName: Disable Update ClusterImageSets
+        path: disableUpdateClusterImageSets
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: (Deprecated) Enable cluster backup
+        displayName: Enable Cluster Backup
+        path: enableClusterBackup
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: (Deprecated) Enable cluster proxy addon
+        displayName: Enable Cluster Proxy Addon
+        path: enableClusterProxyAddon
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: (Deprecated) Overrides for the default HiveConfig spec
+        displayName: Hive Config
+        path: hive
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: Override pull secret for accessing MultiClusterHub operand and endpoint images
+        displayName: Image Pull Secret
+        path: imagePullSecret
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: (Deprecated) Configuration options for ingress management
+        displayName: Ingress Management
+        path: ingress
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Developer Overrides
+        displayName: Developer Overrides
+        path: overrides
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: Provides optional configuration for components
+        displayName: Component Configuration
+        path: overrides.components
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: (Deprecated) Install cert-manager into its own namespace
+        displayName: Separate Certificate Management
+        path: separateCertificateManagement
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      version: v1
+  install:
+    strategy: deployment
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ''
+          - action.open-cluster-management.io
+          - addon.open-cluster-management.io
+          - agent.open-cluster-management.io
+          - app.k8s.io
+          - apps.open-cluster-management.io
+          - argoproj.io
+          - authorization.k8s.io
+          - certificates.k8s.io
+          - cluster.open-cluster-management.io
+          - clusterregistry.k8s.io
+          - compliance.mcm.ibm.com
+          - config.openshift.io
+          - coordination.k8s.io
+          - discovery.open-cluster-management.io
+          - hive.openshift.io
+          - hiveinternal.openshift.io
+          - imageregistry.open-cluster-management.io
+          - internal.open-cluster-management.io
+          - inventory.open-cluster-management.io
+          - mcm.ibm.com
+          - multicloud.ibm.com
+          - operator.open-cluster-management.io
+          - policy.open-cluster-management.io
+          - proxy.open-cluster-management.io
+          - rbac.authorization.k8s.io
+          - register.open-cluster-management.io
+          - search.open-cluster-management.io
+          - submarineraddon.open-cluster-management.io
+          - view.open-cluster-management.io
+          - work.open-cluster-management.io
+          resources:
+          - applicationrelationships
+          - applicationrelationships/status
+          - applications
+          - applications/status
+          - certificatesigningrequests
+          - certificatesigningrequests/approval
+          - channels
+          - channels/status
+          - clusterclaims
+          - clustercurators
+          - clusterdeployments
+          - clustermanagementaddons
+          - clustermanagers
+          - clusterpools
+          - clusterrolebindings
+          - clusterroles
+          - clusterstatuses/aggregator
+          - clustersyncs
+          - clusterversions
+          - compliances
+          - configmaps
+          - deployableoverrides
+          - deployableoverrides/status
+          - deployables
+          - deployables/status
+          - discoveredclusters
+          - discoveryconfigs
+          - endpointconfigs
+          - endpoints
+          - events
+          - helmrepos
+          - helmrepos/status
+          - klusterletaddonconfigs
+          - leases
+          - machinepools
+          - managedclusteractions
+          - managedclusteractions/status
+          - managedclusteraddons
+          - managedclusteraddons/status
+          - managedclusterimageregistries
+          - managedclusterimageregistries/status
+          - managedclusterinfos
+          - managedclusterinfos/status
+          - managedclusters
+          - managedclusters/accept
+          - managedclusters/status
+          - managedclustersetbindings
+          - managedclustersets
+          - managedclustersets/bind
+          - managedclustersets/join
+          - managedclustersets/status
+          - managedclusterviews
+          - managedclusterviews/status
+          - manifestworks
+          - manifestworks/status
+          - namespaces
+          - placementbindings
+          - placementdecisions
+          - placementdecisions/status
+          - placementrules
+          - placementrules/status
+          - placements
+          - pods
+          - pods/log
+          - policies
+          - policies/status
+          - policyautomations
+          - policysets
+          - policysets/status
+          - rolebindings
+          - roles
+          - searchcustomizations
+          - secrets
+          - signers
+          - subjectaccessreviews
+          - submarinerconfigs
+          - submarinerconfigs/status
+          - subscriptions
+          - subscriptions/status
+          - syncsets
+          verbs:
+          - approve
+          - bind
+          - create
+          - delete
+          - deletecollection
+          - escalate
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ''
+          - admissionregistration.k8s.io
+          - apiextensions.k8s.io
+          - apiregistration.k8s.io
+          - apps
+          - apps.open-cluster-management.io
+          - authorization.k8s.io
+          - clusterview.open-cluster-management.io
+          - discovery.open-cluster-management.io
+          - hive.openshift.io
+          - mcm.ibm.com
+          - proxy.open-cluster-management.io
+          - rbac.authorization.k8s.io
+          - security.openshift.io
+          - wgpolicyk8s.io
+          resources:
+          - apiservices
+          - channels
+          - clusterjoinrequests
+          - clusterrolebindings
+          - clusterstatuses/log
+          - configmaps
+          - customresourcedefinitions
+          - deployments
+          - discoveryconfigs
+          - helmreleases
+          - hiveconfigs
+          - managedclusters
+          - managedclustersets
+          - mutatingwebhookconfigurations
+          - namespaces
+          - pods
+          - policyreports
+          - replicasets
+          - rolebindings
+          - secrets
+          - serviceaccounts
+          - services
+          - subjectaccessreviews
+          - subscriptions
+          - validatingwebhookconfigurations
+          verbs:
+          - get
+        - apiGroups:
+          - ''
+          - admissionregistration.k8s.io
+          - apiextensions.k8s.io
+          - apiregistration.k8s.io
+          - apps
+          - apps.open-cluster-management.io
+          - authorization.k8s.io
+          - hive.openshift.io
+          - mcm.ibm.com
+          - monitoring.coreos.com
+          - rbac.authorization.k8s.io
+          - security.openshift.io
+          resources:
+          - apiservices
+          - channels
+          - clusterjoinrequests
+          - clusterrolebindings
+          - clusterroles
+          - configmaps
+          - customresourcedefinitions
+          - deployments
+          - hiveconfigs
+          - mutatingwebhookconfigurations
+          - namespaces
+          - rolebindings
+          - secrets
+          - serviceaccounts
+          - servicemonitors
+          - services
+          - subjectaccessreviews
+          - subscriptions
+          - validatingwebhookconfigurations
+          verbs:
+          - create
+          - update
+        - apiGroups:
+          - ''
+          - admissionregistration.k8s.io
+          - apiregistration.k8s.io
+          - apps
+          - apps.open-cluster-management.io
+          - authorization.k8s.io
+          - clusterview.open-cluster-management.io
+          - config.openshift.io
+          - discovery.open-cluster-management.io
+          - hive.openshift.io
+          - inventory.open-cluster-management.io
+          - mcm.ibm.com
+          - observability.open-cluster-management.io
+          - operator.open-cluster-management.io
+          - rbac.authorization.k8s.io
+          - wgpolicyk8s.io
+          resources:
+          - apiservices
+          - clusterjoinrequests
+          - configmaps
+          - deployments
+          - discoveryconfigs
+          - helmreleases
+          - hiveconfigs
+          - ingresses
+          - managedclusters
+          - managedclustersets
+          - multiclusterhubs
+          - multiclusterobservabilities
+          - namespaces
+          - pods
+          - policyreports
+          - rolebindings
+          - secrets
+          - servicemonitors
+          - services
+          - subjectaccessreviews
+          - subscriptions
+          - validatingwebhookconfigurations
+          verbs:
+          - list
+        - apiGroups:
+          - ''
+          - admissionregistration.k8s.io
+          - apiregistration.k8s.io
+          - apps
+          - apps.open-cluster-management.io
+          - authorization.k8s.io
+          - clusterview.open-cluster-management.io
+          - config.openshift.io
+          - hive.openshift.io
+          - mcm.ibm.com
+          - operator.open-cluster-management.io
+          - rbac.authorization.k8s.io
+          - storage.k8s.io
+          - wgpolicyk8s.io
+          resources:
+          - apiservices
+          - clusterjoinrequests
+          - configmaps
+          - deployments
+          - helmreleases
+          - hiveconfigs
+          - ingresses
+          - managedclusters
+          - managedclustersets
+          - multiclusterhubs
+          - namespaces
+          - pods
+          - policyreports
+          - rolebindings
+          - secrets
+          - services
+          - subjectaccessreviews
+          - validatingwebhookconfigurations
+          verbs:
+          - list
+          - watch
+        - apiGroups:
+          - ''
+          - admissionregistration.k8s.io
+          - apps
+          - apps.open-cluster-management.io
+          - mcm.ibm.com
+          - monitoring.coreos.com
+          - operator.open-cluster-management.io
+          resources:
+          - deployments
+          - deployments/finalizers
+          - helmreleases
+          - multiclusterhubs
+          - multiclusterhubs/finalizers
+          - multiclusterhubs/status
+          - servicemonitors
+          - servicemonitors/finalizers
+          - services
+          - services/finalizers
+          - validatingwebhookconfigurations
+          verbs:
+          - update
+        - apiGroups:
+          - ''
+          - apiextensions.k8s.io
+          - apiregistration.k8s.io
+          - apps
+          - apps.open-cluster-management.io
+          resources:
+          - apiservices
+          - channels
+          - customresourcedefinitions
+          - deployments
+          - services
+          verbs:
+          - delete
+        - apiGroups:
+          - ''
+          - apps
+          resources:
+          - deployments
+          - serviceaccounts
+          - services
+          verbs:
+          - delete
+          - deletecollection
+          - get
+          - patch
+        - apiGroups:
+          - admissionregistration.k8s.io
+          - apiextensions.k8s.io
+          - apiregistration.k8s.io
+          - hive.openshift.io
+          - mcm.ibm.com
+          - rbac.authorization.k8s.io
+          resources:
+          - apiservices
+          - clusterrolebindings
+          - clusterroles
+          - customresourcedefinitions
+          - hiveconfigs
+          - mutatingwebhookconfigurations
+          - validatingwebhookconfigurations
+          verbs:
+          - delete
+          - deletecollection
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - agent-install.openshift.io
+          resources:
+          - agentserviceconfigs
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - console.openshift.io
+          - search.open-cluster-management.io
+          resources:
+          - consolelinks
+          - consoleplugins
+          - searches
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - prometheusrules
+          - servicemonitors
+          verbs:
+          - create
+          - delete
+          - deletecollection
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - multicluster.openshift.io
+          resources:
+          - multiclusterengines
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingresses
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - operator.openshift.io
+          resources:
+          - consoles
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - operators.coreos.com
+          resources:
+          - clusterserviceversions
+          - operatorconditions
+          - operatorgroups
+          - subscriptions
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - packages.operators.coreos.com
+          resources:
+          - packagemanifests
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        serviceAccountName: multiclusterhub-operator
+      permissions:
+      - rules:
+        - apiGroups:
+          - ''
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ''
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: multiclusterhub-operator
+      deployments:
+      - label:
+          control-plane: multiclusterhub-operator
+        name: multiclusterhub-operator
+        spec:
+          replicas: 2
+          selector:
+            matchLabels:
+              name: multiclusterhub-operator
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                name: multiclusterhub-operator
+                ocm-antiaffinity-selector: multiclusterhub-operator
+            spec:
+              affinity:
+                podAntiAffinity:
+                  preferredDuringSchedulingIgnoredDuringExecution:
+                  - podAffinityTerm:
+                      labelSelector:
+                        matchExpressions:
+                        - key: ocm-antiaffinity-selector
+                          operator: In
+                          values:
+                          - multiclusterhub-operator
+                      topologyKey: topology.kubernetes.io/zone
+                    weight: 70
+                  - podAffinityTerm:
+                      labelSelector:
+                        matchExpressions:
+                        - key: ocm-antiaffinity-selector
+                          operator: In
+                          values:
+                          - multiclusterhub-operator
+                      topologyKey: kubernetes.io/hostname
+                    weight: 35
+              containers:
+              - args:
+                - --leader-elect
+                command:
+                - multiclusterhub-operator
+                env:
+                - name: CRDS_PATH
+                  value: /usr/local/templates/crds
+                - name: TEMPLATES_PATH
+                  value: /usr/local/templates
+                - name: POD_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: OPERAND_IMAGE_ANALYTICS_RECOMMENDS
+                  value: quay.io/stolostron/analytics-recommends@sha256:1d4a3cfb193992bed84578661affc31be25523966af3aea9f13d1d52498bac8b
+                - name: OPERAND_IMAGE_APPLIFECYCLE_BACKEND_E2E
+                  value: quay.io/stolostron/applifecycle-backend-e2e@sha256:ac0d52fc195736599ac9105f2514c1075915befe0bce92f8c1f1a6bfd55f9e21
+                - name: OPERAND_IMAGE_BAILER
+                  value: quay.io/stolostron/bailer@sha256:b6d0f5ff086a0a19e98ef4b60ac4e1c3f61e775863ee772d7829395800eb6492
+                - name: OPERAND_IMAGE_CERT_POLICY_CONTROLLER
+                  value: quay.io/stolostron/cert-policy-controller@sha256:3aa72cd9fffacbb2d8dda561383fe57febd3b4f71bbb6b72ce536644c7559a58
+                - name: OPERAND_IMAGE_CLUSTER_BACKUP_CONTROLLER
+                  value: quay.io/stolostron/cluster-backup-controller@sha256:b2829655116bb934c918f2062cef25760d9c6398f6050a73352595e4ddd20cfa
+                - name: OPERAND_IMAGE_CLUSTER_LIFECYCLE_E2E
+                  value: quay.io/stolostron/cluster-lifecycle-e2e@sha256:030a0989ea2a9a8b9df4adff4ff75a4351cb0ecaaefd000d10630d801c2fd991
+                - name: OPERAND_IMAGE_CLUSTER_PERMISSION
+                  value: quay.io/stolostron/cluster-permission@sha256:f5371db99a2465dfa33f49036e2b3ed5ee417ebc84f4ac48dc06ed619579a333
+                - name: OPERAND_IMAGE_CLUSTER_PROXY
+                  value: quay.io/stolostron/cluster-proxy@sha256:decd4ebdad2fcadd15fcc4be977ac85f5bb6331afcd96dc862626ae8e1f58691
+                - name: OPERAND_IMAGE_CLUSTER_PROXY_ADDON
+                  value: quay.io/stolostron/cluster-proxy-addon@sha256:5c9df70888b1cbc5209b0217bd0312991e6320cd9442e72e208f0af1498aa2f1
+                - name: OPERAND_IMAGE_CLUSTER_TEMPLATES_OPERATOR
+                  value: quay.io/stolostron/cluster-templates-operator@sha256:133e5cede92a5dbe9373982c851ca40134fc4de8665e54de60ecc7738f9f50f7
+                - name: OPERAND_IMAGE_CONFIG_POLICY_CONTROLLER
+                  value: quay.io/stolostron/config-policy-controller@sha256:ae2427edcf3021ec41e783df68a2bd95b9e09199c1257581b6e3b369f618f328
+                - name: OPERAND_IMAGE_CONSOLE
+                  value: quay.io/stolostron/console@sha256:cffd16e31e37b7b547b1f36fbe3e445e7081a877e945b876f5be996c062fdba3
+                - name: OPERAND_IMAGE_ENDPOINT_MONITORING_OPERATOR
+                  value: quay.io/stolostron/endpoint-monitoring-operator@sha256:c29025c4c37f5b1eb1a0b322999c14940f7b9a5d55b7081fabc933afa8795286
+                - name: OPERAND_IMAGE_GOVERNANCE_POLICY_ADDON_CONTROLLER
+                  value: quay.io/stolostron/governance-policy-addon-controller@sha256:ae0a5854e9108cd8504820d32a3a8314306cf24b6e240b5b5ba961eebd34b488
+                - name: OPERAND_IMAGE_GOVERNANCE_POLICY_FRAMEWORK_ADDON
+                  value: quay.io/stolostron/governance-policy-framework-addon@sha256:2c421b1038b85b0c9afa26d950fe726429f933538f73d3fe0bea4ff4c4d02fa2
+                - name: OPERAND_IMAGE_GOVERNANCE_POLICY_PROPAGATOR
+                  value: quay.io/stolostron/governance-policy-propagator@sha256:630316a55ed285cc0c10819bda73e692fc2db5427dca536b5f9dfbcc7ab68113
+                - name: OPERAND_IMAGE_GRAFANA
+                  value: quay.io/stolostron/grafana@sha256:c95f42a62364a663920d519614cb3e81cfa0ac9848bb8bffb4798233be6934a0
+                - name: OPERAND_IMAGE_GRAFANA_DASHBOARD_LOADER
+                  value: quay.io/stolostron/grafana-dashboard-loader@sha256:8adbfc6ddcff93c9abed16a13ce98a51b6cb5bb7efa34af18f5fc6b007521448
+                - name: OPERAND_IMAGE_GRC_POLICY_FRAMEWORK_TESTS
+                  value: quay.io/stolostron/grc-policy-framework-tests@sha256:a04af5f0de41dfd150f0694067414e27811fb91011e270f995ba06dff3b50c49
+                - name: OPERAND_IMAGE_HELLOPROW_GO
+                  value: quay.io/stolostron/helloprow-go@sha256:0671c58cc5c1f3fb9e00ae58ad6ef2c1f470867e26637b823261e9ab9279f05e
+                - name: OPERAND_IMAGE_HELLOWORLD
+                  value: quay.io/stolostron/helloworld@sha256:4ec73f968651ddf443544ba76418f521c7ee27d9c753c433f4a4fb5400c7ce19
+                - name: OPERAND_IMAGE_IAM_POLICY_CONTROLLER
+                  value: quay.io/stolostron/iam-policy-controller@sha256:482a2e8dfd90e67473e7625f2bf3de557dbd6fb9a22f29a7738e33ceb6c78c17
+                - name: OPERAND_IMAGE_INSIGHTS_CLIENT
+                  value: quay.io/stolostron/insights-client@sha256:d97a1df00490c79d8a42c8eeb43ff7396ddfa6b3e5666b6b905a06e9227cd701
+                - name: OPERAND_IMAGE_INSIGHTS_METRICS
+                  value: quay.io/stolostron/insights-metrics@sha256:a37e270cf4c4e461fd883b1ab58fff4446acce5e6882e04bf90ddf6d2d59fc84
+                - name: OPERAND_IMAGE_KLUSTERLET_ADDON_CONTROLLER
+                  value: quay.io/stolostron/klusterlet-addon-controller@sha256:ef18183a86e4c35887c74e5b6e3b8a0b3db640586ac664ef6b1946d648f9a696
+                - name: OPERAND_IMAGE_KUBE_RBAC_PROXY
+                  value: quay.io/stolostron/kube-rbac-proxy@sha256:b4b6b69f414921cbf401af80eace77231da48556a6f20495fdd73c5c4d86a879
+                - name: OPERAND_IMAGE_KUBE_STATE_METRICS
+                  value: quay.io/stolostron/kube-state-metrics@sha256:62b3dc4866ccc6af37d8895a50213a621f391dc99ccdc307807ce8f8c126ba51
+                - name: OPERAND_IMAGE_METRICS_COLLECTOR
+                  value: quay.io/stolostron/metrics-collector@sha256:41ce397366049dbffcbbf6f82d32a5050b28184813b01dd8047cdecd1350a501
+                - name: OPERAND_IMAGE_MULTICLOUD_INTEGRATIONS
+                  value: quay.io/stolostron/multicloud-integrations@sha256:976d5734c7eb3ad391394dbd3e8fcaf22d26283273a3f10a699938f5dd264e2d
+                - name: OPERAND_IMAGE_MULTICLUSTER_GLOBAL_HUB_OPERATOR
+                  value: quay.io/stolostron/multicluster-global-hub-operator@sha256:3518ea412b978411cdeda3f8b2077465d83759bc769290ea3f5d7641f0e0fbbf
+                - name: OPERAND_IMAGE_MULTICLUSTER_OBSERVABILITY_OPERATOR
+                  value: quay.io/stolostron/multicluster-observability-operator@sha256:474d9a59752f1dfb0296681a00f8840d60ba74d0ad0b3beb9e19e8ce3e87d962
+                - name: OPERAND_IMAGE_MULTICLUSTER_OPERATORS_APPLICATION
+                  value: quay.io/stolostron/multicluster-operators-application@sha256:1b0a83f021369dad76da81d2e34fd459bdea66d215b72edebf7f047c6b636c46
+                - name: OPERAND_IMAGE_MULTICLUSTER_OPERATORS_CHANNEL
+                  value: quay.io/stolostron/multicluster-operators-channel@sha256:8ef60376c20df7217fd3914f8b8107dcce2da7efd0f70af29e824893e2e6ab40
+                - name: OPERAND_IMAGE_MULTICLUSTER_OPERATORS_SUBSCRIPTION
+                  value: quay.io/stolostron/multicluster-operators-subscription@sha256:e45adc097d73f78ecbb16bf8f14b477b7e2f255e0ffaaab719359f183e29886a
+                - name: OPERAND_IMAGE_MULTICLUSTERHUB_OPERATOR
+                  value: quay.io/stolostron/multiclusterhub-operator@sha256:e71cfeb7422519111dc51e35a131be139bd060b55b41bcee92b10378ed897d9e
+                - name: OPERAND_IMAGE_MULTICLUSTERHUB_OPERATOR_TESTS
+                  value: quay.io/stolostron/multiclusterhub-operator-tests@sha256:9787f6062beb6679837843b3efd1cf9cee1debbb514ffda5f8ab975d32e8a867
+                - name: OPERAND_IMAGE_MUST_GATHER
+                  value: quay.io/stolostron/must-gather@sha256:1f7c129859bdaf6bd93dda77aec01f7cd03000fbfaccd809f26d33b9e3f66e51
+                - name: OPERAND_IMAGE_NODE_EXPORTER
+                  value: quay.io/stolostron/node-exporter@sha256:0bc8646970bb701de7baa2b8f2edb451430391f724e8aaf022c708d98d2fa0b5
+                - name: OPERAND_IMAGE_OBSERVABILITY_E2E_TEST
+                  value: quay.io/stolostron/observability-e2e-test@sha256:20a7a5d3adddab0d2717982ab08c3443a87dce27b7b278827841d312ea2d99f4
+                - name: OPERAND_IMAGE_OBSERVATORIUM
+                  value: quay.io/stolostron/observatorium@sha256:b987fd3d38bda8f6e8a0edb142e19c98df7da9951d956850b00498bff85681f1
+                - name: OPERAND_IMAGE_OBSERVATORIUM_OPERATOR
+                  value: quay.io/stolostron/observatorium-operator@sha256:d0842667d58049d121dd425ab6da686b0e78824ca5227100df72cb284c0bb0ed
+                - name: OPERAND_IMAGE_OAUTH_PROXY
+                  value: quay.io/stolostron/origin-oauth-proxy@sha256:c92a1480b2628d50d8fe158df9451598406e2e5cc7177cf5efcb81caba120afd
+                - name: OPERAND_IMAGE_OAUTH_PROXY_48
+                  value: quay.io/stolostron/origin-oauth-proxy-48@sha256:c92a1480b2628d50d8fe158df9451598406e2e5cc7177cf5efcb81caba120afd
+                - name: OPERAND_IMAGE_OAUTH_PROXY_49_AND_UP
+                  value: quay.io/stolostron/origin-oauth-proxy-49-and-up@sha256:0e72ed64cdf76828392ef8cfe4ee49d644a013ac00ff1590d6c53774d77615e3
+                - name: OPERAND_IMAGE_POSTGRESQL_12
+                  value: quay.io/stolostron/postgresql-12@sha256:da0b8d525b173ef472ff4c71fae60b396f518860d6313c4f3287b844aab6d622
+                - name: OPERAND_IMAGE_POSTGRESQL_13
+                  value: quay.io/stolostron/postgresql-13@sha256:f8c4c4364ab8d27d2c774cbd02a0d02b9d6e3cb6e8d69af728cdd889df312b56
+                - name: OPERAND_IMAGE_PROMETHEUS
+                  value: quay.io/stolostron/prometheus@sha256:9eb030d88039b2a55c0a8c6c11ba9e68ab02aae7af6bcdb5468e987f6339951b
+                - name: OPERAND_IMAGE_PROMETHEUS_ALERTMANAGER
+                  value: quay.io/stolostron/prometheus-alertmanager@sha256:39acb86f42b4ce1bdde708337aa228c66c95fa5c84f2e47b8d3129bd12ad6438
+                - name: OPERAND_IMAGE_PROMETHEUS_CONFIG_RELOADER
+                  value: quay.io/stolostron/prometheus-config-reloader@sha256:860f0cbc73bf609e0cdaf1cdc096932dffd9554d5326822a1f489f54ec844e69
+                - name: OPERAND_IMAGE_PROMETHEUS_OPERATOR
+                  value: quay.io/stolostron/prometheus-operator@sha256:18860e4243198186d8d6d9edeab151c72592e74cdaa90b95305f52d271b9ca39
+                - name: OPERAND_IMAGE_RBAC_QUERY_PROXY
+                  value: quay.io/stolostron/rbac-query-proxy@sha256:a32e16d915d960190d0a9d1d24ef3a0099f7fdfd70065240edd416ce05907a59
+                - name: OPERAND_IMAGE_SEARCH_COLLECTOR
+                  value: quay.io/stolostron/search-collector@sha256:5cbfbf965554af0b9e6a3b2ca615e6f0ed49ace97983c3e264939f348a0f092e
+                - name: OPERAND_IMAGE_SEARCH_E2E
+                  value: quay.io/stolostron/search-e2e@sha256:9e83b66c2cf43ec5c1524d3c0457d2bc58e61366647893ffc31415a65149d9de
+                - name: OPERAND_IMAGE_SEARCH_INDEXER
+                  value: quay.io/stolostron/search-indexer@sha256:ff14c5848c0863b4af12272d295dcf8a3d9a03ea556c812b911c6676bcef5e55
+                - name: OPERAND_IMAGE_SEARCH_OPERATOR_BUNDLE
+                  value: quay.io/stolostron/search-operator-bundle@sha256:c2e7291651e37bb5405ad4293f28315047752567a757c28302cdd718595041f9
+                - name: OPERAND_IMAGE_SEARCH_V2_API
+                  value: quay.io/stolostron/search-v2-api@sha256:3ce0c03e892223e632d0f9361442fc290f42004bcf4cef6bf2e44a17156b42da
+                - name: OPERAND_IMAGE_SEARCH_V2_OPERATOR
+                  value: quay.io/stolostron/search-v2-operator@sha256:23feafd6dba4aef3cbcf0c7374eceaee2c0f6ec45a6c0d5496e4bea1040c4a1d
+                - name: OPERAND_IMAGE_SUBMARINER_ADDON
+                  value: quay.io/stolostron/submariner-addon@sha256:d035f4f45b92d00ec984fcaa87b63439742078785f36d0871fe339f6451fb7d5
+                - name: OPERAND_IMAGE_THANOS
+                  value: quay.io/stolostron/thanos@sha256:44769fec24d848eca6622b47a1f82c34edbffcec51acb37c9cbbf64c4ce1454b
+                - name: OPERAND_IMAGE_THANOS_RECEIVE_CONTROLLER
+                  value: quay.io/stolostron/thanos-receive-controller@sha256:36e99ee53ece193d68bc2b65503dac33d03a59f2892d19e8d96c4914fbc61cc1
+                - name: OPERAND_IMAGE_VOLSYNC
+                  value: quay.io/stolostron/volsync@sha256:10b2c69f0cc5e4a815fc38a145dcdb83840e76589478ca892667f14b8a058daa
+                - name: OPERAND_IMAGE_VOLSYNC_ADDON_CONTROLLER
+                  value: quay.io/stolostron/volsync-addon-controller@sha256:b22c11ded4b33597e6b5f449547f20dbf0661a39c1adb6a1433e2861ab72eb3d
+                - name: OPERAND_IMAGE_VOLSYNC_MOVER_RCLONE
+                  value: quay.io/stolostron/volsync-mover-rclone@sha256:1fec9402dac78f44e4d6c705d6b2b020e1b230947f101cc51853f32ecd3e29d3
+                - name: OPERAND_IMAGE_VOLSYNC_MOVER_RESTIC
+                  value: quay.io/stolostron/volsync-mover-restic@sha256:a3f1e8562438da55b5e9a8b697bedc3978f4bf746565c379dd23d7930c52630e
+                - name: OPERAND_IMAGE_VOLSYNC_MOVER_RSYNC
+                  value: quay.io/stolostron/volsync-mover-rsync@sha256:b57e860faed9df4cdcd820968481461ff98cea10e541ba1cca93887c7dc8f83f
+                - name: OPERAND_IMAGE_VOLSYNC_MOVER_SYNCTHING
+                  value: quay.io/stolostron/volsync-mover-syncthing@sha256:0205e773e6b1e1053be95c5c3a3f91a814020543a2fbc39e3c796269f261f69b
+                - name: OPERATOR_VERSION
+                  value: 0.3.1
+                - name: OPERATOR_PACKAGE
+                  value: stolostron
+                image: quay.io/stolostron/multiclusterhub-operator@sha256:e71cfeb7422519111dc51e35a131be139bd060b55b41bcee92b10378ed897d9e
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: multiclusterhub-operator
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 100m
+                    memory: 4Gi
+                  requests:
+                    cpu: 100m
+                    memory: 256Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  privileged: false
+                  readOnlyRootFilesystem: true
+                volumeMounts:
+                - mountPath: /tmp/k8s-webhook-server/serving-certs
+                  name: cert
+                  readOnly: true
+              securityContext:
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+              serviceAccountName: multiclusterhub-operator
+              terminationGracePeriodSeconds: 10
+              volumes:
+              - name: cert
+                secret:
+                  defaultMode: 420
+                  secretName: multiclusterhub-operator-webhook
+  replaces: stolostron.v0.3.0
+  relatedImages:
+  - name: analytics_recommends
+    image: quay.io/stolostron/analytics-recommends@sha256:1d4a3cfb193992bed84578661affc31be25523966af3aea9f13d1d52498bac8b
+  - name: applifecycle_backend_e2e
+    image: quay.io/stolostron/applifecycle-backend-e2e@sha256:ac0d52fc195736599ac9105f2514c1075915befe0bce92f8c1f1a6bfd55f9e21
+  - name: bailer
+    image: quay.io/stolostron/bailer@sha256:b6d0f5ff086a0a19e98ef4b60ac4e1c3f61e775863ee772d7829395800eb6492
+  - name: cert_policy_controller
+    image: quay.io/stolostron/cert-policy-controller@sha256:3aa72cd9fffacbb2d8dda561383fe57febd3b4f71bbb6b72ce536644c7559a58
+  - name: cluster_backup_controller
+    image: quay.io/stolostron/cluster-backup-controller@sha256:b2829655116bb934c918f2062cef25760d9c6398f6050a73352595e4ddd20cfa
+  - name: cluster_lifecycle_e2e
+    image: quay.io/stolostron/cluster-lifecycle-e2e@sha256:030a0989ea2a9a8b9df4adff4ff75a4351cb0ecaaefd000d10630d801c2fd991
+  - name: cluster_permission
+    image: quay.io/stolostron/cluster-permission@sha256:f5371db99a2465dfa33f49036e2b3ed5ee417ebc84f4ac48dc06ed619579a333
+  - name: cluster_proxy
+    image: quay.io/stolostron/cluster-proxy@sha256:decd4ebdad2fcadd15fcc4be977ac85f5bb6331afcd96dc862626ae8e1f58691
+  - name: cluster_proxy_addon
+    image: quay.io/stolostron/cluster-proxy-addon@sha256:5c9df70888b1cbc5209b0217bd0312991e6320cd9442e72e208f0af1498aa2f1
+  - name: cluster_templates_operator
+    image: quay.io/stolostron/cluster-templates-operator@sha256:133e5cede92a5dbe9373982c851ca40134fc4de8665e54de60ecc7738f9f50f7
+  - name: config_policy_controller
+    image: quay.io/stolostron/config-policy-controller@sha256:ae2427edcf3021ec41e783df68a2bd95b9e09199c1257581b6e3b369f618f328
+  - name: console
+    image: quay.io/stolostron/console@sha256:cffd16e31e37b7b547b1f36fbe3e445e7081a877e945b876f5be996c062fdba3
+  - name: endpoint_monitoring_operator
+    image: quay.io/stolostron/endpoint-monitoring-operator@sha256:c29025c4c37f5b1eb1a0b322999c14940f7b9a5d55b7081fabc933afa8795286
+  - name: governance_policy_addon_controller
+    image: quay.io/stolostron/governance-policy-addon-controller@sha256:ae0a5854e9108cd8504820d32a3a8314306cf24b6e240b5b5ba961eebd34b488
+  - name: governance_policy_framework_addon
+    image: quay.io/stolostron/governance-policy-framework-addon@sha256:2c421b1038b85b0c9afa26d950fe726429f933538f73d3fe0bea4ff4c4d02fa2
+  - name: governance_policy_propagator
+    image: quay.io/stolostron/governance-policy-propagator@sha256:630316a55ed285cc0c10819bda73e692fc2db5427dca536b5f9dfbcc7ab68113
+  - name: grafana
+    image: quay.io/stolostron/grafana@sha256:c95f42a62364a663920d519614cb3e81cfa0ac9848bb8bffb4798233be6934a0
+  - name: grafana_dashboard_loader
+    image: quay.io/stolostron/grafana-dashboard-loader@sha256:8adbfc6ddcff93c9abed16a13ce98a51b6cb5bb7efa34af18f5fc6b007521448
+  - name: grc_policy_framework_tests
+    image: quay.io/stolostron/grc-policy-framework-tests@sha256:a04af5f0de41dfd150f0694067414e27811fb91011e270f995ba06dff3b50c49
+  - name: helloprow_go
+    image: quay.io/stolostron/helloprow-go@sha256:0671c58cc5c1f3fb9e00ae58ad6ef2c1f470867e26637b823261e9ab9279f05e
+  - name: helloworld
+    image: quay.io/stolostron/helloworld@sha256:4ec73f968651ddf443544ba76418f521c7ee27d9c753c433f4a4fb5400c7ce19
+  - name: iam_policy_controller
+    image: quay.io/stolostron/iam-policy-controller@sha256:482a2e8dfd90e67473e7625f2bf3de557dbd6fb9a22f29a7738e33ceb6c78c17
+  - name: insights_client
+    image: quay.io/stolostron/insights-client@sha256:d97a1df00490c79d8a42c8eeb43ff7396ddfa6b3e5666b6b905a06e9227cd701
+  - name: insights_metrics
+    image: quay.io/stolostron/insights-metrics@sha256:a37e270cf4c4e461fd883b1ab58fff4446acce5e6882e04bf90ddf6d2d59fc84
+  - name: klusterlet_addon_controller
+    image: quay.io/stolostron/klusterlet-addon-controller@sha256:ef18183a86e4c35887c74e5b6e3b8a0b3db640586ac664ef6b1946d648f9a696
+  - name: kube_rbac_proxy
+    image: quay.io/stolostron/kube-rbac-proxy@sha256:b4b6b69f414921cbf401af80eace77231da48556a6f20495fdd73c5c4d86a879
+  - name: kube_state_metrics
+    image: quay.io/stolostron/kube-state-metrics@sha256:62b3dc4866ccc6af37d8895a50213a621f391dc99ccdc307807ce8f8c126ba51
+  - name: metrics_collector
+    image: quay.io/stolostron/metrics-collector@sha256:41ce397366049dbffcbbf6f82d32a5050b28184813b01dd8047cdecd1350a501
+  - name: multicloud_integrations
+    image: quay.io/stolostron/multicloud-integrations@sha256:976d5734c7eb3ad391394dbd3e8fcaf22d26283273a3f10a699938f5dd264e2d
+  - name: multicluster_global_hub_operator
+    image: quay.io/stolostron/multicluster-global-hub-operator@sha256:3518ea412b978411cdeda3f8b2077465d83759bc769290ea3f5d7641f0e0fbbf
+  - name: multicluster_observability_operator
+    image: quay.io/stolostron/multicluster-observability-operator@sha256:474d9a59752f1dfb0296681a00f8840d60ba74d0ad0b3beb9e19e8ce3e87d962
+  - name: multicluster_operators_application
+    image: quay.io/stolostron/multicluster-operators-application@sha256:1b0a83f021369dad76da81d2e34fd459bdea66d215b72edebf7f047c6b636c46
+  - name: multicluster_operators_channel
+    image: quay.io/stolostron/multicluster-operators-channel@sha256:8ef60376c20df7217fd3914f8b8107dcce2da7efd0f70af29e824893e2e6ab40
+  - name: multicluster_operators_subscription
+    image: quay.io/stolostron/multicluster-operators-subscription@sha256:e45adc097d73f78ecbb16bf8f14b477b7e2f255e0ffaaab719359f183e29886a
+  - name: multiclusterhub_operator_tests
+    image: quay.io/stolostron/multiclusterhub-operator-tests@sha256:9787f6062beb6679837843b3efd1cf9cee1debbb514ffda5f8ab975d32e8a867
+  - name: must_gather
+    image: quay.io/stolostron/must-gather@sha256:1f7c129859bdaf6bd93dda77aec01f7cd03000fbfaccd809f26d33b9e3f66e51
+  - name: node_exporter
+    image: quay.io/stolostron/node-exporter@sha256:0bc8646970bb701de7baa2b8f2edb451430391f724e8aaf022c708d98d2fa0b5
+  - name: observability_e2e_test
+    image: quay.io/stolostron/observability-e2e-test@sha256:20a7a5d3adddab0d2717982ab08c3443a87dce27b7b278827841d312ea2d99f4
+  - name: observatorium
+    image: quay.io/stolostron/observatorium@sha256:b987fd3d38bda8f6e8a0edb142e19c98df7da9951d956850b00498bff85681f1
+  - name: observatorium_operator
+    image: quay.io/stolostron/observatorium-operator@sha256:d0842667d58049d121dd425ab6da686b0e78824ca5227100df72cb284c0bb0ed
+  - name: oauth_proxy
+    image: quay.io/stolostron/origin-oauth-proxy@sha256:c92a1480b2628d50d8fe158df9451598406e2e5cc7177cf5efcb81caba120afd
+  - name: oauth_proxy_48
+    image: quay.io/stolostron/origin-oauth-proxy-48@sha256:c92a1480b2628d50d8fe158df9451598406e2e5cc7177cf5efcb81caba120afd
+  - name: oauth_proxy_49_and_up
+    image: quay.io/stolostron/origin-oauth-proxy-49-and-up@sha256:0e72ed64cdf76828392ef8cfe4ee49d644a013ac00ff1590d6c53774d77615e3
+  - name: postgresql_12
+    image: quay.io/stolostron/postgresql-12@sha256:da0b8d525b173ef472ff4c71fae60b396f518860d6313c4f3287b844aab6d622
+  - name: postgresql_13
+    image: quay.io/stolostron/postgresql-13@sha256:f8c4c4364ab8d27d2c774cbd02a0d02b9d6e3cb6e8d69af728cdd889df312b56
+  - name: prometheus
+    image: quay.io/stolostron/prometheus@sha256:9eb030d88039b2a55c0a8c6c11ba9e68ab02aae7af6bcdb5468e987f6339951b
+  - name: prometheus_alertmanager
+    image: quay.io/stolostron/prometheus-alertmanager@sha256:39acb86f42b4ce1bdde708337aa228c66c95fa5c84f2e47b8d3129bd12ad6438
+  - name: prometheus_config_reloader
+    image: quay.io/stolostron/prometheus-config-reloader@sha256:860f0cbc73bf609e0cdaf1cdc096932dffd9554d5326822a1f489f54ec844e69
+  - name: prometheus_operator
+    image: quay.io/stolostron/prometheus-operator@sha256:18860e4243198186d8d6d9edeab151c72592e74cdaa90b95305f52d271b9ca39
+  - name: rbac_query_proxy
+    image: quay.io/stolostron/rbac-query-proxy@sha256:a32e16d915d960190d0a9d1d24ef3a0099f7fdfd70065240edd416ce05907a59
+  - name: search_collector
+    image: quay.io/stolostron/search-collector@sha256:5cbfbf965554af0b9e6a3b2ca615e6f0ed49ace97983c3e264939f348a0f092e
+  - name: search_e2e
+    image: quay.io/stolostron/search-e2e@sha256:9e83b66c2cf43ec5c1524d3c0457d2bc58e61366647893ffc31415a65149d9de
+  - name: search_indexer
+    image: quay.io/stolostron/search-indexer@sha256:ff14c5848c0863b4af12272d295dcf8a3d9a03ea556c812b911c6676bcef5e55
+  - name: search_operator_bundle
+    image: quay.io/stolostron/search-operator-bundle@sha256:c2e7291651e37bb5405ad4293f28315047752567a757c28302cdd718595041f9
+  - name: search_v2_api
+    image: quay.io/stolostron/search-v2-api@sha256:3ce0c03e892223e632d0f9361442fc290f42004bcf4cef6bf2e44a17156b42da
+  - name: search_v2_operator
+    image: quay.io/stolostron/search-v2-operator@sha256:23feafd6dba4aef3cbcf0c7374eceaee2c0f6ec45a6c0d5496e4bea1040c4a1d
+  - name: submariner_addon
+    image: quay.io/stolostron/submariner-addon@sha256:d035f4f45b92d00ec984fcaa87b63439742078785f36d0871fe339f6451fb7d5
+  - name: thanos
+    image: quay.io/stolostron/thanos@sha256:44769fec24d848eca6622b47a1f82c34edbffcec51acb37c9cbbf64c4ce1454b
+  - name: thanos_receive_controller
+    image: quay.io/stolostron/thanos-receive-controller@sha256:36e99ee53ece193d68bc2b65503dac33d03a59f2892d19e8d96c4914fbc61cc1
+  - name: volsync
+    image: quay.io/stolostron/volsync@sha256:10b2c69f0cc5e4a815fc38a145dcdb83840e76589478ca892667f14b8a058daa
+  - name: volsync_addon_controller
+    image: quay.io/stolostron/volsync-addon-controller@sha256:b22c11ded4b33597e6b5f449547f20dbf0661a39c1adb6a1433e2861ab72eb3d
+  - name: volsync_mover_rclone
+    image: quay.io/stolostron/volsync-mover-rclone@sha256:1fec9402dac78f44e4d6c705d6b2b020e1b230947f101cc51853f32ecd3e29d3
+  - name: volsync_mover_restic
+    image: quay.io/stolostron/volsync-mover-restic@sha256:a3f1e8562438da55b5e9a8b697bedc3978f4bf746565c379dd23d7930c52630e
+  - name: volsync_mover_rsync
+    image: quay.io/stolostron/volsync-mover-rsync@sha256:b57e860faed9df4cdcd820968481461ff98cea10e541ba1cca93887c7dc8f83f
+  - name: volsync_mover_syncthing
+    image: quay.io/stolostron/volsync-mover-syncthing@sha256:0205e773e6b1e1053be95c5c3a3f91a814020543a2fbc39e3c796269f261f69b

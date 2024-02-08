@@ -1,0 +1,2938 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  creationTimestamp: null
+  name: istios.operator.istio.io
+spec:
+  group: operator.istio.io
+  names:
+    categories:
+    - istio-io
+    kind: Istio
+    listKind: IstioList
+    plural: istios
+    singular: istio
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - description: Total number of IstioRevision objects currently associated with
+        this object.
+      jsonPath: .status.revisions.total
+      name: Revisions
+      type: string
+    - description: Number of revisions that are ready.
+      jsonPath: .status.revisions.ready
+      name: Ready
+      type: string
+    - description: Number of revisions that are currently being used by workloads.
+      jsonPath: .status.revisions.inUse
+      name: In use
+      type: string
+    - description: The current state of the active revision.
+      jsonPath: .status.state
+      name: Active Revision
+      type: string
+    - description: The version of the control plane installation.
+      jsonPath: .spec.version
+      name: Version
+      type: string
+    - description: The age of the object
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          Istio represents an Istio Service Mesh deployment consisting of one or more
+          control plane instances (represented by one or more IstioRevision objects).
+          To deploy an Istio Service Mesh, a user creates an Istio object with the
+          desired Istio version and configuration. The Istio operator then creates
+          an IstioRevision object, which in turn creates the underlying Deployment
+          objects for istiod and other control plane components, similar to how a
+          Deployment object in Kubernetes creates ReplicaSets that create the Pods.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: IstioSpec defines the desired state of Istio
+            properties:
+              namespace:
+                description: Namespace to which the Istio components should be installed.
+                type: string
+              profile:
+                description: |-
+                  The built-in installation configuration profile to use.
+                  The 'default' profile is always applied. On OpenShift, the 'openshift' profile is also applied on top of 'default'.
+                  Must be one of: ambient, default, demo, empty, external, minimal, openshift-ambient, openshift, preview, remote.
+                enum:
+                - ambient
+                - default
+                - demo
+                - empty
+                - external
+                - minimal
+                - openshift-ambient
+                - openshift
+                - preview
+                - remote
+                type: string
+              rawValues:
+                description: Defines the non-validated values to be passed to the
+                  Helm charts when installing Istio.
+                x-kubernetes-preserve-unknown-fields: true
+              updateStrategy:
+                description: Defines the update strategy to use when the version in
+                  the Istio CR is updated.
+                properties:
+                  inactiveRevisionDeletionGracePeriodSeconds:
+                    description: |-
+                      Defines how many seconds the operator should wait before removing a non-active revision after all
+                      the workloads have stopped using it. You may want to set this value on the order of minutes.
+                      The minimum and the default value is 30.
+                    format: int64
+                    minimum: 30
+                    type: integer
+                  type:
+                    description: "Type of strategy to use. Can be \"InPlace\" or \"RevisionBased\".
+                      When the \"InPlace\" strategy\nis used, the existing Istio control
+                      plane is updated in-place. The workloads therefore\ndon't need
+                      to be moved from one control plane instance to another. When
+                      the \"RevisionBased\"\nstrategy is used, a new Istio control
+                      plane instance is created for every change to the\nIstio.spec.version
+                      field. The old control plane remains in place until all workloads
+                      have\nbeen moved to the new control plane instance.\n\n\nThe
+                      \"InPlace\" strategy is the default.\tTODO: change default to
+                      \"RevisionBased\""
+                    enum:
+                    - InPlace
+                    - RevisionBased
+                    type: string
+                  updateWorkloads:
+                    description: |-
+                      Defines whether the workloads should be moved from one control plane instance to another
+                      automatically. If updateWorkloads is true, the operator moves the workloads from the old
+                      control plane instance to the new one after the new control plane is ready.
+                      If updateWorkloads is false, the user must move the workloads manually by updating the
+                      istio.io/rev labels on the namespace and/or the pods.
+                      Defaults to false.
+                    type: boolean
+                type: object
+              values:
+                description: Defines the values to be passed to the Helm charts when
+                  installing Istio.
+                properties:
+                  base:
+                    description: Configuration for base component
+                    properties:
+                      enableCRDTemplates:
+                        description: For Helm2 use, adds the CRDs to templates.
+                        type: boolean
+                      enableIstioConfigCRDs:
+                        description: For istioctl usage to disable istio config crds
+                          in base
+                        type: boolean
+                      validateGateway:
+                        type: boolean
+                      validationURL:
+                        description: URL to use for validating webhook.
+                        type: string
+                    type: object
+                  cni:
+                    description: Configuration for CNI.
+                    properties:
+                      chained:
+                        type: boolean
+                      cniBinDir:
+                        type: string
+                      cniConfDir:
+                        type: string
+                      cniConfFileName:
+                        type: string
+                      cniNetnsDir:
+                        type: string
+                      enabled:
+                        description: Controls whether CNI is enabled.
+                        type: boolean
+                      excludeNamespaces:
+                        items:
+                          type: string
+                        type: array
+                      hub:
+                        type: string
+                      image:
+                        type: string
+                      logLevel:
+                        type: string
+                      privileged:
+                        type: boolean
+                      provider:
+                        type: string
+                      psp_cluster_role:
+                        type: string
+                      pullPolicy:
+                        type: string
+                      repair:
+                        properties:
+                          brokenPodLabelKey:
+                            type: string
+                          brokenPodLabelValue:
+                            type: string
+                          deletePods:
+                            type: boolean
+                          enabled:
+                            description: Controls whether repair behavior is enabled.
+                            type: boolean
+                          hub:
+                            type: string
+                          image:
+                            type: string
+                          initContainerName:
+                            type: string
+                          labelPods:
+                            description: Controls whether various repair behaviors
+                              are enabled.
+                            type: boolean
+                          repairPods:
+                            type: boolean
+                          tag:
+                            anyOf:
+                            - type: integer
+                            - type: string
+                            x-kubernetes-int-or-string: true
+                        type: object
+                      resource_quotas:
+                        properties:
+                          enabled:
+                            description: Controls whether to create resource quotas
+                              or not for the CNI DaemonSet.
+                            type: boolean
+                          pods:
+                            format: int64
+                            type: integer
+                        type: object
+                      rollingMaxUnavailable:
+                        anyOf:
+                        - type: integer
+                        - type: string
+                        description: K8s rolling update strategy
+                        x-kubernetes-int-or-string: true
+                      seccompProfile:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          The Container seccompProfile
+
+
+                          See: https://kubernetes.io/docs/tutorials/security/seccomp/
+                        type: object
+                      tag:
+                        anyOf:
+                        - type: integer
+                        - type: string
+                        x-kubernetes-int-or-string: true
+                      variant:
+                        type: string
+                    type: object
+                  compatibilityVersion:
+                    type: string
+                  defaultRevision:
+                    type: string
+                  global:
+                    description: Global Configuration for Istio components.
+                    properties:
+                      autoscalingv2API:
+                        type: boolean
+                      caAddress:
+                        description: The address of the CA for CSR.
+                        type: string
+                      caName:
+                        description: |-
+                          The name of the CA for workloads.
+                          For example, when caName=GkeWorkloadCertificate, GKE workload certificates
+                          will be used as the certificates for workloads.
+                          The default value is "" and when caName="", the CA will be configured by other
+                          mechanisms (e.g., environmental variable CA_PROVIDER).
+                        type: string
+                      certSigners:
+                        description: List of certSigners to allow "approve" action
+                          in the ClusterRole
+                        items:
+                          type: string
+                        type: array
+                      configCluster:
+                        description: Controls whether a remote cluster is the config
+                          cluster for an external istiod
+                        type: boolean
+                      configRootNamespace:
+                        type: string
+                      configValidation:
+                        description: Controls whether the server-side validation is
+                          enabled.
+                        type: boolean
+                      defaultConfigVisibilitySettings:
+                        items:
+                          type: string
+                        type: array
+                      defaultPodDisruptionBudget:
+                        description: Specifies the default pod disruption budget configuration.
+                        properties:
+                          enabled:
+                            description: Controls whether a PodDisruptionBudget with
+                              a default minAvailable value of 1 is created for each
+                              deployment.
+                            type: boolean
+                        type: object
+                      externalIstiod:
+                        description: Controls whether one external istiod is enabled.
+                        type: boolean
+                      hub:
+                        description: Specifies the docker hub for Istio images.
+                        type: string
+                      ipFamilies:
+                        items:
+                          type: string
+                        type: array
+                      ipFamilyPolicy:
+                        type: string
+                      istioNamespace:
+                        description: Specifies the default namespace for the Istio
+                          control plane components.
+                        type: string
+                      istiod:
+                        description: Specifies the configution of istiod
+                        properties:
+                          enableAnalysis:
+                            description: If enabled, istiod will perform config analysis
+                            type: boolean
+                        type: object
+                      jwtPolicy:
+                        description: |-
+                          Configure the policy for validating JWT.
+                          Currently, two options are supported: "third-party-jwt" and "first-party-jwt".
+                        type: string
+                      logAsJson:
+                        type: boolean
+                      logging:
+                        description: Specifies the global logging level settings for
+                          the Istio control plane components.
+                        properties:
+                          level:
+                            description: |-
+                              Comma-separated minimum per-scope logging level of messages to output, in the form of <scope>:<level>,<scope>:<level>
+                              The control plane has different scopes depending on component, but can configure default log level across all components
+                              If empty, default scope and level will be used as configured in code
+                            type: string
+                        type: object
+                      meshID:
+                        type: string
+                      meshNetworks:
+                        description: "Configure the mesh networks to be used by the
+                          Split Horizon EDS.\n\n\nThe following example defines two
+                          networks with different endpoints association methods.\nFor
+                          `network1` all endpoints that their IP belongs to the provided
+                          CIDR range will be\nmapped to network1. The gateway for
+                          this network example is specified by its public IP\naddress
+                          and port.\nThe second network, `network2`, in this example
+                          is defined differently with all endpoints\nretrieved through
+                          the specified Multi-Cluster registry being mapped to network2.
+                          The\ngateway is also defined differently with the name of
+                          the gateway service on the remote\ncluster. The public IP
+                          for the gateway will be determined from that remote service
+                          (only\nLoadBalancer gateway service type is currently supported,
+                          for a NodePort type gateway service,\nit still need to be
+                          configured manually).\n\n\nmeshNetworks:\n\n\n\tnetwork1:\n\t
+                          \ endpoints:\n\t  - fromCidr: \"192.168.0.1/24\"\n\t  gateways:\n\t
+                          \ - address: 1.1.1.1\n\t    port: 80\n\tnetwork2:\n\t  endpoints:\n\t
+                          \ - fromRegistry: reg1\n\t  gateways:\n\t  - registryServiceName:
+                          istio-ingressgateway.istio-system.svc.cluster.local\n\t
+                          \   port: 443"
+                        x-kubernetes-preserve-unknown-fields: true
+                      mountMtlsCerts:
+                        description: Controls whether the in-cluster MTLS key and
+                          certs are loaded from the secret volume mounts.
+                        type: boolean
+                      multiCluster:
+                        description: Specifies the Configuration for Istio mesh across
+                          multiple clusters through Istio gateways.
+                        properties:
+                          clusterName:
+                            type: string
+                          enabled:
+                            description: |-
+                              Enables the connection between two kubernetes clusters via their respective ingressgateway services.
+                              Use if the pods in each cluster cannot directly talk to one another.
+                            type: boolean
+                          globalDomainSuffix:
+                            type: string
+                          includeEnvoyFilter:
+                            type: boolean
+                        type: object
+                      network:
+                        type: string
+                      omitSidecarInjectorConfigMap:
+                        type: boolean
+                      oneNamespace:
+                        description: |-
+                          Controls whether to restrict the applications namespace the controller manages;
+                          If set it to false, the controller watches all namespaces.
+                        type: boolean
+                      operatorManageWebhooks:
+                        type: boolean
+                      pilotCertProvider:
+                        description: |-
+                          Configure the Pilot certificate provider.
+                          Currently, four providers are supported: "kubernetes", "istiod", "custom" and "none".
+                        type: string
+                      platform:
+                        description: |-
+                          Platform in which Istio is deployed. Possible values are: "openshift" and "gcp"
+                          An empty value means it is a vanilla Kubernetes distribution, therefore no special
+                          treatment will be considered.
+                        type: string
+                      podDNSSearchNamespaces:
+                        description: |-
+                          Custom DNS config for the pod to resolve names of services in other
+                          clusters. Use this to add additional search domains, and other settings.
+                          see https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#dns-config
+                          This does not apply to gateway pods as they typically need a different
+                          set of DNS settings than the normal application pods (e.g. in multicluster scenarios).
+                        items:
+                          type: string
+                        type: array
+                      proxy:
+                        description: Specifies how proxies are configured within Istio.
+                        properties:
+                          autoInject:
+                            type: string
+                          clusterDomain:
+                            description: |-
+                              Domain for the cluster, default: "cluster.local".
+
+
+                              K8s allows this to be customized, see https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/
+                            type: string
+                          componentLogLevel:
+                            description: |-
+                              Per Component log level for proxy, applies to gateways and sidecars.
+
+
+                              If a component level is not set, then the global "logLevel" will be used. If left empty, "misc:error" is used.
+                            type: string
+                          enableCoreDump:
+                            description: |-
+                              Enables core dumps for newly injected sidecars.
+
+
+                              If set, newly injected sidecars will have core dumps enabled.
+                            type: boolean
+                          excludeIPRanges:
+                            description: Lists the excluded IP ranges of Istio egress
+                              traffic that the sidecar captures.
+                            type: string
+                          excludeInboundPorts:
+                            description: Specifies the Istio ingress ports not to
+                              capture.
+                            type: string
+                          excludeOutboundPorts:
+                            type: string
+                          image:
+                            description: |-
+                              Image name or path for the proxy, default: "proxyv2".
+
+
+                              If registry or tag are not specified, global.hub and global.tag are used.
+
+
+                              Examples: my-proxy (uses global.hub/tag), docker.io/myrepo/my-proxy:v1.0.0
+                            type: string
+                          includeIPRanges:
+                            description: |-
+                              Lists the IP ranges of Istio egress traffic that the sidecar captures.
+
+
+                              Example: "172.30.0.0/16,172.20.0.0/16"
+                              This would only capture egress traffic on those two IP Ranges, all other outbound traffic would # be allowed by the sidecar."
+                            type: string
+                          includeInboundPorts:
+                            type: string
+                          includeOutboundPorts:
+                            type: string
+                          lifecycle:
+                            x-kubernetes-preserve-unknown-fields: true
+                          logLevel:
+                            description: 'Log level for proxy, applies to gateways
+                              and sidecars. If left empty, "warning" is used. Expected
+                              values are: trace\|debug\|info\|warning\|error\|critical\|off'
+                            type: string
+                          privileged:
+                            description: |-
+                              Enables privileged securityContext for the istio-proxy container.
+
+
+                              See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+                            type: boolean
+                          readinessFailureThreshold:
+                            description: Sets the number of successive failed probes
+                              before indicating readiness failure.
+                            format: int32
+                            type: integer
+                          readinessInitialDelaySeconds:
+                            description: Sets the initial delay for readiness probes
+                              in seconds.
+                            format: int32
+                            type: integer
+                          readinessPeriodSeconds:
+                            description: Sets the interval between readiness probes
+                              in seconds.
+                            format: int32
+                            type: integer
+                          resources:
+                            description: |-
+                              K8s resources settings.
+
+
+                              See https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container
+                            properties:
+                              claims:
+                                description: |-
+                                  Claims lists the names of resources, defined in spec.resourceClaims,
+                                  that are used by this container.
+
+
+                                  This is an alpha field and requires enabling the
+                                  DynamicResourceAllocation feature gate.
+
+
+                                  This field is immutable. It can only be set for containers.
+                                items:
+                                  description: ResourceClaim references one entry
+                                    in PodSpec.ResourceClaims.
+                                  properties:
+                                    name:
+                                      description: |-
+                                        Name must match the name of one entry in pod.spec.resourceClaims of
+                                        the Pod where this field is used. It makes that resource available
+                                        inside a container.
+                                      type: string
+                                  required:
+                                  - name
+                                  type: object
+                                type: array
+                                x-kubernetes-list-map-keys:
+                                - name
+                                x-kubernetes-list-type: map
+                              limits:
+                                additionalProperties:
+                                  anyOf:
+                                  - type: integer
+                                  - type: string
+                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  x-kubernetes-int-or-string: true
+                                description: |-
+                                  Limits describes the maximum amount of compute resources allowed.
+                                  More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                                type: object
+                              requests:
+                                additionalProperties:
+                                  anyOf:
+                                  - type: integer
+                                  - type: string
+                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  x-kubernetes-int-or-string: true
+                                description: |-
+                                  Requests describes the minimum amount of compute resources required.
+                                  If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                                  otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                                  More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                                type: object
+                            type: object
+                          startupProbe:
+                            properties:
+                              enabled:
+                                type: boolean
+                              failureThreshold:
+                                format: int32
+                                type: integer
+                            type: object
+                          statusPort:
+                            description: Default port used for the Pilot agent's health
+                              checks.
+                            format: int32
+                            type: integer
+                          tracer:
+                            description: Specifies which tracer to use.
+                            enum:
+                            - zipkin
+                            - lightstep
+                            - datadog
+                            - stackdriver
+                            - openCensusAgent
+                            - none
+                            type: string
+                        type: object
+                      proxy_init:
+                        description: Specifies the Configuration for proxy_init container
+                          which sets the pods' networking to intercept the inbound/outbound
+                          traffic.
+                        properties:
+                          image:
+                            description: Specifies the image for the proxy_init container.
+                            type: string
+                        type: object
+                      remotePilotAddress:
+                        description: Specifies the Istio control plane’s pilot Pod
+                          IP address or remote cluster DNS resolvable hostname.
+                        type: string
+                      revision:
+                        description: Configures the revision this control plane is
+                          a part of
+                        type: string
+                      sds:
+                        description: Specifies the Configuration for the SecretDiscoveryService
+                          instead of using K8S secrets to mount the certificates.
+                        type: object
+                      sts:
+                        description: Specifies the configuration for Security Token
+                          Service.
+                        properties:
+                          servicePort:
+                            format: int32
+                            type: integer
+                        type: object
+                      tag:
+                        anyOf:
+                        - type: integer
+                        - type: string
+                        description: Specifies the tag for the Istio docker images.
+                        x-kubernetes-int-or-string: true
+                      tracer:
+                        description: Specifies the Configuration for each of the supported
+                          tracers.
+                        properties:
+                          datadog:
+                            description: Configuration for the datadog tracing service.
+                            properties:
+                              address:
+                                description: Address in host:port format for reporting
+                                  trace data to the Datadog agent.
+                                type: string
+                            type: object
+                          lightstep:
+                            description: Configuration for the lightstep tracing service.
+                            properties:
+                              accessToken:
+                                description: Sets the lightstep access token.
+                                type: string
+                              address:
+                                description: Sets the lightstep satellite pool address
+                                  in host:port format for reporting trace data.
+                                type: string
+                            type: object
+                          stackdriver:
+                            description: Configuration for the stackdriver tracing
+                              service.
+                            properties:
+                              debug:
+                                description: enables trace output to stdout.
+                                type: boolean
+                              maxNumberOfAnnotations:
+                                description: The global default max number of annotation
+                                  events per span.
+                                format: int32
+                                type: integer
+                              maxNumberOfAttributes:
+                                description: The global default max number of attributes
+                                  per span.
+                                format: int32
+                                type: integer
+                              maxNumberOfMessageEvents:
+                                description: The global default max number of message
+                                  events per span.
+                                format: int32
+                                type: integer
+                            type: object
+                          zipkin:
+                            description: Configuration for the zipkin tracing service.
+                            properties:
+                              address:
+                                description: |-
+                                  Address of zipkin instance in host:port format for reporting trace data.
+
+
+                                  Example: <zipkin-collector-service>.<zipkin-collector-namespace>:941
+                                type: string
+                            type: object
+                        type: object
+                      useMCP:
+                        description: Controls whether to use of Mesh Configuration
+                          Protocol to distribute configuration.
+                        type: boolean
+                      variant:
+                        type: string
+                    type: object
+                  istio_cni:
+                    description: Configuration for CNI.
+                    properties:
+                      chained:
+                        type: boolean
+                      cniBinDir:
+                        type: string
+                      cniConfDir:
+                        type: string
+                      cniConfFileName:
+                        type: string
+                      cniNetnsDir:
+                        type: string
+                      enabled:
+                        description: Controls whether CNI is enabled.
+                        type: boolean
+                      excludeNamespaces:
+                        items:
+                          type: string
+                        type: array
+                      hub:
+                        type: string
+                      image:
+                        type: string
+                      logLevel:
+                        type: string
+                      privileged:
+                        type: boolean
+                      provider:
+                        type: string
+                      psp_cluster_role:
+                        type: string
+                      pullPolicy:
+                        type: string
+                      repair:
+                        properties:
+                          brokenPodLabelKey:
+                            type: string
+                          brokenPodLabelValue:
+                            type: string
+                          deletePods:
+                            type: boolean
+                          enabled:
+                            description: Controls whether repair behavior is enabled.
+                            type: boolean
+                          hub:
+                            type: string
+                          image:
+                            type: string
+                          initContainerName:
+                            type: string
+                          labelPods:
+                            description: Controls whether various repair behaviors
+                              are enabled.
+                            type: boolean
+                          repairPods:
+                            type: boolean
+                          tag:
+                            anyOf:
+                            - type: integer
+                            - type: string
+                            x-kubernetes-int-or-string: true
+                        type: object
+                      resource_quotas:
+                        properties:
+                          enabled:
+                            description: Controls whether to create resource quotas
+                              or not for the CNI DaemonSet.
+                            type: boolean
+                          pods:
+                            format: int64
+                            type: integer
+                        type: object
+                      rollingMaxUnavailable:
+                        anyOf:
+                        - type: integer
+                        - type: string
+                        description: K8s rolling update strategy
+                        x-kubernetes-int-or-string: true
+                      seccompProfile:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          The Container seccompProfile
+
+
+                          See: https://kubernetes.io/docs/tutorials/security/seccomp/
+                        type: object
+                      tag:
+                        anyOf:
+                        - type: integer
+                        - type: string
+                        x-kubernetes-int-or-string: true
+                      variant:
+                        type: string
+                    type: object
+                  istiodRemote:
+                    properties:
+                      injectionPath:
+                        description: Path to use for the sidecar injector webhook
+                          service.
+                        type: string
+                      injectionURL:
+                        description: URL to use for sidecar injector webhook.
+                        type: string
+                    type: object
+                  meshConfig:
+                    description: MeshConfig defines mesh-wide settings for the Istio
+                      service mesh.
+                    properties:
+                      accessLogEncoding:
+                        description: |-
+                          Encoding for the proxy access log (`TEXT` or `JSON`).
+                          Default value is `TEXT`.
+                        format: int32
+                        type: integer
+                      accessLogFile:
+                        description: |-
+                          File address for the proxy access log (e.g. /dev/stdout).
+                          Empty value disables access logging.
+                        type: string
+                      accessLogFormat:
+                        description: |-
+                          Format for the proxy access log
+                          Empty value results in proxy's default access log format
+                        type: string
+                      caCertificates:
+                        description: |-
+                          The extra root certificates for workload-to-workload communication.
+                          The plugin certificates (the 'cacerts' secret) or self-signed certificates (the 'istio-ca-secret' secret)
+                          are automatically added by Istiod.
+                          The CA certificate that signs the workload certificates is automatically added by Istio Agent.
+                        items:
+                          properties:
+                            certSigners:
+                              description: |-
+                                Optional. Specify the kubernetes signers (External CA) that use this trustAnchor
+                                when Istiod is acting as RA(registration authority)
+                                If set, they are used for these signers. Otherwise, this trustAnchor is used for all signers.
+                              items:
+                                type: string
+                              type: array
+                            pem:
+                              description: The PEM data of the certificate.
+                              type: string
+                            spiffeBundleUrl:
+                              description: |-
+                                The SPIFFE bundle endpoint URL that complies to:
+                                https://github.com/spiffe/spiffe/blob/master/standards/SPIFFE_Trust_Domain_and_Bundle.md#the-spiffe-trust-domain-and-bundle
+                                The endpoint should support authentication based on Web PKI:
+                                https://github.com/spiffe/spiffe/blob/master/standards/SPIFFE_Trust_Domain_and_Bundle.md#521-web-pki
+                                The certificate is retrieved from the endpoint.
+                              type: string
+                            trustDomains:
+                              description: |-
+                                Optional. Specify the list of trust domains to which this trustAnchor data belongs.
+                                If set, they are used for these trust domains. Otherwise, this trustAnchor is used for default trust domain
+                                and its aliases.
+                                Note that we can have multiple trustAnchor data for a same trust_domain.
+                                In that case, trustAnchors with a same trust domain will be merged and used together to verify peer certificates.
+                                If neither cert_signers nor trust_domains is set, this trustAnchor is used for all trust domains and all signers.
+                                If only trust_domains is set, this trustAnchor is used for these trust_domains and all signers.
+                                If only cert_signers is set, this trustAnchor is used for these cert_signers and all trust domains.
+                                If both cert_signers and trust_domains is set, this trustAnchor is only used for these signers and trust domains.
+                              items:
+                                type: string
+                              type: array
+                          type: object
+                          x-kubernetes-validations:
+                          - message: At most one of [pem spiffeBundleUrl] should be
+                              set
+                            rule: '[has(self.pem), has(self.spiffeBundleUrl)].exists_one(x,x)'
+                        maxItems: 100
+                        type: array
+                      configSources:
+                        description: |-
+                          ConfigSource describes a source of configuration data for networking
+                          rules, and other Istio configuration artifacts. Multiple data sources
+                          can be configured for a single control plane.
+                        items:
+                          description: |-
+                            ConfigSource describes information about a configuration store inside a
+                            mesh. A single control plane instance can interact with one or more data
+                            sources.
+                          properties:
+                            address:
+                              description: |-
+                                Address of the server implementing the Istio Mesh Configuration
+                                protocol (MCP). Can be IP address or a fully qualified DNS name.
+                                Use xds:// to specify a grpc-based xds backend, k8s:// to specify a k8s controller or
+                                fs:/// to specify a file-based backend with absolute path to the directory.
+                              type: string
+                            subscribedResources:
+                              description: Describes the source of configuration,
+                                if nothing is specified default is MCP
+                              items:
+                                description: Resource describes the source of configuration
+                                format: int32
+                                type: integer
+                              type: array
+                            tlsSettings:
+                              description: |-
+                                Use the tlsSettings to specify the tls mode to use. If the MCP server
+                                uses Istio mutual TLS and shares the root CA with Pilot, specify the TLS
+                                mode as `ISTIO_MUTUAL`.
+                              properties:
+                                caCertificates:
+                                  description: |-
+                                    OPTIONAL: The path to the file containing certificate authority
+                                    certificates to use in verifying a presented server certificate. If
+                                    omitted, the proxy will not verify the server's certificate.
+                                    Should be empty if mode is `ISTIO_MUTUAL`.
+                                  type: string
+                                clientCertificate:
+                                  description: |-
+                                    REQUIRED if mode is `MUTUAL`. The path to the file holding the
+                                    client-side TLS certificate to use.
+                                    Should be empty if mode is `ISTIO_MUTUAL`.
+                                  type: string
+                                credentialName:
+                                  description: |-
+                                    The name of the secret that holds the TLS certs for the
+                                    client including the CA certificates. This secret must exist in
+                                    the namespace of the proxy using the certificates.
+                                    An Opaque secret should contain the following keys and values:
+                                    `key: <privateKey>`, `cert: <clientCert>`, `cacert: <CACertificate>`,
+                                    `crl: <certificateRevocationList>`
+                                    Here CACertificate is used to verify the server certificate.
+                                    For mutual TLS, `cacert: <CACertificate>` can be provided in the
+                                    same secret or a separate secret named `<secret>-cacert`.
+                                    A TLS secret for client certificates with an additional
+                                    `ca.crt` key for CA certificates and `ca.crl` key for
+                                    certificate revocation list(CRL) is also supported.
+                                    Only one of client certificates and CA certificate
+                                    or credentialName can be specified.
+
+
+                                    **NOTE:** This field is applicable at sidecars only if
+                                    `DestinationRule` has a `workloadSelector` specified.
+                                    Otherwise the field will be applicable only at gateways, and
+                                    sidecars will continue to use the certificate paths.
+                                  type: string
+                                insecureSkipVerify:
+                                  description: |-
+                                    `insecureSkipVerify` specifies whether the proxy should skip verifying the
+                                    CA signature and SAN for the server certificate corresponding to the host.
+                                    This flag should only be set if global CA signature verification is
+                                    enabled, `VERIFY_CERTIFICATE_AT_CLIENT` environmental variable is set to `true`,
+                                    but no verification is desired for a specific host. If enabled with or
+                                    without `VERIFY_CERTIFICATE_AT_CLIENT` enabled, verification of the CA signature and
+                                    SAN will be skipped.
+
+
+                                    `insecureSkipVerify` is `false` by default.
+                                    `VERIFY_CERTIFICATE_AT_CLIENT` is `false` by default in Istio version 1.9 but will
+                                    be `true` by default in a later version where, going forward, it will be
+                                    enabled by default.
+                                  type: boolean
+                                mode:
+                                  description: |-
+                                    Indicates whether connections to this port should be secured
+                                    using TLS. The value of this field determines how TLS is enforced.
+                                  format: int32
+                                  type: integer
+                                privateKey:
+                                  description: |-
+                                    REQUIRED if mode is `MUTUAL`. The path to the file holding the
+                                    client's private key.
+                                    Should be empty if mode is `ISTIO_MUTUAL`.
+                                  type: string
+                                sni:
+                                  description: |-
+                                    SNI string to present to the server during TLS handshake.
+                                    If unspecified, SNI will be automatically set based on downstream HTTP
+                                    host/authority header for SIMPLE and MUTUAL TLS modes, provided `ENABLE_AUTO_SNI`
+                                    environmental variable is set to `true`.
+                                  type: string
+                                subjectAltNames:
+                                  description: |-
+                                    A list of alternate names to verify the subject identity in the
+                                    certificate. If specified, the proxy will verify that the server
+                                    certificate's subject alt name matches one of the specified values.
+                                    If specified, this list overrides the value of subject_alt_names
+                                    from the ServiceEntry. If unspecified, automatic validation of upstream
+                                    presented certificate for new upstream connections will be done based on the
+                                    downstream HTTP host/authority header, provided `VERIFY_CERTIFICATE_AT_CLIENT`
+                                    and `ENABLE_AUTO_SNI` environmental variables are set to `true`.
+                                  items:
+                                    type: string
+                                  type: array
+                              type: object
+                          type: object
+                        type: array
+                      connectTimeout:
+                        description: |-
+                          Connection timeout used by Envoy. (MUST BE >=1ms)
+                          Default timeout is 10s.
+                        type: string
+                      defaultConfig:
+                        description: |-
+                          Default proxy config used by gateway and sidecars.
+                          In case of Kubernetes, the proxy config is applied once during the injection process,
+                          and remain constant for the duration of the pod. The rest of the mesh config can be changed
+                          at runtime and config gets distributed dynamically.
+                          On Kubernetes, this can be overridden on individual pods with the `proxy.istio.io/config` annotation.
+                        properties:
+                          autoInject:
+                            type: string
+                          clusterDomain:
+                            description: |-
+                              Domain for the cluster, default: "cluster.local".
+
+
+                              K8s allows this to be customized, see https://kubernetes.io/docs/tasks/administer-cluster/dns-custom-nameservers/
+                            type: string
+                          componentLogLevel:
+                            description: |-
+                              Per Component log level for proxy, applies to gateways and sidecars.
+
+
+                              If a component level is not set, then the global "logLevel" will be used. If left empty, "misc:error" is used.
+                            type: string
+                          enableCoreDump:
+                            description: |-
+                              Enables core dumps for newly injected sidecars.
+
+
+                              If set, newly injected sidecars will have core dumps enabled.
+                            type: boolean
+                          excludeIPRanges:
+                            description: Lists the excluded IP ranges of Istio egress
+                              traffic that the sidecar captures.
+                            type: string
+                          excludeInboundPorts:
+                            description: Specifies the Istio ingress ports not to
+                              capture.
+                            type: string
+                          excludeOutboundPorts:
+                            type: string
+                          image:
+                            description: |-
+                              Image name or path for the proxy, default: "proxyv2".
+
+
+                              If registry or tag are not specified, global.hub and global.tag are used.
+
+
+                              Examples: my-proxy (uses global.hub/tag), docker.io/myrepo/my-proxy:v1.0.0
+                            type: string
+                          includeIPRanges:
+                            description: |-
+                              Lists the IP ranges of Istio egress traffic that the sidecar captures.
+
+
+                              Example: "172.30.0.0/16,172.20.0.0/16"
+                              This would only capture egress traffic on those two IP Ranges, all other outbound traffic would # be allowed by the sidecar."
+                            type: string
+                          includeInboundPorts:
+                            type: string
+                          includeOutboundPorts:
+                            type: string
+                          lifecycle:
+                            x-kubernetes-preserve-unknown-fields: true
+                          logLevel:
+                            description: 'Log level for proxy, applies to gateways
+                              and sidecars. If left empty, "warning" is used. Expected
+                              values are: trace\|debug\|info\|warning\|error\|critical\|off'
+                            type: string
+                          privileged:
+                            description: |-
+                              Enables privileged securityContext for the istio-proxy container.
+
+
+                              See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+                            type: boolean
+                          readinessFailureThreshold:
+                            description: Sets the number of successive failed probes
+                              before indicating readiness failure.
+                            format: int32
+                            type: integer
+                          readinessInitialDelaySeconds:
+                            description: Sets the initial delay for readiness probes
+                              in seconds.
+                            format: int32
+                            type: integer
+                          readinessPeriodSeconds:
+                            description: Sets the interval between readiness probes
+                              in seconds.
+                            format: int32
+                            type: integer
+                          resources:
+                            description: |-
+                              K8s resources settings.
+
+
+                              See https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/#resource-requests-and-limits-of-pod-and-container
+                            properties:
+                              claims:
+                                description: |-
+                                  Claims lists the names of resources, defined in spec.resourceClaims,
+                                  that are used by this container.
+
+
+                                  This is an alpha field and requires enabling the
+                                  DynamicResourceAllocation feature gate.
+
+
+                                  This field is immutable. It can only be set for containers.
+                                items:
+                                  description: ResourceClaim references one entry
+                                    in PodSpec.ResourceClaims.
+                                  properties:
+                                    name:
+                                      description: |-
+                                        Name must match the name of one entry in pod.spec.resourceClaims of
+                                        the Pod where this field is used. It makes that resource available
+                                        inside a container.
+                                      type: string
+                                  required:
+                                  - name
+                                  type: object
+                                type: array
+                                x-kubernetes-list-map-keys:
+                                - name
+                                x-kubernetes-list-type: map
+                              limits:
+                                additionalProperties:
+                                  anyOf:
+                                  - type: integer
+                                  - type: string
+                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  x-kubernetes-int-or-string: true
+                                description: |-
+                                  Limits describes the maximum amount of compute resources allowed.
+                                  More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                                type: object
+                              requests:
+                                additionalProperties:
+                                  anyOf:
+                                  - type: integer
+                                  - type: string
+                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  x-kubernetes-int-or-string: true
+                                description: |-
+                                  Requests describes the minimum amount of compute resources required.
+                                  If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                                  otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                                  More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                                type: object
+                            type: object
+                          startupProbe:
+                            properties:
+                              enabled:
+                                type: boolean
+                              failureThreshold:
+                                format: int32
+                                type: integer
+                            type: object
+                          statusPort:
+                            description: Default port used for the Pilot agent's health
+                              checks.
+                            format: int32
+                            type: integer
+                          tracer:
+                            description: Specifies which tracer to use.
+                            enum:
+                            - zipkin
+                            - lightstep
+                            - datadog
+                            - stackdriver
+                            - openCensusAgent
+                            - none
+                            type: string
+                        type: object
+                      defaultDestinationRuleExportTo:
+                        description: |-
+                          The default value for the `DestinationRule.export_to` field. Has the same
+                          syntax as `default_service_export_to`.
+
+
+                          If not set the system will use "*" as the default value which implies that
+                          destination rules are exported to all namespaces
+                        items:
+                          type: string
+                        type: array
+                      defaultHttpRetryPolicy:
+                        description: "Configure the default HTTP retry policy.\nThe
+                          default number of retry attempts is set at 2 for these errors:\n\n\n\t\"connect-failure,refused-stream,unavailable,cancelled,retriable-status-codes\".\n\n\nSetting
+                          the number of attempts to 0 disables retry policy globally.\nThis
+                          setting can be overridden on a per-host basis using the
+                          Virtual Service\nAPI.\nAll settings in the retry policy
+                          except `perTryTimeout` can currently be\nconfigured globally
+                          via this field."
+                        properties:
+                          attempts:
+                            description: |-
+                              Number of retries to be allowed for a given request. The interval
+                              between retries will be determined automatically (25ms+). When request
+                              `timeout` of the [HTTP route](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRoute)
+                              or `per_try_timeout` is configured, the actual number of retries attempted also depends on
+                              the specified request `timeout` and `per_try_timeout` values. MUST BE >= 0. If `0`, retries will be disabled.
+                              The maximum possible number of requests made will be 1 + `attempts`.
+                            format: int32
+                            type: integer
+                          perTryTimeout:
+                            description: |-
+                              Timeout per attempt for a given request, including the initial call and any retries. Format: 1h/1m/1s/1ms. MUST BE >=1ms.
+                              Default is same value as request
+                              `timeout` of the [HTTP route](https://istio.io/docs/reference/config/networking/virtual-service/#HTTPRoute),
+                              which means no timeout.
+                            type: string
+                          retryOn:
+                            description: |-
+                              Specifies the conditions under which retry takes place.
+                              One or more policies can be specified using a ‘,’ delimited list.
+                              If `retry_on` specifies a valid HTTP status, it will be added to retriable_status_codes retry policy.
+                              See the [retry policies](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-on)
+                              and [gRPC retry policies](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-grpc-on) for more details.
+                            type: string
+                          retryRemoteLocalities:
+                            description: |-
+                              Flag to specify whether the retries should retry to other localities.
+                              See the [retry plugin configuration](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http_connection_management#retry-plugin-configuration) for more details.
+                            type: boolean
+                        type: object
+                      defaultProviders:
+                        description: Specifies extension providers to use by default
+                          in Istio configuration resources.
+                        properties:
+                          accessLogging:
+                            description: Name of the default provider(s) for access
+                              logging.
+                            items:
+                              type: string
+                            type: array
+                          metrics:
+                            description: Name of the default provider(s) for metrics.
+                            items:
+                              type: string
+                            type: array
+                          tracing:
+                            description: Name of the default provider(s) for tracing.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      defaultServiceExportTo:
+                        description: |-
+                          The default value for the ServiceEntry.export_to field and services
+                          imported through container registry integrations, e.g. this applies to
+                          Kubernetes Service resources. The value is a list of namespace names and
+                          reserved namespace aliases. The allowed namespace aliases are:
+                          ```
+                          * - All Namespaces
+                          . - Current Namespace
+                          ~ - No Namespace
+                          ```
+                          If not set the system will use "*" as the default value which implies that
+                          services are exported to all namespaces.
+
+
+                          `All namespaces` is a reasonable default for implementations that don't
+                          need to restrict access or visibility of services across namespace
+                          boundaries. If that requirement is present it is generally good practice to
+                          make the default `Current namespace` so that services are only visible
+                          within their own namespaces by default. Operators can then expand the
+                          visibility of services to other namespaces as needed. Use of `No Namespace`
+                          is expected to be rare but can have utility for deployments where
+                          dependency management needs to be precise even within the scope of a single
+                          namespace.
+
+
+                          For further discussion see the reference documentation for `ServiceEntry`,
+                          `Sidecar`, and `Gateway`.
+                        items:
+                          type: string
+                        type: array
+                      defaultVirtualServiceExportTo:
+                        description: |-
+                          The default value for the VirtualService.export_to field. Has the same
+                          syntax as `default_service_export_to`.
+
+
+                          If not set the system will use "*" as the default value which implies that
+                          virtual services are exported to all namespaces
+                        items:
+                          type: string
+                        type: array
+                      disableEnvoyListenerLog:
+                        description: |-
+                          This flag disables Envoy Listener logs.
+                          See [Listener Access Log](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener.proto#envoy-v3-api-field-config-listener-v3-listener-access-log)
+                          Istio Enables Envoy's listener access logs on "NoRoute" response flag.
+                          Default value is `false`.
+                        type: boolean
+                      discoverySelectors:
+                        description: |-
+                          A list of Kubernetes selectors that specify the set of namespaces that Istio considers when
+                          computing configuration updates for sidecars. This can be used to reduce Istio's computational load
+                          by limiting the number of entities (including services, pods, and endpoints) that are watched and processed.
+                          If omitted, Istio will use the default behavior of processing all namespaces in the cluster.
+                          Elements in the list are disjunctive (OR semantics), i.e. a namespace will be included if it matches any selector.
+                          The following example selects any namespace that matches either below:
+                          1. The namespace has both of these labels: `env: prod` and `region: us-east1`
+                          2. The namespace has label `app` equal to `cassandra` or `spark`.
+                          ```yaml
+                          discoverySelectors:
+                            - matchLabels:
+                              env: prod
+                              region: us-east1
+                            - matchExpressions:
+                            - key: app
+                              operator: In
+                              values:
+                            - cassandra
+                            - spark
+
+
+                          ```
+                          Refer to the [Kubernetes selector docs](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors)
+                          for additional detail on selector semantics.
+                        items:
+                          description: |-
+                            A label selector is a label query over a set of resources. The result of matchLabels and
+                            matchExpressions are ANDed. An empty label selector matches all objects. A null
+                            label selector matches no objects.
+                          properties:
+                            matchExpressions:
+                              description: matchExpressions is a list of label selector
+                                requirements. The requirements are ANDed.
+                              items:
+                                description: |-
+                                  A label selector requirement is a selector that contains values, a key, and an operator that
+                                  relates the key and values.
+                                properties:
+                                  key:
+                                    description: key is the label key that the selector
+                                      applies to.
+                                    type: string
+                                  operator:
+                                    description: |-
+                                      operator represents a key's relationship to a set of values.
+                                      Valid operators are In, NotIn, Exists and DoesNotExist.
+                                    type: string
+                                  values:
+                                    description: |-
+                                      values is an array of string values. If the operator is In or NotIn,
+                                      the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                      the values array must be empty. This array is replaced during a strategic
+                                      merge patch.
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                - key
+                                - operator
+                                type: object
+                              type: array
+                            matchLabels:
+                              additionalProperties:
+                                type: string
+                              description: |-
+                                matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                                map is equivalent to an element of matchExpressions, whose key field is "key", the
+                                operator is "In", and the values array contains only "value". The requirements are ANDed.
+                              type: object
+                          type: object
+                          x-kubernetes-map-type: atomic
+                        type: array
+                      dnsRefreshRate:
+                        description: |-
+                          Configures DNS refresh rate for Envoy clusters of type `STRICT_DNS`
+                          Default refresh rate is `60s`.
+                        type: string
+                      enableAutoMtls:
+                        description: |-
+                          This flag is used to enable mutual `TLS` automatically for service to service communication
+                          within the mesh, default true.
+                          If set to true, and a given service does not have a corresponding `DestinationRule` configured,
+                          or its `DestinationRule` does not have ClientTLSSettings specified, Istio configures client side
+                          TLS configuration appropriately. More specifically,
+                          If the upstream authentication policy is in `STRICT` mode, use Istio provisioned certificate
+                          for mutual `TLS` to connect to upstream.
+                          If upstream service is in plain text mode, use plain text.
+                          If the upstream authentication policy is in PERMISSIVE mode, Istio configures clients to use
+                          mutual `TLS` when server sides are capable of accepting mutual `TLS` traffic.
+                          If service `DestinationRule` exists and has `ClientTLSSettings` specified, that is always used instead.
+                        type: boolean
+                      enableEnvoyAccessLogService:
+                        description: |-
+                          This flag enables Envoy's gRPC Access Log Service.
+                          See [Access Log Service](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/access_loggers/grpc/v3/als.proto)
+                          for details about Envoy's gRPC Access Log Service API.
+                          Default value is `false`.
+                        type: boolean
+                      enablePrometheusMerge:
+                        description: |-
+                          If enabled, Istio agent will merge metrics exposed by the application with metrics from Envoy
+                          and Istio agent. The sidecar injection will replace `prometheus.io` annotations present on the pod
+                          and redirect them towards Istio agent, which will then merge metrics of from the application with Istio metrics.
+                          This relies on the annotations `prometheus.io/scrape`, `prometheus.io/port`, and
+                          `prometheus.io/path` annotations.
+                          If you are running a separately managed Envoy with an Istio sidecar, this may cause issues, as the metrics will collide.
+                          In this case, it is recommended to disable aggregation on that deployment with the
+                          `prometheus.istio.io/merge-metrics: "false"` annotation.
+                          If not specified, this will be enabled by default.
+                        type: boolean
+                      enableTracing:
+                        description: |-
+                          Flag to control generation of trace spans and request IDs.
+                          Requires a trace span collector defined in the proxy configuration.
+                        type: boolean
+                      extensionProviders:
+                        description: |-
+                          Defines a list of extension providers that extend Istio's functionality. For example, the AuthorizationPolicy
+                          can be used with an extension provider to delegate the authorization decision to a custom authorization system.
+                        items:
+                          maxProperties: 2
+                          properties:
+                            datadog:
+                              description: Configures a Datadog tracing provider.
+                              properties:
+                                maxTagLength:
+                                  description: |-
+                                    Optional. Controls the overall path length allowed in a reported span.
+                                    NOTE: currently only controls max length of the path tag.
+                                  format: int32
+                                  type: integer
+                                port:
+                                  description: REQUIRED. Specifies the port of the
+                                    service.
+                                  format: int32
+                                  type: integer
+                                service:
+                                  description: |-
+                                    REQUIRED. Specifies the service for the Datadog agent.
+                                    The format is `[<Namespace>/]<Hostname>`. The specification of `<Namespace>` is required only when it is insufficient
+                                    to unambiguously resolve a service in the service registry. The `<Hostname>` is a fully qualified host name of a
+                                    service defined by the Kubernetes service or ServiceEntry.
+
+
+                                    Example: "datadog.default.svc.cluster.local" or "bar/datadog.example.com".
+                                  type: string
+                              required:
+                              - port
+                              - service
+                              type: object
+                            envoyExtAuthzGrpc:
+                              description: Configures an external authorizer that
+                                implements the Envoy ext_authz filter authorization
+                                check service using the gRPC API.
+                              properties:
+                                failOpen:
+                                  description: |-
+                                    If true, the HTTP request or TCP connection will be allowed even if the communication with the authorization service has failed,
+                                    or if the authorization service has returned a HTTP 5xx error.
+                                    Default is false. For HTTP request, it will be rejected with 403 (HTTP Forbidden). For TCP connection, it will be closed immediately.
+                                  type: boolean
+                                includeRequestBodyInCheck:
+                                  description: If set, the client request body will
+                                    be included in the authorization request sent
+                                    to the authorization service.
+                                  properties:
+                                    allowPartialMessage:
+                                      description: |-
+                                        When this field is true, ext-authz filter will buffer the message until max_request_bytes is reached.
+                                        The authorization request will be dispatched and no 413 HTTP error will be returned by the filter.
+                                        A "x-envoy-auth-partial-body: false|true" metadata header will be added to the authorization request message
+                                        indicating if the body data is partial.
+                                      type: boolean
+                                    maxRequestBytes:
+                                      description: |-
+                                        Sets the maximum size of a message body that the ext-authz filter will hold in memory.
+                                        If max_request_bytes is reached, and allow_partial_message is false, Envoy will return a 413 (Payload Too Large).
+                                        Otherwise the request will be sent to the provider with a partial message.
+                                        Note that this setting will have precedence over the fail_open field, the 413 will be returned even when the
+                                        fail_open is set to true.
+                                      format: int32
+                                      type: integer
+                                    packAsBytes:
+                                      description: |-
+                                        If true, the body sent to the external authorization service in the gRPC authorization request is set with raw bytes
+                                        in the [raw_body field](https://github.com/envoyproxy/envoy/blame/cffb095d59d7935abda12b9509bcd136808367bb/api/envoy/service/auth/v3/attribute_context.proto#L153).
+                                        Otherwise, it will be filled with UTF-8 string in the [body field](https://github.com/envoyproxy/envoy/blame/cffb095d59d7935abda12b9509bcd136808367bb/api/envoy/service/auth/v3/attribute_context.proto#L147).
+                                        This field only works with the envoy_ext_authz_grpc provider and has no effect for the envoy_ext_authz_http provider.
+                                      type: boolean
+                                  type: object
+                                port:
+                                  description: REQUIRED. Specifies the port of the
+                                    service.
+                                  format: int32
+                                  type: integer
+                                service:
+                                  description: |-
+                                    REQUIRED. Specifies the service that implements the Envoy ext_authz gRPC authorization service.
+                                    The format is `[<Namespace>/]<Hostname>`. The specification of `<Namespace>` is required only when it is insufficient
+                                    to unambiguously resolve a service in the service registry. The `<Hostname>` is a fully qualified host name of a
+                                    service defined by the Kubernetes service or ServiceEntry.
+
+
+                                    Example: "my-ext-authz.foo.svc.cluster.local" or "bar/my-ext-authz.example.com".
+                                  type: string
+                                statusOnError:
+                                  description: |-
+                                    Sets the HTTP status that is returned to the client when there is a network error to the authorization service.
+                                    The default status is "403" (HTTP Forbidden).
+                                  type: string
+                                timeout:
+                                  description: |-
+                                    The maximum duration that the proxy will wait for a response from the provider, this is the timeout for a specific request (default timeout: 600s).
+                                    When this timeout condition is met, the proxy marks the communication to the authorization service as failure.
+                                    In this situation, the response sent back to the client will depend on the configured `fail_open` field.
+                                  type: string
+                              required:
+                              - port
+                              - service
+                              type: object
+                            envoyExtAuthzHttp:
+                              description: Configures an external authorizer that
+                                implements the Envoy ext_authz filter authorization
+                                check service using the HTTP API.
+                              properties:
+                                failOpen:
+                                  description: |-
+                                    If true, the user request will be allowed even if the communication with the authorization service has failed,
+                                    or if the authorization service has returned a HTTP 5xx error.
+                                    Default is false and the request will be rejected with "Forbidden" response.
+                                  type: boolean
+                                headersToDownstreamOnAllow:
+                                  description: |-
+                                    List of headers from the authorization service that should be forwarded to downstream when the authorization
+                                    check result is allowed (HTTP code 200).
+                                    If not specified, the original response will not be modified and forwarded to downstream as-is.
+                                    Note, any existing headers will be overridden.
+
+
+                                    Exact, prefix and suffix matches are supported (similar to the
+                                    [authorization policy rule syntax](https://istio.io/latest/docs/reference/config/security/authorization-policy/#Rule)
+                                    except the presence match):
+                                    - Exact match: "abc" will match on value "abc".
+                                    - Prefix match: "abc*" will match on value "abc" and "abcd".
+                                    - Suffix match: "*abc" will match on value "abc" and "xabc".
+                                  items:
+                                    type: string
+                                  type: array
+                                headersToDownstreamOnDeny:
+                                  description: |-
+                                    List of headers from the authorization service that should be forwarded to downstream when the authorization
+                                    check result is not allowed (HTTP code other than 200).
+                                    If not specified, all the authorization response headers, except *Authority (Host)* will be in the response to
+                                    the downstream.
+                                    When a header is included in this list, *Path*, *Status*, *Content-Length*, *WWWAuthenticate* and *Location* are
+                                    automatically added.
+                                    Note, the body from the authorization service is always included in the response to downstream.
+
+
+                                    Exact, prefix and suffix matches are supported (similar to the
+                                    [authorization policy rule syntax](https://istio.io/latest/docs/reference/config/security/authorization-policy/#Rule)
+                                    except the presence match):
+                                    - Exact match: "abc" will match on value "abc".
+                                    - Prefix match: "abc*" will match on value "abc" and "abcd".
+                                    - Suffix match: "*abc" will match on value "abc" and "xabc".
+                                  items:
+                                    type: string
+                                  type: array
+                                headersToUpstreamOnAllow:
+                                  description: |-
+                                    List of headers from the authorization service that should be added or overridden in the original request and
+                                    forwarded to the upstream when the authorization check result is allowed (HTTP code 200).
+                                    If not specified, the original request will not be modified and forwarded to backend as-is.
+                                    Note, any existing headers will be overridden.
+
+
+                                    Exact, prefix and suffix matches are supported (similar to the
+                                    [authorization policy rule syntax](https://istio.io/latest/docs/reference/config/security/authorization-policy/#Rule)
+                                    except the presence match):
+                                    - Exact match: "abc" will match on value "abc".
+                                    - Prefix match: "abc*" will match on value "abc" and "abcd".
+                                    - Suffix match: "*abc" will match on value "abc" and "xabc".
+                                  items:
+                                    type: string
+                                  type: array
+                                includeAdditionalHeadersInCheck:
+                                  additionalProperties:
+                                    type: string
+                                  description: |-
+                                    Set of additional fixed headers that should be included in the authorization request sent to the authorization service.
+                                    Key is the header name and value is the header value.
+                                    Note that client request of the same key or headers specified in include_request_headers_in_check will be overridden.
+                                  type: object
+                                includeRequestBodyInCheck:
+                                  description: If set, the client request body will
+                                    be included in the authorization request sent
+                                    to the authorization service.
+                                  properties:
+                                    allowPartialMessage:
+                                      description: |-
+                                        When this field is true, ext-authz filter will buffer the message until max_request_bytes is reached.
+                                        The authorization request will be dispatched and no 413 HTTP error will be returned by the filter.
+                                        A "x-envoy-auth-partial-body: false|true" metadata header will be added to the authorization request message
+                                        indicating if the body data is partial.
+                                      type: boolean
+                                    maxRequestBytes:
+                                      description: |-
+                                        Sets the maximum size of a message body that the ext-authz filter will hold in memory.
+                                        If max_request_bytes is reached, and allow_partial_message is false, Envoy will return a 413 (Payload Too Large).
+                                        Otherwise the request will be sent to the provider with a partial message.
+                                        Note that this setting will have precedence over the fail_open field, the 413 will be returned even when the
+                                        fail_open is set to true.
+                                      format: int32
+                                      type: integer
+                                    packAsBytes:
+                                      description: |-
+                                        If true, the body sent to the external authorization service in the gRPC authorization request is set with raw bytes
+                                        in the [raw_body field](https://github.com/envoyproxy/envoy/blame/cffb095d59d7935abda12b9509bcd136808367bb/api/envoy/service/auth/v3/attribute_context.proto#L153).
+                                        Otherwise, it will be filled with UTF-8 string in the [body field](https://github.com/envoyproxy/envoy/blame/cffb095d59d7935abda12b9509bcd136808367bb/api/envoy/service/auth/v3/attribute_context.proto#L147).
+                                        This field only works with the envoy_ext_authz_grpc provider and has no effect for the envoy_ext_authz_http provider.
+                                      type: boolean
+                                  type: object
+                                includeRequestHeadersInCheck:
+                                  description: |-
+                                    List of client request headers that should be included in the authorization request sent to the authorization service.
+                                    Note that in addition to the headers specified here following headers are included by default:
+                                    1. *Host*, *Method*, *Path* and *Content-Length* are automatically sent.
+                                    2. *Content-Length* will be set to 0 and the request will not have a message body. However, the authorization
+                                    request can include the buffered client request body (controlled by include_request_body_in_check setting),
+                                    consequently the value of Content-Length of the authorization request reflects the size of its payload size.
+
+
+                                    Exact, prefix and suffix matches are supported (similar to the
+                                    [authorization policy rule syntax](https://istio.io/latest/docs/reference/config/security/authorization-policy/#Rule)
+                                    except the presence match):
+                                    - Exact match: "abc" will match on value "abc".
+                                    - Prefix match: "abc*" will match on value "abc" and "abcd".
+                                    - Suffix match: "*abc" will match on value "abc" and "xabc".
+                                  items:
+                                    type: string
+                                  type: array
+                                pathPrefix:
+                                  description: |-
+                                    Sets a prefix to the value of authorization request header *Path*.
+                                    For example, setting this to "/check" for an original user request at path "/admin" will cause the
+                                    authorization check request to be sent to the authorization service at the path "/check/admin" instead of "/admin".
+                                  type: string
+                                port:
+                                  description: REQUIRED. Specifies the port of the
+                                    service.
+                                  format: int32
+                                  type: integer
+                                service:
+                                  description: |-
+                                    REQUIRED. Specifies the service that implements the Envoy ext_authz HTTP authorization service.
+                                    The format is `[<Namespace>/]<Hostname>`. The specification of `<Namespace>` is required only when it is insufficient
+                                    to unambiguously resolve a service in the service registry. The `<Hostname>` is a fully qualified host name of a
+                                    service defined by the Kubernetes service or ServiceEntry.
+
+
+                                    Example: "my-ext-authz.foo.svc.cluster.local" or "bar/my-ext-authz.example.com".
+                                  type: string
+                                statusOnError:
+                                  description: |-
+                                    Sets the HTTP status that is returned to the client when there is a network error to the authorization service.
+                                    The default status is "403" (HTTP Forbidden).
+                                  type: string
+                                timeout:
+                                  description: |-
+                                    The maximum duration that the proxy will wait for a response from the provider (default timeout: 600s).
+                                    When this timeout condition is met, the proxy marks the communication to the authorization service as failure.
+                                    In this situation, the response sent back to the client will depend on the configured `fail_open` field.
+                                  type: string
+                              required:
+                              - port
+                              - service
+                              type: object
+                            envoyFileAccessLog:
+                              description: Configures an Envoy File Access Log provider.
+                              properties:
+                                logFormat:
+                                  description: Optional. Allows overriding of the
+                                    default access log format.
+                                  properties:
+                                    labels:
+                                      additionalProperties:
+                                        type: string
+                                      description: "JSON structured format for the
+                                        envoy access logs. Envoy [command operators](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#command-operators)\ncan
+                                        be used as values for fields within the Struct.
+                                        Values are rendered\nas strings, numbers,
+                                        or boolean values, as appropriate\n(see: [format
+                                        dictionaries](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log-format-dictionaries)).
+                                        Nested JSON is\nsupported for some command
+                                        operators (e.g. `FILTER_STATE` or `DYNAMIC_METADATA`).\nUse
+                                        `labels: {}` for default envoy JSON log format.\n\n\nExample:\n```\nlabels:\n\n\n\tstatus:
+                                        \"%RESPONSE_CODE%\"\n\tmessage: \"%LOCAL_REPLY_BODY%\"\n\n\n```"
+                                      type: object
+                                    text:
+                                      description: |-
+                                        Textual format for the envoy access logs. Envoy [command operators](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#command-operators) may be
+                                        used in the format. The [format string documentation](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log-format-strings)
+                                        provides more information.
+
+
+                                        NOTE: Istio will insert a newline ('\n') on all formats (if missing).
+
+
+                                        Example: `text: "%LOCAL_REPLY_BODY%:%RESPONSE_CODE%:path=%REQ(:path)%"`
+                                      type: string
+                                  type: object
+                                  x-kubernetes-validations:
+                                  - message: At most one of [text labels] should be
+                                      set
+                                    rule: '[has(self.text), has(self.labels)].exists_one(x,x)'
+                                path:
+                                  description: |-
+                                    Path to a local file to write the access log entries.
+                                    This may be used to write to streams, via `/dev/stderr` and `/dev/stdout`
+                                    If unspecified, defaults to `/dev/stdout`.
+                                  type: string
+                              type: object
+                            envoyHttpAls:
+                              description: Configures an Envoy Access Logging Service
+                                provider for HTTP traffic.
+                              properties:
+                                additionalRequestHeadersToLog:
+                                  description: Optional. Additional request headers
+                                    to log.
+                                  items:
+                                    type: string
+                                  type: array
+                                additionalResponseHeadersToLog:
+                                  description: Optional. Additional response headers
+                                    to log.
+                                  items:
+                                    type: string
+                                  type: array
+                                additionalResponseTrailersToLog:
+                                  description: Optional. Additional response trailers
+                                    to log.
+                                  items:
+                                    type: string
+                                  type: array
+                                filterStateObjectsToLog:
+                                  description: Optional. Additional filter state objects
+                                    to log.
+                                  items:
+                                    type: string
+                                  type: array
+                                logName:
+                                  description: |-
+                                    Optional. The friendly name of the access log.
+                                    Defaults:
+                                    -  "http_envoy_accesslog"
+                                    -  "listener_envoy_accesslog"
+                                  type: string
+                                port:
+                                  description: REQUIRED. Specifies the port of the
+                                    service.
+                                  format: int32
+                                  type: integer
+                                service:
+                                  description: |-
+                                    REQUIRED. Specifies the service that implements the Envoy ALS gRPC authorization service.
+                                    The format is `[<Namespace>/]<Hostname>`. The specification of `<Namespace>` is required only when it is insufficient
+                                    to unambiguously resolve a service in the service registry. The `<Hostname>` is a fully qualified host name of a
+                                    service defined by the Kubernetes service or ServiceEntry.
+
+
+                                    Example: "envoy-als.foo.svc.cluster.local" or "bar/envoy-als.example.com".
+                                  type: string
+                              required:
+                              - port
+                              - service
+                              type: object
+                            envoyOtelAls:
+                              description: Configures an Envoy Open Telemetry Access
+                                Logging Service provider.
+                              properties:
+                                logFormat:
+                                  description: |-
+                                    Optional. Format for the proxy access log
+                                    Empty value results in proxy's default access log format, following Envoy access logging formatting.
+                                  properties:
+                                    labels:
+                                      additionalProperties:
+                                        type: string
+                                      description: "Optional. Additional attributes
+                                        that describe the specific event occurrence.\nStructured
+                                        format for the envoy access logs. Envoy [command
+                                        operators](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#command-operators)\ncan
+                                        be used as values for fields within the Struct.
+                                        Values are rendered\nas strings, numbers,
+                                        or boolean values, as appropriate\n(see: [format
+                                        dictionaries](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log-format-dictionaries)).
+                                        Nested JSON is\nsupported for some command
+                                        operators (e.g. FILTER_STATE or DYNAMIC_METADATA).\nAlias
+                                        to `attributes` filed in [Open Telemetry](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/access_loggers/open_telemetry/v3/logs_service.proto)\n\n\nExample:\n```\nlabels:\n\n\n\tstatus:
+                                        \"%RESPONSE_CODE%\"\n\tmessage: \"%LOCAL_REPLY_BODY%\"\n\n\n```"
+                                      type: object
+                                    text:
+                                      description: |-
+                                        Textual format for the envoy access logs. Envoy [command operators](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#command-operators) may be
+                                        used in the format. The [format string documentation](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log-format-strings)
+                                        provides more information.
+                                        Alias to `body` filed in [Open Telemetry](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/access_loggers/open_telemetry/v3/logs_service.proto)
+                                        Example: `text: "%LOCAL_REPLY_BODY%:%RESPONSE_CODE%:path=%REQ(:path)%"`
+                                      type: string
+                                  type: object
+                                logName:
+                                  description: |-
+                                    Optional. The friendly name of the access log.
+                                    Defaults:
+                                    - "otel_envoy_accesslog"
+                                  type: string
+                                port:
+                                  description: REQUIRED. Specifies the port of the
+                                    service.
+                                  format: int32
+                                  type: integer
+                                service:
+                                  description: |-
+                                    REQUIRED. Specifies the service that implements the Envoy ALS gRPC authorization service.
+                                    The format is `[<Namespace>/]<Hostname>`. The specification of `<Namespace>` is required only when it is insufficient
+                                    to unambiguously resolve a service in the service registry. The `<Hostname>` is a fully qualified host name of a
+                                    service defined by the Kubernetes service or ServiceEntry.
+
+
+                                    Example: "envoy-als.foo.svc.cluster.local" or "bar/envoy-als.example.com".
+                                  type: string
+                              required:
+                              - port
+                              - service
+                              type: object
+                            envoyTcpAls:
+                              description: Configures an Envoy Access Logging Service
+                                provider for TCP traffic.
+                              properties:
+                                filterStateObjectsToLog:
+                                  description: Optional. Additional filter state objects
+                                    to log.
+                                  items:
+                                    type: string
+                                  type: array
+                                logName:
+                                  description: |-
+                                    Optional. The friendly name of the access log.
+                                    Defaults:
+                                    - "tcp_envoy_accesslog"
+                                    - "listener_envoy_accesslog"
+                                  type: string
+                                port:
+                                  description: REQUIRED. Specifies the port of the
+                                    service.
+                                  format: int32
+                                  type: integer
+                                service:
+                                  description: |-
+                                    REQUIRED. Specifies the service that implements the Envoy ALS gRPC authorization service.
+                                    The format is `[<Namespace>/]<Hostname>`. The specification of `<Namespace>` is required only when it is insufficient
+                                    to unambiguously resolve a service in the service registry. The `<Hostname>` is a fully qualified host name of a
+                                    service defined by the Kubernetes service or ServiceEntry.
+
+
+                                    Example: "envoy-als.foo.svc.cluster.local" or "bar/envoy-als.example.com".
+                                  type: string
+                              required:
+                              - port
+                              - service
+                              type: object
+                            name:
+                              description: REQUIRED. A unique name identifying the
+                                extension provider.
+                              type: string
+                            opentelemetry:
+                              description: Configures an OpenTelemetry tracing provider.
+                              properties:
+                                maxTagLength:
+                                  description: |-
+                                    Optional. Controls the overall path length allowed in a reported span.
+                                    NOTE: currently only controls max length of the path tag.
+                                  format: int32
+                                  type: integer
+                                port:
+                                  description: REQUIRED. Specifies the port of the
+                                    service.
+                                  format: int32
+                                  type: integer
+                                service:
+                                  description: |-
+                                    REQUIRED. Specifies the OpenTelemetry endpoint that will receive OTLP traces.
+                                    The format is `[<Namespace>/]<Hostname>`. The specification of `<Namespace>` is required only when it is insufficient
+                                    to unambiguously resolve a service in the service registry. The `<Hostname>` is a fully qualified host name of a
+                                    service defined by the Kubernetes service or ServiceEntry.
+
+
+                                    Example: "otlp.default.svc.cluster.local" or "bar/otlp.example.com".
+                                  type: string
+                              required:
+                              - port
+                              - service
+                              type: object
+                            prometheus:
+                              description: Configures a Prometheus metrics provider.
+                              type: object
+                            skywalking:
+                              description: Configures a Apache SkyWalking provider.
+                              properties:
+                                accessToken:
+                                  description: Optional. The SkyWalking OAP access
+                                    token.
+                                  type: string
+                                port:
+                                  description: REQUIRED. Specifies the port of the
+                                    service.
+                                  format: int32
+                                  type: integer
+                                service:
+                                  description: |-
+                                    REQUIRED. Specifies the service for the SkyWalking receiver.
+                                    The format is `[<Namespace>/]<Hostname>`. The specification of `<Namespace>` is required only when it is insufficient
+                                    to unambiguously resolve a service in the service registry. The `<Hostname>` is a fully qualified host name of a
+                                    service defined by the Kubernetes service or ServiceEntry.
+
+
+                                    Example: "skywalking.default.svc.cluster.local" or "bar/skywalking.example.com".
+                                  type: string
+                              required:
+                              - port
+                              - service
+                              type: object
+                            stackdriver:
+                              description: Configures a Stackdriver provider.
+                              properties:
+                                logging:
+                                  description: Optional. Controls Stackdriver logging
+                                    behavior.
+                                  properties:
+                                    labels:
+                                      additionalProperties:
+                                        type: string
+                                      description: "Collection of tag names and tag
+                                        expressions to include in the log\nentry.
+                                        Conflicts are resolved by the tag name by
+                                        overriding previously\nsupplied values.\n\n\nExample:\n\n\n\tlabels:\n\t
+                                        \ path: request.url_path\n\t  foo: request.headers['x-foo']"
+                                      type: object
+                                  required:
+                                  - labels
+                                  type: object
+                                maxTagLength:
+                                  description: |-
+                                    Optional. Controls the overall path length allowed in a reported span.
+                                    NOTE: currently only controls max length of the path tag.
+                                  format: int32
+                                  type: integer
+                              type: object
+                            zipkin:
+                              description: Configures a tracing provider that uses
+                                the Zipkin API.
+                              properties:
+                                enable64bitTraceId:
+                                  description: |-
+                                    Optional. A 128 bit trace id will be used in Istio.
+                                    If true, will result in a 64 bit trace id being used.
+                                  type: boolean
+                                maxTagLength:
+                                  description: |-
+                                    Optional. Controls the overall path length allowed in a reported span.
+                                    NOTE: currently only controls max length of the path tag.
+                                  format: int32
+                                  type: integer
+                                port:
+                                  description: REQUIRED. Specifies the port of the
+                                    service.
+                                  format: int32
+                                  type: integer
+                                service:
+                                  description: |-
+                                    REQUIRED. Specifies the service that the Zipkin API.
+                                    The format is `[<Namespace>/]<Hostname>`. The specification of `<Namespace>` is required only when it is insufficient
+                                    to unambiguously resolve a service in the service registry. The `<Hostname>` is a fully qualified host name of a
+                                    service defined by the Kubernetes service or ServiceEntry.
+
+
+                                    Example: "zipkin.default.svc.cluster.local" or "bar/zipkin.example.com".
+                                  type: string
+                              required:
+                              - port
+                              - service
+                              type: object
+                          required:
+                          - name
+                          type: object
+                          x-kubernetes-validations:
+                          - message: At most one of [envoyExtAuthzHttp envoyExtAuthzGrpc
+                              zipkin datadog stackdriver skywalking opentelemetry
+                              prometheus envoyFileAccessLog envoyHttpAls envoyTcpAls
+                              envoyOtelAls] should be set
+                            rule: '[has(self.envoyExtAuthzHttp), has(self.envoyExtAuthzGrpc),
+                              has(self.zipkin), has(self.datadog), has(self.stackdriver),
+                              has(self.skywalking), has(self.opentelemetry), has(self.prometheus),
+                              has(self.envoyFileAccessLog), has(self.envoyHttpAls),
+                              has(self.envoyTcpAls), has(self.envoyOtelAls)].exists_one(x,x)'
+                        maxItems: 100
+                        type: array
+                      h2UpgradePolicy:
+                        description: |-
+                          Specify if http1.1 connections should be upgraded to http2 by default.
+                          if sidecar is installed on all pods in the mesh, then this should be set to `UPGRADE`.
+                          If one or more services or namespaces do not have sidecar(s), then this should be set to `DO_NOT_UPGRADE`.
+                          It can be enabled by destination using the `destinationRule.trafficPolicy.connectionPool.http.h2UpgradePolicy` override.
+                        format: int32
+                        type: integer
+                      inboundClusterStatName:
+                        description: |-
+                          Name to be used while emitting statistics for inbound clusters. The same pattern is used while computing stat prefix for
+                          network filters like TCP and Redis.
+                          By default, Istio emits statistics with the pattern `inbound|<port>|<port-name>|<service-FQDN>`.
+                          For example `inbound|7443|grpc-reviews|reviews.prod.svc.cluster.local`. This can be used to override that pattern.
+
+
+                          A Pattern can be composed of various pre-defined variables. The following variables are supported.
+
+
+                          - `%SERVICE%` - Will be substituted with name of the service.
+                          - `%SERVICE_FQDN%` - Will be substituted with FQDN of the service.
+                          - `%SERVICE_PORT%` - Will be substituted with port of the service.
+                          - `%TARGET_PORT%`  - Will be substituted with the target port of the service.
+                          - `%SERVICE_PORT_NAME%` - Will be substituted with port name of the service.
+
+
+                          Following are some examples of supported patterns for reviews:
+
+
+                          - `%SERVICE_FQDN%_%SERVICE_PORT%` will use reviews.prod.svc.cluster.local_7443 as the stats name.
+                          - `%SERVICE%` will use reviews.prod as the stats name.
+                        type: string
+                      ingressClass:
+                        description: |-
+                          Class of ingress resources to be processed by Istio ingress
+                          controller. This corresponds to the value of
+                          `kubernetes.io/ingress.class` annotation.
+                        type: string
+                      ingressControllerMode:
+                        description: |-
+                          Defines whether to use Istio ingress controller for annotated or all ingress resources.
+                          Default mode is `STRICT`.
+                        enum:
+                        - UNSPECIFIED
+                        - DEFAULT
+                        - STRICT
+                        - "OFF"
+                        type: string
+                      ingressSelector:
+                        description: |-
+                          Defines which gateway deployment to use as the Ingress controller. This field corresponds to
+                          the Gateway.selector field, and will be set as `istio: INGRESS_SELECTOR`.
+                          By default, `ingressgateway` is used, which will select the default IngressGateway as it has the
+                          `istio: ingressgateway` labels.
+                          It is recommended that this is the same value as ingress_service.
+                        type: string
+                      ingressService:
+                        description: |-
+                          Name of the Kubernetes service used for the istio ingress controller.
+                          If no ingress controller is specified, the default value `istio-ingressgateway` is used.
+                        type: string
+                      localityLbSetting:
+                        description: |-
+                          Locality based load balancing distribution or failover settings.
+                          If unspecified, locality based load balancing will be enabled by default.
+                          However, this requires outlierDetection to actually take effect for a particular
+                          service, see https://istio.io/latest/docs/tasks/traffic-management/locality-load-balancing/failover/
+                        properties:
+                          distribute:
+                            description: |-
+                              Optional: only one of distribute, failover or failoverPriority can be set.
+                              Explicitly specify loadbalancing weight across different zones and geographical locations.
+                              Refer to [Locality weighted load balancing](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/locality_weight)
+                              If empty, the locality weight is set according to the endpoints number within it.
+                            items:
+                              description: |-
+                                Describes how traffic originating in the 'from' zone or sub-zone is
+                                distributed over a set of 'to' zones. Syntax for specifying a zone is
+                                {region}/{zone}/{sub-zone} and terminal wildcards are allowed on any
+                                segment of the specification. Examples:
+
+
+                                `*` - matches all localities
+
+
+                                `us-west/*` - all zones and sub-zones within the us-west region
+
+
+                                `us-west/zone-1/*` - all sub-zones within us-west/zone-1
+                              properties:
+                                from:
+                                  description: Originating locality, '/' separated,
+                                    e.g. 'region/zone/sub_zone'.
+                                  type: string
+                                to:
+                                  additionalProperties:
+                                    format: int32
+                                    type: integer
+                                  description: |-
+                                    Map of upstream localities to traffic distribution weights. The sum of
+                                    all weights should be 100. Any locality not present will
+                                    receive no traffic.
+                                  type: object
+                              type: object
+                            type: array
+                          enabled:
+                            description: |-
+                              enable locality load balancing, this is DestinationRule-level and will override mesh wide settings in entirety.
+                              e.g. true means that turn on locality load balancing for this DestinationRule no matter what mesh wide settings is.
+                            type: boolean
+                          failover:
+                            description: |-
+                              Optional: only one of distribute, failover or failoverPriority can be set.
+                              Explicitly specify the region traffic will land on when endpoints in local region becomes unhealthy.
+                              Should be used together with OutlierDetection to detect unhealthy endpoints.
+                              Note: if no OutlierDetection specified, this will not take effect.
+                            items:
+                              description: |-
+                                Specify the traffic failover policy across regions. Since zone and sub-zone
+                                failover is supported by default this only needs to be specified for
+                                regions when the operator needs to constrain traffic failover so that
+                                the default behavior of failing over to any endpoint globally does not
+                                apply. This is useful when failing over traffic across regions would not
+                                improve service health or may need to be restricted for other reasons
+                                like regulatory controls.
+                              properties:
+                                from:
+                                  description: Originating region.
+                                  type: string
+                                to:
+                                  description: |-
+                                    Destination region the traffic will fail over to when endpoints in
+                                    the 'from' region becomes unhealthy.
+                                  type: string
+                              type: object
+                            type: array
+                          failoverPriority:
+                            description: |-
+                              failoverPriority is an ordered list of labels used to sort endpoints to do priority based load balancing.
+                              This is to support traffic failover across different groups of endpoints.
+                              Two kinds of labels can be specified:
+
+
+                                - Specify only label keys `[key1, key2, key3]`, istio would compare the label values of client with endpoints.
+                                  Suppose there are total N label keys `[key1, key2, key3, ...keyN]` specified:
+
+
+                                  1. Endpoints matching all N labels with the client proxy have priority P(0) i.e. the highest priority.
+                                  2. Endpoints matching the first N-1 labels with the client proxy have priority P(1) i.e. second highest priority.
+                                  3. By extension of this logic, endpoints matching only the first label with the client proxy has priority P(N-1) i.e. second lowest priority.
+                                  4. All the other endpoints have priority P(N) i.e. lowest priority.
+
+
+                                - Specify labels with key and value `[key1=value1, key2=value2, key3=value3]`, istio would compare the labels with endpoints.
+                                  Suppose there are total N labels `[key1=value1, key2=value2, key3=value3, ...keyN=valueN]` specified:
+
+
+                                  1. Endpoints matching all N labels have priority P(0) i.e. the highest priority.
+                                  2. Endpoints matching the first N-1 labels have priority P(1) i.e. second highest priority.
+                                  3. By extension of this logic, endpoints matching only the first label has priority P(N-1) i.e. second lowest priority.
+                                  4. All the other endpoints have priority P(N) i.e. lowest priority.
+
+
+                              Note: For a label to be considered for match, the previous labels must match, i.e. nth label would be considered matched only if first n-1 labels match.
+
+
+                              It can be any label specified on both client and server workloads.
+                              The following labels which have special semantic meaning are also supported:
+
+
+                                - `topology.istio.io/network` is used to match the network metadata of an endpoint, which can be specified by pod/namespace label `topology.istio.io/network`, sidecar env `ISTIO_META_NETWORK` or MeshNetworks.
+                                - `topology.istio.io/cluster` is used to match the clusterID of an endpoint, which can be specified by pod label `topology.istio.io/cluster` or pod env `ISTIO_META_CLUSTER_ID`.
+                                - `topology.kubernetes.io/region` is used to match the region metadata of an endpoint, which maps to Kubernetes node label `topology.kubernetes.io/region` or the deprecated label `failure-domain.beta.kubernetes.io/region`.
+                                - `topology.kubernetes.io/zone` is used to match the zone metadata of an endpoint, which maps to Kubernetes node label `topology.kubernetes.io/zone` or the deprecated label `failure-domain.beta.kubernetes.io/zone`.
+                                - `topology.istio.io/subzone` is used to match the subzone metadata of an endpoint, which maps to Istio node label `topology.istio.io/subzone`.
+
+
+                              The below topology config indicates the following priority levels:
+
+
+                              ```yaml
+                              failoverPriority:
+                              - "topology.istio.io/network"
+                              - "topology.kubernetes.io/region"
+                              - "topology.kubernetes.io/zone"
+                              - "topology.istio.io/subzone"
+                              ```
+
+
+                              1. endpoints match same [network, region, zone, subzone] label with the client proxy have the highest priority.
+                              2. endpoints have same [network, region, zone] label but different [subzone] label with the client proxy have the second highest priority.
+                              3. endpoints have same [network, region] label but different [zone] label with the client proxy have the third highest priority.
+                              4. endpoints have same [network] but different [region] labels with the client proxy have the fourth highest priority.
+                              5. all the other endpoints have the same lowest priority.
+
+
+                              Suppose a service associated endpoints reside in multi clusters, the below example represents:
+                              1. endpoints in `clusterA` and has `version=v1` label have P(0) priority.
+                              2. endpoints not in `clusterA` but has `version=v1` label have P(1) priority.
+                              2. all the other endpoints have P(2) priority.
+
+
+                              ```yaml
+                              failoverPriority:
+                              - "version=v1"
+                              - "topology.istio.io/cluster=clusterA"
+                              ```
+
+
+                              Optional: only one of distribute, failover or failoverPriority can be set.
+                              And it should be used together with `OutlierDetection` to detect unhealthy endpoints, otherwise has no effect.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      meshMTLS:
+                        description: "The below configuration parameters can be used
+                          to specify TLSConfig for mesh traffic.\nFor example, a user
+                          could enable min TLS version for ISTIO_MUTUAL traffic and
+                          specify a curve for non ISTIO_MUTUAL traffic like below:\n```yaml\nmeshConfig:\n\n\n\tmeshMTLS:\n\t
+                          \ minProtocolVersion: TLSV1_3\n\ttlsDefaults:\n\t  Note:
+                          applicable only for non ISTIO_MUTUAL scenarios\n\t  ecdhCurves:\n\t
+                          \   - P-256\n\t    - P-512\n\n\n```\nConfiguration of mTLS
+                          for traffic between workloads with ISTIO_MUTUAL TLS traffic.\n\n\nNote:
+                          Mesh mTLS does not respect ECDH curves."
+                        properties:
+                          cipherSuites:
+                            description: |-
+                              Optional: If specified, the TLS connection will only support the specified cipher list when negotiating TLS 1.0-1.2.
+                              If not specified, the following cipher suites will be used:
+                              ```
+                              ECDHE-ECDSA-AES256-GCM-SHA384
+                              ECDHE-RSA-AES256-GCM-SHA384
+                              ECDHE-ECDSA-AES128-GCM-SHA256
+                              ECDHE-RSA-AES128-GCM-SHA256
+                              AES256-GCM-SHA384
+                              AES128-GCM-SHA256
+                              ```
+                            items:
+                              type: string
+                            type: array
+                          ecdhCurves:
+                            description: |-
+                              Optional: If specified, the TLS connection will only support the specified ECDH curves for the DH key exchange.
+                              If not specified, the default curves enforced by Envoy will be used. For details about the default curves, refer to
+                              [Ecdh Curves](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/common.proto).
+                            items:
+                              type: string
+                            type: array
+                          minProtocolVersion:
+                            description: |-
+                              Optional: the minimum TLS protocol version. The default minimum
+                              TLS version will be TLS 1.2. As servers may not be Envoy and be
+                              set to TLS 1.2 (e.g., workloads using mTLS without sidecars), the
+                              minimum TLS version for clients may also be TLS 1.2.
+                              In the current Istio implementation, the maximum TLS protocol version
+                              is TLS 1.3.
+                            format: int32
+                            type: integer
+                        type: object
+                      outboundClusterStatName:
+                        description: |-
+                          Name to be used while emitting statistics for outbound clusters. The same pattern is used while computing stat prefix for
+                          network filters like TCP and Redis.
+                          By default, Istio emits statistics with the pattern `outbound|<port>|<subsetname>|<service-FQDN>`.
+                          For example `outbound|8080|v2|reviews.prod.svc.cluster.local`. This can be used to override that pattern.
+
+
+                          A Pattern can be composed of various pre-defined variables. The following variables are supported.
+
+
+                          - `%SERVICE%` - Will be substituted with name of the service.
+                          - `%SERVICE_FQDN%` - Will be substituted with FQDN of the service.
+                          - `%SERVICE_PORT%` - Will be substituted with port of the service.
+                          - `%SERVICE_PORT_NAME%` - Will be substituted with port name of the service.
+                          - `%SUBSET_NAME%` - Will be substituted with subset.
+
+
+                          Following are some examples of supported patterns for reviews:
+
+
+                          - `%SERVICE_FQDN%_%SERVICE_PORT%` will use `reviews.prod.svc.cluster.local_7443` as the stats name.
+                          - `%SERVICE%` will use reviews.prod as the stats name.
+                        type: string
+                      outboundTrafficPolicy:
+                        description: |-
+                          Set the default behavior of the sidecar for handling outbound
+                          traffic from the application.  If your application uses one or
+                          more external services that are not known apriori, setting the
+                          policy to `ALLOW_ANY` will cause the sidecars to route any unknown
+                          traffic originating from the application to its requested
+                          destination. Users are strongly encouraged to use ServiceEntries
+                          to explicitly declare any external dependencies, instead of using
+                          `ALLOW_ANY`, so that traffic to these services can be
+                          monitored. Can be overridden at a Sidecar level by setting the
+                          `OutboundTrafficPolicy` in the [Sidecar
+                          API](https://istio.io/docs/reference/config/networking/sidecar/#OutboundTrafficPolicy).
+                          Default mode is `ALLOW_ANY` which means outbound traffic to unknown destinations will be allowed.
+                        properties:
+                          mode:
+                            format: int32
+                            type: integer
+                        type: object
+                      pathNormalization:
+                        description: |-
+                          ProxyPathNormalization configures how URL paths in incoming and outgoing HTTP requests are
+                          normalized by the sidecars and gateways.
+                          The normalized paths will be used in all aspects through the requests' lifetime on the
+                          sidecars and gateways, which includes routing decisions in outbound direction (client proxy),
+                          authorization policy match and enforcement in inbound direction (server proxy), and the URL
+                          path proxied to the upstream service.
+                          If not set, the NormalizationType.DEFAULT configuration will be used.
+                        properties:
+                          normalization:
+                            format: int32
+                            type: integer
+                        type: object
+                      proxyHttpPort:
+                        description: Port on which Envoy should listen for HTTP PROXY
+                          requests if set.
+                        format: int32
+                        type: integer
+                      proxyInboundListenPort:
+                        description: |-
+                          Port on which Envoy should listen for all inbound traffic to the pod/vm will be captured to.
+                          Default port is 15006.
+                        format: int32
+                        type: integer
+                      proxyListenPort:
+                        description: |-
+                          Port on which Envoy should listen for all outbound traffic to other services.
+                          Default port is 15001.
+                        format: int32
+                        type: integer
+                      rootNamespace:
+                        description: |-
+                          The namespace to treat as the administrative root namespace for
+                          Istio configuration. When processing a leaf namespace Istio will search for
+                          declarations in that namespace first and if none are found it will
+                          search in the root namespace. Any matching declaration found in the root
+                          namespace is processed as if it were declared in the leaf namespace.
+
+
+                          The precise semantics of this processing are documented on each resource
+                          type.
+                        type: string
+                      tcpKeepalive:
+                        description: If set then set `SO_KEEPALIVE` on the socket
+                          to enable TCP Keepalives.
+                        properties:
+                          interval:
+                            description: |-
+                              The time duration between keep-alive probes.
+                              Default is to use the OS level configuration
+                              (unless overridden, Linux defaults to 75s.)
+                            type: string
+                          probes:
+                            description: |-
+                              Maximum number of keepalive probes to send without response before
+                              deciding the connection is dead. Default is to use the OS level configuration
+                              (unless overridden, Linux defaults to 9.)
+                            format: int32
+                            type: integer
+                          time:
+                            description: |-
+                              The time duration a connection needs to be idle before keep-alive
+                              probes start being sent. Default is to use the OS level configuration
+                              (unless overridden, Linux defaults to 7200s (ie 2 hours.)
+                            type: string
+                        type: object
+                      tlsDefaults:
+                        description: |-
+                          Configuration of TLS for all traffic except for ISTIO_MUTUAL mode.
+                          Currently, this supports configuration of ecdh_curves and cipher_suites only.
+                          For ISTIO_MUTUAL TLS settings, use meshMTLS configuration.
+                        properties:
+                          cipherSuites:
+                            description: |-
+                              Optional: If specified, the TLS connection will only support the specified cipher list when negotiating TLS 1.0-1.2.
+                              If not specified, the following cipher suites will be used:
+                              ```
+                              ECDHE-ECDSA-AES256-GCM-SHA384
+                              ECDHE-RSA-AES256-GCM-SHA384
+                              ECDHE-ECDSA-AES128-GCM-SHA256
+                              ECDHE-RSA-AES128-GCM-SHA256
+                              AES256-GCM-SHA384
+                              AES128-GCM-SHA256
+                              ```
+                            items:
+                              type: string
+                            type: array
+                          ecdhCurves:
+                            description: |-
+                              Optional: If specified, the TLS connection will only support the specified ECDH curves for the DH key exchange.
+                              If not specified, the default curves enforced by Envoy will be used. For details about the default curves, refer to
+                              [Ecdh Curves](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/common.proto).
+                            items:
+                              type: string
+                            type: array
+                          minProtocolVersion:
+                            description: |-
+                              Optional: the minimum TLS protocol version. The default minimum
+                              TLS version will be TLS 1.2. As servers may not be Envoy and be
+                              set to TLS 1.2 (e.g., workloads using mTLS without sidecars), the
+                              minimum TLS version for clients may also be TLS 1.2.
+                              In the current Istio implementation, the maximum TLS protocol version
+                              is TLS 1.3.
+                            format: int32
+                            type: integer
+                        type: object
+                      trustDomain:
+                        description: |-
+                          The trust domain corresponds to the trust root of a system.
+                          Refer to [SPIFFE-ID](https://github.com/spiffe/spiffe/blob/master/standards/SPIFFE-ID.md#21-trust-domain)
+                        type: string
+                      trustDomainAliases:
+                        description: |-
+                          The trust domain aliases represent the aliases of `trust_domain`.
+                          For example, if we have
+                          ```yaml
+                          trustDomain: td1
+                          trustDomainAliases: ["td2", "td3"]
+                          ```
+                          Any service with the identity `td1/ns/foo/sa/a-service-account`, `td2/ns/foo/sa/a-service-account`,
+                          or `td3/ns/foo/sa/a-service-account` will be treated the same in the Istio mesh.
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  pilot:
+                    description: Configuration for Pilot.
+                    properties:
+                      autoscaleBehavior:
+                        description: See https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior
+                        x-kubernetes-preserve-unknown-fields: true
+                      autoscaleEnabled:
+                        description: Controls whether a HorizontalPodAutoscaler is
+                          installed for Pilot.
+                        type: boolean
+                      autoscaleMax:
+                        description: Maximum number of replicas in the HorizontalPodAutoscaler
+                          for Pilot.
+                        format: int32
+                        type: integer
+                      autoscaleMin:
+                        description: Minimum number of replicas in the HorizontalPodAutoscaler
+                          for Pilot.
+                        format: int32
+                        type: integer
+                      configMap:
+                        description: |-
+                          Configuration settings passed to Pilot as a ConfigMap.
+
+
+                          This controls whether the mesh config map, generated from values.yaml is generated.
+                          If false, pilot wil use default values or user-supplied values, in that order of preference.
+                        type: boolean
+                      configNamespace:
+                        description: Namespace that the configuration management feature
+                          is installed into, if different from Pilot namespace.
+                        type: string
+                      configSource:
+                        description: |-
+                          ConfigSource describes a source of configuration data for networking
+                          rules, and other Istio configuration artifacts. Multiple data sources
+                          can be configured for a single control plane.
+                        properties:
+                          subscribedResources:
+                            description: Describes the source of configuration, if
+                              nothing is specified default is MCP.
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                      deploymentLabels:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          Labels that are added to Pilot deployment and pods.
+
+
+                          See https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+                        type: object
+                      enabled:
+                        description: Controls whether Pilot is enabled.
+                        type: boolean
+                      env:
+                        additionalProperties:
+                          type: string
+                        description: "Environment variables passed to the Pilot container.\n\n\nExamples:\nenv:\n\n\n\tENV_VAR_1:
+                          value1\n\tENV_VAR_2: value2"
+                        type: object
+                      extraContainerArgs:
+                        x-kubernetes-preserve-unknown-fields: true
+                      hub:
+                        type: string
+                      image:
+                        description: |-
+                          Image name used for Pilot.
+
+
+                          This can be set either to image name if hub is also set, or can be set to the full hub:name string.
+
+
+                          Examples: custom-pilot, docker.io/someuser:custom-pilot
+                        type: string
+                      ipFamilies:
+                        items:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type: array
+                      ipFamilyPolicy:
+                        type: string
+                      jwksResolverExtraRootCA:
+                        type: string
+                      keepaliveMaxServerConnectionAge:
+                        description: |-
+                          Maximum duration that a sidecar can be connected to a pilot.
+
+
+                          This setting balances out load across pilot instances, but adds some resource overhead.
+
+
+                          Examples: 300s, 30m, 1h
+                        type: string
+                      plugins:
+                        items:
+                          type: string
+                        type: array
+                      podLabels:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      seccompProfile:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          The Container seccompProfile
+
+
+                          See: https://kubernetes.io/docs/tutorials/security/seccomp/
+                        type: object
+                      serviceAnnotations:
+                        additionalProperties:
+                          type: string
+                        type: object
+                      tag:
+                        anyOf:
+                        - type: integer
+                        - type: string
+                        x-kubernetes-int-or-string: true
+                      topologySpreadConstraints:
+                        items:
+                          description: TopologySpreadConstraint specifies how to spread
+                            matching pods among the given topology.
+                          properties:
+                            labelSelector:
+                              description: |-
+                                LabelSelector is used to find matching pods.
+                                Pods that match this label selector are counted to determine the number of pods
+                                in their corresponding topology domain.
+                              properties:
+                                matchExpressions:
+                                  description: matchExpressions is a list of label
+                                    selector requirements. The requirements are ANDed.
+                                  items:
+                                    description: |-
+                                      A label selector requirement is a selector that contains values, a key, and an operator that
+                                      relates the key and values.
+                                    properties:
+                                      key:
+                                        description: key is the label key that the
+                                          selector applies to.
+                                        type: string
+                                      operator:
+                                        description: |-
+                                          operator represents a key's relationship to a set of values.
+                                          Valid operators are In, NotIn, Exists and DoesNotExist.
+                                        type: string
+                                      values:
+                                        description: |-
+                                          values is an array of string values. If the operator is In or NotIn,
+                                          the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                          the values array must be empty. This array is replaced during a strategic
+                                          merge patch.
+                                        items:
+                                          type: string
+                                        type: array
+                                    required:
+                                    - key
+                                    - operator
+                                    type: object
+                                  type: array
+                                matchLabels:
+                                  additionalProperties:
+                                    type: string
+                                  description: |-
+                                    matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                                    map is equivalent to an element of matchExpressions, whose key field is "key", the
+                                    operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                  type: object
+                              type: object
+                              x-kubernetes-map-type: atomic
+                            matchLabelKeys:
+                              description: |-
+                                MatchLabelKeys is a set of pod label keys to select the pods over which
+                                spreading will be calculated. The keys are used to lookup values from the
+                                incoming pod labels, those key-value labels are ANDed with labelSelector
+                                to select the group of existing pods over which spreading will be calculated
+                                for the incoming pod. The same key is forbidden to exist in both MatchLabelKeys and LabelSelector.
+                                MatchLabelKeys cannot be set when LabelSelector isn't set.
+                                Keys that don't exist in the incoming pod labels will
+                                be ignored. A null or empty list means only match against labelSelector.
+
+
+                                This is a beta field and requires the MatchLabelKeysInPodTopologySpread feature gate to be enabled (enabled by default).
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
+                            maxSkew:
+                              description: |-
+                                MaxSkew describes the degree to which pods may be unevenly distributed.
+                                When `whenUnsatisfiable=DoNotSchedule`, it is the maximum permitted difference
+                                between the number of matching pods in the target topology and the global minimum.
+                                The global minimum is the minimum number of matching pods in an eligible domain
+                                or zero if the number of eligible domains is less than MinDomains.
+                                For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
+                                labelSelector spread as 2/2/1:
+                                In this case, the global minimum is 1.
+                                | zone1 | zone2 | zone3 |
+                                |  P P  |  P P  |   P   |
+                                - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 2/2/2;
+                                scheduling it onto zone1(zone2) would make the ActualSkew(3-1) on zone1(zone2)
+                                violate MaxSkew(1).
+                                - if MaxSkew is 2, incoming pod can be scheduled onto any zone.
+                                When `whenUnsatisfiable=ScheduleAnyway`, it is used to give higher precedence
+                                to topologies that satisfy it.
+                                It's a required field. Default value is 1 and 0 is not allowed.
+                              format: int32
+                              type: integer
+                            minDomains:
+                              description: |-
+                                MinDomains indicates a minimum number of eligible domains.
+                                When the number of eligible domains with matching topology keys is less than minDomains,
+                                Pod Topology Spread treats "global minimum" as 0, and then the calculation of Skew is performed.
+                                And when the number of eligible domains with matching topology keys equals or greater than minDomains,
+                                this value has no effect on scheduling.
+                                As a result, when the number of eligible domains is less than minDomains,
+                                scheduler won't schedule more than maxSkew Pods to those domains.
+                                If value is nil, the constraint behaves as if MinDomains is equal to 1.
+                                Valid values are integers greater than 0.
+                                When value is not nil, WhenUnsatisfiable must be DoNotSchedule.
+
+
+                                For example, in a 3-zone cluster, MaxSkew is set to 2, MinDomains is set to 5 and pods with the same
+                                labelSelector spread as 2/2/2:
+                                | zone1 | zone2 | zone3 |
+                                |  P P  |  P P  |  P P  |
+                                The number of domains is less than 5(MinDomains), so "global minimum" is treated as 0.
+                                In this situation, new pod with the same labelSelector cannot be scheduled,
+                                because computed skew will be 3(3 - 0) if new Pod is scheduled to any of the three zones,
+                                it will violate MaxSkew.
+
+
+                                This is a beta field and requires the MinDomainsInPodTopologySpread feature gate to be enabled (enabled by default).
+                              format: int32
+                              type: integer
+                            nodeAffinityPolicy:
+                              description: |-
+                                NodeAffinityPolicy indicates how we will treat Pod's nodeAffinity/nodeSelector
+                                when calculating pod topology spread skew. Options are:
+                                - Honor: only nodes matching nodeAffinity/nodeSelector are included in the calculations.
+                                - Ignore: nodeAffinity/nodeSelector are ignored. All nodes are included in the calculations.
+
+
+                                If this value is nil, the behavior is equivalent to the Honor policy.
+                                This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
+                              type: string
+                            nodeTaintsPolicy:
+                              description: |-
+                                NodeTaintsPolicy indicates how we will treat node taints when calculating
+                                pod topology spread skew. Options are:
+                                - Honor: nodes without taints, along with tainted nodes for which the incoming pod
+                                has a toleration, are included.
+                                - Ignore: node taints are ignored. All nodes are included.
+
+
+                                If this value is nil, the behavior is equivalent to the Ignore policy.
+                                This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
+                              type: string
+                            topologyKey:
+                              description: |-
+                                TopologyKey is the key of node labels. Nodes that have a label with this key
+                                and identical values are considered to be in the same topology.
+                                We consider each <key, value> as a "bucket", and try to put balanced number
+                                of pods into each bucket.
+                                We define a domain as a particular instance of a topology.
+                                Also, we define an eligible domain as a domain whose nodes meet the requirements of
+                                nodeAffinityPolicy and nodeTaintsPolicy.
+                                e.g. If TopologyKey is "kubernetes.io/hostname", each Node is a domain of that topology.
+                                And, if TopologyKey is "topology.kubernetes.io/zone", each zone is a domain of that topology.
+                                It's a required field.
+                              type: string
+                            whenUnsatisfiable:
+                              description: |-
+                                WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy
+                                the spread constraint.
+                                - DoNotSchedule (default) tells the scheduler not to schedule it.
+                                - ScheduleAnyway tells the scheduler to schedule the pod in any location,
+                                  but giving higher precedence to topologies that would help reduce the
+                                  skew.
+                                A constraint is considered "Unsatisfiable" for an incoming pod
+                                if and only if every possible node assignment for that pod would violate
+                                "MaxSkew" on some topology.
+                                For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
+                                labelSelector spread as 3/1/1:
+                                | zone1 | zone2 | zone3 |
+                                | P P P |   P   |   P   |
+                                If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled
+                                to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies
+                                MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler
+                                won't make it *more* imbalanced.
+                                It's a required field.
+                              type: string
+                          required:
+                          - maxSkew
+                          - topologyKey
+                          - whenUnsatisfiable
+                          type: object
+                        type: array
+                      traceSampling:
+                        description: |-
+                          Trace sampling fraction.
+
+
+                          Used to set the fraction of time that traces are sampled. Higher values are more accurate but add CPU overhead.
+
+
+                          Allowed values: 0.0 to 1.0
+                        type: number
+                      useMCP:
+                        description: |-
+                          Controls whether Pilot is configured through the Mesh Control Protocol (MCP).
+
+
+                          If set to true, Pilot requires an MCP server (like Galley) to be installed.
+                        type: boolean
+                      variant:
+                        type: string
+                    type: object
+                  profile:
+                    type: string
+                  revision:
+                    type: string
+                  revisionTags:
+                    items:
+                      type: string
+                    type: array
+                  sidecarInjectorWebhook:
+                    description: SidecarInjectorConfig is described in istio.io documentation.
+                    properties:
+                      alwaysInjectSelector:
+                        description: See NeverInjectSelector.
+                        x-kubernetes-preserve-unknown-fields: true
+                      defaultTemplates:
+                        description: 'defaultTemplates: ["sidecar", "hello"]'
+                        items:
+                          type: string
+                        type: array
+                      enableNamespacesByDefault:
+                        description: Enables sidecar auto-injection in namespaces
+                          by default.
+                        type: boolean
+                      injectedAnnotations:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          injectedAnnotations are additional annotations that will be added to the pod spec after injection
+                          This is primarily to support PSP annotations.
+                        type: object
+                      injectionURL:
+                        description: Configure the injection url for sidecar injector
+                          webhook
+                        type: string
+                      neverInjectSelector:
+                        description: |-
+                          Instructs Istio to not inject the sidecar on those pods, based on labels that are present in those pods.
+
+
+                          Annotations in the pods have higher precedence than the label selectors.
+                          Order of evaluation: Pod Annotations → NeverInjectSelector → AlwaysInjectSelector → Default Policy.
+                          See https://istio.io/docs/setup/kubernetes/additional-setup/sidecar-injection/#more-control-adding-exceptions
+                        x-kubernetes-preserve-unknown-fields: true
+                      objectSelector:
+                        additionalProperties:
+                          type: string
+                        description: Enable objectSelector to filter out pods with
+                          no need for sidecar before calling istio-sidecar-injector.
+                        type: object
+                      reinvocationPolicy:
+                        description: 'Setting this to `IfNeeded` will result in the
+                          sidecar injector being run again if additional mutations
+                          occur. Default: Never'
+                        type: string
+                      rewriteAppHTTPProbe:
+                        description: If true, webhook or istioctl injector will rewrite
+                          PodSpec for liveness health check to redirect request to
+                          sidecar. This makes liveness check work even when mTLS is
+                          enabled.
+                        type: boolean
+                      templates:
+                        description: "Templates defines a set of custom injection
+                          templates that can be used. For example, defining:\n\n\ntemplates:\n\n\n\thello:
+                          |\n\t  metadata:\n\t    labels:\n\t      hello: world\n\n\nThen
+                          starting a pod with the `inject.istio.io/templates: hello`
+                          annotation, will result in the pod\nbeing injected with
+                          the hello=world labels.\nThis is intended for advanced configuration
+                          only; most users should use the built in template"
+                        x-kubernetes-preserve-unknown-fields: true
+                    type: object
+                  telemetry:
+                    description: Controls whether telemetry is exported for Pilot.
+                    properties:
+                      enabled:
+                        description: Controls whether telemetry is exported for Pilot.
+                        type: boolean
+                      v2:
+                        description: Use telemetry v2.
+                        properties:
+                          enabled:
+                            description: Controls whether pilot will configure telemetry
+                              v2.
+                            type: boolean
+                          prometheus:
+                            description: Controls telemetry v2 prometheus settings.
+                            properties:
+                              enabled:
+                                description: Controls whether stats envoyfilter would
+                                  be enabled or not.
+                                type: boolean
+                            type: object
+                          stackdriver:
+                            description: TelemetryV2StackDriverConfig controls telemetry
+                              v2 stackdriver settings.
+                            properties:
+                              enabled:
+                                type: boolean
+                            type: object
+                        type: object
+                    type: object
+                type: object
+              version:
+                description: |-
+                  Defines the version of Istio to install.
+                  Must be one of: v1.20.2, v1.20.1, v1.19.6, latest, gwAPIControllerMode.
+                enum:
+                - v1.20.2
+                - v1.20.1
+                - v1.19.6
+                - latest
+                - gwAPIControllerMode
+                type: string
+            required:
+            - namespace
+            - version
+            type: object
+          status:
+            description: IstioStatus defines the observed state of Istio
+            properties:
+              conditions:
+                description: Represents the latest available observations of the object's
+                  current state.
+                items:
+                  description: A Condition represents a specific observation of the
+                    object's state.
+                  properties:
+                    lastTransitionTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: Human-readable message indicating details about
+                        the last transition.
+                      type: string
+                    reason:
+                      description: Unique, single-word, CamelCase reason for the condition's
+                        last transition.
+                      type: string
+                    status:
+                      description: The status of this condition. Can be True, False
+                        or Unknown.
+                      type: string
+                    type:
+                      description: The type of this condition.
+                      type: string
+                  type: object
+                type: array
+              observedGeneration:
+                description: |-
+                  ObservedGeneration is the most recent generation observed for this
+                  Istio object. It corresponds to the object's generation, which is
+                  updated on mutation by the API Server. The information in the status
+                  pertains to this particular generation of the object.
+                format: int64
+                type: integer
+              revisions:
+                description: Reports information about the underlying IstioRevisions.
+                properties:
+                  inUse:
+                    description: Number of IstioRevisions that are currently in use.
+                    format: int32
+                    type: integer
+                  ready:
+                    description: Number of IstioRevisions that are Ready.
+                    format: int32
+                    type: integer
+                  total:
+                    description: Total number of IstioRevisions currently associated
+                      with this Istio.
+                    format: int32
+                    type: integer
+                required:
+                - inUse
+                - ready
+                - total
+                type: object
+              state:
+                description: Reports the current state of the object.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

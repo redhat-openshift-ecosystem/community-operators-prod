@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.4">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.10">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.50c56a3b.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.7e359304.min.css">
       
       
 
@@ -339,14 +339,17 @@
     
     
     
-    
-    
+      
+        
+        
       
       
+        
+      
+    
     
     <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
-        
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
@@ -523,15 +526,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#semver-skippatch" class="md-nav__link">
-    <span class="md-ellipsis">
-      semver-skippatch
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#replaces-mode" class="md-nav__link">
     <span class="md-ellipsis">
       replaces-mode
@@ -629,14 +623,14 @@
     
     
     
-    
-    
       
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
         
         
           
@@ -644,7 +638,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -974,8 +968,6 @@ COPY ./tests/scorecard/ tests/scorecard/
 </code></pre>
 <h4 id="semver-mode">semver-mode</h4>
 <p>OLM treats all your Operator versions with semantic version rules and updates them in order of those versions. That is, every version will be replaced by the next higher version according to a semantic versioning sort order. During an update on the cluster, OLM will update to the latest version, one version at a time. To use this, simply specify <code>spec.version</code> in your CSV. If you accidentally add <code>spec.replaces</code> this will contradict semantic versioning and raise an error.</p>
-<h4 id="semver-skippatch">semver-skippatch</h4>
-<p>Works like <code>semver</code> with slightly different behavior of OLM on the cluster, where instead of updating from e.g. <code>1.1.0</code> and an update path according to a semver ordering rules like so: <code>1.1.0 -&gt; 1.1.1 -&gt; 1.1.2</code>, the update would jump straight to <code>1.1.2</code> instead of updating to <code>1.1.1</code> first.</p>
 <h4 id="replaces-mode">replaces-mode</h4>
 <p>Each Operator bundle not only contains <code>spec.version</code> but also points to an older version it can upgrade from via <code>spec.replaces</code> key in the CSV file, e.g. <code>replaces: my-operator.v1.0.0</code>. From this chain of back pointers, OLM computes the <em>update graph</em> at runtime. This allows us to omit some versions from the <em>update graph</em> or release special leaf versions.</p>
 <p>Regardless of which mode you choose to have OLM create update paths for your Operator, it continuously update your Operator often as new features are added and bugs are fixed.</p>
@@ -1046,10 +1038,10 @@ defaultChannel: stable
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "toc.integrate"], "search": "../assets/javascripts/workers/search.c011b7c0.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "toc.integrate"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.7389ff0e.min.js"></script>
+      <script src="../assets/javascripts/bundle.8fd75fb4.min.js"></script>
       
     
   </body>

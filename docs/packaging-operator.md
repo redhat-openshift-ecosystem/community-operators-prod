@@ -185,9 +185,6 @@ updateGraph: replaces-mode
 #### semver-mode
 OLM treats all your Operator versions with semantic version rules and updates them in order of those versions. That is, every version will be replaced by the next higher version according to a semantic versioning sort order. During an update on the cluster, OLM will update to the latest version, one version at a time. To use this, simply specify `spec.version` in your CSV. If you accidentally add `spec.replaces` this will contradict semantic versioning and raise an error.
 
-#### semver-skippatch
-Works like `semver` with slightly different behavior of OLM on the cluster, where instead of updating from e.g. `1.1.0` and an update path according to a semver ordering rules like so: `1.1.0 -> 1.1.1 -> 1.1.2`, the update would jump straight to `1.1.2` instead of updating to `1.1.1` first.
-
 #### replaces-mode
 Each Operator bundle not only contains `spec.version` but also points to an older version it can upgrade from via `spec.replaces` key in the CSV file, e.g. `replaces: my-operator.v1.0.0`. From this chain of back pointers, OLM computes the *update graph* at runtime. This allows us to omit some versions from the *update graph* or release special leaf versions.
 

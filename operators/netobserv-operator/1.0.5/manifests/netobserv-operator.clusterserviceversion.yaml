@@ -1270,6 +1270,8 @@ spec:
     name: flowlogs-pipeline
   - image: quay.io/netobserv/network-observability-console-plugin:v0.1.12
     name: console-plugin
+  # skipping range due to versions between 0.2.1 and 1.0.5 not being available on OCP 4.15
+  skipRange: ">=0.2.1 <1.0.5"
   replaces: netobserv-operator.v1.0.4
   version: 1.0.5
   webhookdefinitions:

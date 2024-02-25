@@ -1,0 +1,506 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "charts.kubecost.com/v1alpha1",
+          "kind": "CostAnalyzer",
+          "metadata": {
+            "name": "cost-analyzer-ocp-sample"
+          },
+          "spec": {
+            "affinity": {},
+            "global": {
+              "grafana": {
+                "enabled": false,
+                "proxy": false
+              }
+            },
+            "grafana": {
+              "grafana": {
+                "containerSecurityContext": {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true
+                  }
+                }
+              },
+              "initContainers": {
+                "containerSecurityContext": {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true
+                  }
+                }
+              },
+              "rbac": {
+                "pspEnabled": false
+              },
+              "sidecar": {
+                "containerSecurityContext": {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true
+                  }
+                }
+              }
+            },
+            "kubecostDeployment": {
+              "podSecurityContext": {
+                "runAsNonRoot": true
+              }
+            },
+            "kubecostFrontend": {
+              "containerSecurityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "readOnlyRootFilesystem": true,
+                "runAsNonRoot": true
+              }
+            },
+            "kubecostModel": {
+              "containerSecurityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "readOnlyRootFilesystem": true,
+                "runAsNonRoot": true
+              },
+              "containerStatsEnabled": true,
+              "etlCloudAsset": true
+            },
+            "kubecostNetworkCosts": {
+              "containerSecurityContext": {},
+              "securityContext": {}
+            },
+            "kubecostProductConfigs": {
+              "clusterName": "YOUR_CLUSTER_NAME"
+            },
+            "networkCosts": {
+              "config": {
+                "services": {
+                  "amazon-web-services": false,
+                  "azure-cloud-services": false,
+                  "google-cloud-services": false
+                }
+              },
+              "enabled": false,
+              "podSecurityPolicy": {
+                "enabled": false
+              }
+            },
+            "podSecurityPolicy": {
+              "enabled": false
+            },
+            "prometheus": {
+              "configmapReload": {
+                "containerSecurityContext": {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true
+                  }
+                }
+              },
+              "kube-state-metrics": {
+                "disabled": true
+              },
+              "kubeStateMetrics": {
+                "enabled": false
+              },
+              "nodeExporter": {
+                "enabled": false
+              },
+              "podSecurityPolicy": {
+                "enabled": false
+              },
+              "server": {
+                "containerSecurityContext": {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true
+                  }
+                },
+                "global": {
+                  "external_labels": {
+                    "cluster_id": "YOUR_CLUSTER_NAME"
+                  }
+                }
+              },
+              "sidecarContainers": {
+                "containerSecurityContext": {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true
+                  }
+                }
+              }
+            },
+            "thanos": {
+              "thanoscompact": {
+                "containerSecurityContext": {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true
+                  }
+                }
+              },
+              "thanosquery": {
+                "containerSecurityContext": {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true
+                  }
+                }
+              },
+              "thanosqueryfrontend": {
+                "containerSecurityContext": {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true
+                  }
+                }
+              },
+              "thanosstore": {
+                "containerSecurityContext": {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: Monitoring
+    containerImage: gcr.io/kubecost1/operator/controller:latest
+    createdAt: 2023-01-24T08:00:00Z
+    support: Kubecost
+    description: |-
+      The Kubecost Operator runs within a Openshift cluster and provides a means to deploy and manage Kubecost and components to monitor cloud costs.
+    operators.operatorframework.io/builder: operator-sdk-v1.24.0
+    operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+  name: kubecost.v1.99.0
+  namespace: kubecost
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: CostAnalyzer
+      name: costanalyzers.charts.kubecost.com
+      version: v1alpha1
+  description: |-
+    The Kubecost Operator runs within a Openshift cluster and provides a means to deploy and manage Kubecost and components to monitor cloud costs.
+      
+    ## Prerequisites
+    To start using the Kubecost Operator, you need to create a namespace for the deployment:
+    ```
+    kubectl create namespace kubecost
+    ```
+    Refer to the [Kubecost documentation](https://docs.kubecost.com/install-and-configure/install/provider-installations/openshift-operatorhub-kubecost-install) for more details.
+  displayName: Kubecost
+  icon:
+  - base64data: "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"
+    mediatype: "image/png"
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+        - apiGroups:
+          - charts.kubecost.com
+          resources:
+          - costanalyzers
+          - costanalyzers/status
+          - costanalyzers/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - policy
+          resources:
+          - podsecuritypolicies
+          verbs:
+          - '*'
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          - clusterroles
+          verbs:
+          - '*'
+        - apiGroups:
+          - apps
+          resources:
+          - daemonsets
+          - deployments
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - persistentvolumeclaims
+          - secrets
+          - serviceaccounts
+          - services
+          verbs:
+          - '*'
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - rolebindings
+          - roles
+          verbs:
+          - '*'
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: kubecost-controller-manager
+      deployments:
+      - label:
+          control-plane: controller-manager
+        name: kubecost-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.0
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 5m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                - --leader-election-id=kubecost
+                image: gcr.io/kubecost1/operator/controller:latest
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: kubecost-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: kubecost-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - cost
+  - cost saving
+  - recommendation
+  - kubecost
+  - cost management
+  - openshift
+  links:
+  - name: Kubecost
+    url: https://kubecost.domain
+  maturity: alpha
+  provider:
+    name: Kubecost
+    url: kubecost.com
+  maintainers:
+  - name: Kubecost
+    email: linh@kubecost.com
+  version: 1.99.0

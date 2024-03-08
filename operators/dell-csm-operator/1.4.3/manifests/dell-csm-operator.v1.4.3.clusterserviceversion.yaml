@@ -2,6 +2,13 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
+    features.operators.openshift.io/disconnected : "true" 
+    features.operators.openshift.io/fips-compliant: "false" 
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    features.operators.openshift.io/tls-profiles:  "false"
+    features.operators.openshift.io/token-auth-aws: "false"
     alm-examples: |-
       [
         {
@@ -3655,5 +3662,5 @@ spec:
   - image: docker.io/dellemc/connectivity-cert-persister-k8s:0.7.0
     name: cert-persister
   skips:
-  - dell-csm-operator.v1.4.0
+  - dell-csm-operator.v1.4.2
   version: 1.4.3

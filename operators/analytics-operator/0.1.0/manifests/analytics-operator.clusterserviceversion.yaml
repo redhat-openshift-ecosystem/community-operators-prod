@@ -46,7 +46,7 @@ metadata:
             "name": "anomalyengine-sample"
           },
           "spec": {
-            "anomalyqueryconfiguration": "etcd_objects_all:\n  method: percentage_change\n  query: max(apiserver_storage_objects{resource!~\"certificatesigningrequests.certificates.k8s.io|installplans.operators.coreos.com|operators.operators.coreos.com|subscriptions.operators.coreos.com|anomalydata.observability-analytics.redhat.com\"}) by (resource)\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: True\nworkload_memory_usage_bytes:\n  method: percentage_change\n  query: sum(container_memory_working_set_bytes{namespace!~\"openshift-.+\",pod!=\"\",container=\"\"})\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: False\nworkload_cpu_usage_cores:\n  method: percentage_change\n  query: sum(container_cpu_usage_seconds_total{namespace!~\"openshift-.+\",pod!=\"\",container=\"\"})\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: False\nrest_client_requests_total:\n  method: percentage_change\n  query: sum(rest_client_requests_total)\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: False\nscheduler_pending_pods:\n  method: min_max\n  query: sum(scheduler_pending_pods{queue=~\"backoff|unschedulable\"}) by (queue)\n  min: 0\n  max: 10\n",
+            "anomalyqueryconfiguration": "etcd_objects_all:\n  method: percentage_change\n  query: max(apiserver_storage_objects{resource!~\"certificatesigningrequests.certificates.k8s.io|installplans.operators.coreos.com|operators.operators.coreos.com|subscriptions.operators.coreos.com|anomalydata.observability-analytics.redhat.com\"}) by (resource)\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: True\nfailed_pods:\n  method: min_max\n  query: count(kube_pod_status_phase{phase!~\"Succeeded|Pending|Running|Unknown\"}) by (phase, namespace)\n  min: 0\n  max: 10\n  have_multi_result_data: True\nworkload_memory_usage_bytes:\n  method: percentage_change\n  query: sum(container_memory_working_set_bytes{namespace!~\"openshift-.+\",pod!=\"\",container=\"\"})\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: False\nworkload_cpu_usage_cores:\n  method: percentage_change\n  query: sum(container_cpu_usage_seconds_total{namespace!~\"openshift-.+\",pod!=\"\",container=\"\"})\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: False\nrest_client_requests_total:\n  method: percentage_change\n  query: sum(rest_client_requests_total)\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: False\n",
             "cronjobconfig": {
               "anomalyqueries": "etcd_objects_all,workload_memory_usage_bytes,workload_cpu_usage_cores,rest_client_requests_total,scheduler_pending_pods",
               "name": "osa-anomaly-detection",
@@ -69,7 +69,7 @@ metadata:
     capabilities: Basic Install
     categories: OpenShift Optional
     containerImage: quay.io/openshiftanalytics/observability-analytics-operator:0.1.0
-    createdAt: "2024-03-05T08:13:11Z"
+    createdAt: "2024-03-12T04:25:03Z"
     description: Deploys and Manages Observability Analytics Operator
     operators.operatorframework.io/builder: operator-sdk-v1.31.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4-alpha
@@ -97,18 +97,23 @@ spec:
     may introduce a change that is **NOT** backward-compatible with the previous version.
     Thus, to upgrade the operator, uninstall the already installed version completely
     (including CRDs) and install the new version.\n\n### Installtion Steps for the
-    Anomaly Engine\nOnce you install the Observability Analytics operator, wait until
-    you see the operator in the **Installed Operator** list. Click on the Operator
-    name and go to Operator details.\n\nHere you should see a tab called **Anomaly
-    Engine**. Click on it, and then click on the **Create AnomalyEngine** button,
-    which will redirect you to a form where you need to provide the required inputs
-    for the Anomaly Engine. Once successfully created, you should see a cronjob in
-    the given namespace. This cronjob will identify anomalies and store them into
+    Anomaly Engine\n Craete namespace if you would like to install this operator into
+    separate namespace (You can utilize existing namespace as well). ```bash kubectl
+    create ns <Namespace> ``` Install the Observability Analytics operator to specific
+    `<Namespace>`, wait until you see the operator in the **Installed Operator** list.
+    Click on the Operator name and go to Operator details.\n\nHere you should see
+    a tab called **Anomaly Engine**. Click on it, and then click on the **Create AnomalyEngine**
+    button, which will redirect you to a form where you need to provide the required
+    inputs for the Anomaly Engine. Once successfully created, you should see a cronjob
+    in the given namespace. This cronjob will identify anomalies and store them into
     **anomalydata**.\n\n### How to See Anomaly Data Captured by Anomaly Engine?\nWe
-    are storing anomaly data into CR. You can check detected anomalies using the following
-    command from your terminal. (As of now, we don't have any UI to showcase this
-    data in the cluster)\n\n```bash\nkubectl get anomalydata -n <Namespace>\nkubectl
-    describe anomalydata <NAME of the anomalydata> -n <Namespace> \n```\n\n### Documentation\nDocumentation
+    are storing anomaly data into CR.\n ####Option 1:Through `kubectl`` command\nYou
+    can check detected anomalies using the following command from your terminal. \n\n```bash\nkubectl
+    get anomalydata -n <Namespace>\nkubectl describe anomalydata <NAME of the anomalydata>
+    -n <Namespace> \n```\n #### Option 2: From Installed Operator UI Go to installed
+    operator and select **Observability Analytics** operator, now go to **Anomaly
+    Data** tab where you can able to see the detected anomaly, click on specific anomaly
+    and you should be able to see details of the same. ### Documentation\nDocumentation
     around how to test Operator codebase as a developer can be found [here](https://github.com/openshift/analytics-operator#readme)\n\n###
     Contributing\nYou can contribute by:\n  * Raising [issues](https://github.com/openshift/analytics-operator/issues)\n
     \   related to observability-analytics-operator\n  * Fixing issues by opening

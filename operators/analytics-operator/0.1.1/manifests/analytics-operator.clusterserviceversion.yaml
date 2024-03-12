@@ -1,0 +1,382 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "observability-analytics.redhat.com/v1alpha1",
+          "kind": "AnomalyData",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "analytics-operator",
+              "app.kubernetes.io/instance": "anomalydata-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "anomalydata",
+              "app.kubernetes.io/part-of": "analytics-operator"
+            },
+            "name": "anomalydata-sample"
+          },
+          "spec": {
+            "anomalyname": "etcd_object_namespaces",
+            "config": {
+              "max": 100,
+              "min": 60,
+              "query": "max(apiserver_storage_objects{resource=~\"namespaces\"}) by (resource)"
+            },
+            "method": "min_max",
+            "metricdata": {
+              "groupeddata": "{ \"resource\": \"namespaces\" }",
+              "latestvalue": 121,
+              "timestamp": 1695804362
+            }
+          }
+        },
+        {
+          "apiVersion": "observability-analytics.redhat.com/v1alpha1",
+          "kind": "AnomalyEngine",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "analytics-operator",
+              "app.kubernetes.io/instance": "anomalyengine-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "anomalyengine",
+              "app.kubernetes.io/part-of": "analytics-operator"
+            },
+            "name": "anomalyengine-sample"
+          },
+          "spec": {
+            "anomalyqueryconfiguration": "etcd_objects_all:\n  method: percentage_change\n  query: max(apiserver_storage_objects{resource!~\"certificatesigningrequests.certificates.k8s.io|installplans.operators.coreos.com|operators.operators.coreos.com|subscriptions.operators.coreos.com|anomalydata.observability-analytics.redhat.com|anomalyengines.observability-analytics.redhat.com\"}) by (resource)\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: True\nfailed_pods:\n  method: min_max\n  query: count(kube_pod_status_phase{phase!~\"Succeeded|Pending|Running|Unknown\"}) by (phase, namespace)\n  min: 0\n  max: 10\n  have_multi_result_data: True\nworkload_memory_usage_bytes:\n  method: percentage_change\n  query: sum(container_memory_working_set_bytes{namespace!~\"openshift-.+\",pod!=\"\",container=\"\"})\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: False\nworkload_cpu_usage_cores:\n  method: percentage_change\n  query: sum(container_cpu_usage_seconds_total{namespace!~\"openshift-.+\",pod!=\"\",container=\"\"})\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: False\nrest_client_requests_total:\n  method: percentage_change\n  query: sum(rest_client_requests_total)\n  step: 5  # minutes\n  percentage_change: 60  # percentage\n  period_range: 120  # minutes\n  have_multi_result_data: False\n",
+            "cronjobconfig": {
+              "anomalyqueries": "etcd_objects_all,failed_pods,workload_memory_usage_bytes,workload_cpu_usage_cores,rest_client_requests_total",
+              "name": "osa-anomaly-detection",
+              "resource": {
+                "cpulimit": "256m",
+                "cpurequest": "128m",
+                "memorylimit": "512Mi",
+                "memoryrequest": "256Mi"
+              },
+              "schedule": "*/5 * * * *"
+            },
+            "namespace": "osa-anomaly-detection",
+            "serviceaccountrolebinding": {
+              "clusterrolename": "cluster-monitoring-view",
+              "name": "osa-in-cluster-thanos-querier"
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: OpenShift Optional
+    containerImage: quay.io/openshiftanalytics/observability-analytics-operator:0.1.1
+    createdAt: "2024-03-12T08:02:25Z"
+    description: Deploys and Manages Observability Analytics Operator
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4-alpha
+    repository: https://github.com/openshift/analytics-operator
+    support: RedHat
+  name: analytics-operator.v0.1.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: AnomalyData is the Schema for the anomalydata API
+      displayName: Anomaly Data
+      kind: AnomalyData
+      name: anomalydata.observability-analytics.redhat.com
+      version: v1alpha1
+    - description: AnomalyEngine is the Schema for the anomalyengines API
+      displayName: Anomaly Engine
+      kind: AnomalyEngine
+      name: anomalyengines.observability-analytics.redhat.com
+      version: v1alpha1
+  description: "### Introduction\nObservability Analytics for Red Hat OpenShift runs
+    OpenShift analytics processes like anomaly detection.\n\n### API Backward Compatibility\n**NOTE:**
+    Until the Operator supports **seamless upgrades**, a new version of the operator
+    may introduce a change that is **NOT** backward-compatible with the previous version.
+    Thus, to upgrade the operator, uninstall the already installed version completely
+    (including CRDs) and install the new version.\n\n### Installtion Steps for the
+    Anomaly Engine\n Create namespace if you would like to install this operator into
+    separate namespace (You can utilize existing namespace as well). ```bash kubectl
+    create ns <Namespace> ``` Install the Observability Analytics operator to specific
+    `<Namespace>`, wait until you see the operator in the **Installed Operator** list.
+    Click on the Operator name and go to Operator details.\n\nHere you should see
+    a tab called **Anomaly Engine**. Click on it, and then click on the **Create AnomalyEngine**
+    button, which will redirect you to a form where you need to provide the required
+    inputs for the Anomaly Engine. Once successfully created, you should see a cronjob
+    in the given namespace. This cronjob will identify anomalies and store them into
+    **anomalydata**.\n\n### How to See Anomaly Data Captured by Anomaly Engine?\nWe
+    are storing anomaly data into CR.\n ####Option 1:Through `kubectl`` command\nYou
+    can check detected anomalies using the following command from your terminal. \n\n```bash\nkubectl
+    get anomalydata -n <Namespace>\nkubectl describe anomalydata <NAME of the anomalydata>
+    -n <Namespace> \n```\n #### Option 2: From Installed Operator UI Go to installed
+    operator and select **Observability Analytics** operator, now go to **Anomaly
+    Data** tab where you can able to see the detected anomaly, click on specific anomaly
+    and you should be able to see details of the same. ### Documentation\nDocumentation
+    around how to test Operator codebase as a developer can be found [here](https://github.com/openshift/analytics-operator#readme)\n\n###
+    Contributing\nYou can contribute by:\n  * Raising [issues](https://github.com/openshift/analytics-operator/issues)\n
+    \   related to observability-analytics-operator\n  * Fixing issues by opening
+    [Pull Requests](https://github.com/openshift/analytics-operator/pulls)\n  * Discussing
+    observability-analytics-operator\n\n### License\nobservability-analytics-operator
+    is licensed under the Apache 2.0 license.\n"
+  displayName: Observability Analytics
+  icon:
+  - base64data: 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
+    mediatype: image/jpeg
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - batch
+          resources:
+          - cronjobs
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - namespaces
+          - secrets
+          - serviceaccounts
+          - services
+          verbs:
+          - create
+          - delete
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - observability-analytics.redhat.com
+          resources:
+          - anomalydata
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - observability-analytics.redhat.com
+          resources:
+          - anomalydata/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - observability-analytics.redhat.com
+          resources:
+          - anomalydata/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - observability-analytics.redhat.com
+          resources:
+          - anomalyengines
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - observability-analytics.redhat.com
+          resources:
+          - anomalyengines/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - observability-analytics.redhat.com
+          resources:
+          - anomalyengines/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: analytics-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/component: manager
+          app.kubernetes.io/created-by: analytics-operator
+          app.kubernetes.io/instance: controller-manager
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: deployment
+          app.kubernetes.io/part-of: analytics-operator
+          control-plane: controller-manager
+        name: analytics-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - amd64
+                        - arm64
+                        - ppc64le
+                        - s390x
+                      - key: kubernetes.io/os
+                        operator: In
+                        values:
+                        - linux
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 5m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                command:
+                - /manager
+                image: quay.io/openshiftanalytics/observability-analytics-operator:0.1.1
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 256Mi
+                  requests:
+                    cpu: 10m
+                    memory: 128Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: analytics-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: analytics-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: false
+    type: AllNamespaces
+  keywords:
+  - observability-analytics-operator
+  - analytics-operator
+  - analytics
+  - anomaly
+  links:
+  - name: Analytics Operator
+    url: https://analytics-operator.domain
+  maintainers:
+  - email: rzalavad@redhat.com
+    name: Raj
+  maturity: alpha
+  provider:
+    name: Red Hat Inc.
+    url: https://www.redhat.com/
+  version: 0.1.1
+  replaces: analytics-operator.v0.1.0

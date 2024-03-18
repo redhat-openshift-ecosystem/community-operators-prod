@@ -1,0 +1,139 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.13.0
+  creationTimestamp: null
+  name: istiorevisions.operator.istio.io
+spec:
+  group: operator.istio.io
+  names:
+    categories:
+    - istio-io
+    kind: IstioRevision
+    listKind: IstioRevisionList
+    plural: istiorevisions
+    shortNames:
+    - istiorev
+    singular: istiorevision
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - description: Whether the control plane installation is ready to handle requests.
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    - description: The current state of this object.
+      jsonPath: .status.state
+      name: Status
+      type: string
+    - description: Whether the revision is being used by workloads.
+      jsonPath: .status.conditions[?(@.type=="InUse")].status
+      name: In use
+      type: string
+    - description: The version of the control plane installation.
+      jsonPath: .spec.version
+      name: Version
+      type: string
+    - description: The age of the object
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: IstioRevision represents a single revision of an Istio Service
+          Mesh deployment. Users shouldn't create IstioRevision objects directly.
+          Instead, they should create an Istio object and allow the Istio operator
+          to create the underlying IstioRevision object(s).
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: IstioRevisionSpec defines the desired state of IstioRevision
+            properties:
+              namespace:
+                description: Namespace to which the Istio components should be installed.
+                type: string
+              values:
+                description: Defines the values to be passed to the Helm charts when
+                  installing Istio.
+                x-kubernetes-preserve-unknown-fields: true
+              version:
+                description: 'Defines the version of Istio to install. Must be one
+                  of: v1.20.1, v1.20.0, v1.19.5, latest, gwAPIControllerMode.'
+                enum:
+                - v1.20.1
+                - v1.20.0
+                - v1.19.5
+                - latest
+                - gwAPIControllerMode
+                type: string
+            required:
+            - namespace
+            - version
+            type: object
+          status:
+            description: IstioRevisionStatus defines the observed state of IstioRevision
+            properties:
+              conditions:
+                description: Represents the latest available observations of the object's
+                  current state.
+                items:
+                  description: A Condition represents a specific observation of the
+                    object's state.
+                  properties:
+                    lastTransitionTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: Human-readable message indicating details about
+                        the last transition.
+                      type: string
+                    reason:
+                      description: Unique, single-word, CamelCase reason for the condition's
+                        last transition.
+                      type: string
+                    status:
+                      description: The status of this condition. Can be True, False
+                        or Unknown.
+                      type: string
+                    type:
+                      description: The type of this condition.
+                      type: string
+                  type: object
+                type: array
+              observedGeneration:
+                description: ObservedGeneration is the most recent generation observed
+                  for this IstioRevision object. It corresponds to the object's generation,
+                  which is updated on mutation by the API Server. The information
+                  in the status pertains to this particular generation of the object.
+                format: int64
+                type: integer
+              state:
+                description: Reports the current state of the object.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

@@ -1,0 +1,704 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "monitoring.rhobs/v1alpha1",
+          "kind": "MonitoringStack",
+          "metadata": {
+            "labels": {
+              "mso": "example"
+            },
+            "name": "sample-monitoring-stack"
+          },
+          "spec": {
+            "logLevel": "debug",
+            "resourceSelector": {
+              "matchLabels": {
+                "app": "demo"
+              }
+            },
+            "retention": "1d"
+          }
+        },
+        {
+          "apiVersion": "monitoring.rhobs/v1alpha1",
+          "kind": "ThanosQuerier",
+          "metadata": {
+            "name": "example-thanos"
+          },
+          "spec": {
+            "selector": {
+              "matchLabels": {
+                "mso": "example"
+              }
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: Monitoring
+    certified: "false"
+    containerImage: quay.io/rhobs/observability-operator:0.0.28
+    createdAt: "2023-11-09T07:43:16Z"
+    description: A Go based Kubernetes operator to setup and manage highly available
+      Monitoring Stack using Prometheus, Alertmanager and Thanos Querier.
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/internal-objects: |-
+      [
+        "prometheuses.monitoring.rhobs", "alertmanagers.monitoring.rhobs",
+        "thanosrulers.monitoring.rhobs"
+      ]
+    operators.operatorframework.io/project_layout: unknown
+    repository: https://github.com/rhobs/observability-operator
+  name: observability-operator.v0.0.28
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: AlertmanagerConfig configures the Prometheus Alertmanager, specifying
+        how alerts should be grouped, inhibited and notified to external systems
+      displayName: AlertmanagerConfig
+      kind: AlertmanagerConfig
+      name: alertmanagerconfigs.monitoring.rhobs
+      version: v1alpha1
+    - description: Alertmanager describes an Alertmanager cluster
+      displayName: Alertmanager
+      kind: Alertmanager
+      name: alertmanagers.monitoring.rhobs
+      version: v1
+    - description: MonitoringStack is the Schema for the monitoringstacks API
+      displayName: MonitoringStack
+      kind: MonitoringStack
+      name: monitoringstacks.monitoring.rhobs
+      version: v1alpha1
+    - description: PodMonitor defines monitoring for a set of pods
+      displayName: PodMonitor
+      kind: PodMonitor
+      name: podmonitors.monitoring.rhobs
+      version: v1
+    - description: Probe defines monitoring for a set of static targets or ingresses
+      displayName: Probe
+      kind: Probe
+      name: probes.monitoring.rhobs
+      version: v1
+    - description: PrometheusAgent defines a Prometheus agent deployment
+      displayName: PrometheusAgent
+      kind: PrometheusAgent
+      name: prometheusagents.monitoring.rhobs
+      version: v1alpha1
+    - description: Prometheus defines a Prometheus deployment
+      displayName: Prometheus
+      kind: Prometheus
+      name: prometheuses.monitoring.rhobs
+      version: v1
+    - description: PrometheusRule defines recording and alerting rules for a Prometheus
+        instance
+      displayName: PrometheusRule
+      kind: PrometheusRule
+      name: prometheusrules.monitoring.rhobs
+      version: v1
+    - description: ScrapeConfig defines a namespaced Prometheus scrape_config to be
+        aggregated across multiple namespaces into the Prometheus configuration
+      displayName: ScrapeConfig
+      kind: ScrapeConfig
+      name: scrapeconfigs.monitoring.rhobs
+      version: v1alpha1
+    - description: ServiceMonitor defines monitoring for a set of services
+      displayName: ServiceMonitor
+      kind: ServiceMonitor
+      name: servicemonitors.monitoring.rhobs
+      version: v1
+    - description: ThanosQuerier outlines the Thanos querier components, managed by
+        this stack
+      displayName: ThanosQuerier
+      kind: ThanosQuerier
+      name: thanosqueriers.monitoring.rhobs
+      version: v1alpha1
+    - description: ThanosRuler defines a ThanosRuler deployment
+      displayName: ThanosRuler
+      kind: ThanosRuler
+      name: thanosrulers.monitoring.rhobs
+      version: v1
+  description: |2+
+
+    Observability Operator is a Go based Kubernetes operator to setup and manage highly available Monitoring stack using Prometheus, Alertmanager and Thanos Querier.
+    ### Supported Features
+    - Setup multiple Highly Available Monitoring stack using Prometheus, Alertmanager and Thanos Querier
+    - Customizable configuration for managing Prometheus deployments
+    - Customizable configuration for managing Alertmanager deployments
+    - Customizable configuration for managing Thanos Querier deployments
+    ### Documentation
+    - **[Documentation](https://github.com/rhobs/observability-operator/tree/main/docs)**
+    - **[Developer Docs](https://github.com/rhobs/observability-operator/blob/main/docs/developer.md)**
+    ### Contributing
+    **[See Contribution Guidelines](https://github.com/rhobs/observability-operator/blob/main/docs/developer.md#contributions)** to contribute to the project by
+    - Raising Bugs and Feature Requests
+    - Fixing Issues by opening a Pull Request
+    - Improving Documentation
+    ###  License
+    Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+  displayName: Observability Operator
+  icon:
+  - base64data: PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iODI3cHgiIGhlaWdodD0iNjg2cHgiIHZpZXdCb3g9IjAgMCA4MjcgNjg2IiBjb2xvcj0iIzJCMzg4RiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KICAgIDx0aXRsZT5PYnNlcnZhdG9yaXVtRmluYWxfQmx1ZV9JY29uT25seTwvdGl0bGU+CiAgICA8ZyBpZD0iT2JzZXJ2YXRvcml1bUZpbmFsX0JsdWVfSWNvbk9ubHkiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxwYXRoIGQ9Ik03MTYuMTcsNTczLjg3IEw3MTYuMTcsNDk0LjQ5IEw3MTYuMDksMzg0LjU4IEM3MTYuMTM4NjYsMzY4Ljc4MDIzOSA3MTQuNjA3NzE1LDM1My4wMTUxODcgNzExLjUyLDMzNy41MiBMNzExLjUyLDMzNy40NiBDNzExLjUyLDMzNy4zIDcxMS40NSwzMzcuMTQgNzExLjQyLDMzNi45OCBDNzA5Ljg3MzMzMywzMjkuMjkzMzMzIDcwNy45NDY2NjcsMzIxLjY4IDcwNS42NCwzMTQuMTQgQzcwNS41OTc4OTEsMzE0LjAwNzMxIDcwNS41NDA4NTksMzEzLjg3OTgyOCA3MDUuNDcsMzEzLjc2IEM3MDIuNzM2MjQ4LDMwNC45ODE3IDY5OS41MDA5MjgsMjk2LjM2NzUzNSA2OTUuNzgsMjg3Ljk2IEw2OTIuODcsMjg3LjEgQzY3OS42OSwyOTUuNzcgNjYwLjE3LDMwOC40NiA2NTQuODcsMzExLjg3IEM2NTQuMTAzNDczLDMxMi4zOTI3MjcgNjUzLjc5NzA4OCwzMTMuMzczOTg4IDY1NC4xMywzMTQuMjQgQzY2Mi44Nzg4NjYsMzM2LjM4NDYzOCA2NjcuNDEwMDU3LDM1OS45Njk4OTIgNjY3LjQ5LDM4My43OCBDNjY3Ljk1LDQ4OC43OCA1ODIuNzMsNTc1LjIgNDc3LjcxLDU3Ni4xMiBDNDA2LjU1MzMyLDU3Ni43ODEyNjkgMzQwLjkwMTM1Nyw1MzcuOTIwMDUyIDMwNy4yNSw0NzUuMjIgQzMwNi44MTQ0NTUsNDc0LjM5MjE0OCAzMDUuODYzMjYyLDQ3My45NzY3NzkgMzA0Ljk2LDQ3NC4yMiBMMjM3LjczLDQ5My43MiBDMjM2Ljg3NzA2NCw0OTMuOTczNTg0IDIzNi4yOTQyNDYsNDk0Ljc2MDE4NSAyMzYuMjk5OTU4LDQ5NS42NSBDMjM2LjQ0LDUzNy4yOCAyMzYuNTgsNTczLjg0IDIzNi41OCw1NzMuODQgQzIzNi41OCw2NDEuOTEgMzMzLjMsNjc5LjQgNDM5Ljg2LDY4Ni4zMyBDNDQwLjQxNDI0NCw2ODYuMzY0OTExIDQ0MC45NTk2ODksNjg2LjE3NTQ3OSA0NDEuMzY1NjE1LDY4NS43OTYxMDggQzQ0MS43NzE1NDIsNjg1LjQxNjczOCA0NDIuMDAxMzYzLDY4NC44ODU2MDUgNDQyLDY4NC4zMyBMNDQyLDYyMS43IEM0NDEuOTk5MTY3LDYyMS4xNDk5NDYgNDQyLjIyNDkxMyw2MjAuNjIzODMxIDQ0Mi42MjQxMjcsNjIwLjI0NTQyOSBDNDQzLjAyMzM0MSw2MTkuODY3MDI3IDQ0My41NjA3NzgsNjE5LjY2OTc0NiA0NDQuMTEsNjE5LjcgQzQ2NS41ODkwNzIsNjIwLjkzMDAxMyA0ODcuMTIwOTI4LDYyMC45MzAwMTMgNTA4LjYsNjE5LjcgQzUwOS4xNDkyMjIsNjE5LjY2OTc0NiA1MDkuNjg2NjU5LDYxOS44NjcwMjcgNTEwLjA4NTg3Myw2MjAuMjQ1NDI5IEM1MTAuNDg1MDg3LDYyMC42MjM4MzEgNTEwLjcxMDgzMyw2MjEuMTQ5OTQ2IDUxMC43MSw2MjEuNyBMNTEwLjcxLDY4NC4zNiBDNTEwLjcwODYzNyw2ODQuOTE1NjA1IDUxMC45Mzg0NTgsNjg1LjQ0NjczOCA1MTEuMzQ0Mzg1LDY4NS44MjYxMDggQzUxMS43NTAzMTEsNjg2LjIwNTQ3OSA1MTIuMjk1NzU2LDY4Ni4zOTg4OTQgNTEyLjg1LDY4Ni4zNiBDNjE5LjQ1LDY3OS40MyA3MTYuMTcsNjQxLjk0IDcxNi4xNyw1NzMuODcgWiBNMzAyLjMzMDA0OSw2MjkuNDggQzMwMi4zMzQ4NjYsNjMwLjE3Njc0NCAzMDEuOTc2NzcsNjMwLjgyNTgwMiAzMDEuMzg0Nzc0LDYzMS4xOTMyNDggQzMwMC43OTI3NzksNjMxLjU2MDY5NCAzMDAuMDUyMjE5LDYzMS41OTM1NTkgMjk5LjQzLDYzMS4yOCBDMjc3LjgxLDYyMC40MSAyNTIuNjUsNjAwLjggMjUyLjY1LDU3OS40NSBMMjUyLjY1LDU1NC43MSBDMjUyLjY1NzUxOCw1NTMuODczMDk5IDI1My4xODUzNCw1NTMuMTI5MzgyIDI1My45NzI4NTgsNTUyLjg0NjA1NCBDMjU0Ljc2MDM3Niw1NTIuNTYyNzI2IDI1NS42NDEwMjksNTUyLjc5OTcxMSAyNTYuMTgsNTUzLjQ0IEMyNjcuMTMsNTY2LjggMjgxLjc2LDU3OC4xNyAzMDEuMTgsNTg3LjU0IEMzMDEuODc0NTY4LDU4Ny44NzA4MDUgMzAyLjMxNzgyMiw1ODguNTcwNjgxIDMwMi4zMiw1ODkuMzQgTDMwMi4zMzAwNDksNjI5LjQ4IFogTTM5NC4wNyw2NTkuMDYgQzM3NS41ODE2NDEsNjU2LjI0Nzg3MyAzNTcuMzEwOTg4LDY1Mi4xNTQ2ODUgMzM5LjM5LDY0Ni44MSBDMzM4LjU0ODU1Miw2NDYuNTUwMjIxIDMzNy45NzYwMzcsNjQ1Ljc3MDYyNyAzMzcuOTc5OTgsNjQ0Ljg5IEwzMzcuOTc5OTgsNjA0LjQ2IEMzMzcuOTgyMjIyLDYwMy44Mjk4OTMgMzM4LjI4MTI1OCw2MDMuMjM3Njc5IDMzOC43ODY5OTUsNjAyLjg2MTgyIEMzMzkuMjkyNzMxLDYwMi40ODU5NjEgMzM5Ljk0NjAyMyw2MDIuMzcwNDE1IDM0MC41NSw2MDIuNTUgQzM1OC4zMDA2MTksNjA3Ljc4NDkwNyAzNzYuMzg5ODYxLDYxMS43OTQzNDMgMzk0LjY5LDYxNC41NSBDMzk1LjY3NjA3Niw2MTQuNjk5NTM5IDM5Ni40MDEyNzQsNjE1LjU1MjcxMyAzOTYuMzkwMTMsNjE2LjU1IEwzOTYuMzkwMTMsNjU3LjExIEMzOTYuMzgyOTUzLDY1Ny42OTIxMDEgMzk2LjEyMjYzMiw2NTguMjQyMjQ0IDM5NS42NzY5OTUsNjU4LjYxNjgwOSBDMzk1LjIzMTM1OCw2NTguOTkxMzc1IDM5NC42NDQ2MzcsNjU5LjE1MzE4NiAzOTQuMDcsNjU5LjA2IEwzOTQuMDcsNjU5LjA2IFogTTY1MS42LDU4Ny41NCBDNjcxLjAzLDU3OC4xNyA2ODUuNjYsNTY2LjggNjk2LjYsNTUzLjQ0IEM2OTcuMTM4OTcxLDU1Mi43OTk3MTEgNjk4LjAxOTYyNCw1NTIuNTYyNzI2IDY5OC44MDcxNDIsNTUyLjg0NjA1NCBDNjk5LjU5NDY2LDU1My4xMjkzODIgNzAwLjEyMjQ4Miw1NTMuODczMDk5IDcwMC4xMyw1NTQuNzEgTDcwMC4xMyw1NzkuNDUgQzcwMC4xMyw2MDAuOCA2NzQuOTcsNjIwLjQ1IDY1My4zNSw2MzEuMjggQzY1Mi43Mjc3ODEsNjMxLjU5MzU1OSA2NTEuOTg3MjIxLDYzMS41NjA2OTQgNjUxLjM5NTIyNiw2MzEuMTkzMjQ4IEM2NTAuODAzMjMsNjMwLjgyNTgwMiA2NTAuNDQ1MTM0LDYzMC4xNzY3NDQgNjUwLjQ0OTk1MSw2MjkuNDggTDY1MC40NDk5NTEsNTg5LjM0IEM2NTAuNDU0MDEyLDU4OC41NjgzOTcgNjUwLjkwMTUzNiw1ODcuODY3OTI1IDY1MS42LDU4Ny41NCBMNjUxLjYsNTg3LjU0IFogTTU1OC4xLDYxNC41NCBDNTc2LjQwMDEzOSw2MTEuNzg0MzQzIDU5NC40ODkzODEsNjA3Ljc3NDkwNyA2MTIuMjQsNjAyLjU0IEM2MTIuODQzOTc3LDYwMi4zNjA0MTUgNjEzLjQ5NzI2OSw2MDIuNDc1OTYxIDYxNC4wMDMwMDUsNjAyLjg1MTgyIEM2MTQuNTA4NzQyLDYwMy4yMjc2NzkgNjE0LjgwNzc3OCw2MDMuODE5ODkzIDYxNC44MTAwMiw2MDQuNDUgTDYxNC44MTAwMiw2NDQuODggQzYxNC44MTM5NjMsNjQ1Ljc2MDYyNyA2MTQuMjQxNDQ4LDY0Ni41NDAyMjEgNjEzLjQsNjQ2LjggQzU5NS40NzkwMTIsNjUyLjE0NDY4NSA1NzcuMjA4MzU5LDY1Ni4yMzc4NzMgNTU4LjcyLDY1OS4wNSBDNTU4LjEzNjczNiw2NTkuMTQ0NTkxIDU1Ny41NDE0OTYsNjU4Ljk3NjQyNSA1NTcuMDkzOTU0LDY1OC41OTA2MTMgQzU1Ni42NDY0MTMsNjU4LjIwNDgwMSA1NTYuMzkyMzgsNjU3LjY0MDgzNSA1NTYuMzk5ODMzLDY1Ny4wNSBMNTU2LjM5OTgzMyw2MTYuNTEgQzU1Ni40MDM2MzUsNjE1LjUyNDA3NyA1NTcuMTI1MjI0LDYxNC42ODc4ODMgNTU4LjEsNjE0LjU0IFogTTQ3Ni40LDQ0Ny45IEM1MTEuMzcwNjcsNDQ3LjkgNTM5LjcyLDQxOS41NTA2NyA1MzkuNzIsMzg0LjU4IEM1MzkuNzIsMzQ5LjYwOTMzIDUxMS4zNzA2NywzMjEuMjYgNDc2LjQsMzIxLjI2IEM0NDEuNDI5MzMsMzIxLjI2IDQxMy4wOCwzNDkuNjA5MzMgNDEzLjA4LDM4NC41OCBDNDEzLjA4LDQxOS41NTA2NyA0NDEuNDI5MzMsNDQ3LjkgNDc2LjQsNDQ3LjkgTDQ3Ni40LDQ0Ny45IFogTTQ3NS44NSwzMjcuNjMgQzQ4Ny40OSwzMjcuNjMgNDk2LjkzLDMzNC41MyA0OTYuOTMsMzQzLjAzIEM0OTYuOTMsMzUxLjUzIDQ4Ny40OSwzNTguNDMgNDc1Ljg1LDM1OC40MyBDNDY0LjIxLDM1OC40MyA0NTQuNzgsMzUxLjU0IDQ1NC43OCwzNDMuMDMgQzQ1NC43OCwzMzQuNTIgNDY0LjIxLDMyNy42MyA0NzUuODUsMzI3LjYzIFogTTU0LjQzLDQ3NS42MyBDNTcuNjg0NDYzNSw0ODIuNzA3NDQ5IDYxLjYxMjU3NDgsNDg5LjQ1NTIyOCA2Ni4xNiw0OTUuNzggQzc3LjMwMjE4NDMsNTEwLjgxMDE0MSA5Ni40OTYzMTU5LDUxNy41MDY4NzUgMTE0LjU3LDUxMi42NyBDMTE3LjM4LDUxMi4wMyAyNDkuMzcsNDczLjczIDI5Ny42Myw0NTkuNzMgQzI5OC4xNzI3NTYsNDU5LjU2ODk2MiAyOTguNjIxODMzLDQ1OS4xODU0NCAyOTguODY1ODI4LDQ1OC42NzQ1NzUgQzI5OS4xMDk4MjQsNDU4LjE2MzcxIDI5OS4xMjU4NzUsNDU3LjU3MzM2OSAyOTguOTEsNDU3LjA1IEMyODAuMzcyNTE1LDQxMS40NjM2MjMgMjgwLjA0Njc2MywzNjAuNDk5NjE4IDI5OCwzMTQuNjggQzI5OC4yMTUyNTYsMzE0LjE1MzkzNCAyOTguMTk2NTA1LDMxMy41NjExMjYgMjk3Ljk0ODQzMywzMTMuMDQ5NzE1IEMyOTcuNzAwMzYsMzEyLjUzODMwNSAyOTcuMjQ2NDAzLDMxMi4xNTY2MDUgMjk2LjcsMzEyIEMyNTAuNDcsMjk5Ljg5IDExOC4xOSwyNjUuMjQgMTE1LjMzLDI2NC42IEM5Ny41OTQwNzc5LDI1OS44NzMyMjQgNzguNzM3MzE1NywyNjYuMDI0Mjk3IDY3LjIsMjgwLjMgQzY2Ljc5NzQ0NDMsMjgwLjc5NTUzMSA2Ni43NTI2NjA4LDI4MS40OTE1NyA2Ny4wODgzOTQ4LDI4Mi4wMzQ2MDIgQzY3LjQyNDEyODgsMjgyLjU3NzYzNSA2OC4wNjY4MDAxLDI4Mi44NDg2NSA2OC42OSwyODIuNzEgQzc0Ljg1LDI4MS4yNyA4Ni42NCwyNzguNzEgOTIuOTgsMjc4LjcxIEMxMTcuMjMsMjc4LjcxIDEzNy44MSwyOTIuOTUgMTUwLjk4LDMxOC43MSBDMTYwLjc1LDMzNy44NCAxNjYuMTIsMzYyLjcxIDE2Ni4xLDM4OC44OSBDMTY2LjA4LDQxNS4wNyAxNjAuNjgsNDM5Ljg5IDE1MC45LDQ1OC45OSBDMTQyLjQsNDc1LjYgMTMwLjgzLDQ4Ny40MSAxMTcuMiw0OTMuNzEgQzExMC4zMiw0OTYuODkgMTA1LjIsNDg2LjY2IDExMS45Miw0ODMuMTIgTDExMi41Niw0ODIuOCBDMTIzLjcsNDc3LjUxIDEzMy4yNiw0NjcuNiAxNDAuNDIsNDUzLjYyIEMxNDkuMzYsNDM2LjE1IDE1NC4zLDQxMy4xNiAxNTQuMzIsMzg4Ljg4IEMxNTQuMzQsMzY0LjYgMTQ5LjQzLDM0MS41NiAxNDAuNDksMzI0LjA3IEMxMjkuNDIsMzAyLjQxIDExMi41NywyOTAuNDggOTMuMDMsMjkwLjQ2IEw5My4wMywyOTAuNDYgQzgzLjY0LDI5MC40NiA2OS43OCwyOTMuMTcgNTUuNDYsMjk5Ljk4IEw1NS4yOCwzMDAuMzcgQzQ4LjQ1MTY0NDcsMzAzLjY2MjU2OCA0Mi4wMDA1ODE0LDMwNy42ODYxMDEgMzYuMDQsMzEyLjM3IEMxOS43NCwzMjUuMTggMC4zLDM0OC44NiAwLjI3LDM4OC45IEMwLjI3LDQyOC40NSAyMC45MSw0NTIuMzcgMzguMjcsNDY1LjQ3IEM0My4zNzQ3MTYsNDY5LjMxMTk5MSA0OC43OTM4NTczLDQ3Mi43MTczNTIgNTQuNDcsNDc1LjY1IEw1NC40Myw0NzUuNjMgWiBNMTcuNTYsMzUwLjg0IEMxNy41NiwzNTAuODQgMjAuNDIsMzQwLjg0IDI3LjY5LDM0MC44NCBDMzUuMjMsMzQwLjg0IDQxLjM0LDM0NS4yOCA0MS4zNTAwMTIzLDM1MC43OSBDNDEuMzYsMzU2LjMgMzUuMjYsMzYwLjc5IDI3LjczLDM2MC43OSBDMjAuMiwzNjAuNzkgMTUuNzUsMzU3LjYzIDE3LjU2LDM1MC44NCBaIE0yNy4xNCw0MzguMDggQzI2LjcyMzI2NzQsNDM3LjQzNzQ2OSAyNi43MTAwNDExLDQzNi42MTMzODEgMjcuMTA1OTM5NSw0MzUuOTU3ODA4IEMyNy41MDE4MzgsNDM1LjMwMjIzNCAyOC4yMzczMzc0LDQzNC45MzAyOTkgMjksNDM1IEMzMC40ODA5NDI2LDQzNS4yNTE2ODggMzEuOTc4MjIwOCw0MzUuMzk1NCAzMy40OCw0MzUuNDMgQzU3LjEzLDQzNS40MyA3Ni4yNiw0MTMuMTQgNzYuMjIsMzg1LjczIEM3Ni4xOCwzNTguMzIgNTYuOTcsMzM2LjE0IDMzLjMyLDMzNi4xOCBMMzIuNjEsMzM2LjE4IEMzMS44NTI0NDI0LDMzNi4xNzUyOTUgMzEuMTYyNTY3MiwzMzUuNzQyOTY2IDMwLjgyODAxMjEsMzM1LjA2MzI2OCBDMzAuNDkzNDU3LDMzNC4zODM1NzEgMzAuNTcxNjU0MiwzMzMuNTczMTg3IDMxLjAzLDMzMi45NyBDMzQuNjU0MTYzLDMyOC43MDg4MTUgMzguNjk0MTQzNCwzMjQuODE5NTggNDMuMDksMzIxLjM2IEM1OS45MiwzMDguMTQgODAuMjYsMzAyLjI3IDkzLjAxLDMwMi4yNCBDMTI1LjU2LDMwMi4yNCAxNDIuNTYsMzQ1Ljg0IDE0Mi41MzAwNCwzODguODcgQzE0Mi41LDQzMS45IDEyNS40Niw0NzUuMzcgOTIuOTYsNDc1LjQzIEw5Mi44Nyw0NzUuNDMgQzg0LjIzLDQ3NS40MyA2My42Miw0NzAuMjEgNDUuMTQsNDU2LjI2IEMzOC4yODI4NDU3LDQ1MS4xMTMzMDEgMzIuMjE4MjE1MSw0NDQuOTg4MDI1IDI3LjE0LDQzOC4wOCBaIE02NDYuODcsMjk4IEM2ODcuMTIsMjcxLjMzIDgwNS4xMywxOTMuMTMgODA3LjQ3LDE5MS4zNiBDODIyLjg1MjM4NSwxODAuNzA5Njc3IDgzMC4xNTc3NzMsMTYxLjczNjI5MSA4MjUuODksMTQzLjUyIEM4MjQuMDA1NzcyLDEzNS45NTM1NDQgODIxLjM5NzA1OCwxMjguNTg2MTg2IDgxOC4xLDEyMS41MiBMODE4LjEsMTIxLjUyIEM4MTkuNTQwMzM1LDExNS4yOTUyMjcgODIwLjQ0Njk1NiwxMDguOTU4OTE1IDgyMC44MSwxMDIuNTggQzgyMiw4MC45MyA4MTcuMTYsNDkuNjkgNzg3LDI0LjE0IEM3NTYuNDEsLTEuNzMgNzI1Ljc3LC0yLjIxIDcwNS40NiwxLjk0IEM2OTguMDQzMjIxLDMuNDY1NzYwMzcgNjkwLjgxNDE0NSw1Ljc5Mjc0NTAxIDY4My45LDguODggTDY4My40OCw4Ljc4IEM2NjksMTUuMjkgNjU4LDI0LjEyIDY1MS45MywzMS4yOCBMNjUxLjkzLDMxLjI4IEM2MzkuMyw0Ni4yIDYzNy41MSw2Ni43OCA2NDYuODcsODkuMjIgQzY1NC40NCwxMDcuMzUgNjY4LjgyLDEyNS45OCA2ODcuMzcsMTQxLjY4IEM3MDUuOTIsMTU3LjM4IDcyNi42MywxNjguNDYgNzQ1Ljc1LDE3Mi45NCBDNzYxLjAzLDE3Ni41MSA3NzQuNzUsMTc1LjYzIDc4Ni4wMSwxNzAuNTUgQzc4Ni4yMiwxNzAuNDYgNzg2LjQ0LDE3MC4zNiA3ODYuNjgsMTcwLjI3IEM3OTMuNjgsMTY3LjQ1IDc5OC4yMSwxNzcuOTYgNzkxLjM0LDE4MS4xNCBDNzc3LjczLDE4Ny40NyA3NjEuMjMsMTg4LjY2IDc0My4wNiwxODQuNDEgQzcyMi4xNywxNzkuNTIgNjk5LjY5LDE2Ny41NCA2NzkuNzYsMTUwLjY3IEM2NTkuODMsMTMzLjggNjQ0LjI1LDExMy42IDYzNiw5My43OCBDNjI0Ljg1LDY3LjA1IDYyNy4zMSw0Mi4xNiA2NDMsMjMuNjQgQzY0Ny4xMSwxOC44MSA2NTYuNjgsMTEuNDcgNjYxLjc2LDcuNzEgQzY2Mi4yNzEwOCw3LjMyNzE0NzQ5IDY2Mi40ODM3NDEsNi42NjI2OTc5IDY2Mi4yODk5MzcsNi4wNTQyNDIzIEM2NjIuMDk2MTMzLDUuNDQ1Nzg2NyA2NjEuNTM4MzU2LDUuMDI2NzM2MDMgNjYwLjksNS4wMSBDNjQyLjU0ODIzNCw0LjU4MzAyMDY1IDYyNS42NjI3NjksMTQuOTkyNDU5MyA2MTcuOCwzMS41OCBDNjE2LjQyLDM0LjIzIDU1NS40MSwxNjEuNTIgNTM1LjcxLDIwMi41OCBDNTgzLjkxODMyLDIxOC40NDUwMDQgNjIzLjg4NDI0NCwyNTIuNzUxODQ1IDY0Ni44NywyOTggWiBNNzMyLjU4LDE0IEM3MzcuMjgsOC40NSA3NDYuNzUsMTIuNzMgNzQ2Ljc1LDEyLjczIEM3NTMuMSwxNS43MyA3NTIuNjUsMjEuMTggNzQ3Ljc1LDI2LjkyIEM3NDIuODUsMzIuNjYgNzM1LjUxLDM0LjQxIDczMS4zMiwzMC44NSBDNzI3LjEzLDI3LjI5IDcyNy43MiwxOS43OCA3MzIuNTgsMTQgWiBNNzkzLjEsMTUwLjggTDc5My4wNCwxNTAuODcgQzc3MiwxNzUuNjIgNzI3Ljc4LDE2MC40OCA2OTUsMTMyLjcxIEM2NjIuMjIsMTA0Ljk0IDYzOS45MSw2My43MSA2NjAuOTQsMzguOTEgQzY2OS4yLDI5LjIxIDY4Ni44MywxNy40OSA3MDcuOCwxMy4yIEM3MTMuMjc5NjQzLDEyLjA4MjEwMTIgNzE4Ljg1NzQ5MSwxMS41MTU5NDEzIDcyNC40NSwxMS41MSBDNzI1LjIwODQ5NCwxMS41NDYwMjA0IDcyNS44ODExNjYsMTIuMDA4NDc1MSA3MjYuMTg2NDE2LDEyLjcwMzc2ODQgQzcyNi40OTE2NjcsMTMuMzk5MDYxOCA3MjYuMzc2ODM4LDE0LjIwNzI0ODMgNzI1Ljg5LDE0Ljc5IEM3MjUuNzEsMTQuOTcgNzI1LjU1LDE1LjE1IDcyNS40MSwxNS4zMiBDNzEwLjA5LDMzLjMyIDcxNC42LDYyLjMyIDczNS40OCw4MC4wOSBDNzU2LjM2LDk3Ljg2IDc4NS43LDk3LjY0IDgwMS4wMiw3OS42MiBDODAxLjk2ODY0NSw3OC40NTU0MTAzIDgwMi44MjQ1OTcsNzcuMjE4MjkyMiA4MDMuNTgsNzUuOTIgQzgwNC4wMTUyODgsNzUuMjgxOTk4OSA4MDQuNzc5MDI3LDc0Ljk1MTY1MjYgODA1LjU0MjA0NCw3NS4wNzEzNDE1IEM4MDYuMzA1MDYyLDc1LjE5MTAzMDUgODA2LjkzMDk3LDc1LjczOTM2MDkgODA3LjE1LDc2LjQ4IEM4MDkuMTI0NzA5LDg0LjgzMzY5NDMgODA5Ljg2MjU3Myw5My40MzIwMDEyIDgwOS4zNCwxMDIgQzgwOCwxMjUuMTEgNzk4LjY4LDE0NC4yIDc5My4xLDE1MC44IFogTTEwMi4yMSwxMzQuNDggQzk1LjY0NDY2MTEsMTUwLjQ3MzY4IDEwMS43MTQ1NjYsMTY4Ljg2NTkxNyAxMTYuNTEsMTc3LjgxIEwyNTEuNTEsMjYwLjAyIEMyNTEuOTQwNTQyLDI2MC4yNzkzMjEgMjUyLjQ1NzcwNSwyNjAuMzUzMzY1IDI1Mi45NDM3MTQsMjYwLjIyNTI2OSBDMjUzLjQyOTcyNCwyNjAuMDk3MTc0IDI1My44NDMyMDcsMjU5Ljc3Nzg0NCAyNTQuMDksMjU5LjM0IEMyNjkuMTM3ODgzLDIzMi42NjM2ODUgMjg4Ljg0MjM2MywyMDguODk4NDE2IDMxMi4yNywxODkuMTcgQzMxMy4wNDEyODYsMTg4LjUzMjEyOCAzMTMuMTYxMjQ0LDE4Ny4zOTQ3NDEgMzEyLjU0LDE4Ni42MSBMMjE4LjQsNjUuODcgQzIxNS4wNDMwMTcsNjEuNjU2NjkxNCAyMDkuMjg5NjU4LDYwLjE5Njg4MzkgMjA0LjMzLDYyLjMgQzIwMy4xNTI2NjUsNjIuODA2MDk5OCAyMDEuODE3NTc4LDYyLjc5ODEzMTggMjAwLjY0NjM2Nyw2Mi4yNzgwMTU2IEMxOTkuNDc1MTU3LDYxLjc1Nzg5OTQgMTk4LjU3NDAwNCw2MC43NzI3ODg0IDE5OC4xNiw1OS41NiBDMTk3LjQyNzMxLDU3LjE3NDg5NTcgMTk4LjY2OTA3OCw1NC42MzAxNDU5IDIwMSw1My43NCBDMjA5LjczNjE0NCw1MC4xNDM3NzE1IDIxOS43OTc3ODksNTIuNzcxMzg2NyAyMjUuNjYsNjAuMTggTDMxOS43NiwxODAuODIgQzMyMC4wNTY4OCwxODEuMjA3OTkgMzIwLjQ5NjU3MywxODEuNDYxMTY0IDMyMC45ODExNjcsMTgxLjUyMzE0NyBDMzIxLjQ2NTc2MiwxODEuNTg1MTMgMzIxLjk1NTAyMiwxODEuNDUwNzc1IDMyMi4zNCwxODEuMTUgQzMyMy43MywxODAuMTUgMzI1LjEyLDE3OS4wNyAzMjYuNTMsMTc4LjA1IEMzMjYuOTM1Nzk4LDE3Ny43NTY1NDIgMzI3LjIwNTI5LDE3Ny4zMTExMDcgMzI3LjI3NjkwNCwxNzYuODE1NDY1IEMzMjcuMzQ4NTE4LDE3Ni4zMTk4MjMgMzI3LjIxNjEzNCwxNzUuODE2MzIyIDMyNi45MSwxNzUuNDIgTDIzNS43MSw1Ni40MiBDMjI2LjE2NDMzNiw0My45OTQ2NjgzIDIwOS42NzgxMDIsMzkuMTcwNTE0IDE5NC45NCw0NC40OSBDMTc0LjE4LDI3LjQ0IDE0MC43NCwyOS45OCAxMTcuMTEsNTEuNDkgQzEwNC44Miw2Mi42OCA5Ni45NSw3Ny4zMiA5NC45Niw5Mi42OSBDOTMuMTUsMTA2LjY5IDk2LjQsMTE5LjggMTA0LjEyLDEzMC4xMiBDMTAzLjQyLDEzMS42IDEwMi43OCwxMzMuMDggMTAyLjIxLDEzNC40OCBaIE0xMDQuMDUsOTMuODMgQzEwNS43Niw4MC42MSAxMTIuNTksNjcuOTggMTIzLjI3LDU4LjI1IEMxNDIuMDQsNDEuMTcgMTY3Ljc2LDM3Ljc5IDE4NS4xOCw0OC43NCBDMTY4Ljg2MDMwMiw1Ni43MzE3MjM1IDE1My43ODY1OSw2Ny4wNDkyMTYzIDE0MC40Myw3OS4zNyBDMTI3LjYxMzkzNCw5MS4xNjc4MTI2IDExNi45MDY3MDMsMTA1LjA2NzU5OCAxMDguNzcsMTIwLjQ3IEMxMDQuMzU2OTA1LDExMi4zMzQxOCAxMDIuNzAwNzU4LDEwMi45ODY3NzQgMTA0LjA1LDkzLjgzIEwxMDQuMDUsOTMuODMgWiBNNDE0LjcsNTI5LjQ5IEM0NTQuMDUzNzk4LDU0NS43Mjk2OTQgNDk4LjIzNjIwMiw1NDUuNzI5Njk0IDUzNy41OSw1MjkuNDkgQzU5NS42NDA5NzksNTA0LjQyMDk1MyA2MzMuMDQ2MDg3LDQ0Ny4wMzczMDcgNjMyLjU1MjY5MiwzODMuODA2NTQgQzYzMi4wNTkyOTcsMzIwLjU3NTc3NCA1OTMuNzYzMjU5LDI2My43ODI4MyA1MzUuMzI4MTQxLDIzOS42MjI3MzQgQzQ3Ni44OTMwMjMsMjE1LjQ2MjYzOCA0MDkuNjcyMDMzLDIyOC42MjkzOTMgMzY0LjY3LDI3My4wNSBDMzUwLjQyMTg3MSwyODcuMzg0NjE3IDMzOS4xMTkxMzcsMzA0LjM3MDk5MiAzMzEuNCwzMjMuMDUgQzMxNS4xNjAyODksMzYyLjQ3NjU0MSAzMTUuMTYwMjg5LDQwNi43MjM0NTkgMzMxLjQsNDQ2LjE1IEMzNDYuODcyNjI2LDQ4My45NjYwNTEgMzc2Ljg4NTgwNyw1MTMuOTgyODM1IDQxNC43LDUyOS40NiBMNDE0LjcsNTI5LjQ5IFogTTM1My4xNSwzODQuNjMgQzM1My4wMjY4NDYsMzY3LjU1ODI4NiAzNTYuMjc5MTY5LDM1MC42MzA1NzUgMzYyLjcyLDMzNC44MiBDMzY4LjY4Nzc0MywzMTkuOTQzMTYgMzc3LjQ3NTY5NiwzMDYuMzYwNTQ1IDM4OC42LDI5NC44MiBDNDExLjcwMzQxLDI3MS40Njk3NzkgNDQzLjE4Njg1OSwyNTguMzMwODEzIDQ3Ni4wMzUsMjU4LjMzMDgxMyBDNTA4Ljg4MzE0MSwyNTguMzMwODEzIDU0MC4zNjY1OSwyNzEuNDY5Nzc5IDU2My40NywyOTQuODIgQzU3NC41ODc1ODksMzA2LjM2NTg3MSA1ODMuMzc0NjQ2LDMxOS45NDcxMDMgNTg5LjM1LDMzNC44MiBDNTk1Ljc4NjAyMywzNTAuNjMyMDAxIDU5OS4wMzgxNiwzNjcuNTU4NzQzIDU5OC45MiwzODQuNjMgQzU5OS4xNDI2ODgsNDE3Ljk2MTYyNyA1ODYuNDM1ODM2LDQ1MC4wODE4MjYgNTYzLjQ3LDQ3NC4yNCBDNTUyLjQxNTAyNyw0ODUuNjc1NTA1IDUzOS4xNzY4MSw0OTQuNzc1MjkyIDUyNC41NCw1MDEgQzQ5My41MjM2NjIsNTE0LjA1MTEwNyA0NTguNTU2MzM4LDUxNC4wNTExMDcgNDI3LjU0LDUwMSBDNDEyLjkwMTI4NSw0OTQuNzgzMjgyIDM5OS42NjIxODcsNDg1LjY4NjI5IDM4OC42MSw0NzQuMjUgQzM2NS42NDQxNjQsNDUwLjA5MTgyNiAzNTIuOTM3MzEyLDQxNy45NzE2MjcgMzUzLjE2LDM4NC42NCBMMzUzLjE1LDM4NC42MyBaIE00NzYsMTQ0LjYyOTc0MyBDNDk3LjM0ODMyNCwxNDQuNTk4NzUyIDUxOC42MDU1NDksMTQ3LjQxMzU0MyA1MzkuMjEsMTUzIEM1MzkuNzg1NTI5LDE1My4xNTY4MjkgNTQwLjI2MTAxNCwxNTMuNTYyMzcxIDU0MC41MDY2ODYsMTU0LjEwNTk0NiBDNTQwLjc1MjM1OSwxNTQuNjQ5NTIxIDU0MC43NDI1NzMsMTU1LjI3NDM4NCA1NDAuNDgsMTU1LjgxIEw1MjAuMTQsMTk4LjIgTDUyMC4xNCwxOTguMiBDNDM0Ljc0OTQwMywxNzguMDgyODEzIDM0Ni41OTQ2NDYsMjE4LjQ3MjQ5MiAzMDYuMDcsMjk2LjI4IEMzMDUuNjM2MzgsMjk3LjA5ODk3MyAzMDQuNjk2OTYyLDI5Ny41MTI4MTMgMzAzLjgsMjk3LjI4IEwyNTkuODUsMjg1Ljc3IEMyNTkuMjcyNzIxLDI4NS42MjEzMDYgMjU4Ljc5MTg2MiwyODUuMjIyODUgMjU4LjUzODUwMSwyODQuNjgzMjQ5IEMyNTguMjg1MTM5LDI4NC4xNDM2NDggMjU4LjI4NTY4OSwyODMuNTE5MTU0IDI1OC41NCwyODIuOTggQzI5Ni44LDIwMS4yOCAzNzkuOCwxNDQuNjI5NzQzIDQ3NiwxNDQuNjI5NzQzIFogTTM0OS4xLDE2MSBDMzQ5LjMxNzQyLDE2MS40NjYxMjIgMzQ5LjcyMDAxMiwxNjEuODE5OTY2IDM1MC4yMTAxODYsMTYxLjk3NTc1NyBDMzUwLjcwMDM1OSwxNjIuMTMxNTQ5IDM1MS4yMzMzNjUsMTYyLjA3NTA2NiAzNTEuNjgsMTYxLjgyIEMzNzQuOTI5OTE1LDE0OC44MDAzNjUgNDAwLjA3OTI4NiwxMzkuNTEwNjU0IDQyNi4yMSwxMzQuMjkgTDQzNS4yMSwxMzIuNjYgQzQ2Mi4xODc5NzYsMTI4LjIwMzI1NyA0ODkuNzA4MzU3LDEyOC4xMjg5NjkgNTE2LjcxLDEzMi40NCBDNTE3LjIxODA2MywxMzIuNTIyNTYxIDUxNy43Mzc2MjQsMTMyLjM5MDg5MSA1MTguMTQ1MDQ1LDEzMi4wNzYzMjQgQzUxOC41NTI0NjcsMTMxLjc2MTc1NyA1MTguODExMzE3LDEzMS4yOTI0MiA1MTguODYsMTMwLjc4IEw1MjEuNDksMTAyLjI0IEM1MjIuODgwMjQxLDg3LjEzNDkwODIgNTE0LjUzNTYxNiw3Mi44MTA5MDU4IDUwMC43MSw2Ni41NyBDNDk2LjA5NTM1NCw2NC41MDQxNDE4IDQ5MS4zMjM2MjUsNjIuODA4NzkwNSA0ODYuNDQsNjEuNSBDNDgzLjE3NjA1Myw1Ny4wMTc0NDE3IDQ3OS40NTI0ODcsNTIuODg4MzM5MyA0NzUuMzMsNDkuMTggQzQ2My42NCwzOC43MyA0NDMuNDQsMjcuMzcgNDEzLjYxLDMyLjYyIEw0MTMuNDEsMzIuNjIgQzM4NC4xMiwzNy45MyAzNjkuMDksNTYuNDMgMzYxLjYzLDcxIEMzNTkuNTI2MzA0LDc1LjE0NzcyMTMgMzU3Ljc2MDU3OSw3OS40NTgzNjQyIDM1Ni4zNSw4My44OSBDMzUxLjQxNDM4Nyw4Ny4yODczMSAzNDYuODI1NTQ5LDkxLjE2MjcwMDYgMzQyLjY1LDk1LjQ2IEMzMzIuNzI5Mjc1LDEwNS45MDEzMDEgMzMwLjI2ODEwMSwxMjEuMzc2MDggMzM2LjQ2LDEzNC4zOCBMMzQ5LjEsMTYxIFogTTM2OS44Myw3NS4xOCBDMzc2LjMzLDYyLjQyIDM4OS40Niw0Ni4yOCA0MTUuMDcsNDEuNzEgTDQxNS4yNSw0MS43MSBDNDQxLjQ0LDM3LjEgNDU5LjA2LDQ2Ljk4IDQ2OS4yNSw1Ni4wOCBDNDcwLjE1LDU2Ljg5IDQ3MS4wMiw1Ny43MyA0NzEuODcsNTguNTggQzQ1Ny43MSw1Ni41OCA0MzkuODcsNTYuNTEgNDE4LjA1LDYwLjQxIEMzOTcuNDcsNjQuMDkgMzgxLjU5LDY5LjgyIDM2OS40LDc2LjExIEMzNjkuNTQsNzUuODEgMzY5LjY3LDc1LjUyIDM2OS44Myw3NS4yMiBMMzY5LjgzLDc1LjE4IFogTTM0NS4xNSwxMDkuNjIgQzM0OC43MSwxMDAuMjEgMzYzLjE1LDgzLjEyIDQxOS45Myw3Mi45OSBDNDc5LjYsNjIuMzMgNTAwLjI5LDc0LjUxIDUwNy4wMiw4MS41OCBDNTA3Ljg2ODIxNCw4Mi40NTAzNDg0IDUwOC4yMzkyMyw4My42NzkzNTcgNTA4LjAxNDMwMSw4NC44NzM2Njg0IEM1MDcuNzg5MzczLDg2LjA2Nzk3OTggNTA2Ljk5NjcwNSw4Ny4wNzc4Mjc5IDUwNS44OSw4Ny41OCBMNTA1LjI5LDg3Ljg1IEM1MDMuMzEwMjYxLDg4Ljc4MDg0NiA1MDAuOTcwNTM5LDg4LjQ4MDU4MTcgNDk5LjI5LDg3LjA4IEM0OTMuNzEsODIuMzMgNDc1LjkyLDczLjA4IDQyNi4wNyw4MS4zMSBMNDE3LDgyLjkyIEMzNjguMSw5Mi4zNSAzNTYuNjcsMTA2LjM4IDM1NCwxMTIuMzEgQzM1My4xODc2NSwxMTQuMDcxOTI5IDM1MS41MTY5OTcsMTE1LjI4NDE5NCAzNDkuNTksMTE1LjUxIEMzNDguMDk5NTYsMTE1LjY1NjgyIDM0Ni42Mzk3NTIsMTE1LjAxOTQwMSAzNDUuNzM0MzIzLDExMy44MjY0MzcgQzM0NC44Mjg4OTQsMTEyLjYzMzQ3MyAzNDQuNjA3NjYyLDExMS4wNTYwMDcgMzQ1LjE1LDEwOS42NiBMMzQ1LjE1LDEwOS42MiBaIiBpZD0iU2hhcGUiIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1ydWxlPSJub256ZXJvIj48L3BhdGg+CiAgICA8L2c+Cjwvc3ZnPgo=
+    mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - monitoring.rhobs
+          resources:
+          - alertmanagers
+          - alertmanagers/finalizers
+          - alertmanagers/status
+          - alertmanagerconfigs
+          - prometheuses
+          - prometheuses/finalizers
+          - prometheuses/status
+          - prometheusagents
+          - prometheusagents/finalizers
+          - prometheusagents/status
+          - thanosrulers
+          - thanosrulers/finalizers
+          - thanosrulers/status
+          - scrapeconfigs
+          - servicemonitors
+          - podmonitors
+          - probes
+          - prometheusrules
+          verbs:
+          - '*'
+        - apiGroups:
+          - apps
+          resources:
+          - statefulsets
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - secrets
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - list
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - services
+          - services/finalizers
+          - endpoints
+          verbs:
+          - get
+          - create
+          - update
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - nodes
+          verbs:
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingresses
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - storage.k8s.io
+          resources:
+          - storageclasses
+          verbs:
+          - get
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - nonroot-v2
+          - nonroot
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: obo-prometheus-operator
+      - rules:
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - nonroot-v2
+          - nonroot
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: obo-prometheus-operator-admission-webhook
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - endpoints
+          - pods
+          - services
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          - serviceaccounts
+          - services
+          verbs:
+          - create
+          - delete
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - create
+          - delete
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - serviceaccounts
+          - services
+          verbs:
+          - create
+          - delete
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - extensions
+          - networking.k8s.io
+          resources:
+          - ingresses
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - monitoring.rhobs
+          resources:
+          - alertmanagers
+          - prometheuses
+          - servicemonitors
+          verbs:
+          - create
+          - delete
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.rhobs
+          resources:
+          - monitoringstacks
+          verbs:
+          - create
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.rhobs
+          resources:
+          - monitoringstacks/finalizers
+          - monitoringstacks/status
+          verbs:
+          - get
+          - update
+        - apiGroups:
+          - monitoring.rhobs
+          resources:
+          - monitoringstacks/status
+          verbs:
+          - get
+          - update
+        - apiGroups:
+          - monitoring.rhobs
+          resources:
+          - servicemonitors
+          verbs:
+          - create
+          - delete
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.rhobs
+          resources:
+          - thanosqueriers
+          verbs:
+          - create
+          - delete
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.rhobs
+          resources:
+          - thanosqueriers/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - monitoring.rhobs
+          resources:
+          - thanosqueriers/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - policy
+          resources:
+          - poddisruptionbudgets
+          verbs:
+          - create
+          - delete
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          - clusterroles
+          - rolebindings
+          - roles
+          verbs:
+          - create
+          - delete
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - nonroot
+          - nonroot-v2
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: observability-operator-sa
+      deployments:
+      - label:
+          app.kubernetes.io/component: controller
+          app.kubernetes.io/name: prometheus-operator
+          app.kubernetes.io/part-of: observability-operator
+          app.kubernetes.io/version: 0.69.0-rhobs1
+        name: obo-prometheus-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/component: controller
+              app.kubernetes.io/name: prometheus-operator
+              app.kubernetes.io/part-of: observability-operator
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: prometheus-operator
+                target.workload.openshift.io/management: '{"effect": "PreferredDuringScheduling"}'
+              labels:
+                app.kubernetes.io/component: controller
+                app.kubernetes.io/name: prometheus-operator
+                app.kubernetes.io/part-of: observability-operator
+                app.kubernetes.io/version: 0.69.0-rhobs1
+            spec:
+              affinity:
+                nodeAffinity:
+                  preferredDuringSchedulingIgnoredDuringExecution:
+                  - preference:
+                      matchExpressions:
+                      - key: node-role.kubernetes.io/infra
+                        operator: Exists
+                    weight: 1
+              automountServiceAccountToken: true
+              containers:
+              - args:
+                - --prometheus-config-reloader=quay.io/rhobs/obo-prometheus-config-reloader:v0.69.0-rhobs1
+                - --prometheus-instance-selector=app.kubernetes.io/managed-by=observability-operator
+                - --alertmanager-instance-selector=app.kubernetes.io/managed-by=observability-operator
+                - --thanos-ruler-instance-selector=app.kubernetes.io/managed-by=observability-operator
+                image: quay.io/rhobs/obo-prometheus-operator:v0.69.0-rhobs1
+                name: prometheus-operator
+                ports:
+                - containerPort: 8080
+                  name: http
+                resources:
+                  limits:
+                    cpu: 100m
+                    memory: 500Mi
+                  requests:
+                    cpu: 5m
+                    memory: 150Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  readOnlyRootFilesystem: true
+                terminationMessagePolicy: FallbackToLogsOnError
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 65534
+              serviceAccountName: obo-prometheus-operator
+              tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/infra
+                operator: Exists
+      - label:
+          app.kubernetes.io/name: prometheus-operator-admission-webhook
+          app.kubernetes.io/part-of: observability-operator
+          app.kubernetes.io/version: 0.69.0-rhobs1
+        name: obo-prometheus-operator-admission-webhook
+        spec:
+          replicas: 2
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus-operator-admission-webhook
+              app.kubernetes.io/part-of: observability-operator
+          strategy:
+            rollingUpdate:
+              maxUnavailable: 1
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: prometheus-operator-admission-webhook
+              labels:
+                app.kubernetes.io/name: prometheus-operator-admission-webhook
+                app.kubernetes.io/part-of: observability-operator
+                app.kubernetes.io/version: 0.69.0-rhobs1
+            spec:
+              affinity:
+                nodeAffinity:
+                  preferredDuringSchedulingIgnoredDuringExecution:
+                  - preference:
+                      matchExpressions:
+                      - key: node-role.kubernetes.io/infra
+                        operator: Exists
+                    weight: 1
+                podAntiAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/name: prometheus-operator-admission-webhook
+                        app.kubernetes.io/part-of: observability-operator
+                    namespaces:
+                    - default
+                    topologyKey: kubernetes.io/hostname
+              automountServiceAccountToken: false
+              containers:
+              - args:
+                - --web.enable-tls=true
+                - --web.cert-file=/tmp/k8s-webhook-server/serving-certs/tls.crt
+                - --web.key-file=/tmp/k8s-webhook-server/serving-certs/tls.key
+                image: quay.io/rhobs/obo-admission-webhook:v0.69.0-rhobs1
+                name: prometheus-operator-admission-webhook
+                ports:
+                - containerPort: 8443
+                  name: https
+                resources:
+                  limits:
+                    cpu: 200m
+                    memory: 200Mi
+                  requests:
+                    cpu: 50m
+                    memory: 50Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  readOnlyRootFilesystem: true
+                terminationMessagePolicy: FallbackToLogsOnError
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 65534
+              serviceAccountName: obo-prometheus-operator-admission-webhook
+              tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/infra
+                operator: Exists
+      - label:
+          app.kubernetes.io/component: operator
+          app.kubernetes.io/name: observability-operator
+          app.kubernetes.io/version: 0.0.1
+        name: observability-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/component: operator
+              app.kubernetes.io/name: observability-operator
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                app.kubernetes.io/component: operator
+                app.kubernetes.io/name: observability-operator
+                app.kubernetes.io/version: 0.0.1
+            spec:
+              affinity:
+                nodeAffinity:
+                  preferredDuringSchedulingIgnoredDuringExecution:
+                  - preference:
+                      matchExpressions:
+                      - key: node-role.kubernetes.io/infra
+                        operator: Exists
+                    weight: 1
+              containers:
+              - args:
+                - --namespace=$(NAMESPACE)
+                env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                image: quay.io/rhobs/observability-operator:0.0.28
+                imagePullPolicy: Always
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                name: operator
+                readinessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                resources:
+                  limits:
+                    cpu: 50m
+                    memory: 150Mi
+                  requests:
+                    cpu: 5m
+                    memory: 50Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: observability-operator-sa
+              terminationGracePeriodSeconds: 30
+              tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/infra
+                operator: Exists
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - observability
+  - monitoring
+  - prometheus
+  - thanos
+  links:
+  - name: Observability Operator
+    url: https://rhobs-handbook.netlify.app/products/observability-operator
+  - name: GitHub
+    url: https://github.com/rhobs/observability-operator
+  maintainers:
+  - email: jfajersk@redhat.com
+    name: Jan Fajerski
+  - email: sthaha@redhat.com
+    name: Sunil Thaha
+  - email: spasquie@redhat.com
+    name: Simon Pasquier
+  maturity: alpha
+  provider:
+    name: Red Hat
+  version: 0.0.28
+  webhookdefinitions:
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: obo-prometheus-operator-admission-webhook
+    failurePolicy: Ignore
+    generateName: alertmanagerconfigs.monitoring.rhobs
+    rules:
+    - apiGroups:
+      - monitoring.rhobs
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - alertmanagerconfigs
+      scope: Namespaced
+    sideEffects: None
+    targetPort: https
+    timeoutSeconds: 5
+    type: ValidatingAdmissionWebhook
+    webhookPath: /admission-alertmanagerconfigs/validate
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: obo-prometheus-operator-admission-webhook
+    failurePolicy: Ignore
+    generateName: prometheusrules.monitoring.rhobs
+    rules:
+    - apiGroups:
+      - monitoring.rhobs
+      apiVersions:
+      - '*'
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - prometheusrules
+      scope: Namespaced
+    sideEffects: None
+    targetPort: https
+    timeoutSeconds: 5
+    type: ValidatingAdmissionWebhook
+    webhookPath: /admission-prometheusrules/validate

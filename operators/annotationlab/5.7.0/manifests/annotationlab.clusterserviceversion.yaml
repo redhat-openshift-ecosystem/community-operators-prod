@@ -1,0 +1,2228 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "apps.johnsnowlabs.com/v1",
+          "kind": "Annotationlab",
+          "metadata": {
+            "name": "annotationlab"
+          },
+          "spec": {
+            "activelearning": {
+              "extraEnv": "",
+              "extraVolumeMounts": "",
+              "extraVolumes": "",
+              "image": {
+                "pullPolicy": "IfNotPresent",
+                "repository": "docker.io/johnsnowlabs/annotationlab",
+                "tag": "active-learning-5.7.0"
+              },
+              "lifecycleHooks": ""
+            },
+            "affinity": "podAntiAffinity:\n  requiredDuringSchedulingIgnoredDuringExecution:\n    - labelSelector:\n        matchLabels:\n          {{- include \"annotationlab.selectorLabels\" . | nindent 10 }}\n        matchExpressions:\n          - key: role\n            operator: NotIn\n            values:\n              - test\n      topologyKey: kubernetes.io/hostname\n  preferredDuringSchedulingIgnoredDuringExecution:\n    - weight: 100\n      podAffinityTerm:\n        labelSelector:\n          matchLabels:\n            {{- include \"annotationlab.selectorLabels\" . | nindent 12 }}\n          matchExpressions:\n            - key: role\n              operator: NotIn\n              values:\n                - test\n        topologyKey: failure-domain.beta.kubernetes.io/zone\n",
+            "airflow": {
+              "activelearning": {
+                "image": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "docker.io/johnsnowlabs/annotationlab",
+                  "tag": "active-learning-5.7.0"
+                }
+              },
+              "affinity": {},
+              "airflowConfigAnnotations": {},
+              "airflowHome": "/opt/airflow",
+              "airflowLocalSettings": "{{- if semverCompare \"\u003e=2.2.0\" .Values.airflowVersion }}\n{{- if not (or .Values.webserverSecretKey .Values.webserverSecretKeySecretName) }}\nfrom airflow.www.utils import UIAlert\n\nDASHBOARD_UIALERTS = [\n  UIAlert(\n    'Usage of a dynamic webserver secret key detected. We recommend a static webserver secret key instead.'\n    ' See the \u003ca href='\n    '\"https://airflow.apache.org/docs/helm-chart/stable/production-guide.html#webserver-secret-key\"\u003e'\n    'Helm Chart Production Guide\u003c/a\u003e for more details.',\n    category=\"warning\",\n    roles=[\"Admin\"],\n    html=True,\n  )\n]\n{{- end }}\n{{- end }}",
+              "airflowPodAnnotations": {},
+              "airflowVersion": "2.5.1",
+              "allowPodLaunching": true,
+              "cleanup": {
+                "affinity": {},
+                "args": [
+                  "bash",
+                  "-c",
+                  "exec airflow kubernetes cleanup-pods --namespace={{ .Release.Namespace }}"
+                ],
+                "command": null,
+                "enabled": false,
+                "env": [],
+                "failedJobsHistoryLimit": null,
+                "labels": {},
+                "nodeSelector": {},
+                "podAnnotations": {},
+                "resources": {},
+                "schedule": "*/15 * * * *",
+                "securityContext": {},
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": null
+                },
+                "successfulJobsHistoryLimit": null,
+                "tolerations": [],
+                "topologySpreadConstraints": []
+              },
+              "config": {
+                "api": {
+                  "auth_backend": "airflow.api.auth.backend.default"
+                },
+                "celery": {
+                  "flower_url_prefix": "{{ .Values.ingress.flower.path }}",
+                  "worker_concurrency": 16
+                },
+                "celery_kubernetes_executor": {
+                  "kubernetes_queue": "kubernetes"
+                },
+                "core": {
+                  "colored_console_log": "False",
+                  "dags_are_paused_at_creation": "False",
+                  "dags_folder": "{{ include \"airflow_dags\" . }}",
+                  "executor": "{{ .Values.executor }}",
+                  "load_examples": "False",
+                  "remote_logging": "{{- ternary \"True\" \"False\" .Values.elasticsearch.enabled }}"
+                },
+                "elasticsearch": {
+                  "json_format": "True",
+                  "log_id_template": "{dag_id}_{task_id}_{execution_date}_{try_number}"
+                },
+                "elasticsearch_configs": {
+                  "max_retries": 3,
+                  "retry_timeout": "True",
+                  "timeout": 30
+                },
+                "kerberos": {
+                  "ccache": "{{ .Values.kerberos.ccacheMountPath }}/{{ .Values.kerberos.ccacheFileName }}",
+                  "keytab": "{{ .Values.kerberos.keytabPath }}",
+                  "principal": "{{ .Values.kerberos.principal }}",
+                  "reinit_frequency": "{{ .Values.kerberos.reinitFrequency }}"
+                },
+                "kubernetes": {
+                  "airflow_configmap": "{{ include \"airflow_config\" . }}",
+                  "airflow_local_settings_configmap": "{{ include \"airflow_config\" . }}",
+                  "multi_namespace_mode": "{{ ternary \"True\" \"False\" .Values.multiNamespaceMode }}",
+                  "namespace": "{{ .Release.Namespace }}",
+                  "pod_template_file": "{{ include \"airflow_pod_template_file\" . }}/pod_template_file.yaml",
+                  "worker_container_repository": "{{ .Values.images.airflow.repository | default .Values.defaultAirflowRepository }}",
+                  "worker_container_tag": "{{ .Values.images.airflow.tag | default .Values.defaultAirflowTag }}"
+                },
+                "logging": {
+                  "colored_console_log": "False",
+                  "remote_logging": "{{- ternary \"True\" \"False\" .Values.elasticsearch.enabled }}"
+                },
+                "metrics": {
+                  "statsd_host": "{{ printf \"%s-statsd\" .Release.Name }}",
+                  "statsd_on": "{{ ternary \"True\" \"False\" .Values.statsd.enabled }}",
+                  "statsd_port": 9125,
+                  "statsd_prefix": "airflow"
+                },
+                "scheduler": {
+                  "run_duration": 41460,
+                  "standalone_dag_processor": "{{ ternary \"True\" \"False\" .Values.dagProcessor.enabled }}",
+                  "statsd_host": "{{ printf \"%s-statsd\" .Release.Name }}",
+                  "statsd_on": "{{ ternary \"True\" \"False\" .Values.statsd.enabled }}",
+                  "statsd_port": 9125,
+                  "statsd_prefix": "airflow"
+                },
+                "webserver": {
+                  "authenticate": "False",
+                  "base_url": "http://0.0.0.0:8080",
+                  "enable_proxy_fix": "True",
+                  "rbac": "False"
+                }
+              },
+              "createUserJob": {
+                "affinity": {},
+                "annotations": {},
+                "applyCustomEnv": true,
+                "args": [
+                  "bash",
+                  "-c",
+                  "exec \\\nairflow {{ semverCompare \"\u003e=2.0.0\" .Values.airflowVersion | ternary \"users create\" \"create_user\" }} \"$@\"",
+                  "--",
+                  "-r",
+                  "{{ .Values.webserver.defaultUser.role }}",
+                  "-u",
+                  "{{ .Values.webserver.defaultUser.username }}",
+                  "-e",
+                  "{{ .Values.webserver.defaultUser.email }}",
+                  "-f",
+                  "{{ .Values.webserver.defaultUser.firstName }}",
+                  "-l",
+                  "{{ .Values.webserver.defaultUser.lastName }}",
+                  "-p",
+                  "{{ .Values.webserver.defaultUser.password }}"
+                ],
+                "command": null,
+                "env": [],
+                "extraContainers": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "jobAnnotations": {},
+                "labels": {},
+                "nodeSelector": {},
+                "resources": {},
+                "securityContext": {},
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": "airflow-create-user-job"
+                },
+                "tolerations": [],
+                "topologySpreadConstraints": [],
+                "useHelmHooks": true
+              },
+              "dagProcessor": {
+                "affinity": {},
+                "annotations": {},
+                "args": [
+                  "bash",
+                  "-c",
+                  "exec airflow dag-processor"
+                ],
+                "command": null,
+                "enabled": false,
+                "env": [],
+                "extraContainers": [],
+                "extraInitContainers": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "livenessProbe": {
+                  "command": null,
+                  "failureThreshold": 5,
+                  "initialDelaySeconds": 10,
+                  "periodSeconds": 60,
+                  "timeoutSeconds": 20
+                },
+                "nodeSelector": {},
+                "podAnnotations": {},
+                "priorityClassName": null,
+                "replicas": 1,
+                "resources": {},
+                "revisionHistoryLimit": null,
+                "safeToEvict": true,
+                "securityContext": {},
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": null
+                },
+                "strategy": {
+                  "rollingUpdate": {
+                    "maxSurge": "100%",
+                    "maxUnavailable": "50%"
+                  }
+                },
+                "terminationGracePeriodSeconds": 60,
+                "tolerations": [],
+                "topologySpreadConstraints": [],
+                "waitForMigrations": {
+                  "enabled": true,
+                  "env": []
+                }
+              },
+              "dags": {
+                "gitSync": {
+                  "branch": "v2-2-stable",
+                  "containerName": "git-sync",
+                  "depth": 1,
+                  "enabled": false,
+                  "env": [],
+                  "extraVolumeMounts": [],
+                  "maxFailures": 0,
+                  "repo": "https://github.com/apache/airflow.git",
+                  "resources": {},
+                  "rev": "HEAD",
+                  "securityContext": {},
+                  "subPath": "tests/dags",
+                  "uid": 65533,
+                  "wait": 5
+                },
+                "persistence": {
+                  "accessMode": "ReadWriteOnce",
+                  "enabled": false,
+                  "existingClaim": null,
+                  "size": "1Gi",
+                  "storageClassName": null,
+                  "subPath": null
+                }
+              },
+              "data": {
+                "brokerUrl": null,
+                "brokerUrlSecretName": null,
+                "metadataConnection": {
+                  "db": "airflow",
+                  "pass": "airflow",
+                  "port": 5432,
+                  "protocol": "postgresql",
+                  "sslmode": "disable",
+                  "user": "airflow"
+                },
+                "metadataSecretName": null,
+                "resultBackendConnection": null,
+                "resultBackendSecretName": null
+              },
+              "defaultAirflowRepository": "apache/airflow",
+              "defaultAirflowTag": "2.5.1",
+              "elasticsearch": {
+                "connection": {},
+                "enabled": false,
+                "secretName": null
+              },
+              "enableBuiltInSecretEnvVars": {
+                "AIRFLOW_CONN_AIRFLOW_DB": true,
+                "AIRFLOW__CELERY__BROKER_URL": true,
+                "AIRFLOW__CELERY__CELERY_RESULT_BACKEND": true,
+                "AIRFLOW__CELERY__RESULT_BACKEND": true,
+                "AIRFLOW__CORE__FERNET_KEY": true,
+                "AIRFLOW__CORE__SQL_ALCHEMY_CONN": true,
+                "AIRFLOW__DATABASE__SQL_ALCHEMY_CONN": true,
+                "AIRFLOW__ELASTICSEARCH__ELASTICSEARCH_HOST": true,
+                "AIRFLOW__ELASTICSEARCH__HOST": true,
+                "AIRFLOW__WEBSERVER__SECRET_KEY": true
+              },
+              "env": [],
+              "executor": "CeleryExecutor",
+              "extraConfigMaps": {},
+              "extraEnv": "- name: ACTIVE_LEARNING_IMAGE_PULL_POLICY\n  value: \"{{ .Values.activelearning.image.pullPolicy }}\"\n- name: ACTIVE_LEARNING_IMAGE\n  value: \"{{ .Values.activelearning.image.repository }}:{{ .Values.activelearning.image.tag }}\"\n- name: NUMBER_OF_PREANNOTATOR_DAG\n  value: {{ .Values.preannotator_queues.count | quote }}\n- name: AIRFLOW__LOGGING__LOGGING_LEVEL\n  value: INFO\n- name: ANNOTATIONLAB_FULLNAME\n  value: {{ include \"annotationlab.annotationlab.fullname\" . }}\n- name: ANNOTATIONLAB_URL\n  value: http://{{ include \"annotationlab.annotationlab.fullname\" . }}:8200\n- name: AIRFLOW_NAMESPACE\n  value: {{ .Release.Namespace }}\n- name: DATABASE_CONNECTION_STRING\n  valueFrom:\n    secretKeyRef:\n      name: {{ include \"annotationlab.annotationlab.fullname\" . }}-secret\n      key: DATABASE_CONNECTION_STRING\n",
+              "extraEnvFrom": null,
+              "extraSecrets": {},
+              "fernetKey": null,
+              "fernetKeySecretName": null,
+              "flower": {
+                "affinity": {},
+                "annotations": {},
+                "args": [
+                  "bash",
+                  "-c",
+                  "exec \\\nairflow {{ semverCompare \"\u003e=2.0.0\" .Values.airflowVersion | ternary \"celery flower\" \"flower\" }}"
+                ],
+                "command": null,
+                "enabled": false,
+                "env": [],
+                "extraContainers": [],
+                "extraNetworkPolicies": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "labels": {},
+                "networkPolicy": {
+                  "ingress": {
+                    "from": [],
+                    "ports": [
+                      {
+                        "port": "{{ .Values.ports.flowerUI }}"
+                      }
+                    ]
+                  }
+                },
+                "nodeSelector": {},
+                "password": null,
+                "podAnnotations": {},
+                "priorityClassName": null,
+                "resources": {},
+                "revisionHistoryLimit": null,
+                "secretName": null,
+                "securityContext": {},
+                "service": {
+                  "annotations": {},
+                  "loadBalancerIP": null,
+                  "loadBalancerSourceRanges": [],
+                  "ports": [
+                    {
+                      "name": "flower-ui",
+                      "port": "{{ .Values.ports.flowerUI }}"
+                    }
+                  ],
+                  "type": "ClusterIP"
+                },
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": null
+                },
+                "tolerations": [],
+                "topologySpreadConstraints": [],
+                "username": null
+              },
+              "fullnameOverride": "",
+              "gid": 0,
+              "global": {},
+              "image": {
+                "repository": "docker.io/johnsnowlabs/annotationlab"
+              },
+              "images": {
+                "airflow": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": null,
+                  "tag": "dataflows-5.7.0"
+                },
+                "flower": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": null,
+                  "tag": null
+                },
+                "gitSync": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "k8s.gcr.io/git-sync/git-sync",
+                  "tag": "v3.6.3"
+                },
+                "migrationsWaitTimeout": 60,
+                "pgbouncer": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "apache/airflow",
+                  "tag": "airflow-pgbouncer-2021.04.28-1.14.0"
+                },
+                "pgbouncerExporter": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "apache/airflow",
+                  "tag": "airflow-pgbouncer-exporter-2021.09.22-0.12.0"
+                },
+                "pod_template": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": null,
+                  "tag": null
+                },
+                "redis": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "docker.io/redis",
+                  "tag": "alpine3.16"
+                },
+                "statsd": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "quay.io/prometheus/statsd-exporter",
+                  "tag": "v0.22.8"
+                },
+                "useDefaultImageForMigration": false
+              },
+              "ingress": {
+                "enabled": false,
+                "flower": {
+                  "annotations": {},
+                  "enabled": false,
+                  "host": "",
+                  "hosts": [],
+                  "ingressClassName": "",
+                  "path": "/",
+                  "pathType": "ImplementationSpecific",
+                  "tls": {
+                    "enabled": false,
+                    "secretName": ""
+                  }
+                },
+                "web": {
+                  "annotations": {},
+                  "enabled": false,
+                  "host": "",
+                  "hosts": [],
+                  "ingressClassName": "",
+                  "path": "/",
+                  "pathType": "ImplementationSpecific",
+                  "precedingPaths": [],
+                  "succeedingPaths": [],
+                  "tls": {
+                    "enabled": false,
+                    "secretName": ""
+                  }
+                }
+              },
+              "kerberos": {
+                "ccacheFileName": "cache",
+                "ccacheMountPath": "/var/kerberos-ccache",
+                "config": "# This is an example config showing how you can use templating and how \"example\" config\n# might look like. It works with the test kerberos server that we are using during integration\n# testing at Apache Airflow (see `scripts/ci/docker-compose/integration-kerberos.yml` but in\n# order to make it production-ready you must replace it with your own configuration that\n# Matches your kerberos deployment. Administrators of your Kerberos instance should\n# provide the right configuration.\n\n[logging]\ndefault = \"FILE:{{ template \"airflow_logs_no_quote\" . }}/kerberos_libs.log\"\nkdc = \"FILE:{{ template \"airflow_logs_no_quote\" . }}/kerberos_kdc.log\"\nadmin_server = \"FILE:{{ template \"airflow_logs_no_quote\" . }}/kadmind.log\"\n\n[libdefaults]\ndefault_realm = FOO.COM\nticket_lifetime = 10h\nrenew_lifetime = 7d\nforwardable = true\n\n[realms]\nFOO.COM = {\n  kdc = kdc-server.foo.com\n  admin_server = admin_server.foo.com\n}\n",
+                "configPath": "/etc/krb5.conf",
+                "enabled": false,
+                "keytabBase64Content": null,
+                "keytabPath": "/etc/airflow.keytab",
+                "principal": "airflow@FOO.COM",
+                "reinitFrequency": 3600
+              },
+              "kubeVersionOverride": "",
+              "labels": {},
+              "limits": [],
+              "logs": {
+                "persistence": {
+                  "enabled": false,
+                  "existingClaim": null,
+                  "size": "100Gi",
+                  "storageClassName": null
+                }
+              },
+              "migrateDatabaseJob": {
+                "affinity": {},
+                "annotations": {},
+                "applyCustomEnv": true,
+                "args": [
+                  "bash",
+                  "-c",
+                  "exec \\\nairflow {{ semverCompare \"\u003e=2.0.0\" .Values.airflowVersion | ternary \"db upgrade\" \"upgradedb\" }}"
+                ],
+                "command": null,
+                "enabled": true,
+                "extraContainers": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "jobAnnotations": {},
+                "nodeSelector": {},
+                "resources": {},
+                "securityContext": {},
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": "airflow-migrate-database-job"
+                },
+                "tolerations": [],
+                "topologySpreadConstraints": [],
+                "useHelmHooks": true
+              },
+              "multiNamespaceMode": false,
+              "nameOverride": "",
+              "networkPolicies": {
+                "enabled": false
+              },
+              "nodeSelector": {},
+              "pgbouncer": {
+                "affinity": {},
+                "annotations": {},
+                "args": null,
+                "auth_file": "/etc/pgbouncer/users.txt",
+                "auth_type": "md5",
+                "ciphers": "normal",
+                "command": [
+                  "pgbouncer",
+                  "-u",
+                  "nobody",
+                  "/etc/pgbouncer/pgbouncer.ini"
+                ],
+                "configSecretName": null,
+                "enabled": false,
+                "extraIni": null,
+                "extraIniMetadata": null,
+                "extraIniResultBackend": null,
+                "extraNetworkPolicies": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "logConnections": 0,
+                "logDisconnections": 0,
+                "maxClientConn": 100,
+                "metadataPoolSize": 10,
+                "metricsExporterSidecar": {
+                  "resources": {},
+                  "sslmode": "disable"
+                },
+                "nodeSelector": {},
+                "podDisruptionBudget": {
+                  "config": {
+                    "maxUnavailable": 1
+                  },
+                  "enabled": false
+                },
+                "priorityClassName": null,
+                "replicas": 1,
+                "resources": {},
+                "resultBackendPoolSize": 5,
+                "revisionHistoryLimit": null,
+                "service": {
+                  "extraAnnotations": {}
+                },
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": null
+                },
+                "ssl": {
+                  "ca": null,
+                  "cert": null,
+                  "key": null
+                },
+                "sslmode": "prefer",
+                "tolerations": [],
+                "topologySpreadConstraints": [],
+                "uid": 65534,
+                "verbose": 0
+              },
+              "podTemplate": null,
+              "ports": {
+                "airflowUI": 8080,
+                "flowerUI": 5555,
+                "pgbouncer": 6543,
+                "pgbouncerScrape": 9127,
+                "redisDB": 6379,
+                "statsdIngest": 9125,
+                "statsdScrape": 9102,
+                "workerLogs": 8793
+              },
+              "postgresql": {
+                "auth": {
+                  "enablePostgresUser": true,
+                  "password": null,
+                  "postgresPassword": "postgres",
+                  "username": null
+                },
+                "common": {
+                  "exampleValue": "common-chart",
+                  "global": {
+                    "postgresql": {}
+                  }
+                },
+                "commonAnnotations": {},
+                "enabled": true,
+                "extraEnv": [],
+                "global": {
+                  "postgresql": {}
+                },
+                "image": {
+                  "debug": false,
+                  "pullPolicy": "IfNotPresent",
+                  "registry": "docker.io",
+                  "repository": "bitnami/postgresql",
+                  "tag": "11"
+                },
+                "ldap": {
+                  "baseDN": "",
+                  "bindDN": "",
+                  "enabled": false,
+                  "port": "",
+                  "prefix": "",
+                  "scheme": "",
+                  "search_attr": "",
+                  "search_filter": "",
+                  "server": "",
+                  "suffix": "",
+                  "tls": false,
+                  "url": ""
+                },
+                "livenessProbe": {
+                  "enabled": true,
+                  "failureThreshold": 6,
+                  "initialDelaySeconds": 30,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 5
+                },
+                "master": {
+                  "affinity": {},
+                  "annotations": {},
+                  "extraInitContainers": [],
+                  "extraVolumeMounts": [],
+                  "extraVolumes": [],
+                  "labels": {},
+                  "nodeSelector": {},
+                  "podAnnotations": {},
+                  "podLabels": {},
+                  "priorityClassName": "",
+                  "service": {},
+                  "sidecars": [],
+                  "tolerations": []
+                },
+                "metrics": {
+                  "enabled": false,
+                  "extraEnvVars": {},
+                  "image": {
+                    "pullPolicy": "IfNotPresent",
+                    "registry": "docker.io",
+                    "repository": "bitnami/postgres-exporter",
+                    "tag": "0.8.0-debian-10-r166"
+                  },
+                  "livenessProbe": {
+                    "enabled": true,
+                    "failureThreshold": 6,
+                    "initialDelaySeconds": 5,
+                    "periodSeconds": 10,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 5
+                  },
+                  "prometheusRule": {
+                    "additionalLabels": {},
+                    "enabled": false,
+                    "namespace": "",
+                    "rules": []
+                  },
+                  "readinessProbe": {
+                    "enabled": true,
+                    "failureThreshold": 6,
+                    "initialDelaySeconds": 5,
+                    "periodSeconds": 10,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 5
+                  },
+                  "securityContext": {},
+                  "service": {
+                    "annotations": {
+                      "prometheus.io/port": "9187",
+                      "prometheus.io/scrape": "true"
+                    },
+                    "type": "ClusterIP"
+                  },
+                  "serviceMonitor": {
+                    "additionalLabels": {},
+                    "enabled": false
+                  }
+                },
+                "nameOverride": "airflow-postgresql",
+                "networkPolicy": {
+                  "allowExternal": true,
+                  "enabled": false,
+                  "explicitNamespacesSelector": {}
+                },
+                "persistence": {
+                  "accessModes": [
+                    "ReadWriteOnce"
+                  ],
+                  "annotations": {},
+                  "enabled": true,
+                  "mountPath": "/bitnami/postgresql",
+                  "size": "8Gi",
+                  "subPath": ""
+                },
+                "postgresqlDataDir": "/bitnami/postgresql/data",
+                "postgresqlDatabase": "airflow",
+                "postgresqlPassword": "airflow",
+                "postgresqlUsername": "airflow",
+                "psp": {
+                  "create": false
+                },
+                "rbac": {
+                  "create": false
+                },
+                "readinessProbe": {
+                  "enabled": true,
+                  "failureThreshold": 6,
+                  "initialDelaySeconds": 5,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 5
+                },
+                "replication": {
+                  "applicationName": "my_application",
+                  "enabled": false,
+                  "numSynchronousReplicas": 0,
+                  "password": "repl_password",
+                  "slaveReplicas": 1,
+                  "synchronousCommit": "off",
+                  "user": "repl_user"
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                  }
+                },
+                "securityContext": {},
+                "service": {
+                  "annotations": {},
+                  "port": 5432,
+                  "type": "ClusterIP"
+                },
+                "serviceAccount": {
+                  "enabled": true,
+                  "name": "annotationlab-airflow-postgresql"
+                },
+                "shmVolume": {
+                  "chmod": {
+                    "enabled": true
+                  },
+                  "enabled": true
+                },
+                "slave": {
+                  "affinity": {},
+                  "annotations": {},
+                  "extraInitContainers": "# - name: do-something\n#   image: busybox\n#   command: ['do', 'something']\n",
+                  "extraVolumeMounts": [],
+                  "extraVolumes": [],
+                  "labels": {},
+                  "nodeSelector": {},
+                  "podAnnotations": {},
+                  "podLabels": {},
+                  "priorityClassName": "",
+                  "service": {},
+                  "sidecars": [],
+                  "tolerations": []
+                },
+                "tls": {
+                  "certFilename": "",
+                  "certKeyFilename": "",
+                  "certificatesSecret": "",
+                  "enabled": false,
+                  "preferServerCiphers": true
+                },
+                "updateStrategy": {
+                  "type": "RollingUpdate"
+                },
+                "volumePermissions": {
+                  "enabled": false,
+                  "image": {
+                    "pullPolicy": "Always",
+                    "registry": "docker.io",
+                    "repository": "bitnami/minideb",
+                    "tag": "buster"
+                  },
+                  "securityContext": {}
+                }
+              },
+              "preannotator_queues": {
+                "count": 5
+              },
+              "quotas": {},
+              "rbac": {
+                "create": true,
+                "createSCCRoleBinding": false
+              },
+              "redis": {
+                "affinity": {},
+                "enabled": true,
+                "nodeSelector": {},
+                "password": "DefaulTRediS-P0ss",
+                "passwordSecretName": null,
+                "persistence": {
+                  "annotations": {},
+                  "enabled": true,
+                  "size": "1Gi",
+                  "storageClassName": null
+                },
+                "podAnnotations": {},
+                "resources": {},
+                "safeToEvict": true,
+                "securityContext": {},
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": "annotationlab-airflow-redis"
+                },
+                "terminationGracePeriodSeconds": 600,
+                "tolerations": [],
+                "topologySpreadConstraints": [],
+                "uid": 0
+              },
+              "registry": {
+                "connection": {},
+                "secretName": "kubernetesdockerhub"
+              },
+              "registryCredentials": {
+                "pullPolicy": "IfNotPresent",
+                "registryUrl": "docker.io/annotationlab"
+              },
+              "revisionHistoryLimit": null,
+              "scheduler": {
+                "affinity": {},
+                "annotations": {},
+                "args": [
+                  "bash",
+                  "-c",
+                  "exec airflow scheduler"
+                ],
+                "command": null,
+                "env": [],
+                "extraContainers": [],
+                "extraInitContainers": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "labels": {},
+                "livenessProbe": {
+                  "command": null,
+                  "failureThreshold": 5,
+                  "initialDelaySeconds": 10,
+                  "periodSeconds": 60,
+                  "timeoutSeconds": 20
+                },
+                "logGroomerSidecar": {
+                  "args": [
+                    "bash",
+                    "/clean-logs"
+                  ],
+                  "command": null,
+                  "enabled": true,
+                  "resources": {},
+                  "retentionDays": 15
+                },
+                "nodeSelector": {},
+                "podAnnotations": {},
+                "podDisruptionBudget": {
+                  "config": {
+                    "maxUnavailable": 1
+                  },
+                  "enabled": false
+                },
+                "priorityClassName": null,
+                "replicas": 1,
+                "resources": {},
+                "revisionHistoryLimit": null,
+                "safeToEvict": true,
+                "securityContext": {},
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": "airflow-scheduler"
+                },
+                "strategy": null,
+                "tolerations": [],
+                "topologySpreadConstraints": [],
+                "updateStrategy": null,
+                "waitForMigrations": {
+                  "enabled": true,
+                  "env": []
+                }
+              },
+              "secret": [],
+              "securityContext": {},
+              "statsd": {
+                "affinity": {},
+                "args": [
+                  "--statsd.mapping-config=/etc/statsd-exporter/mappings.yml"
+                ],
+                "enabled": false,
+                "extraMappings": [],
+                "extraNetworkPolicies": [],
+                "nodeSelector": {},
+                "overrideMappings": [],
+                "podAnnotations": {},
+                "priorityClassName": null,
+                "resources": {},
+                "revisionHistoryLimit": null,
+                "securityContext": {},
+                "service": {
+                  "extraAnnotations": {}
+                },
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": "airflow-statsd"
+                },
+                "tolerations": [],
+                "topologySpreadConstraints": [],
+                "uid": 65534
+              },
+              "tolerations": [],
+              "topologySpreadConstraints": [],
+              "triggerer": {
+                "affinity": {},
+                "annotations": {},
+                "args": [
+                  "bash",
+                  "-c",
+                  "exec airflow triggerer"
+                ],
+                "command": null,
+                "enabled": false,
+                "env": [],
+                "extraContainers": [],
+                "extraInitContainers": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "labels": {},
+                "livenessProbe": {
+                  "command": null,
+                  "failureThreshold": 5,
+                  "initialDelaySeconds": 10,
+                  "periodSeconds": 60,
+                  "timeoutSeconds": 20
+                },
+                "nodeSelector": {},
+                "podAnnotations": {},
+                "priorityClassName": null,
+                "replicas": 1,
+                "resources": {},
+                "revisionHistoryLimit": null,
+                "safeToEvict": true,
+                "securityContext": {},
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": "annotationlab-airflow-triggerer"
+                },
+                "strategy": {
+                  "rollingUpdate": {
+                    "maxSurge": "100%",
+                    "maxUnavailable": "50%"
+                  }
+                },
+                "terminationGracePeriodSeconds": 60,
+                "tolerations": [],
+                "topologySpreadConstraints": [],
+                "waitForMigrations": {
+                  "enabled": true,
+                  "env": []
+                }
+              },
+              "uid": 50000,
+              "volumeMounts": [],
+              "volumes": [],
+              "webserver": {
+                "affinity": {},
+                "allowPodLogReading": true,
+                "annotations": {},
+                "args": [
+                  "bash",
+                  "-c",
+                  "exec airflow webserver"
+                ],
+                "command": null,
+                "defaultUser": {
+                  "email": "admin@example.com",
+                  "enabled": false,
+                  "firstName": "admin",
+                  "lastName": "user",
+                  "password": "admin",
+                  "role": "Admin",
+                  "username": "admin"
+                },
+                "env": [],
+                "extraContainers": [],
+                "extraInitContainers": [],
+                "extraNetworkPolicies": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "labels": {},
+                "livenessProbe": {
+                  "failureThreshold": 20,
+                  "initialDelaySeconds": 15,
+                  "periodSeconds": 5,
+                  "scheme": "HTTP",
+                  "timeoutSeconds": 30
+                },
+                "networkPolicy": {
+                  "ingress": {
+                    "from": [],
+                    "ports": [
+                      {
+                        "port": "{{ .Values.ports.airflowUI }}"
+                      }
+                    ]
+                  }
+                },
+                "nodeSelector": {},
+                "podAnnotations": {},
+                "podDisruptionBudget": {
+                  "config": {
+                    "maxUnavailable": 1
+                  },
+                  "enabled": false
+                },
+                "priorityClassName": null,
+                "readinessProbe": {
+                  "failureThreshold": 20,
+                  "initialDelaySeconds": 15,
+                  "periodSeconds": 5,
+                  "scheme": "HTTP",
+                  "timeoutSeconds": 30
+                },
+                "replicas": 1,
+                "resources": {},
+                "revisionHistoryLimit": null,
+                "securityContext": {},
+                "service": {
+                  "annotations": {},
+                  "loadBalancerIP": null,
+                  "loadBalancerSourceRanges": [],
+                  "ports": [
+                    {
+                      "name": "airflow-ui",
+                      "port": "{{ .Values.ports.airflowUI }}"
+                    }
+                  ],
+                  "type": "ClusterIP"
+                },
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": "airflow-webserver"
+                },
+                "strategy": null,
+                "tolerations": [],
+                "topologySpreadConstraints": [],
+                "waitForMigrations": {
+                  "enabled": true,
+                  "env": []
+                },
+                "webserverConfig": null,
+                "webserverConfigConfigMapName": null
+              },
+              "webserverSecretKey": "f565cd64401775f93c820dc63fc3d4f6",
+              "webserverSecretKeySecretName": null,
+              "workers": {
+                "affinity": {},
+                "annotations": {},
+                "args": [
+                  "bash",
+                  "-c",
+                  "exec \\\nairflow {{ semverCompare \"\u003e=2.0.0\" .Values.airflowVersion | ternary \"celery worker\" \"worker\" }}"
+                ],
+                "command": null,
+                "env": [],
+                "extraContainers": [],
+                "extraInitContainers": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "hostAliases": [],
+                "keda": {
+                  "advanced": {},
+                  "cooldownPeriod": 30,
+                  "enabled": false,
+                  "maxReplicaCount": 10,
+                  "minReplicaCount": 0,
+                  "namespaceLabels": {},
+                  "pollingInterval": 5
+                },
+                "kerberosSidecar": {
+                  "enabled": false,
+                  "resources": {}
+                },
+                "labels": {},
+                "livenessProbe": {
+                  "command": null,
+                  "enabled": true,
+                  "failureThreshold": 5,
+                  "initialDelaySeconds": 10,
+                  "periodSeconds": 60,
+                  "timeoutSeconds": 20
+                },
+                "logGroomerSidecar": {
+                  "args": [
+                    "bash",
+                    "/clean-logs"
+                  ],
+                  "command": null,
+                  "enabled": true,
+                  "resources": {},
+                  "retentionDays": 15
+                },
+                "nodeSelector": {},
+                "persistence": {
+                  "annotations": {},
+                  "enabled": true,
+                  "fixPermissions": false,
+                  "size": "5Gi",
+                  "storageClassName": null
+                },
+                "podAnnotations": {},
+                "priorityClassName": null,
+                "replicas": 1,
+                "resources": {},
+                "revisionHistoryLimit": null,
+                "safeToEvict": true,
+                "securityContext": {},
+                "serviceAccount": {
+                  "annotations": {},
+                  "create": false,
+                  "name": "airflow-worker"
+                },
+                "strategy": {
+                  "rollingUpdate": {
+                    "maxSurge": "100%",
+                    "maxUnavailable": "50%"
+                  }
+                },
+                "terminationGracePeriodSeconds": 600,
+                "tolerations": [],
+                "topologySpreadConstraints": [],
+                "updateStrategy": null,
+                "waitForMigrations": {
+                  "env": []
+                }
+              }
+            },
+            "backup": {
+              "enable": false,
+              "files": true,
+              "image": {
+                "repository": null,
+                "tag": null
+              },
+              "s3_access_key": "",
+              "s3_bucket_fullpath": "",
+              "s3_secret_key": ""
+            },
+            "configuration": {
+              "FLASK_SECRET_KEY": "rpaQghA-9lmpLwB8qxW0FsW1TJyZZYuB60ppzswpTzM=",
+              "KEYCLOAK_CLIENT_ID": "annotationlab",
+              "KEYCLOAK_CLIENT_SECRET_KEY": "09a71c59-0351-4ce6-bc8f-8fd3feb9d2ff",
+              "KEYCLOAK_REALM_NAME": "master",
+              "PERSISTENT_STORAGE": "/projects"
+            },
+            "extraContainers": "",
+            "extraEnv": "",
+            "extraNetworkPolicies": "- namespaceSelector: {}\n",
+            "extraVolumeMounts": "",
+            "extraVolumes": "",
+            "github_oauth_origin": "https://github.oauth.johnsnowlabs.com",
+            "google_analytics": {
+              "api_secret": "WENfd00yeUxRRWl4N0Utbml5SWt3Zw==",
+              "measurement_id": "Ry1XODBIMDhTTFBZ"
+            },
+            "hostAliases": [],
+            "image": {
+              "pullPolicy": "IfNotPresent",
+              "repository": "docker.io/johnsnowlabs/annotationlab",
+              "tag": "5.7.0"
+            },
+            "ingress": {
+              "annotations": {},
+              "defaultBackend": false,
+              "enabled": true,
+              "hosts": [
+                {
+                  "host": "annotationlab",
+                  "path": "/"
+                }
+              ],
+              "ingressroute": {
+                "enabled": false
+              },
+              "servicePort": "http",
+              "tls": [],
+              "uploadLimitInMegabytes": 16
+            },
+            "installAirflow": true,
+            "installKeycloak": true,
+            "installPostgresql": true,
+            "keycloak": {
+              "affinity": "podAntiAffinity:\n  requiredDuringSchedulingIgnoredDuringExecution:\n    - labelSelector:\n        matchLabels:\n          {{- include \"keycloak.selectorLabels\" . | nindent 10 }}\n        matchExpressions:\n          - key: app.kubernetes.io/component\n            operator: NotIn\n            values:\n              - test\n      topologyKey: kubernetes.io/hostname\n  preferredDuringSchedulingIgnoredDuringExecution:\n    - weight: 100\n      podAffinityTerm:\n        labelSelector:\n          matchLabels:\n            {{- include \"keycloak.selectorLabels\" . | nindent 12 }}\n          matchExpressions:\n            - key: app.kubernetes.io/component\n              operator: NotIn\n              values:\n                - test\n        topologyKey: topology.kubernetes.io/zone\n",
+              "args": [],
+              "auththeme": {
+                "image": {
+                  "repository": "docker.io/johnsnowlabs/annotationlab",
+                  "tag": "auth-theme-5.7.0"
+                }
+              },
+              "autoscaling": {
+                "behavior": {
+                  "scaleDown": {
+                    "policies": [
+                      {
+                        "periodSeconds": 300,
+                        "type": "Pods",
+                        "value": 1
+                      }
+                    ],
+                    "stabilizationWindowSeconds": 300
+                  }
+                },
+                "enabled": false,
+                "labels": {},
+                "maxReplicas": 10,
+                "metrics": [
+                  {
+                    "resource": {
+                      "name": "cpu",
+                      "target": {
+                        "averageUtilization": 80,
+                        "type": "Utilization"
+                      }
+                    },
+                    "type": "Resource"
+                  }
+                ],
+                "minReplicas": 3
+              },
+              "cache": {
+                "stack": "default"
+              },
+              "clusterDomain": "cluster.local",
+              "command": [
+                "/opt/keycloak/bin/kc.sh",
+                "--verbose",
+                "start",
+                "--http-enabled=true",
+                "--http-port=8080",
+                "--hostname-strict=false",
+                "--hostname-strict-https=false",
+                "--spi-events-listener-jboss-logging-success-level=info",
+                "--spi-events-listener-jboss-logging-error-level=warn"
+              ],
+              "database": {
+                "enabled": true,
+                "postgresqlDatabase": "keycloak",
+                "postgresqlPassword": "keycloak",
+                "postgresqlUsername": "keycloak"
+              },
+              "dbchecker": {
+                "enabled": false,
+                "image": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "docker.io/busybox",
+                  "tag": 1.32
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "20m",
+                    "memory": "32Mi"
+                  },
+                  "requests": {
+                    "cpu": "20m",
+                    "memory": "32Mi"
+                  }
+                },
+                "securityContext": {}
+              },
+              "enableServiceLinks": true,
+              "extraContainers": "",
+              "extraEnv": "- name: KC_FEATURES\n  value: \"authorization,account-api,admin-api,admin-fine-grained-authz,ciba,impersonation,kerberos,preview,step-up-authentication,token-exchange,web-authn\"\n- name: KEYCLOAK_ADMIN\n  valueFrom:\n    secretKeyRef:\n      name: {{ include \"keycloak.fullname\" . }}-admincreds\n      key: user\n- name: KEYCLOAK_ADMIN_PASSWORD\n  valueFrom:\n    secretKeyRef:\n      name: {{ include \"keycloak.fullname\" . }}-admincreds\n      key: password\n- name: JAVA_OPTS_APPEND\n  value: \u003e-\n    -XX:+UseContainerSupport\n    -XX:MaxRAMPercentage=50.0\n    -Djava.awt.headless=true\n    -Djgroups.dns.query={{ include \"keycloak.fullname\" . }}-headless\n",
+              "extraEnvFrom": "",
+              "extraInitContainers": "- name: theme-provider\n  image: {{ .Values.auththeme.image.repository }}:{{ .Values.auththeme.image.tag }}\n  imagePullPolicy: IfNotPresent\n  command:\n    - sh\n  args:\n    - -c\n    - |\n      echo \"Copying theme...\"\n      cp -R /johnsnowlabs/* /theme\n  volumeMounts:\n    - name: theme\n      mountPath: /theme\n",
+              "extraPorts": [],
+              "extraServiceMonitor": {
+                "annotations": {},
+                "enabled": false,
+                "interval": "10s",
+                "labels": {},
+                "namespace": "",
+                "namespaceSelector": {},
+                "path": "{{ tpl .Values.http.relativePath $ | trimSuffix \"/\" }}/realms/master/metrics",
+                "port": "http",
+                "scrapeTimeout": "10s"
+              },
+              "extraVolumeMounts": "- name: admincreds\n  mountPath: /secrets/admincreds\n  readOnly: true\n- name: theme\n  mountPath: /opt/keycloak/themes/johnsnowlabs\n",
+              "extraVolumes": "- name: admincreds\n  secret:\n    secretName: '{{ include \"annotationlab.keycloak.fullname\" . }}-admincreds'\n- name: theme\n  emptyDir: {}\n",
+              "fullnameOverride": "",
+              "global": {},
+              "health": {
+                "enabled": true
+              },
+              "hostAliases": [],
+              "http": {
+                "relativePath": "/auth"
+              },
+              "image": {
+                "digest": "",
+                "pullPolicy": "IfNotPresent",
+                "repository": "docker.io/keycloak/keycloak",
+                "tag": "20.0.3"
+              },
+              "imagePullSecrets": [
+                {
+                  "name": "kubernetesdockerhub"
+                }
+              ],
+              "ingress": {
+                "annotations": {
+                  "nginx.ingress.kubernetes.io/proxy-buffer-size": "16k"
+                },
+                "console": {
+                  "annotations": {},
+                  "enabled": false,
+                  "ingressClassName": "",
+                  "rules": [
+                    {
+                      "host": "{{ .Release.Name }}.keycloak.example.com",
+                      "paths": [
+                        {
+                          "path": "{{ tpl .Values.http.relativePath $ | trimSuffix \"/\" }}/admin",
+                          "pathType": "Prefix"
+                        }
+                      ]
+                    }
+                  ],
+                  "tls": []
+                },
+                "enabled": false,
+                "ingressClassName": "",
+                "labels": {},
+                "rules": [
+                  {
+                    "host": "keycloak.example.com",
+                    "paths": [
+                      {
+                        "path": "{{ tpl .Values.http.relativePath $ | trimSuffix \"/\" }}/",
+                        "pathType": "Prefix"
+                      }
+                    ]
+                  }
+                ],
+                "servicePort": "http",
+                "tls": []
+              },
+              "lifecycleHooks": "",
+              "livenessProbe": "httpGet:\n  path: '{{ tpl .Values.http.relativePath $ | trimSuffix \"/\" }}/health/live'\n  port: http\ninitialDelaySeconds: 0\ntimeoutSeconds: 5\n",
+              "metrics": {
+                "enabled": true
+              },
+              "nameOverride": "",
+              "networkPolicy": {
+                "egress": [],
+                "enabled": false,
+                "extraFrom": [],
+                "labels": {}
+              },
+              "nodeSelector": {},
+              "podAnnotations": {},
+              "podDisruptionBudget": {},
+              "podLabels": {},
+              "podManagementPolicy": "OrderedReady",
+              "podSecurityContext": {},
+              "postgresql": {
+                "common": {
+                  "exampleValue": "common-chart",
+                  "global": {
+                    "postgresql": {}
+                  }
+                },
+                "commonAnnotations": {},
+                "enabled": true,
+                "extraEnv": [],
+                "global": {
+                  "postgresql": {}
+                },
+                "image": {
+                  "debug": false,
+                  "pullPolicy": "IfNotPresent",
+                  "registry": "docker.io",
+                  "repository": "bitnami/postgresql",
+                  "tag": "11.20.0-debian-11-r12"
+                },
+                "ldap": {
+                  "baseDN": "",
+                  "bindDN": "",
+                  "bind_password": null,
+                  "enabled": false,
+                  "port": "",
+                  "prefix": "",
+                  "scheme": "",
+                  "search_attr": "",
+                  "search_filter": "",
+                  "server": "",
+                  "suffix": "",
+                  "tls": false,
+                  "url": ""
+                },
+                "livenessProbe": {
+                  "enabled": true,
+                  "failureThreshold": 6,
+                  "initialDelaySeconds": 30,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 5
+                },
+                "master": {
+                  "affinity": {},
+                  "annotations": {},
+                  "extraInitContainers": [],
+                  "extraVolumeMounts": [],
+                  "extraVolumes": [],
+                  "labels": {},
+                  "nodeSelector": {},
+                  "podAnnotations": {},
+                  "podLabels": {},
+                  "priorityClassName": "",
+                  "service": {},
+                  "sidecars": [],
+                  "tolerations": []
+                },
+                "metrics": {
+                  "enabled": false,
+                  "extraEnvVars": {},
+                  "image": {
+                    "pullPolicy": "IfNotPresent",
+                    "registry": "docker.io",
+                    "repository": "bitnami/postgres-exporter",
+                    "tag": "0.8.0-debian-10-r166"
+                  },
+                  "livenessProbe": {
+                    "enabled": true,
+                    "failureThreshold": 6,
+                    "initialDelaySeconds": 5,
+                    "periodSeconds": 10,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 5
+                  },
+                  "prometheusRule": {
+                    "additionalLabels": {},
+                    "enabled": false,
+                    "namespace": "",
+                    "rules": []
+                  },
+                  "readinessProbe": {
+                    "enabled": true,
+                    "failureThreshold": 6,
+                    "initialDelaySeconds": 5,
+                    "periodSeconds": 10,
+                    "successThreshold": 1,
+                    "timeoutSeconds": 5
+                  },
+                  "securityContext": {},
+                  "service": {
+                    "annotations": {
+                      "prometheus.io/port": "9187",
+                      "prometheus.io/scrape": "true"
+                    },
+                    "loadBalancerIP": null,
+                    "type": "ClusterIP"
+                  },
+                  "serviceMonitor": {
+                    "additionalLabels": {},
+                    "enabled": false
+                  }
+                },
+                "nameOverride": "keycloak-postgres",
+                "networkPolicy": {
+                  "allowExternal": true,
+                  "enabled": false,
+                  "explicitNamespacesSelector": {}
+                },
+                "persistence": {
+                  "accessModes": [
+                    "ReadWriteOnce"
+                  ],
+                  "annotations": {},
+                  "enabled": true,
+                  "mountPath": "/bitnami/postgresql",
+                  "size": "8Gi",
+                  "subPath": ""
+                },
+                "postgresqlDataDir": "/bitnami/postgresql/data",
+                "postgresqlDatabase": "keycloak",
+                "postgresqlPassword": "keycloak",
+                "postgresqlUsername": "keycloak",
+                "psp": {
+                  "create": false
+                },
+                "rbac": {
+                  "create": false
+                },
+                "readinessProbe": {
+                  "enabled": true,
+                  "failureThreshold": 6,
+                  "initialDelaySeconds": 5,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 5
+                },
+                "replication": {
+                  "applicationName": "my_application",
+                  "enabled": false,
+                  "numSynchronousReplicas": 0,
+                  "password": "repl_password",
+                  "slaveReplicas": 1,
+                  "synchronousCommit": "off",
+                  "user": "repl_user"
+                },
+                "resources": {
+                  "requests": {
+                    "cpu": "250m",
+                    "memory": "256Mi"
+                  }
+                },
+                "securityContext": {},
+                "service": {
+                  "annotations": {},
+                  "port": 5432,
+                  "type": "ClusterIP"
+                },
+                "serviceAccount": {
+                  "enabled": true,
+                  "name": "annotationlab-keycloak-postgresql"
+                },
+                "shmVolume": {
+                  "chmod": {
+                    "enabled": true
+                  },
+                  "enabled": true
+                },
+                "slave": {
+                  "affinity": {},
+                  "annotations": {},
+                  "extraInitContainers": "# - name: do-something\n#   image: busybox\n#   command: ['do', 'something']\n",
+                  "extraVolumeMounts": [],
+                  "extraVolumes": [],
+                  "labels": {},
+                  "nodeSelector": {},
+                  "podAnnotations": {},
+                  "podLabels": {},
+                  "priorityClassName": "",
+                  "service": {},
+                  "sidecars": [],
+                  "tolerations": []
+                },
+                "tls": {
+                  "certCAFilename": null,
+                  "certFilename": "",
+                  "certKeyFilename": "",
+                  "certificatesSecret": "",
+                  "crlFilename": null,
+                  "enabled": false,
+                  "preferServerCiphers": true
+                },
+                "updateStrategy": {
+                  "type": "RollingUpdate"
+                },
+                "volumePermissions": {
+                  "enabled": false,
+                  "image": {
+                    "pullPolicy": "Always",
+                    "registry": "docker.io",
+                    "repository": "bitnami/minideb",
+                    "tag": "buster"
+                  },
+                  "securityContext": {}
+                }
+              },
+              "priorityClassName": "",
+              "prometheusRule": {
+                "annotations": {},
+                "enabled": false,
+                "labels": {},
+                "namespace": "",
+                "rules": []
+              },
+              "proxy": {
+                "enabled": true,
+                "mode": "edge"
+              },
+              "rbac": {
+                "create": false,
+                "rules": []
+              },
+              "readinessProbe": "httpGet:\n  path: '{{ tpl .Values.http.relativePath $ | trimSuffix \"/\" }}/health/ready'\n  port: http\ninitialDelaySeconds: 10\ntimeoutSeconds: 1\n",
+              "replicas": 1,
+              "resources": {},
+              "restartPolicy": "Always",
+              "route": {
+                "annotations": {},
+                "enabled": false,
+                "host": "",
+                "labels": {},
+                "path": "/",
+                "tls": {
+                  "enabled": true,
+                  "insecureEdgeTerminationPolicy": "Redirect",
+                  "termination": "edge"
+                }
+              },
+              "secrets": {
+                "admincreds": {
+                  "stringData": {
+                    "password": "secret",
+                    "user": "admin"
+                  }
+                }
+              },
+              "securityContext": {},
+              "service": {
+                "annotations": {},
+                "externalTrafficPolicy": "Cluster",
+                "extraPorts": [],
+                "httpNodePort": null,
+                "httpPort": 80,
+                "httpsNodePort": null,
+                "httpsPort": 8443,
+                "labels": {},
+                "loadBalancerIP": "",
+                "loadBalancerSourceRanges": [],
+                "sessionAffinity": "",
+                "sessionAffinityConfig": {},
+                "type": "ClusterIP"
+              },
+              "serviceAccount": {
+                "allowReadPods": false,
+                "annotations": {},
+                "automountServiceAccountToken": true,
+                "create": false,
+                "imagePullSecrets": [],
+                "labels": {},
+                "name": "annotationlab-keyclo"
+              },
+              "serviceHeadless": {
+                "annotations": {}
+              },
+              "serviceMonitor": {
+                "annotations": {},
+                "enabled": false,
+                "interval": "10s",
+                "labels": {},
+                "namespace": "",
+                "namespaceSelector": {},
+                "path": "{{ tpl .Values.http.relativePath $ | trimSuffix \"/\" }}/metrics",
+                "port": "http",
+                "scrapeTimeout": "10s"
+              },
+              "skipInitContainers": false,
+              "startupProbe": "httpGet:\n  path: '{{ tpl .Values.http.relativePath $ | trimSuffix \"/\" }}/health'\n  port: http\ninitialDelaySeconds: 15\ntimeoutSeconds: 1\nfailureThreshold: 60\nperiodSeconds: 5\n",
+              "statefulsetAnnotations": {},
+              "statefulsetLabels": {},
+              "terminationGracePeriodSeconds": 60,
+              "test": {
+                "deletionPolicy": "before-hook-creation",
+                "enabled": false,
+                "image": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "docker.io/seleniarm/standalone-chromium",
+                  "tag": "111.0"
+                },
+                "podSecurityContext": {},
+                "securityContext": {}
+              },
+              "tolerations": [],
+              "topologySpreadConstraints": null,
+              "updateStrategy": "RollingUpdate"
+            },
+            "licenseserver": {
+              "origin": "https://license.johnsnowlabs.com"
+            },
+            "lifecycleHooks": "# postStart:\n#   exec:\n#     command: [\"/bin/sh\", \"-c\", \"ls\"]\n",
+            "modelshub_origin": "https://modelshub.johnsnowlabs.com",
+            "myjohnsnowlabs": {
+              "client_id": "UIGgoiIL9szXW8Nnik0O7tPT4to87oVtWvYWfc6r",
+              "origin": "https://my.johnsnowlabs.com"
+            },
+            "networkPolicy": {
+              "enabled": false
+            },
+            "nodeSelector": {},
+            "persistence": {
+              "accessModes": [
+                "ReadWriteOnce"
+              ],
+              "annotations": {},
+              "enabled": true,
+              "size": "8Gi"
+            },
+            "podAnnotations": {},
+            "podLabels": {},
+            "postgresql": {
+              "common": {
+                "exampleValue": "common-chart",
+                "global": {
+                  "postgresql": {}
+                }
+              },
+              "commonAnnotations": {},
+              "extraEnv": [],
+              "global": {
+                "postgresql": {}
+              },
+              "image": {
+                "debug": false,
+                "pullPolicy": "IfNotPresent",
+                "registry": "docker.io",
+                "repository": "bitnami/postgresql",
+                "tag": "11.20.0-debian-11-r12"
+              },
+              "ldap": {
+                "baseDN": "",
+                "bindDN": "",
+                "bind_password": null,
+                "enabled": false,
+                "port": "",
+                "prefix": "",
+                "scheme": "",
+                "search_attr": "",
+                "search_filter": "",
+                "server": "",
+                "suffix": "",
+                "tls": false,
+                "url": ""
+              },
+              "livenessProbe": {
+                "enabled": true,
+                "failureThreshold": 6,
+                "initialDelaySeconds": 30,
+                "periodSeconds": 10,
+                "successThreshold": 1,
+                "timeoutSeconds": 5
+              },
+              "master": {
+                "affinity": {},
+                "annotations": {},
+                "extraInitContainers": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "labels": {},
+                "nodeSelector": {},
+                "podAnnotations": {},
+                "podLabels": {},
+                "priorityClassName": "",
+                "service": {},
+                "sidecars": [],
+                "tolerations": []
+              },
+              "metrics": {
+                "enabled": false,
+                "extraEnvVars": {},
+                "image": {
+                  "pullPolicy": "IfNotPresent",
+                  "registry": "docker.io",
+                  "repository": "bitnami/postgres-exporter",
+                  "tag": "0.8.0-debian-10-r166"
+                },
+                "livenessProbe": {
+                  "enabled": true,
+                  "failureThreshold": 6,
+                  "initialDelaySeconds": 5,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 5
+                },
+                "prometheusRule": {
+                  "additionalLabels": {},
+                  "enabled": false,
+                  "namespace": "",
+                  "rules": []
+                },
+                "readinessProbe": {
+                  "enabled": true,
+                  "failureThreshold": 6,
+                  "initialDelaySeconds": 5,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "timeoutSeconds": 5
+                },
+                "securityContext": {},
+                "service": {
+                  "annotations": {
+                    "prometheus.io/port": "9187",
+                    "prometheus.io/scrape": "true"
+                  },
+                  "loadBalancerIP": null,
+                  "type": "ClusterIP"
+                },
+                "serviceMonitor": {
+                  "additionalLabels": {},
+                  "enabled": false
+                }
+              },
+              "networkPolicy": {
+                "allowExternal": true,
+                "enabled": false,
+                "explicitNamespacesSelector": {}
+              },
+              "persistence": {
+                "accessModes": [
+                  "ReadWriteOnce"
+                ],
+                "annotations": {},
+                "enabled": true,
+                "mountPath": "/bitnami/postgresql",
+                "size": "8Gi",
+                "subPath": ""
+              },
+              "postgresqlDataDir": "/bitnami/postgresql/data",
+              "postgresqlDatabase": "annotationlab",
+              "postgresqlPassword": "annotationlab",
+              "postgresqlUsername": "annotationlab",
+              "psp": {
+                "create": false
+              },
+              "rbac": {
+                "create": false
+              },
+              "readinessProbe": {
+                "enabled": true,
+                "failureThreshold": 6,
+                "initialDelaySeconds": 5,
+                "periodSeconds": 10,
+                "successThreshold": 1,
+                "timeoutSeconds": 5
+              },
+              "replication": {
+                "applicationName": "my_application",
+                "enabled": false,
+                "numSynchronousReplicas": 0,
+                "password": "repl_password",
+                "slaveReplicas": 1,
+                "synchronousCommit": "off",
+                "user": "repl_user"
+              },
+              "resources": {
+                "requests": {
+                  "cpu": "250m",
+                  "memory": "256Mi"
+                }
+              },
+              "securityContext": {},
+              "service": {
+                "annotations": {},
+                "port": 5432,
+                "type": "ClusterIP"
+              },
+              "serviceAccount": {
+                "enabled": false
+              },
+              "shmVolume": {
+                "chmod": {
+                  "enabled": true
+                },
+                "enabled": true
+              },
+              "slave": {
+                "affinity": {},
+                "annotations": {},
+                "extraInitContainers": "# - name: do-something\n#   image: busybox\n#   command: ['do', 'something']\n",
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "labels": {},
+                "nodeSelector": {},
+                "podAnnotations": {},
+                "podLabels": {},
+                "priorityClassName": "",
+                "service": {},
+                "sidecars": [],
+                "tolerations": []
+              },
+              "tls": {
+                "certCAFilename": null,
+                "certFilename": "",
+                "certKeyFilename": "",
+                "certificatesSecret": "",
+                "crlFilename": null,
+                "enabled": false,
+                "preferServerCiphers": true
+              },
+              "updateStrategy": {
+                "type": "RollingUpdate"
+              },
+              "volumePermissions": {
+                "enabled": false,
+                "image": {
+                  "pullPolicy": "Always",
+                  "registry": "docker.io",
+                  "repository": "bitnami/minideb",
+                  "tag": "buster"
+                },
+                "securityContext": {}
+              }
+            },
+            "preannotator_queues": {
+              "count": 5,
+              "service": {
+                "port": 5000,
+                "portName": "http",
+                "type": "ClusterIP"
+              }
+            },
+            "priorityClassName": "",
+            "readinessProbe": "httpGet:\n  path: /healthz\n  port: http\ninitialDelaySeconds: 10\ntimeoutSeconds: 1\n",
+            "registryCredentials": {
+              "create": false,
+              "password": "XXXXX",
+              "secretName": "kubernetesdockerhub",
+              "username": "XXXXX"
+            },
+            "replicas": 1,
+            "resources": {},
+            "restartPolicy": "Always",
+            "securityContext": {
+              "enabled": false,
+              "fsGroup": 65534,
+              "fsGroupChangePolicy": "OnRootMismatch",
+              "runAsUser": 65534
+            },
+            "service": {
+              "port": 8200,
+              "portName": "http",
+              "type": "ClusterIP"
+            },
+            "serviceAccount": {
+              "annotations": {},
+              "create": false,
+              "name": "annotationlab"
+            },
+            "sharedData": {
+              "enabled": true,
+              "images": {
+                "storageSize": "5Gi"
+              },
+              "storageSize": "100Gi"
+            },
+            "sqlalchemy_pool_size": 10,
+            "telemetry": {
+              "enabled": true
+            },
+            "terminationGracePeriodSeconds": 60,
+            "tolerations": [],
+            "updateStrategy": {
+              "type": "Recreate"
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2023-12-19T10:26:54Z"
+    operators.operatorframework.io/builder: operator-sdk-v1.28.1
+    operatorframework.io/suggested-namespace: johnsnowlabs-operator
+    categories: AI/Machine Learning
+    containerImage: registry.johnsnowlabs.com/annotationlab/annotationlab-operator:v5.7.0
+    support: NLP Lab
+    marketplace.openshift.io/remote-workflow: https://marketplace.redhat.com/en-us/operators/annotationlab/pricing?utm_source=openshift_console
+    marketplace.openshift.io/support-workflow: https://marketplace.redhat.com/en-us/operators/annotationlab/support?utm_source=openshift_console
+    operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+  name: annotationlab.v5.7.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: Annotationlab
+      name: annotationlabs.apps.johnsnowlabs.com
+      version: v1
+  description: |
+    NLP Lab is a data labeling and annotation tool that helps you
+    label different types of data using a simple interface with a standardized output
+    format.
+
+    It contains enterprise features like Project Management and sharing, SSO
+    integration, OpenAPI Specification 3.0 compliant API, task management, and active
+    learning/preannotation using Spark NLP.
+
+    Furthermore, the production deployment of the application is done using a helm chart.
+    The same helm chart is also used to create an AWS AMI for an EC2 based single server 
+    deployment using packer.
+
+    Make sure you have defined shared storage such as efs/nfs/cephfs prior to installing the NLP Lab Operator.
+    Update the host property in the YAML configuration to define the required domain name to use instead of the 
+    default hostname annotationlab.
+
+    NLP Lab Operator Installtion guide [NLP Lab Operator][]:
+    [NLP Lab Operator]: https://nlp.johnsnowlabs.com/docs/en/alab/install    
+  displayName: NLPLab
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+        - apiGroups:
+          - batch
+          resources:
+          - jobs
+          verbs:
+          - '*'
+        - apiGroups:
+          - apps.johnsnowlabs.com
+          resources:
+          - annotationlabs
+          - annotationlabs/status
+          - annotationlabs/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - persistentvolumeclaims
+          - secrets
+          - serviceaccounts
+          - services
+          - jobs
+          verbs:
+          - '*'
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - rolebindings
+          - roles
+          verbs:
+          - '*'
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - statefulsets
+          verbs:
+          - '*'
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingresses
+          verbs:
+          - '*'
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - anyuid
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: annotationlab-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/component: manager
+          app.kubernetes.io/created-by: annotationlab
+          app.kubernetes.io/instance: controller-manager
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: deployment
+          app.kubernetes.io/part-of: annotationlab
+          control-plane: controller-manager
+        name: annotationlab-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - amd64
+                        - arm64
+                        - ppc64le
+                        - s390x
+                      - key: kubernetes.io/os
+                        operator: In
+                        values:
+                        - linux
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 256Mi
+                  requests:
+                    cpu: 5m
+                    memory: 128Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                - --leader-election-id=annotationlab
+                image: registry.johnsnowlabs.com/annotationlab/annotationlab-operator:v5.7.0
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 1Gi
+                  requests:
+                    cpu: 10m
+                    memory: 512Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: annotationlab-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: annotationlab-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - nlplab
+  links:
+  - name: Annotationlab
+    url: https://annotationlab.domain
+  maintainers:
+  - email: bhandari@johnsnowlabs.com
+    name: bikash
+  maturity: alpha
+  provider:
+    name: JohnSnowLABS
+    url: nlp.johnsnowlabs.com
+  version: 5.7.0
+  replaces: annotationlab.v5.4.1

@@ -421,7 +421,7 @@ metadata:
     operatorframework.io/arch.ppc64le: supported
     operatorframework.io/arch.s390x: supported
     operatorframework.io/os.linux: supported
-  name: netobserv-operator.v1.0.5
+  name: netobserv-operator.v1.5.0-community
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -1270,15 +1270,7 @@ spec:
     name: flowlogs-pipeline
   - image: quay.io/netobserv/network-observability-console-plugin:v0.1.12
     name: console-plugin
-  # skipping range due to versions between 0.2.1 and 1.0.5 not being available on OCP 4.15
-  skips:
-  - netobserv-operator.v0.2.2
-  - netobserv-operator.v1.0.1
-  - netobserv-operator.v1.0.2
-  - netobserv-operator.v1.0.3
-  - netobserv-operator.v1.0.4
-  replaces: netobserv-operator.v1.0.4
-  version: 1.0.5
+  version: 1.5.0-community
   webhookdefinitions:
   - admissionReviewVersions:
     - v1alpha1

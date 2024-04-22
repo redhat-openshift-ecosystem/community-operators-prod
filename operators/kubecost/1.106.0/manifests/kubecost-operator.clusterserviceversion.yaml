@@ -1,0 +1,2397 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "charts.kubecost.com/v1alpha1",
+          "kind": "CostAnalyzer",
+          "metadata": {
+            "name": "costanalyzer-sample"
+          },
+          "spec": {
+            "affinity": {},
+            "awsstore": {
+              "createServiceAccount": false,
+              "priorityClassName": "",
+              "useAwsStore": false
+            },
+            "clusterController": {
+              "enabled": false,
+              "image": "gcr.io/kubecost1/cluster-controller:v0.12.0",
+              "imagePullPolicy": "Always",
+              "kubescaler": {
+                "defaultResizeAll": false
+              },
+              "namespaceTurndown": {
+                "rbac": {
+                  "enabled": true
+                }
+              },
+              "priorityClassName": ""
+            },
+            "costEventsAudit": {
+              "enabled": false
+            },
+            "extraObjects": [],
+            "extraVolumeMounts": [],
+            "extraVolumes": [],
+            "federatedETL": {
+              "federatedCluster": false,
+              "federator": {
+                "clusters": [],
+                "enabled": false,
+                "resources": {}
+              },
+              "primaryCluster": false,
+              "redirectS3Backup": false,
+              "useExistingS3Config": false,
+              "useMultiClusterDB": false
+            },
+            "global": {
+              "additionalLabels": {},
+              "advancedReports": {
+                "enabled": false,
+                "reports": [
+                  {
+                    "aggregateBy": "namespace",
+                    "cloudBreakdown": "service",
+                    "cloudJoin": "label:kubernetes_namespace",
+                    "filters": [
+                      {
+                        "property": "cluster",
+                        "value": "cluster-one"
+                      }
+                    ],
+                    "title": "Example Advanced Report 0",
+                    "window": "7d"
+                  }
+                ]
+              },
+              "amp": {
+                "enabled": false,
+                "prometheusServerEndpoint": "https://localhost:8085/\u003cworkspaceId\u003e/",
+                "remoteWriteService": "https://aps-workspaces.us-west-2.amazonaws.com/workspaces/\u003cworkspaceId\u003e/api/v1/remote_write",
+                "sigv4": {
+                  "region": "us-west-2"
+                }
+              },
+              "assetReports": {
+                "enabled": false,
+                "reports": [
+                  {
+                    "accumulate": false,
+                    "aggregateBy": "type",
+                    "filters": [
+                      {
+                        "property": "cluster",
+                        "value": "cluster-one"
+                      }
+                    ],
+                    "title": "Example Asset Report 0",
+                    "window": "today"
+                  }
+                ]
+              },
+              "cloudCostReports": {
+                "enabled": false,
+                "reports": [
+                  {
+                    "accumulate": false,
+                    "aggregateBy": "service",
+                    "title": "Cloud Cost Report 0",
+                    "window": "today"
+                  }
+                ]
+              },
+              "containerSecurityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "privileged": false,
+                "readOnlyRootFilesystem": true
+              },
+              "gcpstore": {
+                "enabled": false
+              },
+              "gmp": {
+                "enabled": false,
+                "gmpProxy": {
+                  "enabled": false,
+                  "image": "gke.gcr.io/prometheus-engine/frontend:v0.4.1-gke.0",
+                  "imagePullPolicy": "Always",
+                  "name": "gmp-proxy",
+                  "port": 8085,
+                  "projectId": "YOUR_PROJECT_ID"
+                },
+                "prometheusServerEndpoint": "http://localhost:8085/"
+              },
+              "grafana": {
+                "domainName": "cost-analyzer-grafana.default.svc",
+                "enabled": true,
+                "proxy": true,
+                "scheme": "http"
+              },
+              "mimirProxy": {
+                "enabled": false,
+                "image": "nginxinc/nginx-unprivileged",
+                "mimirEndpoint": "$mimir_endpoint",
+                "name": "mimir-proxy",
+                "orgIdentifier": "$your_tenant_ID",
+                "port": 8085
+              },
+              "notifications": {
+                "alertmanager": {
+                  "enabled": false,
+                  "fqdn": "http://cost-analyzer-prometheus-server.default.svc"
+                }
+              },
+              "podAnnotations": {},
+              "prometheus": {
+                "enabled": true,
+                "fqdn": "http://cost-analyzer-prometheus-server.default.svc"
+              },
+              "savedReports": {
+                "enabled": false,
+                "reports": [
+                  {
+                    "accumulate": false,
+                    "aggregateBy": "namespace",
+                    "chartDisplay": "category",
+                    "filters": [
+                      {
+                        "property": "cluster",
+                        "value": "cluster-one,cluster*"
+                      },
+                      {
+                        "property": "namespace",
+                        "value": "kubecost"
+                      }
+                    ],
+                    "idle": "separate",
+                    "rate": "cumulative",
+                    "title": "Example Saved Report 0",
+                    "window": "today"
+                  },
+                  {
+                    "accumulate": false,
+                    "aggregateBy": "controllerKind",
+                    "chartDisplay": "category",
+                    "filters": [
+                      {
+                        "property": "label",
+                        "value": "app:cost*,environment:kube*"
+                      },
+                      {
+                        "property": "namespace",
+                        "value": "kubecost"
+                      }
+                    ],
+                    "idle": "share",
+                    "rate": "monthly",
+                    "title": "Example Saved Report 1",
+                    "window": "month"
+                  },
+                  {
+                    "accumulate": true,
+                    "aggregateBy": "service",
+                    "chartDisplay": "category",
+                    "filters": [],
+                    "idle": "hide",
+                    "rate": "daily",
+                    "title": "Example Saved Report 2",
+                    "window": "2020-11-11T00:00:00Z,2020-12-09T23:59:59Z"
+                  }
+                ]
+              },
+              "securityContext": {
+                "runAsNonRoot": true,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "thanos": {
+                "enabled": false
+              }
+            },
+            "grafana": {
+              "adminPassword": "strongpassword",
+              "adminUser": "admin",
+              "affinity": {},
+              "dashboardProviders": {},
+              "dashboards": {},
+              "dashboardsConfigMaps": {},
+              "datasources": {},
+              "deploymentStrategy": "RollingUpdate",
+              "downloadDashboardsImage": {
+                "pullPolicy": "IfNotPresent",
+                "repository": "curlimages/curl",
+                "tag": "latest"
+              },
+              "env": {},
+              "envFromSecret": "",
+              "extraSecretMounts": [],
+              "global": {
+                "additionalLabels": {},
+                "advancedReports": {
+                  "enabled": false,
+                  "reports": [
+                    {
+                      "aggregateBy": "namespace",
+                      "cloudBreakdown": "service",
+                      "cloudJoin": "label:kubernetes_namespace",
+                      "filters": [
+                        {
+                          "property": "cluster",
+                          "value": "cluster-one"
+                        }
+                      ],
+                      "title": "Example Advanced Report 0",
+                      "window": "7d"
+                    }
+                  ]
+                },
+                "amp": {
+                  "enabled": false,
+                  "prometheusServerEndpoint": "https://localhost:8085/\u003cworkspaceId\u003e/",
+                  "remoteWriteService": "https://aps-workspaces.us-west-2.amazonaws.com/workspaces/\u003cworkspaceId\u003e/api/v1/remote_write",
+                  "sigv4": {
+                    "region": "us-west-2"
+                  }
+                },
+                "assetReports": {
+                  "enabled": false,
+                  "reports": [
+                    {
+                      "accumulate": false,
+                      "aggregateBy": "type",
+                      "filters": [
+                        {
+                          "property": "cluster",
+                          "value": "cluster-one"
+                        }
+                      ],
+                      "title": "Example Asset Report 0",
+                      "window": "today"
+                    }
+                  ]
+                },
+                "cloudCostReports": {
+                  "enabled": false,
+                  "reports": [
+                    {
+                      "accumulate": false,
+                      "aggregateBy": "service",
+                      "title": "Cloud Cost Report 0",
+                      "window": "today"
+                    }
+                  ]
+                },
+                "containerSecurityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "privileged": false,
+                  "readOnlyRootFilesystem": true
+                },
+                "gcpstore": {
+                  "enabled": false
+                },
+                "gmp": {
+                  "enabled": false,
+                  "gmpProxy": {
+                    "enabled": false,
+                    "image": "gke.gcr.io/prometheus-engine/frontend:v0.4.1-gke.0",
+                    "imagePullPolicy": "Always",
+                    "name": "gmp-proxy",
+                    "port": 8085,
+                    "projectId": "YOUR_PROJECT_ID"
+                  },
+                  "prometheusServerEndpoint": "http://localhost:8085/"
+                },
+                "grafana": {
+                  "domainName": "cost-analyzer-grafana.default.svc",
+                  "enabled": true,
+                  "proxy": true,
+                  "scheme": "http"
+                },
+                "mimirProxy": {
+                  "enabled": false,
+                  "image": "nginxinc/nginx-unprivileged",
+                  "mimirEndpoint": "$mimir_endpoint",
+                  "name": "mimir-proxy",
+                  "orgIdentifier": "$your_tenant_ID",
+                  "port": 8085
+                },
+                "notifications": {
+                  "alertmanager": {
+                    "enabled": false,
+                    "fqdn": "http://cost-analyzer-prometheus-server.default.svc"
+                  }
+                },
+                "podAnnotations": {},
+                "prometheus": {
+                  "enabled": true,
+                  "fqdn": "http://cost-analyzer-prometheus-server.default.svc"
+                },
+                "savedReports": {
+                  "enabled": false,
+                  "reports": [
+                    {
+                      "accumulate": false,
+                      "aggregateBy": "namespace",
+                      "chartDisplay": "category",
+                      "filters": [
+                        {
+                          "property": "cluster",
+                          "value": "cluster-one,cluster*"
+                        },
+                        {
+                          "property": "namespace",
+                          "value": "kubecost"
+                        }
+                      ],
+                      "idle": "separate",
+                      "rate": "cumulative",
+                      "title": "Example Saved Report 0",
+                      "window": "today"
+                    },
+                    {
+                      "accumulate": false,
+                      "aggregateBy": "controllerKind",
+                      "chartDisplay": "category",
+                      "filters": [
+                        {
+                          "property": "label",
+                          "value": "app:cost*,environment:kube*"
+                        },
+                        {
+                          "property": "namespace",
+                          "value": "kubecost"
+                        }
+                      ],
+                      "idle": "share",
+                      "rate": "monthly",
+                      "title": "Example Saved Report 1",
+                      "window": "month"
+                    },
+                    {
+                      "accumulate": true,
+                      "aggregateBy": "service",
+                      "chartDisplay": "category",
+                      "filters": [],
+                      "idle": "hide",
+                      "rate": "daily",
+                      "title": "Example Saved Report 2",
+                      "window": "2020-11-11T00:00:00Z,2020-12-09T23:59:59Z"
+                    }
+                  ]
+                },
+                "securityContext": {
+                  "runAsNonRoot": true,
+                  "seccompProfile": {
+                    "type": "RuntimeDefault"
+                  }
+                },
+                "thanos": {
+                  "enabled": false
+                }
+              },
+              "grafana.ini": {
+                "analytics": {
+                  "check_for_updates": true
+                },
+                "auth.anonymous": {
+                  "enabled": true,
+                  "org_name": "Main Org.",
+                  "org_role": "Editor"
+                },
+                "grafana_net": {
+                  "url": "https://grafana.net"
+                },
+                "log": {
+                  "mode": "console"
+                },
+                "paths": {
+                  "data": "/var/lib/grafana/data",
+                  "logs": "/var/log/grafana",
+                  "plugins": "/var/lib/grafana/plugins",
+                  "provisioning": "/etc/grafana/provisioning"
+                },
+                "server": {
+                  "root_url": "%(protocol)s://%(domain)s:%(http_port)s/grafana",
+                  "serve_from_sub_path": true
+                }
+              },
+              "image": {
+                "pullPolicy": "IfNotPresent",
+                "repository": "grafana/grafana",
+                "tag": "9.4.7"
+              },
+              "ingress": {
+                "annotations": {},
+                "enabled": false,
+                "hosts": [
+                  "chart-example.local"
+                ],
+                "labels": {},
+                "path": "/",
+                "pathType": "Prefix",
+                "tls": []
+              },
+              "ldap": {
+                "config": "",
+                "existingSecret": ""
+              },
+              "livenessProbe": {
+                "failureThreshold": 10,
+                "httpGet": {
+                  "path": "/api/health",
+                  "port": 3000
+                },
+                "initialDelaySeconds": 60,
+                "timeoutSeconds": 30
+              },
+              "nodeSelector": {},
+              "persistence": {
+                "enabled": false
+              },
+              "plugins": [],
+              "priorityClassName": "",
+              "rbac": {
+                "create": true,
+                "grafana": {
+                  "containerSecurityContext": {
+                    "securityContext": {
+                      "allowPrivilegeEscalation": false,
+                      "capabilities": {
+                        "drop": [
+                          "ALL"
+                        ]
+                      },
+                      "readOnlyRootFilesystem": true,
+                      "runAsNonRoot": true,
+                      "seccompProfile": {
+                        "type": "RuntimeDefault"
+                      }
+                    }
+                  }
+                },
+                "initContainers": {
+                  "containerSecurityContext": {
+                    "securityContext": {
+                      "allowPrivilegeEscalation": false,
+                      "capabilities": {
+                        "drop": [
+                          "ALL"
+                        ]
+                      },
+                      "readOnlyRootFilesystem": true,
+                      "runAsNonRoot": true,
+                      "seccompProfile": {
+                        "type": "RuntimeDefault"
+                      }
+                    }
+                  }
+                },
+                "pspEnabled": false,
+                "pspUseAppArmor": true,
+                "sidecar": {
+                  "containerSecurityContext": {
+                    "securityContext": {
+                      "allowPrivilegeEscalation": false,
+                      "capabilities": {
+                        "drop": [
+                          "ALL"
+                        ]
+                      },
+                      "readOnlyRootFilesystem": true,
+                      "runAsNonRoot": true,
+                      "seccompProfile": {
+                        "type": "RuntimeDefault"
+                      }
+                    }
+                  }
+                }
+              },
+              "readinessProbe": {
+                "httpGet": {
+                  "path": "/api/health",
+                  "port": 3000
+                }
+              },
+              "replicas": 1,
+              "resources": {},
+              "securityContext": {
+                "fsGroup": 472,
+                "runAsUser": 472
+              },
+              "service": {
+                "annotations": {},
+                "labels": {},
+                "port": 80,
+                "type": "ClusterIP"
+              },
+              "serviceAccount": {
+                "create": true,
+                "name": null
+              },
+              "sidecar": {
+                "dashboards": {
+                  "annotations": {},
+                  "enabled": true,
+                  "error_throttle_sleep": 0,
+                  "folder": "/tmp/dashboards",
+                  "label": "grafana_dashboard"
+                },
+                "datasources": {
+                  "enabled": false,
+                  "error_throttle_sleep": 0,
+                  "label": "grafana_datasource"
+                },
+                "image": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "kiwigrid/k8s-sidecar",
+                  "tag": "1.25.1"
+                },
+                "resources": null
+              },
+              "smtp": {
+                "existingSecret": ""
+              },
+              "tolerations": []
+            },
+            "ingress": {
+              "annotations": null,
+              "enabled": false,
+              "hosts": [
+                "cost-analyzer.local"
+              ],
+              "labels": null,
+              "pathType": "ImplementationSpecific",
+              "paths": [
+                "/"
+              ],
+              "tls": []
+            },
+            "initChownData": {
+              "resources": {}
+            },
+            "initChownDataImage": "busybox",
+            "kubecostAdmissionController": {
+              "enabled": false
+            },
+            "kubecostDeployment": {
+              "annotations": {},
+              "labels": {},
+              "leaderFollower": {
+                "enabled": false
+              },
+              "podSecurityContext": {
+                "runAsNonRoot": true,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "queryService": {
+                "configVolumeSize": "1Gi",
+                "containerSecurityContext": {
+                  "allowPrivilegeEscalation": true,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": false
+                },
+                "databaseVolumeSize": "100Gi",
+                "resources": {
+                  "requests": {
+                    "cpu": "1000m",
+                    "memory": "500Mi"
+                  }
+                },
+                "securityContext": {
+                  "fsGroup": 65534,
+                  "runAsGroup": 65534,
+                  "runAsNonRoot": false,
+                  "runAsUser": 65534,
+                  "seccompProfile": {
+                    "type": "RuntimeDefault"
+                  }
+                },
+                "storageClass": ""
+              },
+              "queryServiceReplicas": 0,
+              "replicas": 1
+            },
+            "kubecostFrontend": {
+              "containerSecurityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "readOnlyRootFilesystem": true,
+                "runAsNonRoot": true,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "enabled": true,
+              "image": "gcr.io/kubecost1/frontend",
+              "imagePullPolicy": "Always",
+              "ipv6": {
+                "enabled": true
+              },
+              "livenessProbe": {
+                "enabled": true,
+                "failureThreshold": 200,
+                "initialDelaySeconds": 30,
+                "periodSeconds": 10
+              },
+              "resources": {
+                "requests": {
+                  "cpu": "10m",
+                  "memory": "55Mi"
+                }
+              }
+            },
+            "kubecostMetrics": {
+              "exporter": {
+                "additionalLabels": {},
+                "affinity": {},
+                "enabled": false,
+                "extraArgs": [],
+                "nodeSelector": {},
+                "port": 9005,
+                "priorityClassName": "",
+                "prometheusScrape": true,
+                "resources": {},
+                "service": {
+                  "annotations": {}
+                },
+                "serviceMonitor": {
+                  "additionalLabels": {},
+                  "enabled": false,
+                  "metricRelabelings": [],
+                  "relabelings": []
+                },
+                "tolerations": []
+              }
+            },
+            "kubecostModel": {
+              "allocation": null,
+              "cloudCost": {
+                "enabled": true,
+                "labelList": {
+                  "IsIncludeList": false,
+                  "labels": ""
+                },
+                "topNItems": 1000
+              },
+              "containerSecurityContext": {
+                "allowPrivilegeEscalation": false,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                },
+                "readOnlyRootFilesystem": true,
+                "runAsNonRoot": true,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                }
+              },
+              "etl": true,
+              "etlDailyStoreDurationDays": 91,
+              "etlFileStoreEnabled": true,
+              "etlHourlyStoreDurationHours": 49,
+              "etlReadOnlyMode": false,
+              "etlWeeklyStoreDurationWeeks": 53,
+              "extraArgs": [],
+              "image": "gcr.io/kubecost1/cost-model",
+              "imagePullPolicy": "Always",
+              "livenessProbe": {
+                "enabled": false,
+                "failureThreshold": 200,
+                "initialDelaySeconds": 30,
+                "periodSeconds": 10
+              },
+              "maxQueryConcurrency": 5,
+              "outOfClusterPromMetricsEnabled": false,
+              "resources": {
+                "requests": {
+                  "cpu": "200m",
+                  "memory": "55Mi"
+                }
+              },
+              "warmCache": false,
+              "warmSavingsCache": true
+            },
+            "kubecostNetworkCosts": {
+              "containerSecurityContext": {},
+              "securityContext": {}
+            },
+            "kubecostToken": null,
+            "networkCosts": {
+              "additionalLabels": {},
+              "additionalSecurityContext": {},
+              "affinity": {},
+              "annotations": {},
+              "config": {
+                "destinations": {
+                  "cross-region": [],
+                  "direct-classification": [],
+                  "in-region": [],
+                  "in-zone": [
+                    "127.0.0.0/8",
+                    "169.254.0.0/16",
+                    "10.0.0.0/8",
+                    "172.16.0.0/12",
+                    "192.168.0.0/16"
+                  ],
+                  "internet": []
+                },
+                "services": {
+                  "amazon-web-services": false,
+                  "azure-cloud-services": false,
+                  "google-cloud-services": false
+                }
+              },
+              "enabled": false,
+              "extraArgs": [],
+              "healthCheckProbes": {},
+              "image": "gcr.io/kubecost1/kubecost-network-costs:v0.16.8",
+              "imagePullPolicy": "Always",
+              "nodeSelector": {},
+              "podMonitor": {
+                "additionalLabels": {},
+                "enabled": false
+              },
+              "podSecurityPolicy": {
+                "enabled": false
+              },
+              "port": 3001,
+              "priorityClassName": "",
+              "prometheusScrape": false,
+              "resources": {
+                "limits": {
+                  "cpu": "500m"
+                },
+                "requests": {
+                  "cpu": "50m",
+                  "memory": "20Mi"
+                }
+              },
+              "service": {
+                "annotations": {},
+                "labels": {}
+              },
+              "tolerations": [],
+              "trafficLogging": true,
+              "updateStrategy": {
+                "type": "RollingUpdate"
+              }
+            },
+            "networkPolicy": {
+              "costAnalyzer": {
+                "additionalLabels": {},
+                "annotations": {},
+                "enabled": false
+              },
+              "denyEgress": true,
+              "enabled": false,
+              "sameNamespace": true
+            },
+            "nodeSelector": {},
+            "oidc": {
+              "authURL": "https://my.auth.server/authorize",
+              "clientID": "",
+              "clientSecret": "",
+              "discoveryURL": "https://my.auth.server/.well-known/openid-configuration",
+              "enabled": false,
+              "loginRedirectURL": "http://my.kubecost.url/model/oidc/authorize",
+              "rbac": {
+                "enabled": false,
+                "groups": [
+                  {
+                    "claimName": "roles",
+                    "claimValues": [
+                      "admin",
+                      "superusers"
+                    ],
+                    "enabled": false,
+                    "name": "admin"
+                  },
+                  {
+                    "claimName": "roles",
+                    "claimValues": [
+                      "readonly"
+                    ],
+                    "enabled": false,
+                    "name": "readonly"
+                  },
+                  {
+                    "claimName": "roles",
+                    "claimValues": [
+                      "editor"
+                    ],
+                    "enabled": false,
+                    "name": "editor"
+                  }
+                ]
+              },
+              "secretName": "kubecost-oidc-secret"
+            },
+            "persistentVolume": {
+              "annotations": {},
+              "dbSize": "32.0Gi",
+              "enabled": true,
+              "labels": {},
+              "size": "32Gi"
+            },
+            "podSecurityPolicy": {
+              "enabled": false
+            },
+            "pricingCsv": {
+              "enabled": false,
+              "location": {
+                "URI": "s3://kc-csv-test/pricing_schema.csv",
+                "csvAccessCredentials": "pricing-schema-access-secret",
+                "provider": "AWS",
+                "region": "us-east-1"
+              }
+            },
+            "priority": {
+              "enabled": false,
+              "name": ""
+            },
+            "prometheus": {
+              "alertRelabelConfigs": null,
+              "alertmanager": {
+                "affinity": {},
+                "baseURL": "http://localhost:9093",
+                "configFileName": "alertmanager.yml",
+                "configFromSecret": "",
+                "configMapOverrideName": "",
+                "enabled": false,
+                "extraArgs": {},
+                "extraEnv": {},
+                "extraSecretMounts": [],
+                "image": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "quay.io/prometheus/alertmanager",
+                  "tag": "v0.25.0"
+                },
+                "ingress": {
+                  "annotations": {},
+                  "enabled": false,
+                  "extraLabels": {},
+                  "extraPaths": [],
+                  "hosts": [],
+                  "tls": []
+                },
+                "name": "alertmanager",
+                "nodeSelector": {},
+                "persistentVolume": {
+                  "accessModes": [
+                    "ReadWriteOnce"
+                  ],
+                  "annotations": {},
+                  "enabled": true,
+                  "existingClaim": "",
+                  "mountPath": "/data",
+                  "size": "2Gi",
+                  "subPath": ""
+                },
+                "podAnnotations": {},
+                "podDisruptionBudget": {
+                  "enabled": false,
+                  "maxUnavailable": 1
+                },
+                "podLabels": {},
+                "podSecurityPolicy": {
+                  "annotations": {}
+                },
+                "prefixURL": "",
+                "priorityClassName": "",
+                "replicaCount": 1,
+                "resources": {},
+                "securityContext": {
+                  "fsGroup": 1001,
+                  "runAsGroup": 1001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 1001
+                },
+                "service": {
+                  "annotations": {},
+                  "clusterIP": "",
+                  "externalIPs": [],
+                  "labels": {},
+                  "loadBalancerIP": "",
+                  "loadBalancerSourceRanges": [],
+                  "servicePort": 80,
+                  "sessionAffinity": "None",
+                  "type": "ClusterIP"
+                },
+                "statefulSet": {
+                  "enabled": false,
+                  "headless": {
+                    "annotations": {},
+                    "labels": {},
+                    "servicePort": 80
+                  },
+                  "podManagementPolicy": "OrderedReady"
+                },
+                "strategy": {
+                  "rollingUpdate": null,
+                  "type": "Recreate"
+                },
+                "tolerations": []
+              },
+              "alertmanagerFiles": {
+                "alertmanager.yml": {
+                  "global": {},
+                  "receivers": [
+                    {
+                      "name": "default-receiver"
+                    }
+                  ],
+                  "route": {
+                    "group_interval": "5m",
+                    "group_wait": "10s",
+                    "receiver": "default-receiver",
+                    "repeat_interval": "3h"
+                  }
+                }
+              },
+              "configmapReload": {
+                "alertmanager": {
+                  "enabled": true,
+                  "extraArgs": {},
+                  "extraConfigmapMounts": [],
+                  "extraVolumeDirs": [],
+                  "image": {
+                    "pullPolicy": "IfNotPresent",
+                    "repository": "jimmidyson/configmap-reload",
+                    "tag": "v0.9.0"
+                  },
+                  "name": "configmap-reload",
+                  "resources": {}
+                },
+                "prometheus": {
+                  "containerSecurityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true,
+                    "seccompProfile": {
+                      "type": "RuntimeDefault"
+                    }
+                  },
+                  "enabled": true,
+                  "extraArgs": {},
+                  "extraConfigmapMounts": [],
+                  "extraVolumeDirs": [],
+                  "image": {
+                    "pullPolicy": "IfNotPresent",
+                    "repository": "jimmidyson/configmap-reload",
+                    "tag": "v0.9.0"
+                  },
+                  "name": "configmap-reload",
+                  "resources": {}
+                }
+              },
+              "extraScrapeConfigs": "- job_name: kubecost\n  honor_labels: true\n  scrape_interval: 1m\n  scrape_timeout: 60s\n  metrics_path: /metrics\n  scheme: http\n  dns_sd_configs:\n  - names:\n    - {{ template \"cost-analyzer.serviceName\" . }}\n    type: 'A'\n    port: 9003\n- job_name: kubecost-networking\n  kubernetes_sd_configs:\n    - role: pod\n  relabel_configs:\n  # Scrape only the the targets matching the following metadata\n    - source_labels: [__meta_kubernetes_pod_label_app]\n      action: keep\n      regex:  {{ template \"cost-analyzer.networkCostsName\" . }}\n",
+              "global": {
+                "additionalLabels": {},
+                "advancedReports": {
+                  "enabled": false,
+                  "reports": [
+                    {
+                      "aggregateBy": "namespace",
+                      "cloudBreakdown": "service",
+                      "cloudJoin": "label:kubernetes_namespace",
+                      "filters": [
+                        {
+                          "property": "cluster",
+                          "value": "cluster-one"
+                        }
+                      ],
+                      "title": "Example Advanced Report 0",
+                      "window": "7d"
+                    }
+                  ]
+                },
+                "amp": {
+                  "enabled": false,
+                  "prometheusServerEndpoint": "https://localhost:8085/\u003cworkspaceId\u003e/",
+                  "remoteWriteService": "https://aps-workspaces.us-west-2.amazonaws.com/workspaces/\u003cworkspaceId\u003e/api/v1/remote_write",
+                  "sigv4": {
+                    "region": "us-west-2"
+                  }
+                },
+                "assetReports": {
+                  "enabled": false,
+                  "reports": [
+                    {
+                      "accumulate": false,
+                      "aggregateBy": "type",
+                      "filters": [
+                        {
+                          "property": "cluster",
+                          "value": "cluster-one"
+                        }
+                      ],
+                      "title": "Example Asset Report 0",
+                      "window": "today"
+                    }
+                  ]
+                },
+                "cloudCostReports": {
+                  "enabled": false,
+                  "reports": [
+                    {
+                      "accumulate": false,
+                      "aggregateBy": "service",
+                      "title": "Cloud Cost Report 0",
+                      "window": "today"
+                    }
+                  ]
+                },
+                "containerSecurityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "privileged": false,
+                  "readOnlyRootFilesystem": true
+                },
+                "gcpstore": {
+                  "enabled": false
+                },
+                "gmp": {
+                  "enabled": false,
+                  "gmpProxy": {
+                    "enabled": false,
+                    "image": "gke.gcr.io/prometheus-engine/frontend:v0.4.1-gke.0",
+                    "imagePullPolicy": "Always",
+                    "name": "gmp-proxy",
+                    "port": 8085,
+                    "projectId": "YOUR_PROJECT_ID"
+                  },
+                  "prometheusServerEndpoint": "http://localhost:8085/"
+                },
+                "grafana": {
+                  "domainName": "cost-analyzer-grafana.default.svc",
+                  "enabled": true,
+                  "proxy": true,
+                  "scheme": "http"
+                },
+                "mimirProxy": {
+                  "enabled": false,
+                  "image": "nginxinc/nginx-unprivileged",
+                  "mimirEndpoint": "$mimir_endpoint",
+                  "name": "mimir-proxy",
+                  "orgIdentifier": "$your_tenant_ID",
+                  "port": 8085
+                },
+                "notifications": {
+                  "alertmanager": {
+                    "enabled": false,
+                    "fqdn": "http://cost-analyzer-prometheus-server.default.svc"
+                  }
+                },
+                "podAnnotations": {},
+                "prometheus": {
+                  "enabled": true,
+                  "fqdn": "http://cost-analyzer-prometheus-server.default.svc"
+                },
+                "savedReports": {
+                  "enabled": false,
+                  "reports": [
+                    {
+                      "accumulate": false,
+                      "aggregateBy": "namespace",
+                      "chartDisplay": "category",
+                      "filters": [
+                        {
+                          "property": "cluster",
+                          "value": "cluster-one,cluster*"
+                        },
+                        {
+                          "property": "namespace",
+                          "value": "kubecost"
+                        }
+                      ],
+                      "idle": "separate",
+                      "rate": "cumulative",
+                      "title": "Example Saved Report 0",
+                      "window": "today"
+                    },
+                    {
+                      "accumulate": false,
+                      "aggregateBy": "controllerKind",
+                      "chartDisplay": "category",
+                      "filters": [
+                        {
+                          "property": "label",
+                          "value": "app:cost*,environment:kube*"
+                        },
+                        {
+                          "property": "namespace",
+                          "value": "kubecost"
+                        }
+                      ],
+                      "idle": "share",
+                      "rate": "monthly",
+                      "title": "Example Saved Report 1",
+                      "window": "month"
+                    },
+                    {
+                      "accumulate": true,
+                      "aggregateBy": "service",
+                      "chartDisplay": "category",
+                      "filters": [],
+                      "idle": "hide",
+                      "rate": "daily",
+                      "title": "Example Saved Report 2",
+                      "window": "2020-11-11T00:00:00Z,2020-12-09T23:59:59Z"
+                    }
+                  ]
+                },
+                "securityContext": {
+                  "runAsNonRoot": true,
+                  "seccompProfile": {
+                    "type": "RuntimeDefault"
+                  }
+                },
+                "thanos": {
+                  "enabled": false
+                }
+              },
+              "imagePullSecrets": null,
+              "kube-state-metrics": {
+                "affinity": {},
+                "autosharding": {
+                  "enabled": false
+                },
+                "collectors": {
+                  "certificatesigningrequests": false,
+                  "configmaps": true,
+                  "cronjobs": true,
+                  "daemonsets": true,
+                  "deployments": true,
+                  "endpoints": true,
+                  "horizontalpodautoscalers": true,
+                  "ingresses": false,
+                  "jobs": true,
+                  "limitranges": true,
+                  "mutatingwebhookconfigurations": false,
+                  "namespaces": true,
+                  "networkpolicies": false,
+                  "nodes": true,
+                  "persistentvolumeclaims": true,
+                  "persistentvolumes": true,
+                  "poddisruptionbudgets": true,
+                  "pods": true,
+                  "replicasets": true,
+                  "replicationcontrollers": true,
+                  "resourcequotas": true,
+                  "secrets": false,
+                  "services": true,
+                  "statefulsets": true,
+                  "storageclasses": true,
+                  "validatingwebhookconfigurations": false,
+                  "verticalpodautoscalers": false,
+                  "volumeattachments": false
+                },
+                "customLabels": {},
+                "disabled": true,
+                "enabled": true,
+                "global": {
+                  "additionalLabels": {},
+                  "advancedReports": {
+                    "enabled": false,
+                    "reports": [
+                      {
+                        "aggregateBy": "namespace",
+                        "cloudBreakdown": "service",
+                        "cloudJoin": "label:kubernetes_namespace",
+                        "filters": [
+                          {
+                            "property": "cluster",
+                            "value": "cluster-one"
+                          }
+                        ],
+                        "title": "Example Advanced Report 0",
+                        "window": "7d"
+                      }
+                    ]
+                  },
+                  "amp": {
+                    "enabled": false,
+                    "prometheusServerEndpoint": "https://localhost:8085/\u003cworkspaceId\u003e/",
+                    "remoteWriteService": "https://aps-workspaces.us-west-2.amazonaws.com/workspaces/\u003cworkspaceId\u003e/api/v1/remote_write",
+                    "sigv4": {
+                      "region": "us-west-2"
+                    }
+                  },
+                  "assetReports": {
+                    "enabled": false,
+                    "reports": [
+                      {
+                        "accumulate": false,
+                        "aggregateBy": "type",
+                        "filters": [
+                          {
+                            "property": "cluster",
+                            "value": "cluster-one"
+                          }
+                        ],
+                        "title": "Example Asset Report 0",
+                        "window": "today"
+                      }
+                    ]
+                  },
+                  "cloudCostReports": {
+                    "enabled": false,
+                    "reports": [
+                      {
+                        "accumulate": false,
+                        "aggregateBy": "service",
+                        "title": "Cloud Cost Report 0",
+                        "window": "today"
+                      }
+                    ]
+                  },
+                  "containerSecurityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "privileged": false,
+                    "readOnlyRootFilesystem": true
+                  },
+                  "gcpstore": {
+                    "enabled": false
+                  },
+                  "gmp": {
+                    "enabled": false,
+                    "gmpProxy": {
+                      "enabled": false,
+                      "image": "gke.gcr.io/prometheus-engine/frontend:v0.4.1-gke.0",
+                      "imagePullPolicy": "Always",
+                      "name": "gmp-proxy",
+                      "port": 8085,
+                      "projectId": "YOUR_PROJECT_ID"
+                    },
+                    "prometheusServerEndpoint": "http://localhost:8085/"
+                  },
+                  "grafana": {
+                    "domainName": "cost-analyzer-grafana.default.svc",
+                    "enabled": true,
+                    "proxy": true,
+                    "scheme": "http"
+                  },
+                  "mimirProxy": {
+                    "enabled": false,
+                    "image": "nginxinc/nginx-unprivileged",
+                    "mimirEndpoint": "$mimir_endpoint",
+                    "name": "mimir-proxy",
+                    "orgIdentifier": "$your_tenant_ID",
+                    "port": 8085
+                  },
+                  "notifications": {
+                    "alertmanager": {
+                      "enabled": false,
+                      "fqdn": "http://cost-analyzer-prometheus-server.default.svc"
+                    }
+                  },
+                  "podAnnotations": {},
+                  "prometheus": {
+                    "enabled": true,
+                    "fqdn": "http://cost-analyzer-prometheus-server.default.svc"
+                  },
+                  "savedReports": {
+                    "enabled": false,
+                    "reports": [
+                      {
+                        "accumulate": false,
+                        "aggregateBy": "namespace",
+                        "chartDisplay": "category",
+                        "filters": [
+                          {
+                            "property": "cluster",
+                            "value": "cluster-one,cluster*"
+                          },
+                          {
+                            "property": "namespace",
+                            "value": "kubecost"
+                          }
+                        ],
+                        "idle": "separate",
+                        "rate": "cumulative",
+                        "title": "Example Saved Report 0",
+                        "window": "today"
+                      },
+                      {
+                        "accumulate": false,
+                        "aggregateBy": "controllerKind",
+                        "chartDisplay": "category",
+                        "filters": [
+                          {
+                            "property": "label",
+                            "value": "app:cost*,environment:kube*"
+                          },
+                          {
+                            "property": "namespace",
+                            "value": "kubecost"
+                          }
+                        ],
+                        "idle": "share",
+                        "rate": "monthly",
+                        "title": "Example Saved Report 1",
+                        "window": "month"
+                      },
+                      {
+                        "accumulate": true,
+                        "aggregateBy": "service",
+                        "chartDisplay": "category",
+                        "filters": [],
+                        "idle": "hide",
+                        "rate": "daily",
+                        "title": "Example Saved Report 2",
+                        "window": "2020-11-11T00:00:00Z,2020-12-09T23:59:59Z"
+                      }
+                    ]
+                  },
+                  "securityContext": {
+                    "runAsNonRoot": true,
+                    "seccompProfile": {
+                      "type": "RuntimeDefault"
+                    }
+                  },
+                  "thanos": {
+                    "enabled": false
+                  }
+                },
+                "hostNetwork": false,
+                "image": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "registry.k8s.io/kube-state-metrics/kube-state-metrics",
+                  "tag": "v1.9.8"
+                },
+                "namespaceOverride": "",
+                "nodeSelector": {},
+                "podAnnotations": {},
+                "podSecurityPolicy": {
+                  "annotations": {},
+                  "enabled": false
+                },
+                "prometheus": {
+                  "monitor": {
+                    "additionalLabels": {},
+                    "enabled": false,
+                    "honorLabels": false,
+                    "namespace": ""
+                  }
+                },
+                "prometheusScrape": true,
+                "rbac": {
+                  "create": true
+                },
+                "replicas": 1,
+                "securityContext": {
+                  "enabled": true,
+                  "fsGroup": 65534,
+                  "runAsUser": 65534
+                },
+                "service": {
+                  "annotations": {},
+                  "loadBalancerIP": "",
+                  "nodePort": 0,
+                  "port": 8080,
+                  "type": "ClusterIP"
+                },
+                "serviceAccount": {
+                  "create": true,
+                  "imagePullSecrets": []
+                },
+                "tolerations": []
+              },
+              "kubeStateMetrics": {
+                "enabled": false
+              },
+              "networkPolicy": {
+                "enabled": false
+              },
+              "nodeExporter": {
+                "dnsPolicy": "ClusterFirstWithHostNet",
+                "enabled": false,
+                "extraArgs": {},
+                "extraConfigmapMounts": [],
+                "extraHostPathMounts": [],
+                "hostNetwork": true,
+                "hostPID": true,
+                "image": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "prom/node-exporter",
+                  "tag": "v1.5.0"
+                },
+                "name": "node-exporter",
+                "nodeSelector": {},
+                "pod": {
+                  "labels": {}
+                },
+                "podAnnotations": {},
+                "podDisruptionBudget": {
+                  "enabled": false,
+                  "maxUnavailable": 1
+                },
+                "podSecurityPolicy": {
+                  "annotations": {}
+                },
+                "priorityClassName": "",
+                "resources": {},
+                "securityContext": {},
+                "service": {
+                  "annotations": {
+                    "prometheus.io/scrape": "true"
+                  },
+                  "clusterIP": "None",
+                  "externalIPs": [],
+                  "hostPort": 9100,
+                  "labels": {},
+                  "loadBalancerIP": "",
+                  "loadBalancerSourceRanges": [],
+                  "servicePort": 9100,
+                  "type": "ClusterIP"
+                },
+                "tolerations": [],
+                "updateStrategy": {
+                  "type": "RollingUpdate"
+                }
+              },
+              "podSecurityPolicy": {
+                "enabled": false
+              },
+              "pushgateway": {
+                "enabled": false,
+                "extraArgs": {},
+                "image": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "prom/pushgateway",
+                  "tag": "v1.5.1"
+                },
+                "ingress": {
+                  "annotations": {},
+                  "enabled": false,
+                  "extraPaths": [],
+                  "hosts": [],
+                  "tls": []
+                },
+                "name": "pushgateway",
+                "nodeSelector": {},
+                "persistentVolume": {
+                  "accessModes": [
+                    "ReadWriteOnce"
+                  ],
+                  "annotations": {},
+                  "enabled": true,
+                  "existingClaim": "",
+                  "mountPath": "/data",
+                  "size": "2Gi",
+                  "subPath": ""
+                },
+                "podAnnotations": {},
+                "podDisruptionBudget": {
+                  "enabled": false,
+                  "maxUnavailable": 1
+                },
+                "podSecurityPolicy": {
+                  "annotations": {}
+                },
+                "priorityClassName": "",
+                "replicaCount": 1,
+                "resources": {},
+                "securityContext": {
+                  "runAsNonRoot": true,
+                  "runAsUser": 1001
+                },
+                "service": {
+                  "annotations": {
+                    "prometheus.io/probe": "pushgateway"
+                  },
+                  "clusterIP": "",
+                  "externalIPs": [],
+                  "labels": {},
+                  "loadBalancerIP": "",
+                  "loadBalancerSourceRanges": [],
+                  "servicePort": 9091,
+                  "strategy": {
+                    "rollingUpdate": null,
+                    "type": "Recreate"
+                  },
+                  "type": "ClusterIP"
+                },
+                "tolerations": []
+              },
+              "rbac": {
+                "create": true
+              },
+              "server": {
+                "affinity": {},
+                "alertmanagers": [],
+                "baseURL": "",
+                "configMapOverrideName": "",
+                "configPath": "/etc/config/prometheus.yml",
+                "containerSecurityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  },
+                  "readOnlyRootFilesystem": true,
+                  "runAsNonRoot": true,
+                  "seccompProfile": {
+                    "type": "RuntimeDefault"
+                  }
+                },
+                "emptyDir": {
+                  "sizeLimit": ""
+                },
+                "enabled": true,
+                "env": [],
+                "extraArgs": {
+                  "query.max-concurrency": 1,
+                  "query.max-samples": 100000000
+                },
+                "extraConfigmapMounts": [],
+                "extraFlags": [
+                  "web.enable-lifecycle"
+                ],
+                "extraHostPathMounts": [],
+                "extraInitContainers": [],
+                "extraSecretMounts": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "global": {
+                  "evaluation_interval": "1m",
+                  "external_labels": {
+                    "cluster_id": "cluster-one"
+                  },
+                  "scrape_interval": "1m",
+                  "scrape_timeout": "60s"
+                },
+                "image": {
+                  "pullPolicy": "IfNotPresent",
+                  "repository": "quay.io/prometheus/prometheus",
+                  "tag": "v2.35.0"
+                },
+                "ingress": {
+                  "annotations": {},
+                  "enabled": false,
+                  "extraLabels": {},
+                  "extraPaths": [],
+                  "hosts": [],
+                  "pathType": "Prefix",
+                  "tls": []
+                },
+                "livenessProbeFailureThreshold": 3,
+                "livenessProbeInitialDelay": 30,
+                "livenessProbeSuccessThreshold": 1,
+                "livenessProbeTimeout": 30,
+                "name": "server",
+                "nodeSelector": {},
+                "persistentVolume": {
+                  "accessModes": [
+                    "ReadWriteOnce"
+                  ],
+                  "annotations": {},
+                  "enabled": true,
+                  "existingClaim": "",
+                  "mountPath": "/data",
+                  "size": "32Gi",
+                  "subPath": ""
+                },
+                "podAnnotations": {},
+                "podDisruptionBudget": {
+                  "enabled": false,
+                  "maxUnavailable": 1
+                },
+                "podLabels": {},
+                "podSecurityPolicy": {
+                  "annotations": {}
+                },
+                "prefixURL": "",
+                "priorityClassName": "",
+                "readinessProbeFailureThreshold": 3,
+                "readinessProbeInitialDelay": 30,
+                "readinessProbeSuccessThreshold": 1,
+                "readinessProbeTimeout": 30,
+                "remoteRead": {},
+                "remoteWrite": {},
+                "replicaCount": 1,
+                "resources": {},
+                "retention": "15d",
+                "securityContext": {
+                  "fsGroup": 1001,
+                  "runAsGroup": 1001,
+                  "runAsNonRoot": true,
+                  "runAsUser": 1001
+                },
+                "service": {
+                  "annotations": {},
+                  "clusterIP": "",
+                  "externalIPs": [],
+                  "gRPC": {
+                    "enabled": false,
+                    "servicePort": 10901
+                  },
+                  "labels": {},
+                  "loadBalancerIP": "",
+                  "loadBalancerSourceRanges": [],
+                  "servicePort": 80,
+                  "sessionAffinity": "None",
+                  "statefulsetReplica": {
+                    "enabled": false,
+                    "replica": 0
+                  },
+                  "type": "ClusterIP"
+                },
+                "sidecarContainers": null,
+                "statefulSet": {
+                  "annotations": {},
+                  "enabled": false,
+                  "headless": {
+                    "annotations": {},
+                    "labels": {},
+                    "servicePort": 80
+                  },
+                  "labels": {},
+                  "podManagementPolicy": "OrderedReady"
+                },
+                "strategy": {
+                  "rollingUpdate": null,
+                  "type": "Recreate"
+                },
+                "terminationGracePeriodSeconds": 300,
+                "tolerations": [],
+                "verticalAutoscaler": {
+                  "enabled": false
+                }
+              },
+              "serverFiles": {
+                "alerting_rules.yml": {},
+                "alerts": {},
+                "prometheus.yml": {
+                  "rule_files": [
+                    "/etc/config/recording_rules.yml",
+                    "/etc/config/alerting_rules.yml",
+                    "/etc/config/rules",
+                    "/etc/config/alerts"
+                  ],
+                  "scrape_configs": [
+                    {
+                      "job_name": "prometheus",
+                      "static_configs": [
+                        {
+                          "targets": [
+                            "localhost:9090"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
+                      "job_name": "kubernetes-nodes-cadvisor",
+                      "kubernetes_sd_configs": [
+                        {
+                          "role": "node"
+                        }
+                      ],
+                      "metric_relabel_configs": [
+                        {
+                          "action": "keep",
+                          "regex": "(container_cpu_usage_seconds_total|container_memory_working_set_bytes|container_network_receive_errors_total|container_network_transmit_errors_total|container_network_receive_packets_dropped_total|container_network_transmit_packets_dropped_total|container_memory_usage_bytes|container_cpu_cfs_throttled_periods_total|container_cpu_cfs_periods_total|container_fs_usage_bytes|container_fs_limit_bytes|container_cpu_cfs_periods_total|container_fs_inodes_free|container_fs_inodes_total|container_fs_usage_bytes|container_fs_limit_bytes|container_cpu_cfs_throttled_periods_total|container_cpu_cfs_periods_total|container_network_receive_bytes_total|container_network_transmit_bytes_total|container_fs_inodes_free|container_fs_inodes_total|container_fs_usage_bytes|container_fs_limit_bytes|container_spec_cpu_shares|container_spec_memory_limit_bytes|container_network_receive_bytes_total|container_network_transmit_bytes_total|container_fs_reads_bytes_total|container_network_receive_bytes_total|container_fs_writes_bytes_total|container_fs_reads_bytes_total|cadvisor_version_info|kubecost_pv_info)",
+                          "source_labels": [
+                            "__name__"
+                          ]
+                        },
+                        {
+                          "action": "replace",
+                          "regex": "(.+)",
+                          "source_labels": [
+                            "container"
+                          ],
+                          "target_label": "container_name"
+                        },
+                        {
+                          "action": "replace",
+                          "regex": "(.+)",
+                          "source_labels": [
+                            "pod"
+                          ],
+                          "target_label": "pod_name"
+                        }
+                      ],
+                      "relabel_configs": [
+                        {
+                          "action": "labelmap",
+                          "regex": "__meta_kubernetes_node_label_(.+)"
+                        },
+                        {
+                          "replacement": "kubernetes.default.svc:443",
+                          "target_label": "__address__"
+                        },
+                        {
+                          "regex": "(.+)",
+                          "replacement": "/api/v1/nodes/$1/proxy/metrics/cadvisor",
+                          "source_labels": [
+                            "__meta_kubernetes_node_name"
+                          ],
+                          "target_label": "__metrics_path__"
+                        }
+                      ],
+                      "scheme": "https",
+                      "tls_config": {
+                        "ca_file": "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
+                        "insecure_skip_verify": true
+                      }
+                    },
+                    {
+                      "bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
+                      "job_name": "kubernetes-nodes",
+                      "kubernetes_sd_configs": [
+                        {
+                          "role": "node"
+                        }
+                      ],
+                      "metric_relabel_configs": [
+                        {
+                          "action": "keep",
+                          "regex": "(kubelet_volume_stats_used_bytes)",
+                          "source_labels": [
+                            "__name__"
+                          ]
+                        }
+                      ],
+                      "relabel_configs": [
+                        {
+                          "action": "labelmap",
+                          "regex": "__meta_kubernetes_node_label_(.+)"
+                        },
+                        {
+                          "replacement": "kubernetes.default.svc:443",
+                          "target_label": "__address__"
+                        },
+                        {
+                          "regex": "(.+)",
+                          "replacement": "/api/v1/nodes/$1/proxy/metrics",
+                          "source_labels": [
+                            "__meta_kubernetes_node_name"
+                          ],
+                          "target_label": "__metrics_path__"
+                        }
+                      ],
+                      "scheme": "https",
+                      "tls_config": {
+                        "ca_file": "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
+                        "insecure_skip_verify": true
+                      }
+                    },
+                    {
+                      "job_name": "kubernetes-service-endpoints",
+                      "kubernetes_sd_configs": [
+                        {
+                          "role": "endpoints"
+                        }
+                      ],
+                      "metric_relabel_configs": [
+                        {
+                          "action": "keep",
+                          "regex": "(container_cpu_allocation|container_cpu_usage_seconds_total|container_fs_limit_bytes|container_fs_writes_bytes_total|container_gpu_allocation|container_memory_allocation_bytes|container_memory_usage_bytes|container_memory_working_set_bytes|container_network_receive_bytes_total|container_network_transmit_bytes_total|DCGM_FI_DEV_GPU_UTIL|deployment_match_labels|kube_daemonset_status_desired_number_scheduled|kube_daemonset_status_number_ready|kube_deployment_spec_replicas|kube_deployment_status_replicas|kube_deployment_status_replicas_available|kube_job_status_failed|kube_namespace_annotations|kube_namespace_labels|kube_node_info|kube_node_labels|kube_node_status_allocatable|kube_node_status_allocatable_cpu_cores|kube_node_status_allocatable_memory_bytes|kube_node_status_capacity|kube_node_status_capacity_cpu_cores|kube_node_status_capacity_memory_bytes|kube_node_status_condition|kube_persistentvolume_capacity_bytes|kube_persistentvolume_status_phase|kube_persistentvolumeclaim_info|kube_persistentvolumeclaim_resource_requests_storage_bytes|kube_pod_container_info|kube_pod_container_resource_limits|kube_pod_container_resource_limits_cpu_cores|kube_pod_container_resource_limits_memory_bytes|kube_pod_container_resource_requests|kube_pod_container_resource_requests_cpu_cores|kube_pod_container_resource_requests_memory_bytes|kube_pod_container_status_restarts_total|kube_pod_container_status_running|kube_pod_container_status_terminated_reason|kube_pod_labels|kube_pod_owner|kube_pod_status_phase|kube_replicaset_owner|kube_statefulset_replicas|kube_statefulset_status_replicas|kubecost_cluster_info|kubecost_cluster_management_cost|kubecost_cluster_memory_working_set_bytes|kubecost_load_balancer_cost|kubecost_network_internet_egress_cost|kubecost_network_region_egress_cost|kubecost_network_zone_egress_cost|kubecost_node_is_spot|kubecost_pod_network_egress_bytes_total|node_cpu_hourly_cost|node_cpu_seconds_total|node_disk_reads_completed|node_disk_reads_completed_total|node_disk_writes_completed|node_disk_writes_completed_total|node_filesystem_device_error|node_gpu_count|node_gpu_hourly_cost|node_memory_Buffers_bytes|node_memory_Cached_bytes|node_memory_MemAvailable_bytes|node_memory_MemFree_bytes|node_memory_MemTotal_bytes|node_network_transmit_bytes_total|node_ram_hourly_cost|node_total_hourly_cost|pod_pvc_allocation|pv_hourly_cost|service_selector_labels|statefulSet_match_labels|kubecost_pv_info|up)",
+                          "source_labels": [
+                            "__name__"
+                          ]
+                        }
+                      ],
+                      "relabel_configs": [
+                        {
+                          "action": "keep",
+                          "regex": true,
+                          "source_labels": [
+                            "__meta_kubernetes_service_annotation_prometheus_io_scrape"
+                          ]
+                        },
+                        {
+                          "action": "keep",
+                          "regex": "(.*kube-state-metrics|.*node-exporter|kubecost-network-costs)",
+                          "source_labels": [
+                            "__meta_kubernetes_endpoints_name"
+                          ]
+                        },
+                        {
+                          "action": "replace",
+                          "regex": "(https?)",
+                          "source_labels": [
+                            "__meta_kubernetes_service_annotation_prometheus_io_scheme"
+                          ],
+                          "target_label": "__scheme__"
+                        },
+                        {
+                          "action": "replace",
+                          "regex": "(.+)",
+                          "source_labels": [
+                            "__meta_kubernetes_service_annotation_prometheus_io_path"
+                          ],
+                          "target_label": "__metrics_path__"
+                        },
+                        {
+                          "action": "replace",
+                          "regex": "([^:]+)(?::\\d+)?;(\\d+)",
+                          "replacement": "$1:$2",
+                          "source_labels": [
+                            "__address__",
+                            "__meta_kubernetes_service_annotation_prometheus_io_port"
+                          ],
+                          "target_label": "__address__"
+                        },
+                        {
+                          "action": "labelmap",
+                          "regex": "__meta_kubernetes_service_label_(.+)"
+                        },
+                        {
+                          "action": "replace",
+                          "source_labels": [
+                            "__meta_kubernetes_namespace"
+                          ],
+                          "target_label": "kubernetes_namespace"
+                        },
+                        {
+                          "action": "replace",
+                          "source_labels": [
+                            "__meta_kubernetes_service_name"
+                          ],
+                          "target_label": "kubernetes_name"
+                        },
+                        {
+                          "action": "replace",
+                          "source_labels": [
+                            "__meta_kubernetes_pod_node_name"
+                          ],
+                          "target_label": "kubernetes_node"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "recording_rules.yml": {},
+                "rules": {
+                  "groups": [
+                    {
+                      "name": "CPU",
+                      "rules": [
+                        {
+                          "expr": "sum(rate(container_cpu_usage_seconds_total{container!=\"\"}[5m]))",
+                          "record": "cluster:cpu_usage:rate5m"
+                        },
+                        {
+                          "expr": "rate(container_cpu_usage_seconds_total{container!=\"\"}[5m])",
+                          "record": "cluster:cpu_usage_nosum:rate5m"
+                        },
+                        {
+                          "expr": "avg(irate(container_cpu_usage_seconds_total{container!=\"POD\", container!=\"\"}[5m])) by (container,pod,namespace)",
+                          "record": "kubecost_container_cpu_usage_irate"
+                        },
+                        {
+                          "expr": "sum(container_memory_working_set_bytes{container!=\"POD\",container!=\"\"}) by (container,pod,namespace)",
+                          "record": "kubecost_container_memory_working_set_bytes"
+                        },
+                        {
+                          "expr": "sum(container_memory_working_set_bytes{container!=\"POD\",container!=\"\"})",
+                          "record": "kubecost_cluster_memory_working_set_bytes"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Savings",
+                      "rules": [
+                        {
+                          "expr": "sum(avg(kube_pod_owner{owner_kind!=\"DaemonSet\"}) by (pod) * sum(container_cpu_allocation) by (pod))",
+                          "labels": {
+                            "daemonset": "false"
+                          },
+                          "record": "kubecost_savings_cpu_allocation"
+                        },
+                        {
+                          "expr": "sum(avg(kube_pod_owner{owner_kind=\"DaemonSet\"}) by (pod) * sum(container_cpu_allocation) by (pod)) / sum(kube_node_info)",
+                          "labels": {
+                            "daemonset": "true"
+                          },
+                          "record": "kubecost_savings_cpu_allocation"
+                        },
+                        {
+                          "expr": "sum(avg(kube_pod_owner{owner_kind!=\"DaemonSet\"}) by (pod) * sum(container_memory_allocation_bytes) by (pod))",
+                          "labels": {
+                            "daemonset": "false"
+                          },
+                          "record": "kubecost_savings_memory_allocation_bytes"
+                        },
+                        {
+                          "expr": "sum(avg(kube_pod_owner{owner_kind=\"DaemonSet\"}) by (pod) * sum(container_memory_allocation_bytes) by (pod)) / sum(kube_node_info)",
+                          "labels": {
+                            "daemonset": "true"
+                          },
+                          "record": "kubecost_savings_memory_allocation_bytes"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "serviceAccounts": {
+                "alertmanager": {
+                  "create": true,
+                  "name": null
+                },
+                "nodeExporter": {
+                  "create": true,
+                  "name": null
+                },
+                "pushgateway": {
+                  "create": true,
+                  "name": null
+                },
+                "server": {
+                  "annotations": {},
+                  "create": true,
+                  "name": null
+                }
+              },
+              "sidecarContainers": {
+                "containerSecurityContext": {
+                  "securityContext": {
+                    "allowPrivilegeEscalation": false,
+                    "capabilities": {
+                      "drop": [
+                        "ALL"
+                      ]
+                    },
+                    "readOnlyRootFilesystem": true,
+                    "runAsNonRoot": true,
+                    "seccompProfile": {
+                      "type": "RuntimeDefault"
+                    }
+                  }
+                }
+              }
+            },
+            "prometheusRule": {
+              "additionalLabels": {},
+              "enabled": false
+            },
+            "remoteWrite": {
+              "postgres": {
+                "auth": {
+                  "password": "admin"
+                },
+                "enabled": false,
+                "initImage": "gcr.io/kubecost1/sql-init",
+                "initImagePullPolicy": "Always",
+                "installLocal": true,
+                "persistentVolume": {
+                  "size": "200Gi"
+                },
+                "priorityClassName": "",
+                "remotePostgresAddress": ""
+              }
+            },
+            "reporting": {
+              "errorReporting": true,
+              "logCollection": true,
+              "productAnalytics": true,
+              "valuesReporting": true
+            },
+            "route": {
+              "annotations": {},
+              "enabled": false
+            },
+            "saml": {
+              "appRootURL": "http://localhost:9090",
+              "authTimeout": 1440,
+              "enabled": false,
+              "idpMetadataURL": "https://dev-elu2z98r.auth0.com/samlp/metadata/c6nY4M37rBP0qSO1IYIqBPPyIPxLS8v2",
+              "rbac": {
+                "enabled": false,
+                "groups": [
+                  {
+                    "assertionName": "http://schemas.auth0.com/userType",
+                    "assertionValues": [
+                      "admin",
+                      "superusers"
+                    ],
+                    "enabled": false,
+                    "name": "admin"
+                  },
+                  {
+                    "assertionName": "http://schemas.auth0.com/userType",
+                    "assertionValues": [
+                      "readonly"
+                    ],
+                    "enabled": false,
+                    "name": "readonly"
+                  },
+                  {
+                    "assertionName": "http://schemas.auth0.com/userType",
+                    "assertionValues": [
+                      "editor"
+                    ],
+                    "enabled": true,
+                    "name": "editor"
+                  }
+                ]
+              },
+              "redirectURL": "https://dev-elu2z98r.auth0.com/v2/logout",
+              "secretName": "kubecost-authzero"
+            },
+            "service": {
+              "annotations": {},
+              "labels": {},
+              "port": 9090,
+              "targetPort": 9090,
+              "type": "ClusterIP"
+            },
+            "serviceAccount": {
+              "annotations": {},
+              "create": true
+            },
+            "serviceMonitor": {
+              "additionalLabels": {},
+              "enabled": false,
+              "metricRelabelings": [],
+              "networkCosts": {
+                "additionalLabels": {},
+                "enabled": false,
+                "metricRelabelings": [],
+                "relabelings": [],
+                "scrapeTimeout": "10s"
+              },
+              "relabelings": []
+            },
+            "sigV4Proxy": {
+              "extraEnv": null,
+              "host": "aps-workspaces.us-west-2.amazonaws.com",
+              "image": "public.ecr.aws/aws-observability/aws-sigv4-proxy:latest",
+              "imagePullPolicy": "Always",
+              "name": "aps",
+              "port": 8005,
+              "region": "us-west-2"
+            },
+            "supportNFS": false,
+            "systemProxy": {
+              "enabled": false,
+              "httpProxyUrl": "",
+              "httpsProxyUrl": "",
+              "noProxy": ""
+            },
+            "tolerations": []
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: Monitoring
+    containerImage: gcr.io/kubecost1/operator/kubecost-operator-controller:v1.106.0
+    createdAt: "2023-09-18T18:35:32Z"
+    support: Stackwatch
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+    description: |-
+      An operator that deploys Kubecost 1.106.0 via the Helm chart.
+  name: kubecost.v1.106.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: CostAnalyzer
+      name: costanalyzers.charts.kubecost.com
+      version: v1alpha1
+      displayName: CostAnalyzer
+      description: The CostAnalyzer API describes a deployment of Kubecost and its dependencies.
+  description: |-
+    Kubecost provides real-time cost visibility and insights for teams using Kubernetes, helping you continuously reduce your cloud costs.
+
+    This OpenShift operator deploys Kubecost from the official Helm chart.
+
+    Kubecost allows you to:
+
+    * See allocated spend across all native Kubernetes concepts, so you can provide your teams with transparent, accurate cost data reconciled with your actual cloud bill.
+    * Join in-cluster costs like CPU and memory with out-of-cluster spend from cloud infrastructure services for complete cost visibility—all services from AWS, GCP, and Microsoft Azure are supported.
+    * Gain insights you can use to save 30-50% or more on your infrastructure spend, without exposing your private information—your data never gets shared externally, even with us.
+    * Have real-time alerts and recurring reports, empowering teams to take control of their Kubernetes-enabled infrastructure, stay within budgeted limits, and address monitoring interruptions immediately.
+
+    Visit the Kubecost website for more details including features, pricing, documentation, and more at www.kubecost.com.
+  displayName: Kubecost
+  icon:
+  - base64data: "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"
+    mediatype: "image/png"
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          - nodes
+          - persistentvolumes
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+        - apiGroups:
+          - charts.kubecost.com
+          resources:
+          - costanalyzers
+          - costanalyzers/status
+          - costanalyzers/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          - clusterroles
+          verbs:
+          - '*'
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - rolebindings
+          - roles
+          verbs:
+          - '*'
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - persistentvolumeclaims
+          - secrets
+          - serviceaccounts
+          - services
+          verbs:
+          - '*'
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: kubecost-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/component: manager
+          app.kubernetes.io/created-by: kubecost-operator
+          app.kubernetes.io/instance: controller-manager
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: deployment
+          app.kubernetes.io/part-of: kubecost-operator
+          control-plane: controller-manager
+        name: kubecost-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - amd64
+                        - arm64
+                        - ppc64le
+                        - s390x
+                      - key: kubernetes.io/os
+                        operator: In
+                        values:
+                        - linux
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 5m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                - --leader-election-id=kubecost-operator
+                image: gcr.io/kubecost1/operator/kubecost-operator-controller:v1.106.0
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: kubecost-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: kubecost-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - kubecost
+  - cost
+  - kubernetes
+  links:
+  - name: Kubecost
+    url: https://www.kubecost.com
+  maintainers:
+  - email: czoller@kubecost.com
+    name: Chip Zoller
+  maturity: alpha
+  provider:
+    name: Stackwatch
+    url: www.kubecost.com
+  version: 1.106.0

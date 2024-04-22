@@ -1,0 +1,476 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    helm.sh/resource-policy: keep
+  creationTimestamp: null
+  labels:
+    app: istio-pilot
+    chart: istio
+    heritage: Tiller
+    release: istio
+  name: serviceentries.networking.istio.io
+spec:
+  group: networking.istio.io
+  names:
+    categories:
+    - istio-io
+    - networking-istio-io
+    kind: ServiceEntry
+    listKind: ServiceEntryList
+    plural: serviceentries
+    shortNames:
+    - se
+    singular: serviceentry
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: The hosts associated with the ServiceEntry
+      jsonPath: .spec.hosts
+      name: Hosts
+      type: string
+    - description: Whether the service is external to the mesh or part of the mesh
+        (MESH_EXTERNAL or MESH_INTERNAL)
+      jsonPath: .spec.location
+      name: Location
+      type: string
+    - description: Service resolution mode for the hosts (NONE, STATIC, or DNS)
+      jsonPath: .spec.resolution
+      name: Resolution
+      type: string
+    - description: 'CreationTimestamp is a timestamp representing the server time
+        when this object was created. It is not guaranteed to be set in happens-before
+        order across separate operations. Clients may not set this value. It is represented
+        in RFC3339 form and is in UTC. Populated by the system. Read-only. Null for
+        lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            description: 'Configuration affecting service registry. See more details
+              at: https://istio.io/docs/reference/config/networking/service-entry.html'
+            properties:
+              addresses:
+                description: The virtual IP addresses associated with the service.
+                items:
+                  type: string
+                type: array
+              endpoints:
+                description: One or more endpoints associated with the service.
+                items:
+                  properties:
+                    address:
+                      description: Address associated with the network endpoint without
+                        the port.
+                      type: string
+                    labels:
+                      additionalProperties:
+                        type: string
+                      description: One or more labels associated with the endpoint.
+                      type: object
+                    locality:
+                      description: The locality associated with the endpoint.
+                      type: string
+                    network:
+                      description: Network enables Istio to group endpoints resident
+                        in the same L3 domain/network.
+                      type: string
+                    ports:
+                      additionalProperties:
+                        type: integer
+                      description: Set of ports associated with the endpoint.
+                      type: object
+                    serviceAccount:
+                      description: The service account associated with the workload
+                        if a sidecar is present in the workload.
+                      type: string
+                    weight:
+                      description: The load balancing weight associated with the endpoint.
+                      type: integer
+                  type: object
+                type: array
+              exportTo:
+                description: A list of namespaces to which this service is exported.
+                items:
+                  type: string
+                type: array
+              hosts:
+                description: The hosts associated with the ServiceEntry.
+                items:
+                  type: string
+                type: array
+              location:
+                description: |-
+                  Specify whether the service should be considered external to the mesh or part of the mesh.
+
+                  Valid Options: MESH_EXTERNAL, MESH_INTERNAL
+                enum:
+                - MESH_EXTERNAL
+                - MESH_INTERNAL
+                type: string
+              ports:
+                description: The ports associated with the external service.
+                items:
+                  properties:
+                    name:
+                      description: Label assigned to the port.
+                      type: string
+                    number:
+                      description: A valid non-negative integer port number.
+                      type: integer
+                    protocol:
+                      description: The protocol exposed on the port.
+                      type: string
+                    targetPort:
+                      description: The port number on the endpoint where the traffic
+                        will be received.
+                      type: integer
+                  required:
+                  - number
+                  - name
+                  type: object
+                type: array
+              resolution:
+                description: |-
+                  Service resolution mode for the hosts.
+
+                  Valid Options: NONE, STATIC, DNS, DNS_ROUND_ROBIN
+                enum:
+                - NONE
+                - STATIC
+                - DNS
+                - DNS_ROUND_ROBIN
+                type: string
+              subjectAltNames:
+                description: If specified, the proxy will verify that the server certificate's
+                  subject alternate name matches one of the specified values.
+                items:
+                  type: string
+                type: array
+              workloadSelector:
+                description: Applicable only for MESH_INTERNAL services.
+                properties:
+                  labels:
+                    additionalProperties:
+                      type: string
+                    description: One or more labels that indicate a specific set of
+                      pods/VMs on which the configuration should be applied.
+                    type: object
+                type: object
+            required:
+            - hosts
+            type: object
+          status:
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+    served: true
+    storage: false
+    subresources:
+      status: {}
+  - additionalPrinterColumns:
+    - description: The hosts associated with the ServiceEntry
+      jsonPath: .spec.hosts
+      name: Hosts
+      type: string
+    - description: Whether the service is external to the mesh or part of the mesh
+        (MESH_EXTERNAL or MESH_INTERNAL)
+      jsonPath: .spec.location
+      name: Location
+      type: string
+    - description: Service resolution mode for the hosts (NONE, STATIC, or DNS)
+      jsonPath: .spec.resolution
+      name: Resolution
+      type: string
+    - description: 'CreationTimestamp is a timestamp representing the server time
+        when this object was created. It is not guaranteed to be set in happens-before
+        order across separate operations. Clients may not set this value. It is represented
+        in RFC3339 form and is in UTC. Populated by the system. Read-only. Null for
+        lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha3
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            description: 'Configuration affecting service registry. See more details
+              at: https://istio.io/docs/reference/config/networking/service-entry.html'
+            properties:
+              addresses:
+                description: The virtual IP addresses associated with the service.
+                items:
+                  type: string
+                type: array
+              endpoints:
+                description: One or more endpoints associated with the service.
+                items:
+                  properties:
+                    address:
+                      description: Address associated with the network endpoint without
+                        the port.
+                      type: string
+                    labels:
+                      additionalProperties:
+                        type: string
+                      description: One or more labels associated with the endpoint.
+                      type: object
+                    locality:
+                      description: The locality associated with the endpoint.
+                      type: string
+                    network:
+                      description: Network enables Istio to group endpoints resident
+                        in the same L3 domain/network.
+                      type: string
+                    ports:
+                      additionalProperties:
+                        type: integer
+                      description: Set of ports associated with the endpoint.
+                      type: object
+                    serviceAccount:
+                      description: The service account associated with the workload
+                        if a sidecar is present in the workload.
+                      type: string
+                    weight:
+                      description: The load balancing weight associated with the endpoint.
+                      type: integer
+                  type: object
+                type: array
+              exportTo:
+                description: A list of namespaces to which this service is exported.
+                items:
+                  type: string
+                type: array
+              hosts:
+                description: The hosts associated with the ServiceEntry.
+                items:
+                  type: string
+                type: array
+              location:
+                description: |-
+                  Specify whether the service should be considered external to the mesh or part of the mesh.
+
+                  Valid Options: MESH_EXTERNAL, MESH_INTERNAL
+                enum:
+                - MESH_EXTERNAL
+                - MESH_INTERNAL
+                type: string
+              ports:
+                description: The ports associated with the external service.
+                items:
+                  properties:
+                    name:
+                      description: Label assigned to the port.
+                      type: string
+                    number:
+                      description: A valid non-negative integer port number.
+                      type: integer
+                    protocol:
+                      description: The protocol exposed on the port.
+                      type: string
+                    targetPort:
+                      description: The port number on the endpoint where the traffic
+                        will be received.
+                      type: integer
+                  required:
+                  - number
+                  - name
+                  type: object
+                type: array
+              resolution:
+                description: |-
+                  Service resolution mode for the hosts.
+
+                  Valid Options: NONE, STATIC, DNS, DNS_ROUND_ROBIN
+                enum:
+                - NONE
+                - STATIC
+                - DNS
+                - DNS_ROUND_ROBIN
+                type: string
+              subjectAltNames:
+                description: If specified, the proxy will verify that the server certificate's
+                  subject alternate name matches one of the specified values.
+                items:
+                  type: string
+                type: array
+              workloadSelector:
+                description: Applicable only for MESH_INTERNAL services.
+                properties:
+                  labels:
+                    additionalProperties:
+                      type: string
+                    description: One or more labels that indicate a specific set of
+                      pods/VMs on which the configuration should be applied.
+                    type: object
+                type: object
+            required:
+            - hosts
+            type: object
+          status:
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+    served: true
+    storage: false
+    subresources:
+      status: {}
+  - additionalPrinterColumns:
+    - description: The hosts associated with the ServiceEntry
+      jsonPath: .spec.hosts
+      name: Hosts
+      type: string
+    - description: Whether the service is external to the mesh or part of the mesh
+        (MESH_EXTERNAL or MESH_INTERNAL)
+      jsonPath: .spec.location
+      name: Location
+      type: string
+    - description: Service resolution mode for the hosts (NONE, STATIC, or DNS)
+      jsonPath: .spec.resolution
+      name: Resolution
+      type: string
+    - description: 'CreationTimestamp is a timestamp representing the server time
+        when this object was created. It is not guaranteed to be set in happens-before
+        order across separate operations. Clients may not set this value. It is represented
+        in RFC3339 form and is in UTC. Populated by the system. Read-only. Null for
+        lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            description: 'Configuration affecting service registry. See more details
+              at: https://istio.io/docs/reference/config/networking/service-entry.html'
+            properties:
+              addresses:
+                description: The virtual IP addresses associated with the service.
+                items:
+                  type: string
+                type: array
+              endpoints:
+                description: One or more endpoints associated with the service.
+                items:
+                  properties:
+                    address:
+                      description: Address associated with the network endpoint without
+                        the port.
+                      type: string
+                    labels:
+                      additionalProperties:
+                        type: string
+                      description: One or more labels associated with the endpoint.
+                      type: object
+                    locality:
+                      description: The locality associated with the endpoint.
+                      type: string
+                    network:
+                      description: Network enables Istio to group endpoints resident
+                        in the same L3 domain/network.
+                      type: string
+                    ports:
+                      additionalProperties:
+                        type: integer
+                      description: Set of ports associated with the endpoint.
+                      type: object
+                    serviceAccount:
+                      description: The service account associated with the workload
+                        if a sidecar is present in the workload.
+                      type: string
+                    weight:
+                      description: The load balancing weight associated with the endpoint.
+                      type: integer
+                  type: object
+                type: array
+              exportTo:
+                description: A list of namespaces to which this service is exported.
+                items:
+                  type: string
+                type: array
+              hosts:
+                description: The hosts associated with the ServiceEntry.
+                items:
+                  type: string
+                type: array
+              location:
+                description: |-
+                  Specify whether the service should be considered external to the mesh or part of the mesh.
+
+                  Valid Options: MESH_EXTERNAL, MESH_INTERNAL
+                enum:
+                - MESH_EXTERNAL
+                - MESH_INTERNAL
+                type: string
+              ports:
+                description: The ports associated with the external service.
+                items:
+                  properties:
+                    name:
+                      description: Label assigned to the port.
+                      type: string
+                    number:
+                      description: A valid non-negative integer port number.
+                      type: integer
+                    protocol:
+                      description: The protocol exposed on the port.
+                      type: string
+                    targetPort:
+                      description: The port number on the endpoint where the traffic
+                        will be received.
+                      type: integer
+                  required:
+                  - number
+                  - name
+                  type: object
+                type: array
+              resolution:
+                description: |-
+                  Service resolution mode for the hosts.
+
+                  Valid Options: NONE, STATIC, DNS, DNS_ROUND_ROBIN
+                enum:
+                - NONE
+                - STATIC
+                - DNS
+                - DNS_ROUND_ROBIN
+                type: string
+              subjectAltNames:
+                description: If specified, the proxy will verify that the server certificate's
+                  subject alternate name matches one of the specified values.
+                items:
+                  type: string
+                type: array
+              workloadSelector:
+                description: Applicable only for MESH_INTERNAL services.
+                properties:
+                  labels:
+                    additionalProperties:
+                      type: string
+                    description: One or more labels that indicate a specific set of
+                      pods/VMs on which the configuration should be applied.
+                    type: object
+                type: object
+            required:
+            - hosts
+            type: object
+          status:
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

@@ -1,0 +1,717 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.13.0
+  creationTimestamp: null
+  name: istios.operator.istio.io
+spec:
+  group: operator.istio.io
+  names:
+    kind: Istio
+    listKind: IstioList
+    plural: istios
+    singular: istio
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Whether the control plane installation is ready to handle requests.
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    - description: The current state of this object.
+      jsonPath: .status.state
+      name: Status
+      type: string
+    - description: The version of the control plane installation.
+      jsonPath: .spec.version
+      name: Version
+      type: string
+    - description: The age of the object
+      jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Istio represents an Istio Service Mesh deployment
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: IstioSpec defines the desired state of Istio
+            properties:
+              profile:
+                description: 'The built-in installation configuration profile to use.
+                  The ''default'' profile is always applied. On OpenShift, the ''openshift''
+                  profile is also applied on top of ''default''. Must be one of: ambient,
+                  default, demo, empty, external, minimal, openshift, preview, remote.'
+                enum:
+                - ambient
+                - default
+                - demo
+                - empty
+                - external
+                - minimal
+                - openshift
+                - preview
+                - remote
+                type: string
+              rawValues:
+                description: RawValues defines the non-validated values to be passed
+                  to the Helm chart when installing Istio.
+                x-kubernetes-preserve-unknown-fields: true
+              values:
+                description: Values defines the values to be passed to the Helm chart
+                  when installing Istio.
+                properties:
+                  base:
+                    properties:
+                      enableCRDTemplates:
+                        type: boolean
+                      enableIstioConfigCRDs:
+                        type: boolean
+                      validateGateway:
+                        type: boolean
+                      validationURL:
+                        type: string
+                    type: object
+                  cni:
+                    properties:
+                      affinity:
+                        type: object
+                      ambient:
+                        properties:
+                          configDir:
+                            type: string
+                          enabled:
+                            type: boolean
+                          redirectMode:
+                            type: string
+                        type: object
+                      chained:
+                        type: boolean
+                      cniBinDir:
+                        type: string
+                      cniConfDir:
+                        type: string
+                      cniConfFileName:
+                        type: string
+                      cniNetnsDir:
+                        type: string
+                      enabled:
+                        type: boolean
+                      excludeNamespaces:
+                        type: string
+                      hub:
+                        type: string
+                      image:
+                        type: string
+                      logLevel:
+                        type: string
+                      privileged:
+                        type: boolean
+                      provider:
+                        type: string
+                      psp_cluster_role:
+                        type: string
+                      pullPolicy:
+                        type: string
+                      repair:
+                        properties:
+                          brokenPodLabelKey:
+                            type: string
+                          brokenPodLabelValue:
+                            type: string
+                          deletePods:
+                            type: object
+                          enabled:
+                            type: boolean
+                          hub:
+                            type: string
+                          image:
+                            type: string
+                          initContainerName:
+                            type: string
+                          labelPods:
+                            type: object
+                          tag:
+                            type: string
+                        type: object
+                      seccompProfile:
+                        type: object
+                      tag:
+                        type: string
+                      variant:
+                        type: string
+                    type: object
+                  gateways:
+                    properties:
+                      enabled:
+                        type: boolean
+                      istio-egressgateway:
+                        properties:
+                          additionalContainers:
+                            type: object
+                          autoscaleEnabled:
+                            type: boolean
+                          autoscaleMax:
+                            type: integer
+                          autoscaleMin:
+                            type: integer
+                          configVolumes:
+                            type: object
+                          customService:
+                            type: boolean
+                          enabled:
+                            type: boolean
+                          env:
+                            type: object
+                          injectionTemplate:
+                            type: string
+                          ipFamilies:
+                            type: string
+                          ipFamilyPolicy:
+                            type: string
+                          labels:
+                            type: object
+                          name:
+                            type: string
+                          ports:
+                            properties:
+                              name:
+                                type: string
+                              nodePort:
+                                type: object
+                              port:
+                                type: object
+                              protocol:
+                                type: string
+                              targetPort:
+                                type: object
+                            type: object
+                          runAsRoot:
+                            type: boolean
+                          secretVolumes:
+                            type: object
+                          serviceAnnotations:
+                            type: object
+                          type:
+                            type: string
+                          zvpn:
+                            properties:
+                              enabled:
+                                type: boolean
+                              suffix:
+                                type: string
+                            type: object
+                        type: object
+                      istio-ingressgateway:
+                        properties:
+                          additionalContainers:
+                            type: object
+                          autoscaleEnabled:
+                            type: boolean
+                          autoscaleMax:
+                            type: integer
+                          autoscaleMin:
+                            type: integer
+                          configVolumes:
+                            type: object
+                          customService:
+                            type: boolean
+                          enabled:
+                            type: boolean
+                          env:
+                            type: object
+                          externalTrafficPolicy:
+                            type: string
+                          ingressPorts:
+                            type: object
+                          injectionTemplate:
+                            type: string
+                          ipFamilies:
+                            type: string
+                          ipFamilyPolicy:
+                            type: string
+                          labels:
+                            type: object
+                          loadBalancerIP:
+                            type: string
+                          loadBalancerSourceRanges:
+                            type: string
+                          name:
+                            type: string
+                          ports:
+                            properties:
+                              name:
+                                type: string
+                              nodePort:
+                                type: object
+                              port:
+                                type: object
+                              protocol:
+                                type: string
+                              targetPort:
+                                type: object
+                            type: object
+                          runAsRoot:
+                            type: boolean
+                          secretVolumes:
+                            type: object
+                          serviceAnnotations:
+                            type: object
+                          type:
+                            type: string
+                          zvpn:
+                            properties:
+                              enabled:
+                                type: boolean
+                              suffix:
+                                type: string
+                            type: object
+                        type: object
+                    type: object
+                  global:
+                    properties:
+                      autoscalingv2API:
+                        type: boolean
+                      caAddress:
+                        type: string
+                      caName:
+                        type: string
+                      certSigners:
+                        type: string
+                      configCluster:
+                        type: boolean
+                      configRootNamespace:
+                        type: string
+                      configValidation:
+                        type: boolean
+                      defaultConfigVisibilitySettings:
+                        type: string
+                      externalIstiod:
+                        type: boolean
+                      hub:
+                        type: string
+                      imagePullPolicy:
+                        type: string
+                      imagePullSecrets:
+                        type: string
+                      ipFamilies:
+                        type: string
+                      ipFamilyPolicy:
+                        type: string
+                      istioNamespace:
+                        type: string
+                      istiod:
+                        properties:
+                          enableAnalysis:
+                            type: boolean
+                        type: object
+                      jwtPolicy:
+                        type: string
+                      logAsJson:
+                        type: boolean
+                      logging:
+                        properties:
+                          level:
+                            type: string
+                        type: object
+                      meshID:
+                        type: string
+                      meshNetworks:
+                        type: object
+                      mountMtlsCerts:
+                        type: boolean
+                      multiCluster:
+                        properties:
+                          clusterName:
+                            type: string
+                          enabled:
+                            type: boolean
+                          globalDomainSuffix:
+                            type: string
+                          includeEnvoyFilter:
+                            type: boolean
+                        type: object
+                      network:
+                        type: string
+                      omitSidecarInjectorConfigMap:
+                        type: boolean
+                      oneNamespace:
+                        type: boolean
+                      operatorManageWebhooks:
+                        type: boolean
+                      pilotCertProvider:
+                        type: string
+                      platform:
+                        type: string
+                      podDNSSearchNamespaces:
+                        type: string
+                      proxy:
+                        properties:
+                          autoInject:
+                            type: string
+                          clusterDomain:
+                            type: string
+                          componentLogLevel:
+                            type: string
+                          enableCoreDump:
+                            type: boolean
+                          excludeIPRanges:
+                            type: string
+                          excludeInboundPorts:
+                            type: string
+                          excludeOutboundPorts:
+                            type: string
+                          image:
+                            type: string
+                          includeIPRanges:
+                            type: string
+                          includeInboundPorts:
+                            type: string
+                          includeOutboundPorts:
+                            type: string
+                          lifecycle:
+                            type: object
+                          logLevel:
+                            type: string
+                          privileged:
+                            type: boolean
+                          readinessFailureThreshold:
+                            type: integer
+                          readinessInitialDelaySeconds:
+                            type: integer
+                          readinessPeriodSeconds:
+                            type: integer
+                          statusPort:
+                            type: integer
+                          tracer:
+                            type: object
+                        type: object
+                      proxy_init:
+                        properties:
+                          image:
+                            type: string
+                        type: object
+                      remotePilotAddress:
+                        type: string
+                      revision:
+                        type: string
+                      sds:
+                        type: object
+                      sts:
+                        properties:
+                          servicePort:
+                            type: integer
+                        type: object
+                      tag:
+                        type: string
+                      tracer:
+                        properties:
+                          datadog:
+                            properties:
+                              address:
+                                type: string
+                            type: object
+                          lightstep:
+                            properties:
+                              accessToken:
+                                type: string
+                              address:
+                                type: string
+                            type: object
+                          stackdriver:
+                            properties:
+                              debug:
+                                type: boolean
+                              maxNumberOfAnnotations:
+                                type: integer
+                              maxNumberOfAttributes:
+                                type: integer
+                              maxNumberOfMessageEvents:
+                                type: integer
+                            type: object
+                          zipkin:
+                            properties:
+                              address:
+                                type: string
+                            type: object
+                        type: object
+                      useMCP:
+                        type: boolean
+                      variant:
+                        type: string
+                    type: object
+                  istio_cni:
+                    properties:
+                      affinity:
+                        type: object
+                      ambient:
+                        properties:
+                          configDir:
+                            type: string
+                          enabled:
+                            type: boolean
+                          redirectMode:
+                            type: string
+                        type: object
+                      chained:
+                        type: boolean
+                      cniBinDir:
+                        type: string
+                      cniConfDir:
+                        type: string
+                      cniConfFileName:
+                        type: string
+                      cniNetnsDir:
+                        type: string
+                      enabled:
+                        type: boolean
+                      excludeNamespaces:
+                        type: string
+                      hub:
+                        type: string
+                      image:
+                        type: string
+                      logLevel:
+                        type: string
+                      privileged:
+                        type: boolean
+                      provider:
+                        type: string
+                      psp_cluster_role:
+                        type: string
+                      pullPolicy:
+                        type: string
+                      repair:
+                        properties:
+                          brokenPodLabelKey:
+                            type: string
+                          brokenPodLabelValue:
+                            type: string
+                          deletePods:
+                            type: object
+                          enabled:
+                            type: boolean
+                          hub:
+                            type: string
+                          image:
+                            type: string
+                          initContainerName:
+                            type: string
+                          labelPods:
+                            type: object
+                          tag:
+                            type: string
+                        type: object
+                      seccompProfile:
+                        type: object
+                      tag:
+                        type: string
+                      variant:
+                        type: string
+                    type: object
+                  istiodRemote:
+                    properties:
+                      injectionPath:
+                        type: string
+                      injectionURL:
+                        type: string
+                    type: object
+                  pilot:
+                    properties:
+                      affinity:
+                        type: object
+                      autoscaleBehavior:
+                        type: object
+                      autoscaleEnabled:
+                        type: boolean
+                      autoscaleMax:
+                        type: integer
+                      autoscaleMin:
+                        type: integer
+                      configMap:
+                        type: boolean
+                      configNamespace:
+                        type: string
+                      configSource:
+                        type: object
+                      deploymentLabels:
+                        type: object
+                      enabled:
+                        type: boolean
+                      env:
+                        type: object
+                      extraContainerArgs:
+                        type: object
+                      hub:
+                        type: string
+                      image:
+                        type: string
+                      ipFamilies:
+                        type: string
+                      ipFamilyPolicy:
+                        type: string
+                      jwksResolverExtraRootCA:
+                        type: string
+                      keepaliveMaxServerConnectionAge:
+                        type: object
+                      plugins:
+                        type: string
+                      podLabels:
+                        type: object
+                      seccompProfile:
+                        type: object
+                      serviceAnnotations:
+                        type: object
+                      subscribedResources:
+                        type: string
+                      tag:
+                        type: string
+                      topologySpreadConstraints:
+                        type: object
+                      traceSampling:
+                        type: object
+                      useMCP:
+                        type: boolean
+                      variant:
+                        type: string
+                      volumeMounts:
+                        type: object
+                      volumes:
+                        type: object
+                    type: object
+                  sidecarInjectorWebhook:
+                    properties:
+                      alwaysInjectSelector:
+                        type: object
+                      defaultTemplates:
+                        type: string
+                      enableNamespacesByDefault:
+                        type: boolean
+                      injectedAnnotations:
+                        type: object
+                      injectionURL:
+                        type: string
+                      neverInjectSelector:
+                        type: object
+                      objectSelector:
+                        type: object
+                      reinvocationPolicy:
+                        type: string
+                      rewriteAppHTTPProbe:
+                        type: boolean
+                      templates:
+                        type: object
+                    type: object
+                  telemetry:
+                    properties:
+                      enabled:
+                        type: boolean
+                      v2:
+                        properties:
+                          access_log_policy:
+                            properties:
+                              enabled:
+                                type: boolean
+                              logWindowDuration:
+                                type: object
+                            type: object
+                          enabled:
+                            type: boolean
+                          metadata_exchange:
+                            properties:
+                              wasmEnabled:
+                                type: boolean
+                            type: object
+                          prometheus:
+                            properties:
+                              enabled:
+                                type: boolean
+                              wasmEnabled:
+                                type: boolean
+                            type: object
+                          stackdriver:
+                            type: object
+                        type: object
+                    type: object
+                type: object
+              version:
+                description: 'Version defines the version of Istio to install. Must
+                  be one of: latest, v1.20.0-rc.0, v1.19.3, v1.19.1. If not specified,
+                  the latest version supported by the operator is installed.'
+                enum:
+                - latest
+                - v1.20.0-rc.0
+                - v1.19.3
+                - v1.19.1
+                type: string
+            type: object
+          status:
+            description: IstioStatus defines the observed state of Istio
+            properties:
+              appliedValues:
+                x-kubernetes-preserve-unknown-fields: true
+              conditions:
+                description: Represents the latest available observations of the object's
+                  current state.
+                items:
+                  description: A Condition represents a specific observation of the
+                    object's state.
+                  properties:
+                    lastTransitionTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: Human-readable message indicating details about
+                        the last transition.
+                      type: string
+                    reason:
+                      description: Unique, single-word, CamelCase reason for the condition's
+                        last transition.
+                      type: string
+                    status:
+                      description: The status of this condition. Can be True, False
+                        or Unknown.
+                      type: string
+                    type:
+                      description: The type of this condition.
+                      type: string
+                  type: object
+                type: array
+              observedGeneration:
+                description: ObservedGeneration is the most recent generation observed
+                  for this Istio object. It corresponds to the object's generation,
+                  which is updated on mutation by the API Server. The information
+                  in the status pertains to this particular generation of the object.
+                format: int64
+                type: integer
+              state:
+                description: Reports the current state of the object.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

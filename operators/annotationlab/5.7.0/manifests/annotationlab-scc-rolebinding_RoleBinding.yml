@@ -1,0 +1,39 @@
+---
+################################
+## Airflow SCC Role Binding
+#################################
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: annotationlab-scc-rolebinding
+  labels:
+    tier: airflow
+    release: annotationlab
+    chart: "airflow-1.8.0"
+    heritage: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:anyuid
+subjects:
+  - kind: ServiceAccount
+    name: airflow-webserver
+    namespace: "johnsnowlabs-operator"
+  - kind: ServiceAccount
+    name: airflow-worker
+    namespace: "johnsnowlabs-operator"
+  - kind: ServiceAccount
+    name: airflow-scheduler
+    namespace: "johnsnowlabs-operator"
+  - kind: ServiceAccount
+    name: airflow-statsd
+    namespace: "johnsnowlabs-operator"
+  - kind: ServiceAccount
+    name: annotationlab-airflow-triggerer
+    namespace: "johnsnowlabs-operator"
+  - kind: ServiceAccount
+    name: airflow-migrate-database-job
+    namespace: "johnsnowlabs-operator"
+  - kind: ServiceAccount
+    name: airflow-create-user-job
+    namespace: "johnsnowlabs-operator"

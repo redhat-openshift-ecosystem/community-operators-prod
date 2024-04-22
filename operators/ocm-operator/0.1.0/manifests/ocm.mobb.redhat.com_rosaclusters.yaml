@@ -1,0 +1,526 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.1
+  creationTimestamp: null
+  name: rosaclusters.ocm.mobb.redhat.com
+spec:
+  group: ocm.mobb.redhat.com
+  names:
+    categories:
+    - cluster
+    - clusters
+    kind: ROSACluster
+    listKind: ROSAClusterList
+    plural: rosaclusters
+    singular: rosacluster
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ROSACluster is the Schema for the clusters API.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ROSAClusterSpec defines the desired state of ROSACluster.
+            properties:
+              accountID:
+                description: AWS Account ID where the ROSA Cluster will be provisioned.
+                type: string
+                x-kubernetes-validations:
+                - message: accountID is immutable
+                  rule: (self == oldSelf)
+              additionalTrustBundle:
+                description: PEM-encoded X.509 certificate bundle that will be added
+                  to each nodes trusted certificate store.
+                type: string
+                x-kubernetes-validations:
+                - message: additionalTrustBundle is immutable
+                  rule: (self == oldSelf)
+              defaultMachinePool:
+                description: Configuration of the default machine pool.
+                properties:
+                  instanceType:
+                    default: m5.xlarge
+                    description: "Instance type to use for all nodes within this MachinePool.
+                      \ Please see the following for a list of supported instance
+                      types based on the provider type (ROSA/OSD only supported for
+                      now): \n *ROSA/OSD: https://docs.openshift.com/rosa/rosa_architecture/rosa_policy_service_definition/rosa-service-definition.html"
+                    type: string
+                    x-kubernetes-validations:
+                    - message: instanceType is immutable
+                      rule: (self == oldSelf)
+                  labels:
+                    additionalProperties:
+                      type: string
+                    description: Additional labels to apply to this MachinePool.  It
+                      should be noted that 'ocm.mobb.redhat.com/managed' = 'true'
+                      is automatically applied as well as 'ocm.mobb.redhat.com/name'
+                      = spec.displayName.  Both of these labels are reserved and cannot
+                      be used as part of the spec.labels field.
+                    type: object
+                    x-kubernetes-validations:
+                    - message: ocm.mobb.redhat.com/name is a reserved label
+                      rule: '!(''ocm.mobb.redhat.com/name'' in self)'
+                    - message: ocm.mobb.redhat.com/managed is a reserved label
+                      rule: '!(''ocm.mobb.redhat.com/managed'' in self)'
+                  maximumNodesPerZone:
+                    description: Maximum amount of nodes allowed per availability
+                      zone.  Must be greater than or equal to spec.minimumNodesPerZone.  If
+                      this field is set, autoscaling will be enabled for this machine
+                      pool.
+                    type: integer
+                  minimumNodesPerZone:
+                    description: Minimum amount of nodes allowed per availability
+                      zone.  For single availability zone clusters, the minimum allowed
+                      is 2 per zone.  For multiple availability zone clusters, the
+                      minimum allowed is 1 per zone.  If spec.maximumNodesPerZone
+                      is also set, autoscaling will be enabled for this machine pool.
+                    type: integer
+                type: object
+              disableUserWorkloadMonitoring:
+                default: false
+                description: Enables you to monitor your own projects in isolation
+                  from Red Hat Site Reliability Engineer (SRE) platform metrics.
+                type: boolean
+                x-kubernetes-validations:
+                - message: disableUserWorkloadMonitoring is immutable
+                  rule: (self == oldSelf)
+              displayName:
+                description: Friendly display name as displayed in the OpenShift Cluster
+                  Manager console.  If this is empty, the metadata.name field of the
+                  parent resource is used to construct the display name.  This is
+                  limited to 15 characters as per a backend API limitation.
+                maxLength: 15
+                minLength: 4
+                type: string
+                x-kubernetes-validations:
+                - message: displayName is immutable
+                  rule: (self == oldSelf)
+              enableFIPS:
+                default: false
+                description: Enable FIPS-compliant cryptography standards on the cluster.
+                type: boolean
+                x-kubernetes-validations:
+                - message: enableFIPS is immutable
+                  rule: (self == oldSelf)
+              encryption:
+                description: Encryption configuration settings for the ROSA cluster.
+                properties:
+                  ebs:
+                    description: EBS encryption configuration.  EBS encryption is
+                      always enabled by default.  Allows you to use a customer-managed
+                      key rather than the default account key.
+                    properties:
+                      kmsKey:
+                        description: KMS Key ARN to use.  Must be a valid and existing
+                          KMS Key ARN.
+                        type: string
+                        x-kubernetes-validations:
+                        - message: kmsKey is immutable
+                          rule: (self == oldSelf)
+                    type: object
+                    x-kubernetes-validations:
+                    - message: ebs.kmsKey must be a valid aws arn
+                      rule: (self.kmsKey.startsWith("arn:aws"))
+                  etcd:
+                    description: ETCD encryption configuration.  If specified, ETCD
+                      encryption is enabled.
+                    properties:
+                      kmsKey:
+                        description: KMS Key ARN to use.  Must be a valid and existing
+                          KMS Key ARN.
+                        type: string
+                        x-kubernetes-validations:
+                        - message: kmsKey is immutable
+                          rule: (self == oldSelf)
+                    type: object
+                    x-kubernetes-validations:
+                    - message: etcd.kmsKey must be a valid aws arn
+                      rule: (self.kmsKey.startsWith("arn:aws"))
+                type: object
+              hostedControlPlane:
+                default: false
+                description: 'Provision a hosted control plane outside of the AWS
+                  account that this is being managed for (default: false). Must have
+                  hosted control plane enabled for your OCM organization.  Be aware
+                  of valid region differences in the ''.spec.region'' field.'
+                type: boolean
+                x-kubernetes-validations:
+                - message: hostedControlPlane is immutable
+                  rule: (self == oldSelf)
+              iam:
+                description: ROSA IAM configuration options including roles and prefixes.
+                properties:
+                  accountRolesPrefix:
+                    default: ManagedOpenShift
+                    description: 'Prefix used for provisioned account roles (default:
+                      ManagedOpenShift).  These should have been created as part of
+                      the prerequisite ''rosa create account-roles'' step.'
+                    type: string
+                    x-kubernetes-validations:
+                    - message: iam.accountRolesPrefix is immutable
+                      rule: (self == oldSelf)
+                    - message: accountRolesPrefix may not be blank
+                      rule: (self != "")
+                  enableManagedPolicies:
+                    default: false
+                    description: 'Use policies that are natively managed by AWS.  NOTE:
+                      currently this is not possible as the OCM API does not return
+                      valid ARNs.  Only ''false'' is an option for now.'
+                    enum:
+                    - false
+                    type: boolean
+                    x-kubernetes-validations:
+                    - message: iam.enableManagedPolicies is immutable
+                      rule: (self == oldSelf)
+                  operatorRolesPrefix:
+                    description: Prefix used for provisioned operator roles.  Defaults
+                      to using the cluster name with a randomly generated 6-digit
+                      ID.  These will be created as part of the cluster creation process.
+                    type: string
+                    x-kubernetes-validations:
+                    - message: iam.operatorRolesPrefix is immutable
+                      rule: (self == oldSelf)
+                  userRole:
+                    description: User role created with the prerequisite 'rosa create
+                      user-role' step.  This is the value used as the 'rosa_creator_arn'
+                      for the cluster.
+                    type: string
+                    x-kubernetes-validations:
+                    - message: iam.userRole is immutable
+                      rule: (self == oldSelf)
+                type: object
+              multiAZ:
+                default: false
+                description: 'Whether the control plane should be provisioned across
+                  multiple availability zones (default: false).  Only applicable when
+                  hostedControlPlane is set to false as hostedControlPlane is always
+                  provisioned across multiple availability zones.'
+                type: boolean
+                x-kubernetes-validations:
+                - message: multiAZ is immutable
+                  rule: (self == oldSelf)
+              network:
+                description: ROSA Network configuration options.
+                properties:
+                  hostPrefix:
+                    default: 23
+                    description: 'Host CIDR Prefix (e.g. /23) to use for host IP addresses
+                      within the ''network.machineCIDR'' subnet (default: 23). Minimum
+                      size available to use is 28 (used as a /28 CIDR Prefix).'
+                    type: integer
+                    x-kubernetes-validations:
+                    - message: network.hostPrefix is immutable
+                      rule: (self == oldSelf)
+                    - message: network.hostPrefix has a minimum size of /28
+                      rule: (self < 28)
+                  machineCIDR:
+                    default: 10.0.0.0/16
+                    description: 'CIDR to use for the AWS VPC (default: 10.0.0.0/16).  Required
+                      if subnets are not set so that the provisioner may create the
+                      network architecture.'
+                    type: string
+                    x-kubernetes-validations:
+                    - message: network.machineCIDR is immutable
+                      rule: (self == oldSelf)
+                    - message: network.machineCIDR not a valid CIDR
+                      rule: (self.split(".").size() == 4)
+                    - message: network.machineCIDR not a valid CIDR
+                      rule: (self.contains("/"))
+                  podCIDR:
+                    default: 10.128.0.0/14
+                    description: 'CIDR to use for the internal pod network (default:
+                      10.128.0.0/14).  Required if subnets are not set so that the
+                      provisioner may create the network architecture.'
+                    type: string
+                    x-kubernetes-validations:
+                    - message: network.podCIDR is immutable
+                      rule: (self == oldSelf)
+                    - message: network.podCIDR not a valid CIDR
+                      rule: (self.split(".").size() == 4)
+                    - message: network.podCIDR not a valid CIDR
+                      rule: (self.contains("/"))
+                  privateLink:
+                    default: false
+                    description: 'Enable PrivateLink (default: false).  Forces Red
+                      Hat SREs to connect to the cluster over an AWS PrivateLink endpoint.  Requires
+                      a pre-existing network configuration and subnets configured
+                      via the ''spec.network.subnets'' field.'
+                    type: boolean
+                    x-kubernetes-validations:
+                    - message: network.privateLink is immutable
+                      rule: (self == oldSelf)
+                  proxy:
+                    description: ROSA Proxy configuration.
+                    properties:
+                      httpProxy:
+                        description: Valid proxy URL to use for proxying HTTP requests
+                          from within the cluster.
+                        type: string
+                        x-kubernetes-validations:
+                        - message: network.proxy.httpProxy is immutable
+                          rule: (self == oldSelf)
+                        - message: http proxy url must be a valid uri
+                          rule: (self.contains("://"))
+                      httpsProxy:
+                        description: Valid proxy URL to use for proxying HTTPS requests
+                          from within the cluster.
+                        type: string
+                        x-kubernetes-validations:
+                        - message: network.proxy.httpsProxy is immutable
+                          rule: (self == oldSelf)
+                        - message: https proxy url must be a valid uri
+                          rule: (self.contains("://"))
+                      noProxy:
+                        description: Comma-separated list of URLs, IP addresses or
+                          Network CIDRs to skip proxying for.
+                        type: string
+                        x-kubernetes-validations:
+                        - message: network.proxy.noProxy is immutable
+                          rule: (self == oldSelf)
+                    type: object
+                  serviceCIDR:
+                    default: 172.30.0.0/16
+                    description: 'CIDR to use for the internal cluster service network
+                      (default: 172.30.0.0/16).  Required if subnets are not set so
+                      that the provisioner may create the network architecture.'
+                    type: string
+                    x-kubernetes-validations:
+                    - message: network.serviceCIDR is immutable
+                      rule: (self == oldSelf)
+                    - message: network.serviceCIDR not a valid CIDR
+                      rule: (self.split(".").size() == 4)
+                    - message: network.serviceCIDR not a valid CIDR
+                      rule: (self.contains("/"))
+                  subnets:
+                    description: Pre-existing subnets used for provisioning a ROSA
+                      cluster.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-validations:
+                    - message: network.subnets are immutable
+                      rule: (self == oldSelf)
+                type: object
+                x-kubernetes-validations:
+                - message: network.subnets must be provided with a PrivateLink configuration
+                  rule: (has(self.privateLink) && self.privateLink && has(self.subnets)
+                    && self.subnets.size() > 0 || !self.privateLink)
+                - message: network.proxy configuration only supported when network.subnets
+                    is specified
+                  rule: (has(self.proxy) && has(self.subnets) && self.subnets.size()
+                    > 0 || !has(self.proxy))
+              openshiftVersion:
+                description: OpenShift version used to provision the cluster with.  This
+                  is only used for initial provisioning and ignored for future updates.  Version
+                  must be in format of x.y.z.  If this is empty, the latest available
+                  and supportable version is selected.  If this is used, the version
+                  must be a part of the 'stable' channel group.
+                type: string
+                x-kubernetes-validations:
+                - message: openshiftVersion is immutable
+                  rule: (self == oldSelf)
+                - message: openshiftVersion must either be blank or valid x.y.z format
+                  rule: (self == "" || self.split(".").size() == 3)
+                - message: openshiftVersion cannot start with a 'v'
+                  rule: (!self.startsWith('v'))
+              region:
+                default: us-east-1
+                description: Region used to provision the ROSA cluster.  Supported
+                  regions can be found using the supportability checker located at
+                  https://access.redhat.com/labs/rosasc/.  Be aware of valid region
+                  differences if using '.spec.hostedControlPlane = true'.
+                type: string
+                x-kubernetes-validations:
+                - message: region is immutable
+                  rule: (self == oldSelf)
+                - message: region not a valid AWS region
+                  rule: (self.split("-").size() == 3)
+              tags:
+                additionalProperties:
+                  type: string
+                description: 'Additional tags to apply to all AWS objects. Tags are
+                  limited to 10 tags in total.  It should be noted that there are
+                  reserved tags that may not be overwritten.  These tags are as follows:
+                  red-hat-managed, red-hat-clustertype.'
+                type: object
+                x-kubernetes-validations:
+                - message: tags is immutable
+                  rule: (self == oldSelf)
+                - message: tags is limited to 10
+                  rule: (self.size() <= 10)
+                - message: red-hat-managed is a reserved tag
+                  rule: '!(''red-hat-managed'' in self)'
+                - message: red-hat-clustertype is a reserved tag
+                  rule: '!(''red-hat-clustertype'' in self)'
+            type: object
+            x-kubernetes-validations:
+            - message: singleAZ clusters require a minimum of 2 nodes
+              rule: (self.multiAZ || self.defaultMachinePool.minimumNodesPerZone >=
+                2)
+            - message: additionalTrustBundle only supported when network.subnets is
+                specified
+              rule: (has(self.network.subnets) && has(self.additionalTrustBundle)
+                && self.network.subnets.size() > 0 || !has(self.additionalTrustBundle))
+            - message: hostedControlPlane cannot have node labels
+              rule: (!self.hostedControlPlane || self.hostedControlPlane && !has(self.defaultMachinePool.labels)
+                || self.hostedControlPlane && has(self.defaultMachinePool.labels)
+                && self.defaultMachinePool.labels.size() == 0)
+          status:
+            description: ROSAClusterStatus defines the observed state of ROSACluster.
+            properties:
+              clusterID:
+                description: Represents the programmatic cluster ID of the cluster,
+                  as determined during reconciliation.  This is used to reduce the
+                  number of API calls to look up a cluster ID based on the cluster
+                  name.
+                type: string
+                x-kubernetes-validations:
+                - message: status.clusterID is immutable
+                  rule: (self == oldSelf)
+              conditions:
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource. --- This struct is intended for direct
+                    use as an array at the field path .status.conditions.  For example,
+                    \n type FooStatus struct{ // Represents the observations of a
+                    foo's current state. // Known .status.conditions.type are: \"Available\",
+                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
+                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
+                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
+                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition
+                        transitioned from one status to another. This should be when
+                        the underlying condition changed.  If that is not known, then
+                        using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating
+                        details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating
+                        the reason for the condition's last transition. Producers
+                        of specific condition types may define expected values and
+                        meanings for this field, and whether the values are considered
+                        a guaranteed API. The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        --- Many .condition.type values are consistent across resources
+                        like Available, but because arbitrary conditions can be useful
+                        (see .node.status.conditions), the ability to deconflict is
+                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              oidcConfigID:
+                description: Represents the programmatic OIDC Config ID of the cluster,
+                  as determined during reconciliation.  This is used to reduce the
+                  number of API calls to look up a cluster ID based on the cluster
+                  name.
+                type: string
+                x-kubernetes-validations:
+                - message: status.oidcConfigID is immutable
+                  rule: (self == oldSelf)
+              oidcProviderARN:
+                description: Represents the AWS ARN for the OIDC provider.  This is
+                  only set after the provider is created.
+                type: string
+                x-kubernetes-validations:
+                - message: status.OIDCProviderARN is immutable
+                  rule: (self == oldSelf)
+              openshiftVersion:
+                description: Represents the OpenShift OCM Version Raw ID which was
+                  used to provision the cluster.  This is useful if the version is
+                  unset to reduce the amount of calls to the OCM API.
+                type: string
+                x-kubernetes-validations:
+                - message: status.openshiftVersion is immutable
+                  rule: (self == oldSelf)
+              openshiftVersionID:
+                description: Represents the OpenShift OCM Version ID which was used
+                  to provision the cluster.  This is used to reduce the number of
+                  API calls to the OCM API.  This will differ from the 'spec.openshiftVersion'
+                  field.
+                type: string
+                x-kubernetes-validations:
+                - message: status.openshiftVersion is immutable
+                  rule: (self == oldSelf)
+              operatorRolesCreated:
+                description: Represents whether the operator roles have been created
+                  or not. This is used to ensure that we do not attempt to recreate
+                  operator roles once they have already been created.
+                type: boolean
+                x-kubernetes-validations:
+                - message: status.operatorRolesCreated is immutable
+                  rule: (self == oldSelf)
+              operatorRolesPrefix:
+                description: The operator roles prefix.  if 'spec.iam.operatorRolesPrefix'
+                  is unset, this is the derived value containing a unique id which
+                  will be unknown to the requester.
+                type: string
+                x-kubernetes-validations:
+                - message: status.operatorRolesPrefix is immutable
+                  rule: (self == oldSelf)
+            type: object
+        type: object
+        x-kubernetes-validations:
+        - message: metadata.name limited to 15 characters
+          rule: (self.metadata.name.size() <= 15)
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

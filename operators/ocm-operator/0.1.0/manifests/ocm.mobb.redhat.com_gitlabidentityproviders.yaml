@@ -1,0 +1,227 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.1
+  creationTimestamp: null
+  name: gitlabidentityproviders.ocm.mobb.redhat.com
+spec:
+  group: ocm.mobb.redhat.com
+  names:
+    categories:
+    - idps
+    - identityproviders
+    kind: GitLabIdentityProvider
+    listKind: GitLabIdentityProviderList
+    plural: gitlabidentityproviders
+    singular: gitlabidentityprovider
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: GitLabIdentityProvider is the Schema for the gitlabidentityproviders
+          API.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: GitLabIdentityProviderSpec defines the desired state of GitLabIdentityProvider.
+            properties:
+              ca:
+                description: ca is an optional reference to a config map by name containing
+                  the PEM-encoded CA bundle. It is used as a trust anchor to validate
+                  the TLS certificate presented by the remote server. The key "ca.crt"
+                  is used to locate the data. If specified and the config map or expected
+                  key is not found, the identity provider is not honored. If the specified
+                  ca data is not valid, the identity provider is not honored. If empty,
+                  the default system roots are used. This should exist in the same
+                  namespace as the operator.
+                properties:
+                  name:
+                    description: name is the metadata.name of the referenced config
+                      map
+                    type: string
+                required:
+                - name
+                type: object
+              clientID:
+                description: clientID is the oauth client ID
+                type: string
+              clientSecret:
+                description: clientSecret is a required reference to the secret by
+                  name containing the oauth client secret. The key "clientSecret"
+                  is used to locate the data. If the secret or expected key is not
+                  found, the identity provider is not honored. This should exist in
+                  the same namespace as the operator.
+                properties:
+                  name:
+                    description: name is the metadata.name of the referenced secret
+                    type: string
+                required:
+                - name
+                type: object
+              clusterName:
+                description: Cluster ID in OpenShift Cluster Manager by which this
+                  should be managed for.  The cluster ID can be obtained on the Clusters
+                  page for the individual cluster.  It may also be known as the 'External
+                  ID' in some CLI clients.  It shows up in the format of 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+                  where the 'x' represents any alphanumeric character.
+                type: string
+                x-kubernetes-validations:
+                - message: clusterName is immutable
+                  rule: (self == oldSelf)
+              displayName:
+                description: Friendly display name as displayed in the OpenShift Cluster
+                  Manager console.  If this is empty, the metadata.name field of the
+                  parent resource is used to construct the display name.  This is
+                  limited to 15 characters as per the backend API limitation.
+                maxLength: 15
+                minLength: 4
+                type: string
+                x-kubernetes-validations:
+                - message: displayName is immutable
+                  rule: (self == oldSelf)
+              mappingMethod:
+                default: claim
+                description: Mapping method to use for the identity provider. See
+                  https://docs.openshift.com/container-platform/latest/authentication/understanding-identity-provider.html#identity-provider-parameters_understanding-identity-provider
+                  for a detailed description of what these mean.  Must be one of claim
+                  (default), lookup, generate, or add.
+                enum:
+                - claim
+                - lookup
+                - generate
+                - add
+                type: string
+              url:
+                description: url is the oauth server base URL
+                type: string
+            required:
+            - clientID
+            - clientSecret
+            - url
+            type: object
+          status:
+            description: GitLabIdentityProviderStatus defines the observed state of
+              GitLabIdentityProvider.
+            properties:
+              callbackURL:
+                description: Represents the OAuth endpoint used for the OAuth provider
+                  to call back to.  This is necessary for proper configuration of
+                  any external identity provider.
+                type: string
+                x-kubernetes-validations:
+                - message: status.callbackURL is immutable
+                  rule: (self == oldSelf)
+              clusterID:
+                description: Represents the programmatic cluster ID of the cluster,
+                  as determined during reconciliation.  This is used to reduce the
+                  number of API calls to look up a cluster ID based on the cluster
+                  name.
+                type: string
+                x-kubernetes-validations:
+                - message: status.clusterID is immutable
+                  rule: (self == oldSelf)
+              conditions:
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource. --- This struct is intended for direct
+                    use as an array at the field path .status.conditions.  For example,
+                    \n type FooStatus struct{ // Represents the observations of a
+                    foo's current state. // Known .status.conditions.type are: \"Available\",
+                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
+                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
+                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
+                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition
+                        transitioned from one status to another. This should be when
+                        the underlying condition changed.  If that is not known, then
+                        using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating
+                        details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating
+                        the reason for the condition's last transition. Producers
+                        of specific condition types may define expected values and
+                        meanings for this field, and whether the values are considered
+                        a guaranteed API. The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        --- Many .condition.type values are consistent across resources
+                        like Available, but because arbitrary conditions can be useful
+                        (see .node.status.conditions), the ability to deconflict is
+                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              providerID:
+                description: Represents the programmatic identity provider ID of the
+                  IDP, as determined during reconciliation.  This is used to reduce
+                  the number of API calls to look up a cluster ID based on the identity
+                  provider name.
+                type: string
+                x-kubernetes-validations:
+                - message: status.providerID is immutable
+                  rule: (self == oldSelf)
+            type: object
+        type: object
+        x-kubernetes-validations:
+        - message: metadata.name limited to 15 characters
+          rule: (self.metadata.name.size() <= 15)
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

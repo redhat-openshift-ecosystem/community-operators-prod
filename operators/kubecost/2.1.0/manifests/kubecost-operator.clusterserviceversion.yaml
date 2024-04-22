@@ -1,0 +1,1728 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "charts.kubecost.com/v1alpha1",
+          "kind": "CostAnalyzer",
+          "metadata": {
+            "name": "costanalyzer-sample"
+          },
+          "spec": {
+            "global": {
+              "prometheus": {
+                "enabled": true,
+                "fqdn": "http://cost-analyzer-prometheus-server.default.svc"
+              },
+              "grafana": {
+                "enabled": false,
+                "domainName": "cost-analyzer-grafana.default.svc",
+                "scheme": "http",
+                "proxy": false
+              },
+              "gcpstore": {
+                "enabled": false
+              },
+              "gmp": {
+                "enabled": false,
+                "prometheusServerEndpoint": "http://localhost:8085/",
+                "gmpProxy": {
+                  "enabled": false,
+                  "image": "gke.gcr.io/prometheus-engine/frontend:v0.4.1-gke.0",
+                  "imagePullPolicy": "Always",
+                  "name": "gmp-proxy",
+                  "port": 8085,
+                  "projectId": "YOUR_PROJECT_ID"
+                }
+              },
+              "amp": {
+                "enabled": false,
+                "prometheusServerEndpoint": "http://localhost:8005/workspaces/<workspaceId>/",
+                "remoteWriteService": "https://aps-workspaces.us-west-2.amazonaws.com/workspaces/<workspaceId>/api/v1/remote_write",
+                "sigv4": {
+                  "region": "us-west-2"
+                }
+              },
+              "mimirProxy": {
+                "enabled": false,
+                "name": "mimir-proxy",
+                "image": "nginxinc/nginx-unprivileged",
+                "port": 8085,
+                "mimirEndpoint": "$mimir_endpoint",
+                "orgIdentifier": "$your_tenant_ID"
+              },
+              "notifications": {
+                "alertmanager": {
+                  "enabled": false,
+                  "fqdn": "http://cost-analyzer-prometheus-server.default.svc"
+                }
+              },
+              "savedReports": {
+                "enabled": false,
+                "reports": [
+                  {
+                    "title": "Example Saved Report 0",
+                    "window": "today",
+                    "aggregateBy": "namespace",
+                    "chartDisplay": "category",
+                    "idle": "separate",
+                    "rate": "cumulative",
+                    "accumulate": false,
+                    "filters": [
+                      {
+                        "key": "cluster",
+                        "operator": ":",
+                        "value": "dev"
+                      }
+                    ]
+                  },
+                  {
+                    "title": "Example Saved Report 1",
+                    "window": "month",
+                    "aggregateBy": "controllerKind",
+                    "chartDisplay": "category",
+                    "idle": "share",
+                    "rate": "monthly",
+                    "accumulate": false,
+                    "filters": [
+                      {
+                        "key": "namespace",
+                        "operator": "!:",
+                        "value": "kubecost"
+                      }
+                    ]
+                  },
+                  {
+                    "title": "Example Saved Report 2",
+                    "window": "2020-11-11T00:00:00Z,2020-12-09T23:59:59Z",
+                    "aggregateBy": "service",
+                    "chartDisplay": "category",
+                    "idle": "hide",
+                    "rate": "daily",
+                    "accumulate": true,
+                    "filters": []
+                  }
+                ]
+              },
+              "assetReports": {
+                "enabled": false,
+                "reports": [
+                  {
+                    "title": "Example Asset Report 0",
+                    "window": "today",
+                    "aggregateBy": "type",
+                    "accumulate": false,
+                    "filters": [
+                      {
+                        "property": "cluster",
+                        "value": "cluster-one"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "advancedReports": {
+                "enabled": false,
+                "reports": [
+                  {
+                    "title": "Example Advanced Report 0",
+                    "window": "7d",
+                    "aggregateBy": "namespace",
+                    "filters": [
+                      {
+                        "key": "cluster",
+                        "operator": ":",
+                        "value": "dev"
+                      }
+                    ],
+                    "cloudBreakdown": "service",
+                    "cloudJoin": "label:kubernetes_namespace"
+                  }
+                ]
+              },
+              "cloudCostReports": {
+                "enabled": false,
+                "reports": [
+                  {
+                    "title": "Cloud Cost Report 0",
+                    "window": "today",
+                    "aggregateBy": "service",
+                    "accumulate": false
+                  }
+                ]
+              },
+              "podAnnotations": {},
+              "additionalLabels": {},
+              "securityContext": {
+                "runAsNonRoot": true,
+                "seccompProfile": {
+                  "type": "RuntimeDefault"
+                },
+                "fsGroup": 1001,
+                "runAsGroup": 1001,
+                "runAsUser": 1001,
+                "fsGroupChangePolicy": "OnRootMismatch"
+              },
+              "containerSecurityContext": {
+                "allowPrivilegeEscalation": false,
+                "privileged": false,
+                "readOnlyRootFilesystem": true,
+                "capabilities": {
+                  "drop": [
+                    "ALL"
+                  ]
+                }
+              },
+              "platforms": {
+                "openshift": {
+                  "enabled": true,
+                  "route": {
+                    "enabled": false,
+                    "annotations": {}
+                  },
+                  "scc": {
+                    "nodeExporter": false,
+                    "networkCosts": false
+                  },
+                  "securityContext": {
+                    "runAsNonRoot": true,
+                    "seccompProfile": {
+                      "type": "RuntimeDefault"
+                    }
+                  }
+                },
+                "cicd": {
+                  "enabled": true,
+                  "skipSanityChecks": true
+                }
+              }
+            },
+            "upgrade": {
+              "toV2": false
+            },
+            "kubecostToken": null,
+            "pricingCsv": {
+              "enabled": false,
+              "location": {
+                "provider": "AWS",
+                "region": "us-east-1",
+                "URI": "s3://kc-csv-test/pricing_schema.csv",
+                "csvAccessCredentials": "pricing-schema-access-secret"
+              }
+            },
+            "saml": {
+              "enabled": false,
+              "rbac": {
+                "enabled": false
+              }
+            },
+            "oidc": {
+              "enabled": false,
+              "clientID": "",
+              "clientSecret": "",
+              "existingCustomSecret": {
+                "enabled": false,
+                "name": ""
+              },
+              "skipOnlineTokenValidation": false,
+              "rbac": {
+                "enabled": false
+              }
+            },
+            "systemProxy": {
+              "enabled": false,
+              "httpProxyUrl": "",
+              "httpsProxyUrl": "",
+              "noProxy": ""
+            },
+            "kubecostFrontend": {
+              "enabled": true,
+              "image": "gcr.io/kubecost1/frontend",
+              "imagePullPolicy": "Always",
+              "resources": {
+                "requests": {
+                  "cpu": "10m",
+                  "memory": "55Mi"
+                }
+              },
+              "readinessProbe": {
+                "enabled": true,
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "failureThreshold": 200
+              },
+              "livenessProbe": {
+                "enabled": true,
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "failureThreshold": 200
+              },
+              "ipv6": {
+                "enabled": true
+              },
+              "useDefaultFqdn": false
+            },
+            "kubecostMetrics": {
+              "exporter": {
+                "enabled": false,
+                "port": 9005,
+                "prometheusScrape": true,
+                "resources": {},
+                "tolerations": [],
+                "affinity": {},
+                "service": {
+                  "annotations": {}
+                },
+                "serviceMonitor": {
+                  "enabled": false,
+                  "additionalLabels": {},
+                  "metricRelabelings": [],
+                  "relabelings": []
+                },
+                "priorityClassName": "",
+                "additionalLabels": {},
+                "nodeSelector": {},
+                "extraArgs": []
+              }
+            },
+            "sigV4Proxy": {
+              "image": "public.ecr.aws/aws-observability/aws-sigv4-proxy:latest",
+              "imagePullPolicy": "Always",
+              "name": "aps",
+              "port": 8005,
+              "region": "us-west-2",
+              "host": "aps-workspaces.us-west-2.amazonaws.com",
+              "extraEnv": null,
+              "resources": {}
+            },
+            "kubecostModel": {
+              "image": "gcr.io/kubecost1/cost-model",
+              "imagePullPolicy": "Always",
+              "outOfClusterPromMetricsEnabled": false,
+              "warmCache": false,
+              "etl": true,
+              "etlFileStoreEnabled": true,
+              "etlDailyStoreDurationDays": 91,
+              "etlHourlyStoreDurationHours": 49,
+              "etlWeeklyStoreDurationWeeks": 53,
+              "etlReadOnlyMode": false,
+              "cloudCost": {
+                "labelList": {
+                  "IsIncludeList": false,
+                  "labels": ""
+                },
+                "topNItems": 1000
+              },
+              "allocation": null,
+              "maxQueryConcurrency": 5,
+              "resources": {
+                "requests": {
+                  "cpu": "200m",
+                  "memory": "55Mi"
+                }
+              },
+              "readinessProbe": {
+                "enabled": true,
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "failureThreshold": 200
+              },
+              "livenessProbe": {
+                "enabled": true,
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "failureThreshold": 200
+              },
+              "extraArgs": [],
+              "ingress": {
+                "enabled": false,
+                "labels": null,
+                "annotations": null,
+                "paths": [
+                  "/"
+                ],
+                "pathType": "ImplementationSpecific",
+                "hosts": [
+                  "cost-analyzer-model.local"
+                ],
+                "tls": []
+              },
+              "utcOffset": "+00:00",
+              "extraPorts": []
+            },
+            "etlUtils": {
+              "enabled": false,
+              "fullImageName": null,
+              "resources": {},
+              "env": {},
+              "nodeSelector": {},
+              "tolerations": {},
+              "affinity": {}
+            },
+            "ingress": {
+              "enabled": false,
+              "labels": null,
+              "annotations": null,
+              "paths": [
+                "/"
+              ],
+              "pathType": "ImplementationSpecific",
+              "hosts": [
+                "cost-analyzer.local"
+              ],
+              "tls": []
+            },
+            "nodeSelector": {},
+            "tolerations": [],
+            "affinity": {},
+            "topologySpreadConstraints": [],
+            "priority": {
+              "enabled": false,
+              "name": ""
+            },
+            "networkPolicy": {
+              "enabled": false,
+              "denyEgress": true,
+              "sameNamespace": true,
+              "costAnalyzer": {
+                "enabled": false,
+                "annotations": {},
+                "additionalLabels": {}
+              }
+            },
+            "extraVolumes": [],
+            "extraVolumeMounts": [],
+            "persistentVolume": {
+              "size": "32Gi",
+              "dbSize": "32.0Gi",
+              "enabled": true,
+              "labels": {},
+              "annotations": {},
+              "dbPVEnabled": false
+            },
+            "service": {
+              "type": "ClusterIP",
+              "port": 9090,
+              "targetPort": 9090,
+              "labels": {},
+              "annotations": {},
+              "sessionAffinity": {
+                "enabled": false,
+                "timeoutSeconds": 10800
+              }
+            },
+            "prometheus": {
+              "rbac": {
+                "create": true
+              },
+              "serviceAccounts": {
+                "alertmanager": {
+                  "create": true,
+                  "name": null
+                },
+                "nodeExporter": {
+                  "create": true,
+                  "name": null
+                },
+                "pushgateway": {
+                  "create": true,
+                  "name": null
+                },
+                "server": {
+                  "create": true,
+                  "name": null,
+                  "annotations": {}
+                }
+              },
+              "imagePullSecrets": null,
+              "extraScrapeConfigs": "- job_name: kubecost\n  honor_labels: true\n  scrape_interval: 1m\n  scrape_timeout: 60s\n  metrics_path: /metrics\n  scheme: http\n  dns_sd_configs:\n  - names:\n    - {{ template \"cost-analyzer.serviceName\" . }}\n    type: 'A'\n    port: 9003\n- job_name: kubecost-networking\n  kubernetes_sd_configs:\n    - role: pod\n  relabel_configs:\n  # Scrape only the the targets matching the following metadata\n    - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]\n      action: keep\n      regex:  kubecost\n    - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]\n      action: keep\n      regex:  network-costs\n",
+              "server": {
+                "enabled": true,
+                "name": "server",
+                "sidecarContainers": null,
+                "strategy": {
+                  "type": "Recreate",
+                  "rollingUpdate": null
+                },
+                "image": {
+                  "repository": "quay.io/prometheus/prometheus",
+                  "tag": "v2.49.1",
+                  "pullPolicy": "IfNotPresent"
+                },
+                "priorityClassName": "",
+                "prefixURL": "",
+                "baseURL": "",
+                "env": [],
+                "extraFlags": [
+                  "web.enable-lifecycle"
+                ],
+                "configPath": "/etc/config/prometheus.yml",
+                "global": {
+                  "scrape_interval": "1m",
+                  "scrape_timeout": "60s",
+                  "evaluation_interval": "1m",
+                  "external_labels": {
+                    "cluster_id": "cluster-one"
+                  }
+                },
+                "remoteWrite": {},
+                "remoteRead": {},
+                "extraArgs": {
+                  "query.max-concurrency": 1,
+                  "query.max-samples": 100000000
+                },
+                "extraInitContainers": [],
+                "extraVolumeMounts": [],
+                "extraVolumes": [],
+                "extraHostPathMounts": [],
+                "extraConfigmapMounts": [],
+                "extraSecretMounts": [],
+                "configMapOverrideName": "",
+                "ingress": {
+                  "enabled": false,
+                  "annotations": {},
+                  "extraLabels": {},
+                  "hosts": [],
+                  "pathType": "Prefix",
+                  "extraPaths": [],
+                  "tls": []
+                },
+                "tolerations": [],
+                "nodeSelector": {},
+                "affinity": {},
+                "podDisruptionBudget": {
+                  "enabled": false,
+                  "maxUnavailable": 1
+                },
+                "persistentVolume": {
+                  "enabled": true,
+                  "accessModes": [
+                    "ReadWriteOnce"
+                  ],
+                  "annotations": {},
+                  "existingClaim": "",
+                  "mountPath": "/data",
+                  "size": "32Gi",
+                  "subPath": ""
+                },
+                "emptyDir": {
+                  "sizeLimit": ""
+                },
+                "podAnnotations": {},
+                "deploymentAnnotations": {},
+                "podLabels": {},
+                "alertmanagers": [],
+                "replicaCount": 1,
+                "statefulSet": {
+                  "enabled": false,
+                  "annotations": {},
+                  "labels": {},
+                  "podManagementPolicy": "OrderedReady",
+                  "headless": {
+                    "annotations": {},
+                    "labels": {},
+                    "servicePort": 80
+                  }
+                },
+                "readinessProbeInitialDelay": 30,
+                "readinessProbeTimeout": 30,
+                "readinessProbeFailureThreshold": 3,
+                "readinessProbeSuccessThreshold": 1,
+                "livenessProbeInitialDelay": 30,
+                "livenessProbeTimeout": 30,
+                "livenessProbeFailureThreshold": 3,
+                "livenessProbeSuccessThreshold": 1,
+                "resources": {},
+                "verticalAutoscaler": {
+                  "enabled": false
+                },
+                "securityContext": {},
+                "containerSecurityContext": {},
+                "service": {
+                  "annotations": {},
+                  "labels": {},
+                  "clusterIP": "",
+                  "externalIPs": [],
+                  "loadBalancerIP": "",
+                  "loadBalancerSourceRanges": [],
+                  "servicePort": 80,
+                  "sessionAffinity": "None",
+                  "type": "ClusterIP",
+                  "gRPC": {
+                    "enabled": false,
+                    "servicePort": 10901
+                  },
+                  "statefulsetReplica": {
+                    "enabled": false,
+                    "replica": 0
+                  }
+                },
+                "terminationGracePeriodSeconds": 300,
+                "retention": "15d"
+              },
+              "alertmanager": {
+                "enabled": false,
+                "strategy": {
+                  "type": "Recreate",
+                  "rollingUpdate": null
+                },
+                "name": "alertmanager",
+                "image": {
+                  "repository": "quay.io/prometheus/alertmanager",
+                  "tag": "v0.26.0",
+                  "pullPolicy": "IfNotPresent"
+                },
+                "priorityClassName": "",
+                "extraArgs": {},
+                "prefixURL": "",
+                "baseURL": "http://localhost:9093",
+                "extraEnv": {},
+                "extraSecretMounts": [],
+                "configMapOverrideName": "",
+                "configFromSecret": "",
+                "configFileName": "alertmanager.yml",
+                "ingress": {
+                  "enabled": false,
+                  "annotations": {},
+                  "extraLabels": {},
+                  "hosts": [],
+                  "extraPaths": [],
+                  "tls": []
+                },
+                "tolerations": [],
+                "nodeSelector": {},
+                "affinity": {},
+                "podDisruptionBudget": {
+                  "enabled": false,
+                  "maxUnavailable": 1
+                },
+                "persistentVolume": {
+                  "enabled": true,
+                  "accessModes": [
+                    "ReadWriteOnce"
+                  ],
+                  "annotations": {},
+                  "existingClaim": "",
+                  "mountPath": "/data",
+                  "size": "2Gi",
+                  "subPath": ""
+                },
+                "podAnnotations": {},
+                "podLabels": {},
+                "replicaCount": 1,
+                "statefulSet": {
+                  "enabled": false,
+                  "podManagementPolicy": "OrderedReady",
+                  "headless": {
+                    "annotations": {},
+                    "labels": {},
+                    "servicePort": 80
+                  }
+                },
+                "resources": {},
+                "securityContext": {
+                  "runAsUser": 1001,
+                  "runAsNonRoot": true,
+                  "runAsGroup": 1001,
+                  "fsGroup": 1001
+                },
+                "service": {
+                  "annotations": {},
+                  "labels": {},
+                  "clusterIP": "",
+                  "externalIPs": [],
+                  "loadBalancerIP": "",
+                  "loadBalancerSourceRanges": [],
+                  "servicePort": 80,
+                  "sessionAffinity": "None",
+                  "type": "ClusterIP"
+                }
+              },
+              "alertmanagerFiles": {
+                "alertmanager.yml": {
+                  "global": {},
+                  "receivers": [
+                    {
+                      "name": "default-receiver"
+                    }
+                  ],
+                  "route": {
+                    "group_wait": "10s",
+                    "group_interval": "5m",
+                    "receiver": "default-receiver",
+                    "repeat_interval": "3h"
+                  }
+                }
+              },
+              "configmapReload": {
+                "prometheus": {
+                  "enabled": false,
+                  "name": "configmap-reload",
+                  "image": {
+                    "repository": "quay.io/prometheus-operator/prometheus-config-reloader",
+                    "tag": "v0.71.2",
+                    "pullPolicy": "IfNotPresent"
+                  },
+                  "extraArgs": {},
+                  "extraVolumeDirs": [],
+                  "extraConfigmapMounts": [],
+                  "resources": {},
+                  "containerSecurityContext": {}
+                },
+                "alertmanager": {
+                  "enabled": false,
+                  "name": "configmap-reload",
+                  "image": {
+                    "repository": "quay.io/prometheus-operator/prometheus-config-reloader",
+                    "tag": "v0.71.2",
+                    "pullPolicy": "IfNotPresent"
+                  },
+                  "extraArgs": {},
+                  "extraVolumeDirs": [],
+                  "extraConfigmapMounts": [],
+                  "resources": {}
+                }
+              },
+              "nodeExporter": {
+                "enabled": false,
+                "hostNetwork": true,
+                "hostPID": true,
+                "dnsPolicy": "ClusterFirstWithHostNet",
+                "name": "node-exporter",
+                "image": {
+                  "repository": "prom/node-exporter",
+                  "tag": "v1.7.0",
+                  "pullPolicy": "IfNotPresent"
+                },
+                "priorityClassName": "",
+                "updateStrategy": {
+                  "type": "RollingUpdate"
+                },
+                "extraArgs": {},
+                "extraHostPathMounts": [],
+                "extraConfigmapMounts": [],
+                "tolerations": [],
+                "nodeSelector": {},
+                "podAnnotations": {},
+                "deploymentAnnotations": {},
+                "pod": {
+                  "labels": {}
+                },
+                "podDisruptionBudget": {
+                  "enabled": false,
+                  "maxUnavailable": 1
+                },
+                "resources": {},
+                "securityContext": {},
+                "service": {
+                  "annotations": {
+                    "prometheus.io/scrape": "true"
+                  },
+                  "labels": {},
+                  "clusterIP": "None",
+                  "externalIPs": [],
+                  "hostPort": 9100,
+                  "loadBalancerIP": "",
+                  "loadBalancerSourceRanges": [],
+                  "servicePort": 9100,
+                  "type": "ClusterIP"
+                }
+              },
+              "pushgateway": {
+                "enabled": false,
+                "name": "pushgateway",
+                "image": {
+                  "repository": "prom/pushgateway",
+                  "tag": "v1.6.2",
+                  "pullPolicy": "IfNotPresent"
+                },
+                "priorityClassName": "",
+                "extraArgs": {},
+                "ingress": {
+                  "enabled": false,
+                  "annotations": {},
+                  "hosts": [],
+                  "extraPaths": [],
+                  "tls": []
+                },
+                "tolerations": [],
+                "nodeSelector": {},
+                "podAnnotations": {},
+                "replicaCount": 1,
+                "podDisruptionBudget": {
+                  "enabled": false,
+                  "maxUnavailable": 1
+                },
+                "resources": {},
+                "securityContext": {
+                  "runAsUser": 1001,
+                  "runAsNonRoot": true
+                },
+                "service": {
+                  "annotations": {
+                    "prometheus.io/probe": "pushgateway"
+                  },
+                  "labels": {},
+                  "clusterIP": "",
+                  "externalIPs": [],
+                  "loadBalancerIP": "",
+                  "loadBalancerSourceRanges": [],
+                  "servicePort": 9091,
+                  "type": "ClusterIP"
+                },
+                "strategy": {
+                  "type": "Recreate",
+                  "rollingUpdate": null
+                },
+                "persistentVolume": {
+                  "enabled": true,
+                  "accessModes": [
+                    "ReadWriteOnce"
+                  ],
+                  "annotations": {},
+                  "existingClaim": "",
+                  "mountPath": "/data",
+                  "size": "2Gi",
+                  "subPath": ""
+                }
+              },
+              "serverFiles": {
+                "alerting_rules.yml": {},
+                "alerts": {},
+                "recording_rules.yml": {},
+                "prometheus.yml": {
+                  "rule_files": [
+                    "/etc/config/recording_rules.yml",
+                    "/etc/config/alerting_rules.yml",
+                    "/etc/config/rules",
+                    "/etc/config/alerts"
+                  ],
+                  "scrape_configs": [
+                    {
+                      "job_name": "prometheus",
+                      "static_configs": [
+                        {
+                          "targets": [
+                            "localhost:9090"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "job_name": "kubernetes-nodes-cadvisor",
+                      "scheme": "https",
+                      "tls_config": {
+                        "ca_file": "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
+                        "insecure_skip_verify": true
+                      },
+                      "bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
+                      "kubernetes_sd_configs": [
+                        {
+                          "role": "node"
+                        }
+                      ],
+                      "relabel_configs": [
+                        {
+                          "action": "labelmap",
+                          "regex": "__meta_kubernetes_node_label_(.+)"
+                        },
+                        {
+                          "target_label": "__address__",
+                          "replacement": "kubernetes.default.svc:443"
+                        },
+                        {
+                          "source_labels": [
+                            "__meta_kubernetes_node_name"
+                          ],
+                          "regex": "(.+)",
+                          "target_label": "__metrics_path__",
+                          "replacement": "/api/v1/nodes/$1/proxy/metrics/cadvisor"
+                        }
+                      ],
+                      "metric_relabel_configs": [
+                        {
+                          "source_labels": [
+                            "__name__"
+                          ],
+                          "regex": "(container_cpu_usage_seconds_total|container_memory_working_set_bytes|container_network_receive_errors_total|container_network_transmit_errors_total|container_network_receive_packets_dropped_total|container_network_transmit_packets_dropped_total|container_memory_usage_bytes|container_cpu_cfs_throttled_periods_total|container_cpu_cfs_periods_total|container_fs_usage_bytes|container_fs_limit_bytes|container_cpu_cfs_periods_total|container_fs_inodes_free|container_fs_inodes_total|container_fs_usage_bytes|container_fs_limit_bytes|container_cpu_cfs_throttled_periods_total|container_cpu_cfs_periods_total|container_network_receive_bytes_total|container_network_transmit_bytes_total|container_fs_inodes_free|container_fs_inodes_total|container_fs_usage_bytes|container_fs_limit_bytes|container_spec_cpu_shares|container_spec_memory_limit_bytes|container_network_receive_bytes_total|container_network_transmit_bytes_total|container_fs_reads_bytes_total|container_network_receive_bytes_total|container_fs_writes_bytes_total|container_fs_reads_bytes_total|cadvisor_version_info|kubecost_pv_info)",
+                          "action": "keep"
+                        },
+                        {
+                          "source_labels": [
+                            "container"
+                          ],
+                          "target_label": "container_name",
+                          "regex": "(.+)",
+                          "action": "replace"
+                        },
+                        {
+                          "source_labels": [
+                            "pod"
+                          ],
+                          "target_label": "pod_name",
+                          "regex": "(.+)",
+                          "action": "replace"
+                        }
+                      ]
+                    },
+                    {
+                      "job_name": "kubernetes-nodes",
+                      "scheme": "https",
+                      "tls_config": {
+                        "ca_file": "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt",
+                        "insecure_skip_verify": true
+                      },
+                      "bearer_token_file": "/var/run/secrets/kubernetes.io/serviceaccount/token",
+                      "kubernetes_sd_configs": [
+                        {
+                          "role": "node"
+                        }
+                      ],
+                      "relabel_configs": [
+                        {
+                          "action": "labelmap",
+                          "regex": "__meta_kubernetes_node_label_(.+)"
+                        },
+                        {
+                          "target_label": "__address__",
+                          "replacement": "kubernetes.default.svc:443"
+                        },
+                        {
+                          "source_labels": [
+                            "__meta_kubernetes_node_name"
+                          ],
+                          "regex": "(.+)",
+                          "target_label": "__metrics_path__",
+                          "replacement": "/api/v1/nodes/$1/proxy/metrics"
+                        }
+                      ],
+                      "metric_relabel_configs": [
+                        {
+                          "source_labels": [
+                            "__name__"
+                          ],
+                          "regex": "(kubelet_volume_stats_used_bytes)",
+                          "action": "keep"
+                        }
+                      ]
+                    },
+                    {
+                      "job_name": "kubernetes-service-endpoints",
+                      "kubernetes_sd_configs": [
+                        {
+                          "role": "endpoints"
+                        }
+                      ],
+                      "relabel_configs": [
+                        {
+                          "source_labels": [
+                            "__meta_kubernetes_service_annotation_prometheus_io_scrape"
+                          ],
+                          "action": "keep",
+                          "regex": true
+                        },
+                        {
+                          "source_labels": [
+                            "__meta_kubernetes_endpoints_name"
+                          ],
+                          "action": "keep",
+                          "regex": "(.*node-exporter|kubecost-network-costs)"
+                        },
+                        {
+                          "source_labels": [
+                            "__meta_kubernetes_service_annotation_prometheus_io_scheme"
+                          ],
+                          "action": "replace",
+                          "target_label": "__scheme__",
+                          "regex": "(https?)"
+                        },
+                        {
+                          "source_labels": [
+                            "__meta_kubernetes_service_annotation_prometheus_io_path"
+                          ],
+                          "action": "replace",
+                          "target_label": "__metrics_path__",
+                          "regex": "(.+)"
+                        },
+                        {
+                          "source_labels": [
+                            "__address__",
+                            "__meta_kubernetes_service_annotation_prometheus_io_port"
+                          ],
+                          "action": "replace",
+                          "target_label": "__address__",
+                          "regex": "([^:]+)(?::\\d+)?;(\\d+)",
+                          "replacement": "$1:$2"
+                        },
+                        {
+                          "action": "labelmap",
+                          "regex": "__meta_kubernetes_service_label_(.+)"
+                        },
+                        {
+                          "source_labels": [
+                            "__meta_kubernetes_namespace"
+                          ],
+                          "action": "replace",
+                          "target_label": "kubernetes_namespace"
+                        },
+                        {
+                          "source_labels": [
+                            "__meta_kubernetes_service_name"
+                          ],
+                          "action": "replace",
+                          "target_label": "kubernetes_name"
+                        },
+                        {
+                          "source_labels": [
+                            "__meta_kubernetes_pod_node_name"
+                          ],
+                          "action": "replace",
+                          "target_label": "kubernetes_node"
+                        }
+                      ],
+                      "metric_relabel_configs": [
+                        {
+                          "source_labels": [
+                            "__name__"
+                          ],
+                          "regex": "(container_cpu_allocation|container_cpu_usage_seconds_total|container_fs_limit_bytes|container_fs_writes_bytes_total|container_gpu_allocation|container_memory_allocation_bytes|container_memory_usage_bytes|container_memory_working_set_bytes|container_network_receive_bytes_total|container_network_transmit_bytes_total|DCGM_FI_DEV_GPU_UTIL|deployment_match_labels|kube_daemonset_status_desired_number_scheduled|kube_daemonset_status_number_ready|kube_deployment_spec_replicas|kube_deployment_status_replicas|kube_deployment_status_replicas_available|kube_job_status_failed|kube_namespace_annotations|kube_namespace_labels|kube_node_info|kube_node_labels|kube_node_status_allocatable|kube_node_status_allocatable_cpu_cores|kube_node_status_allocatable_memory_bytes|kube_node_status_capacity|kube_node_status_capacity_cpu_cores|kube_node_status_capacity_memory_bytes|kube_node_status_condition|kube_persistentvolume_capacity_bytes|kube_persistentvolume_status_phase|kube_persistentvolumeclaim_info|kube_persistentvolumeclaim_resource_requests_storage_bytes|kube_pod_container_info|kube_pod_container_resource_limits|kube_pod_container_resource_limits_cpu_cores|kube_pod_container_resource_limits_memory_bytes|kube_pod_container_resource_requests|kube_pod_container_resource_requests_cpu_cores|kube_pod_container_resource_requests_memory_bytes|kube_pod_container_status_restarts_total|kube_pod_container_status_running|kube_pod_container_status_terminated_reason|kube_pod_labels|kube_pod_owner|kube_pod_status_phase|kube_replicaset_owner|kube_statefulset_replicas|kube_statefulset_status_replicas|kubecost_cluster_info|kubecost_cluster_management_cost|kubecost_cluster_memory_working_set_bytes|kubecost_load_balancer_cost|kubecost_network_internet_egress_cost|kubecost_network_region_egress_cost|kubecost_network_zone_egress_cost|kubecost_node_is_spot|kubecost_pod_network_egress_bytes_total|node_cpu_hourly_cost|node_cpu_seconds_total|node_disk_reads_completed|node_disk_reads_completed_total|node_disk_writes_completed|node_disk_writes_completed_total|node_filesystem_device_error|node_gpu_count|node_gpu_hourly_cost|node_memory_Buffers_bytes|node_memory_Cached_bytes|node_memory_MemAvailable_bytes|node_memory_MemFree_bytes|node_memory_MemTotal_bytes|node_network_transmit_bytes_total|node_ram_hourly_cost|node_total_hourly_cost|pod_pvc_allocation|pv_hourly_cost|service_selector_labels|statefulSet_match_labels|kubecost_pv_info|up)",
+                          "action": "keep"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "rules": {
+                  "groups": [
+                    {
+                      "name": "CPU",
+                      "rules": [
+                        {
+                          "expr": "sum(rate(container_cpu_usage_seconds_total{container!=\"\"}[5m]))",
+                          "record": "cluster:cpu_usage:rate5m"
+                        },
+                        {
+                          "expr": "rate(container_cpu_usage_seconds_total{container!=\"\"}[5m])",
+                          "record": "cluster:cpu_usage_nosum:rate5m"
+                        },
+                        {
+                          "expr": "avg(irate(container_cpu_usage_seconds_total{container!=\"POD\", container!=\"\"}[5m])) by (container,pod,namespace)",
+                          "record": "kubecost_container_cpu_usage_irate"
+                        },
+                        {
+                          "expr": "sum(container_memory_working_set_bytes{container!=\"POD\",container!=\"\"}) by (container,pod,namespace)",
+                          "record": "kubecost_container_memory_working_set_bytes"
+                        },
+                        {
+                          "expr": "sum(container_memory_working_set_bytes{container!=\"POD\",container!=\"\"})",
+                          "record": "kubecost_cluster_memory_working_set_bytes"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Savings",
+                      "rules": [
+                        {
+                          "expr": "sum(avg(kube_pod_owner{owner_kind!=\"DaemonSet\"}) by (pod) * sum(container_cpu_allocation) by (pod))",
+                          "record": "kubecost_savings_cpu_allocation",
+                          "labels": {
+                            "daemonset": "false"
+                          }
+                        },
+                        {
+                          "expr": "sum(avg(kube_pod_owner{owner_kind=\"DaemonSet\"}) by (pod) * sum(container_cpu_allocation) by (pod)) / sum(kube_node_info)",
+                          "record": "kubecost_savings_cpu_allocation",
+                          "labels": {
+                            "daemonset": "true"
+                          }
+                        },
+                        {
+                          "expr": "sum(avg(kube_pod_owner{owner_kind!=\"DaemonSet\"}) by (pod) * sum(container_memory_allocation_bytes) by (pod))",
+                          "record": "kubecost_savings_memory_allocation_bytes",
+                          "labels": {
+                            "daemonset": "false"
+                          }
+                        },
+                        {
+                          "expr": "sum(avg(kube_pod_owner{owner_kind=\"DaemonSet\"}) by (pod) * sum(container_memory_allocation_bytes) by (pod)) / sum(kube_node_info)",
+                          "record": "kubecost_savings_memory_allocation_bytes",
+                          "labels": {
+                            "daemonset": "true"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              "alertRelabelConfigs": null,
+              "networkPolicy": {
+                "enabled": false
+              }
+            },
+            "networkCosts": {
+              "enabled": false,
+              "image": {
+                "repository": "gcr.io/kubecost1/kubecost-network-costs",
+                "tag": "v0.17.2"
+              },
+              "imagePullPolicy": "Always",
+              "updateStrategy": {
+                "type": "RollingUpdate"
+              },
+              "prometheusScrape": false,
+              "trafficLogging": true,
+              "port": 3001,
+              "resources": {
+                "limits": {
+                  "cpu": "500m"
+                },
+                "requests": {
+                  "cpu": "50m",
+                  "memory": "20Mi"
+                }
+              },
+              "extraArgs": [],
+              "config": {
+                "destinations": {
+                  "in-zone": [
+                    "127.0.0.0/8",
+                    "169.254.0.0/16",
+                    "10.0.0.0/8",
+                    "172.16.0.0/12",
+                    "192.168.0.0/16"
+                  ],
+                  "in-region": [],
+                  "cross-region": [],
+                  "internet": [],
+                  "direct-classification": []
+                },
+                "services": {
+                  "google-cloud-services": false,
+                  "amazon-web-services": false,
+                  "azure-cloud-services": false
+                }
+              },
+              "tolerations": [],
+              "affinity": {},
+              "service": {
+                "annotations": {},
+                "labels": {}
+              },
+              "priorityClassName": "",
+              "podMonitor": {
+                "enabled": false,
+                "additionalLabels": {}
+              },
+              "additionalLabels": {},
+              "nodeSelector": {},
+              "annotations": {},
+              "healthCheckProbes": {},
+              "additionalSecurityContext": {}
+            },
+            "kubecostDeployment": {
+              "statefulSet": {
+                "enabled": false
+              },
+              "replicas": 1,
+              "labels": {},
+              "annotations": {}
+            },
+            "forecasting": {
+              "enabled": true,
+              "fullImageName": "gcr.io/kubecost1/kubecost-modeling:v0.1.3",
+              "resources": {
+                "requests": {
+                  "cpu": "200m",
+                  "memory": "300Mi"
+                },
+                "limits": {
+                  "cpu": "1500m",
+                  "memory": "1Gi"
+                }
+              },
+              "env": {
+                "GUNICORN_CMD_ARGS": "--log-level info -t 1200"
+              },
+              "priority": {
+                "enabled": false,
+                "name": ""
+              },
+              "nodeSelector": {},
+              "tolerations": {},
+              "affinity": {},
+              "readinessProbe": {
+                "enabled": true,
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "failureThreshold": 200
+              },
+              "livenessProbe": {
+                "enabled": true,
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "failureThreshold": 200
+              }
+            },
+            "kubecostAggregator": {
+              "deployMethod": "singlepod",
+              "enabled": false,
+              "replicas": 1,
+              "stagingEmptyDirSizeLimit": "2Gi",
+              "numDBCopyPartitions": 25,
+              "resources": {},
+              "env": {
+                "LOG_LEVEL": "info",
+                "DB_READ_THREADS": "1",
+                "DB_WRITE_THREADS": "1",
+                "DB_CONCURRENT_INGESTION_COUNT": "3"
+              },
+              "persistentConfigsStorage": {
+                "storageClass": "",
+                "storageRequest": "1Gi"
+              },
+              "aggregatorDbStorage": {
+                "storageClass": "",
+                "storageRequest": "128Gi"
+              },
+              "readinessProbe": {
+                "enabled": true,
+                "initialDelaySeconds": 10,
+                "periodSeconds": 10,
+                "failureThreshold": 200
+              },
+              "extraPorts": [],
+              "securityContext": {},
+              "cloudCost": {
+                "enabled": false,
+                "resources": {},
+                "readinessProbe": {
+                  "enabled": true,
+                  "initialDelaySeconds": 10,
+                  "periodSeconds": 10,
+                  "failureThreshold": 200
+                }
+              },
+              "jaeger": {
+                "enabled": false,
+                "image": "jaegertracing/all-in-one",
+                "imageVersion": "latest"
+              }
+            },
+            "diagnostics": {
+              "enabled": true,
+              "primary": {
+                "enabled": false,
+                "retention": "7d",
+                "readonly": false
+              },
+              "pollingInterval": "300s",
+              "keepDiagnosticHistory": false,
+              "collectHelmValues": false,
+              "deployment": {
+                "enabled": false,
+                "resources": {
+                  "requests": {
+                    "cpu": "10m",
+                    "memory": "20Mi"
+                  }
+                },
+                "env": {},
+                "labels": {},
+                "securityContext": {},
+                "containerSecurityContext": {},
+                "nodeSelector": {},
+                "tolerations": {},
+                "affinity": {}
+              }
+            },
+            "clusterController": {
+              "enabled": false,
+              "image": {
+                "repository": "gcr.io/kubecost1/cluster-controller",
+                "tag": "v0.15.2"
+              },
+              "imagePullPolicy": "Always",
+              "priorityClassName": "",
+              "tolerations": [],
+              "actionConfigs": {
+                "namespaceTurndown": null,
+                "clusterRightsize": null,
+                "containerRightsize": null
+              },
+              "kubescaler": {
+                "defaultResizeAll": false
+              },
+              "namespaceTurndown": {
+                "rbac": {
+                  "enabled": true
+                }
+              }
+            },
+            "reporting": {
+              "logCollection": true,
+              "productAnalytics": true,
+              "errorReporting": true,
+              "valuesReporting": true
+            },
+            "serviceMonitor": {
+              "enabled": false,
+              "additionalLabels": {},
+              "metricRelabelings": [],
+              "relabelings": [],
+              "networkCosts": {
+                "enabled": false,
+                "scrapeTimeout": "10s",
+                "additionalLabels": {},
+                "metricRelabelings": [],
+                "relabelings": []
+              }
+            },
+            "prometheusRule": {
+              "enabled": false,
+              "additionalLabels": {}
+            },
+            "supportNFS": false,
+            "initChownDataImage": "busybox",
+            "initChownData": {
+              "resources": {}
+            },
+            "grafana": {
+              "rbac": {
+                "create": true
+              },
+              "replicas": 1,
+              "deploymentStrategy": "RollingUpdate",
+              "readinessProbe": {
+                "httpGet": {
+                  "path": "/api/health",
+                  "port": 3000
+                }
+              },
+              "livenessProbe": {
+                "httpGet": {
+                  "path": "/api/health",
+                  "port": 3000
+                },
+                "initialDelaySeconds": 60,
+                "timeoutSeconds": 30,
+                "failureThreshold": 10
+              },
+              "image": {
+                "repository": "grafana/grafana",
+                "tag": "10.3.1",
+                "pullPolicy": "IfNotPresent"
+              },
+              "securityContext": {},
+              "priorityClassName": "",
+              "downloadDashboardsImage": {
+                "repository": "curlimages/curl",
+                "tag": "latest",
+                "pullPolicy": "IfNotPresent"
+              },
+              "podAnnotations": {},
+              "annotations": {},
+              "service": {
+                "type": "ClusterIP",
+                "port": 80,
+                "annotations": {},
+                "labels": {}
+              },
+              "ingress": {
+                "enabled": false,
+                "annotations": {},
+                "labels": {},
+                "path": "/",
+                "pathType": "Prefix",
+                "hosts": [
+                  "chart-example.local"
+                ],
+                "tls": []
+              },
+              "resources": {},
+              "nodeSelector": {},
+              "tolerations": [],
+              "affinity": {},
+              "persistence": {
+                "enabled": false
+              },
+              "adminUser": "admin",
+              "adminPassword": "strongpassword",
+              "env": {},
+              "envFromSecret": "",
+              "extraSecretMounts": [],
+              "plugins": [],
+              "dashboardProviders": {},
+              "dashboards": {},
+              "dashboardsConfigMaps": {},
+              "ldap": {
+                "existingSecret": "",
+                "config": ""
+              },
+              "smtp": {
+                "existingSecret": ""
+              },
+              "sidecar": {
+                "image": {
+                  "repository": "kiwigrid/k8s-sidecar",
+                  "tag": "1.25.4",
+                  "pullPolicy": "IfNotPresent"
+                },
+                "resources": {},
+                "dashboards": {
+                  "enabled": true,
+                  "label": "grafana_dashboard",
+                  "labelValue": "1",
+                  "annotations": {},
+                  "error_throttle_sleep": 0,
+                  "folder": "/tmp/dashboards"
+                },
+                "datasources": {
+                  "enabled": false,
+                  "error_throttle_sleep": 0,
+                  "label": "grafana_datasource"
+                }
+              },
+              "grafana.ini": {
+                "server": {
+                  "serve_from_sub_path": false,
+                  "root_url": "%(protocol)s://%(domain)s:%(http_port)s/grafana"
+                },
+                "paths": {
+                  "data": "/var/lib/grafana/data",
+                  "logs": "/var/log/grafana",
+                  "plugins": "/var/lib/grafana/plugins",
+                  "provisioning": "/etc/grafana/provisioning"
+                },
+                "analytics": {
+                  "check_for_updates": true
+                },
+                "log": {
+                  "mode": "console"
+                },
+                "grafana_net": {
+                  "url": "https://grafana.net"
+                },
+                "auth.anonymous": {
+                  "enabled": true,
+                  "org_role": "Editor",
+                  "org_name": "Main Org."
+                }
+              }
+            },
+            "serviceAccount": {
+              "create": true,
+              "annotations": {}
+            },
+            "awsstore": {
+              "useAwsStore": false,
+              "imageNameAndVersion": "gcr.io/kubecost1/awsstore:latest",
+              "createServiceAccount": false,
+              "priorityClassName": "",
+              "nodeSelector": {}
+            },
+            "federatedETL": {
+              "agentOnly": false,
+              "federatedCluster": false,
+              "redirectS3Backup": false,
+              "useMultiClusterDB": false
+            },
+            "kubecostAdmissionController": {
+              "enabled": false,
+              "secretName": "webhook-server-tls",
+              "caBundle": "${CA_BUNDLE}"
+            },
+            "costEventsAudit": {
+              "enabled": false
+            },
+            "extraObjects": []
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: Monitoring
+    containerImage: gcr.io/kubecost1/operator/kubecost-operator-controller:v2.1.0
+    support: Stackwatch
+    createdAt: "2024-02-25T11:44:34Z"
+    operators.operatorframework.io/builder: operator-sdk-v1.32.0
+    operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+    description: |-
+      An operator that deploys Kubecost 2.1.0 via the Helm chart.
+  name: kubecost.v2.1.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: CostAnalyzer
+      name: costanalyzers.charts.kubecost.com
+      version: v1alpha1
+      displayName: CostAnalyzer
+      description: The CostAnalyzer API describes a deployment of Kubecost and its dependencies.
+  description: |-
+    Kubecost provides real-time cost visibility and insights for teams using Kubernetes, helping you continuously reduce your cloud costs.
+
+    This OpenShift operator deploys Kubecost from the official Helm chart.
+
+    Kubecost allows you to:
+
+    * See allocated spend across all native Kubernetes concepts, so you can provide your teams with transparent, accurate cost data reconciled with your actual cloud bill.
+    * Join in-cluster costs like CPU and memory with out-of-cluster spend from cloud infrastructure services for complete cost visibility—all services from AWS, GCP, and Microsoft Azure are supported.
+    * Gain insights you can use to save 30-50% or more on your infrastructure spend, without exposing your private information—your data never gets shared externally, even with us.
+    * Have real-time alerts and recurring reports, empowering teams to take control of their Kubernetes-enabled infrastructure, stay within budgeted limits, and address monitoring interruptions immediately.
+
+    Visit the Kubecost website for more details including features, pricing, documentation, and more at www.kubecost.com.
+  displayName: Kubecost
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          - nodes
+          - persistentvolumes
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+        - apiGroups:
+          - charts.kubecost.com
+          resources:
+          - costanalyzers
+          - costanalyzers/status
+          - costanalyzers/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          - clusterroles
+          verbs:
+          - '*'
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - rolebindings
+          - roles
+          verbs:
+          - '*'
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - statefulsets
+          verbs:
+          - '*'
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingresses
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - persistentvolumeclaims
+          - secrets
+          - serviceaccounts
+          - services
+          verbs:
+          - '*'
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: kubecost-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/component: manager
+          app.kubernetes.io/created-by: kubecost-operator
+          app.kubernetes.io/instance: controller-manager
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: deployment
+          app.kubernetes.io/part-of: kubecost-operator
+          control-plane: controller-manager
+        name: kubecost-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - amd64
+                        - arm64
+                        - ppc64le
+                        - s390x
+                      - key: kubernetes.io/os
+                        operator: In
+                        values:
+                        - linux
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 5m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                - --leader-election-id=kubecost-operator
+                image: gcr.io/kubecost1/operator/kubecost-operator-controller:v2.1.0
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: kubecost-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: kubecost-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - kubecost
+  - cost
+  - kubernetes
+  links:
+  - name: Kubecost
+    url: https://www.kubecost.com
+  maintainers:
+  - email: czoller@kubecost.com
+    name: Chip Zoller
+  maturity: alpha
+  provider:
+    name: Stackwatch
+    url: www.kubecost.com
+  version: 2.1.0

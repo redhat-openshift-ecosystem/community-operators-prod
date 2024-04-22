@@ -1,0 +1,488 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.1
+  creationTimestamp: null
+  name: clusterrelocations.rhsyseng.github.io
+spec:
+  group: rhsyseng.github.io
+  names:
+    kind: ClusterRelocation
+    listKind: ClusterRelocationList
+    plural: clusterrelocations
+    singular: clusterrelocation
+  scope: Cluster
+  versions:
+  - name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: ClusterRelocation is the Schema for the clusterrelocations API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ClusterRelocationSpec defines the desired state of ClusterRelocation
+            properties:
+              acmRegistration:
+                description: ACMRegistration allows you to register this cluster to
+                  a remote ACM cluster.
+                properties:
+                  acmSecret:
+                    description: acmSecret is a secret reference with credentials
+                      for the ACM cluster. It must have a 'token' field. Optionally,
+                      it can have a 'ca.crt' field which provides the CA bundle for
+                      the ACM cluster. The secret is deleted once ACM registration
+                      succeeds. The type of the secret must be Opaque.
+                    properties:
+                      name:
+                        description: name is unique within a namespace to reference
+                          a secret resource.
+                        type: string
+                      namespace:
+                        description: namespace defines the space within which the
+                          secret name must be unique.
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  clusterName:
+                    description: ClusterName will be the name of the ManagedCluster
+                      in ACM.
+                    type: string
+                  klusterletAddonConfig:
+                    description: KlusterletAddonConfig is the klusterlet add-on configuration.
+                    properties:
+                      applicationManager:
+                        description: ApplicationManagerConfig defines the configurations
+                          of ApplicationManager addon agent.
+                        properties:
+                          enabled:
+                            description: Enabled is the flag to enable/disable the
+                              addon. default is false.
+                            type: boolean
+                          proxyPolicy:
+                            description: ProxyPolicy defines the policy to set proxy
+                              for each addon agent. default is Disabled. Disabled
+                              means that the addon agent pods do not configure the
+                              proxy env variables. OCPGlobalProxy means that the addon
+                              agent pods use the cluster-wide proxy config of OCP
+                              cluster provisioned by ACM. CustomProxy means that the
+                              addon agent pods use the ProxyConfig specified in KlusterletAddonConfig.
+                            enum:
+                            - Disabled
+                            - OCPGlobalProxy
+                            - CustomProxy
+                            type: string
+                        type: object
+                      certPolicyController:
+                        description: CertPolicyControllerConfig defines the configurations
+                          of CertPolicyController addon agent.
+                        properties:
+                          enabled:
+                            description: Enabled is the flag to enable/disable the
+                              addon. default is false.
+                            type: boolean
+                          proxyPolicy:
+                            description: ProxyPolicy defines the policy to set proxy
+                              for each addon agent. default is Disabled. Disabled
+                              means that the addon agent pods do not configure the
+                              proxy env variables. OCPGlobalProxy means that the addon
+                              agent pods use the cluster-wide proxy config of OCP
+                              cluster provisioned by ACM. CustomProxy means that the
+                              addon agent pods use the ProxyConfig specified in KlusterletAddonConfig.
+                            enum:
+                            - Disabled
+                            - OCPGlobalProxy
+                            - CustomProxy
+                            type: string
+                        type: object
+                      clusterLabels:
+                        additionalProperties:
+                          type: string
+                        description: DEPRECATED in release 2.4 and will be removed
+                          in the future since not used anymore.
+                        type: object
+                      clusterName:
+                        description: DEPRECATED in release 2.4 and will be removed
+                          in the future since not used anymore.
+                        minLength: 1
+                        type: string
+                      clusterNamespace:
+                        description: DEPRECATED in release 2.4 and will be removed
+                          in the future since not used anymore.
+                        minLength: 1
+                        type: string
+                      iamPolicyController:
+                        description: IAMPolicyControllerConfig defines the configurations
+                          of IamPolicyController addon agent.
+                        properties:
+                          enabled:
+                            description: Enabled is the flag to enable/disable the
+                              addon. default is false.
+                            type: boolean
+                          proxyPolicy:
+                            description: ProxyPolicy defines the policy to set proxy
+                              for each addon agent. default is Disabled. Disabled
+                              means that the addon agent pods do not configure the
+                              proxy env variables. OCPGlobalProxy means that the addon
+                              agent pods use the cluster-wide proxy config of OCP
+                              cluster provisioned by ACM. CustomProxy means that the
+                              addon agent pods use the ProxyConfig specified in KlusterletAddonConfig.
+                            enum:
+                            - Disabled
+                            - OCPGlobalProxy
+                            - CustomProxy
+                            type: string
+                        type: object
+                      policyController:
+                        description: PolicyController defines the configurations of
+                          PolicyController addon agent.
+                        properties:
+                          enabled:
+                            description: Enabled is the flag to enable/disable the
+                              addon. default is false.
+                            type: boolean
+                          proxyPolicy:
+                            description: ProxyPolicy defines the policy to set proxy
+                              for each addon agent. default is Disabled. Disabled
+                              means that the addon agent pods do not configure the
+                              proxy env variables. OCPGlobalProxy means that the addon
+                              agent pods use the cluster-wide proxy config of OCP
+                              cluster provisioned by ACM. CustomProxy means that the
+                              addon agent pods use the ProxyConfig specified in KlusterletAddonConfig.
+                            enum:
+                            - Disabled
+                            - OCPGlobalProxy
+                            - CustomProxy
+                            type: string
+                        type: object
+                      proxyConfig:
+                        description: ProxyConfig defines the cluster-wide proxy configuration
+                          of the OCP managed cluster.
+                        properties:
+                          httpProxy:
+                            description: HTTPProxy is the URL of the proxy for HTTP
+                              requests.  Empty means unset and will not result in
+                              an env var.
+                            type: string
+                          httpsProxy:
+                            description: HTTPSProxy is the URL of the proxy for HTTPS
+                              requests.  Empty means unset and will not result in
+                              an env var.
+                            type: string
+                          noProxy:
+                            description: NoProxy is a comma-separated list of hostnames
+                              and/or CIDRs for which the proxy should not be used.
+                              Empty means unset and will not result in an env var.
+                              The API Server of Hub cluster should be added here.
+                              And If you scale up workers that are not included in
+                              the network defined by the networking.machineNetwork[].cidr
+                              field from the installation configuration, you must
+                              add them to this list to prevent connection issues.
+                            type: string
+                        type: object
+                      searchCollector:
+                        description: SearchCollectorConfig defines the configurations
+                          of SearchCollector addon agent.
+                        properties:
+                          enabled:
+                            description: Enabled is the flag to enable/disable the
+                              addon. default is false.
+                            type: boolean
+                          proxyPolicy:
+                            description: ProxyPolicy defines the policy to set proxy
+                              for each addon agent. default is Disabled. Disabled
+                              means that the addon agent pods do not configure the
+                              proxy env variables. OCPGlobalProxy means that the addon
+                              agent pods use the cluster-wide proxy config of OCP
+                              cluster provisioned by ACM. CustomProxy means that the
+                              addon agent pods use the ProxyConfig specified in KlusterletAddonConfig.
+                            enum:
+                            - Disabled
+                            - OCPGlobalProxy
+                            - CustomProxy
+                            type: string
+                        type: object
+                      version:
+                        description: DEPRECATED in release 2.4 and will be removed
+                          in the future since not used anymore.
+                        type: string
+                    required:
+                    - applicationManager
+                    - certPolicyController
+                    - iamPolicyController
+                    - policyController
+                    - searchCollector
+                    type: object
+                  managedClusterSet:
+                    description: ManagedClusterSet is the ManagedClusterSet that the
+                      ManagedCluster will join. Defaults to 'default'.
+                    type: string
+                  url:
+                    description: URL is the API URL of the ACM cluster.
+                    type: string
+                required:
+                - acmSecret
+                - clusterName
+                - url
+                type: object
+              addInternalDNSEntries:
+                description: AddInternalDNSEntries deploys a MachineConfig which adds
+                  api and *.apps entries for the new domain to dnsmasq on SNO clusters.
+                  Setting this to true will cause a reboot. If you don't enable this
+                  option, you need to make sure that the cluster can resolve the new
+                  domain address via some other method.
+                type: boolean
+              apiCertRef:
+                description: APICertRef is a reference to a TLS secret that will be
+                  used for the API server. If it is omitted, a certificate will be
+                  generated and signed by loadbalancer-serving-signer. The type of
+                  the secret must be kubernetes.io/tls.
+                properties:
+                  name:
+                    description: name is unique within a namespace to reference a
+                      secret resource.
+                    type: string
+                  namespace:
+                    description: namespace defines the space within which the secret
+                      name must be unique.
+                    type: string
+                type: object
+                x-kubernetes-map-type: atomic
+              catalogSources:
+                description: CatalogSources define new CatalogSources to install on
+                  the cluster.
+                items:
+                  properties:
+                    image:
+                      description: Image is an operator-registry container image to
+                        instantiate a registry-server with.
+                      type: string
+                    name:
+                      description: Name is the name of the CatalogSource.
+                      type: string
+                  required:
+                  - image
+                  - name
+                  type: object
+                type: array
+              domain:
+                description: Domain defines the new base domain for the cluster.
+                type: string
+              imageDigestMirrors:
+                description: ImageDigestMirrors is used to configured a mirror registry
+                  on the cluster.
+                items:
+                  description: ImageDigestMirrors holds cluster-wide information about
+                    how to handle mirrors in the registries config.
+                  properties:
+                    mirrorSourcePolicy:
+                      description: mirrorSourcePolicy defines the fallback policy
+                        if fails to pull image from the mirrors. If unset, the image
+                        will continue to be pulled from the the repository in the
+                        pull spec. sourcePolicy is valid configuration only when one
+                        or more mirrors are in the mirror list.
+                      enum:
+                      - NeverContactSource
+                      - AllowContactingSource
+                      type: string
+                    mirrors:
+                      description: 'mirrors is zero or more locations that may also
+                        contain the same images. No mirror will be configured if not
+                        specified. Images can be pulled from these mirrors only if
+                        they are referenced by their digests. The mirrored location
+                        is obtained by replacing the part of the input reference that
+                        matches source by the mirrors entry, e.g. for registry.redhat.io/product/repo
+                        reference, a (source, mirror) pair *.redhat.io, mirror.local/redhat
+                        causes a mirror.local/redhat/product/repo repository to be
+                        used. The order of mirrors in this list is treated as the
+                        user''s desired priority, while source is by default considered
+                        lower priority than all mirrors. If no mirror is specified
+                        or all image pulls from the mirror list fail, the image will
+                        continue to be pulled from the repository in the pull spec
+                        unless explicitly prohibited by "mirrorSourcePolicy" Other
+                        cluster configuration, including (but not limited to) other
+                        imageDigestMirrors objects, may impact the exact order mirrors
+                        are contacted in, or some mirrors may be contacted in parallel,
+                        so this should be considered a preference rather than a guarantee
+                        of ordering. "mirrors" uses one of the following formats:
+                        host[:port] host[:port]/namespace[/namespace…] host[:port]/namespace[/namespace…]/repo
+                        for more information about the format, see the document about
+                        the location field: https://github.com/containers/image/blob/main/docs/containers-registries.conf.5.md#choosing-a-registry-toml-table'
+                      items:
+                        pattern: ^((?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])(?:(?:\.(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]))+)?(?::[0-9]+)?)(?:(?:/[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?)+)?$
+                        type: string
+                      type: array
+                      x-kubernetes-list-type: set
+                    source:
+                      description: 'source matches the repository that users refer
+                        to, e.g. in image pull specifications. Setting source to a
+                        registry hostname e.g. docker.io. quay.io, or registry.redhat.io,
+                        will match the image pull specification of corressponding
+                        registry. "source" uses one of the following formats: host[:port]
+                        host[:port]/namespace[/namespace…] host[:port]/namespace[/namespace…]/repo
+                        [*.]host for more information about the format, see the document
+                        about the location field: https://github.com/containers/image/blob/main/docs/containers-registries.conf.5.md#choosing-a-registry-toml-table'
+                      pattern: ^\*(?:\.(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]))+$|^((?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])(?:(?:\.(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]))+)?(?::[0-9]+)?)(?:(?:/[a-z0-9]+(?:(?:(?:[._]|__|[-]*)[a-z0-9]+)+)?)+)?$
+                      type: string
+                  required:
+                  - source
+                  type: object
+                type: array
+              ingressCertRef:
+                description: IngressCertRef is a reference to a TLS secret that will
+                  be used for the Ingress Controller. If it is omitted, a certificate
+                  will be generated and signed by loadbalancer-serving-signer. The
+                  type of the secret must be kubernetes.io/tls.
+                properties:
+                  name:
+                    description: name is unique within a namespace to reference a
+                      secret resource.
+                    type: string
+                  namespace:
+                    description: namespace defines the space within which the secret
+                      name must be unique.
+                    type: string
+                type: object
+                x-kubernetes-map-type: atomic
+              pullSecretRef:
+                description: PullSecretRef is a reference to new cluster-wide pull
+                  secret. If defined, it will replace the secret located at openshift-config/pull-secret.
+                  The type of the secret must be kubernetes.io/dockerconfigjson.
+                properties:
+                  name:
+                    description: name is unique within a namespace to reference a
+                      secret resource.
+                    type: string
+                  namespace:
+                    description: namespace defines the space within which the secret
+                      name must be unique.
+                    type: string
+                type: object
+                x-kubernetes-map-type: atomic
+              registryCert:
+                description: RegistryCert is a new trusted CA certificate. It will
+                  be added to image.config.openshift.io/cluster (additionalTrustedCA).
+                properties:
+                  certificate:
+                    description: Certificate is the certificate for the trusted certificate
+                      authority associated with the registry.
+                    type: string
+                  registryHostname:
+                    description: RegistryHostname is the hostname of the new registry.
+                    type: string
+                  registryPort:
+                    description: RegistryPort is the port number that the registry
+                      is served on.
+                    type: integer
+                required:
+                - certificate
+                - registryHostname
+                type: object
+              sshKeys:
+                description: SSHKeys defines a list of authorized SSH keys for the
+                  'core' user. If defined, it will be appended to the existing authorized
+                  SSH key(s).
+                items:
+                  type: string
+                type: array
+            required:
+            - domain
+            type: object
+          status:
+            description: ClusterRelocationStatus defines the observed state of ClusterRelocation
+            properties:
+              conditions:
+                description: Conditions represent the latest available observations
+                  of an object's state
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource. --- This struct is intended for direct
+                    use as an array at the field path .status.conditions.  For example,
+                    \n type FooStatus struct{ // Represents the observations of a
+                    foo's current state. // Known .status.conditions.type are: \"Available\",
+                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
+                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
+                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
+                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition
+                        transitioned from one status to another. This should be when
+                        the underlying condition changed.  If that is not known, then
+                        using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating
+                        details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating
+                        the reason for the condition's last transition. Producers
+                        of specific condition types may define expected values and
+                        meanings for this field, and whether the values are considered
+                        a guaranteed API. The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        --- Many .condition.type values are consistent across resources
+                        like Available, but because arbitrary conditions can be useful
+                        (see .node.status.conditions), the ability to deconflict is
+                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

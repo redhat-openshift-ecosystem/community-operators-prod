@@ -1,0 +1,111 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/name: codeflare-operator
+    app.kubernetes.io/part-of: codeflare
+  name: schedulingspecs.workload.codeflare.dev
+spec:
+  group: workload.codeflare.dev
+  names:
+    kind: SchedulingSpec
+    listKind: SchedulingSpecList
+    plural: schedulingspecs
+    singular: schedulingspec
+  scope: Namespaced
+  versions:
+  - name: v1beta1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              dispatchDuration:
+                description: Wall clock duration time of appwrapper in seconds.
+                properties:
+                  expected:
+                    type: integer
+                  limit:
+                    type: integer
+                  overrun:
+                    type: boolean
+                type: object
+              minAvailable:
+                description: Expected number of pods in running and/or completed state.
+                  Requeuing is triggered when the number of running/completed pods
+                  is not equal to this value. When not specified, requeuing is disabled
+                  and no check is performed.
+                type: integer
+              nodeSelector:
+                additionalProperties:
+                  type: string
+                type: object
+              requeuing:
+                description: Specification of the requeuing strategy based on waiting
+                  time. Values in this field control how often the pod check should
+                  happen, and if requeuing has reached its maximum number of times.
+                properties:
+                  growthType:
+                    default: exponential
+                    description: Growth strategy to increase the waiting time between
+                      requeuing checks. The values available are 'exponential', 'linear',
+                      or 'none'. For example, 'exponential' growth would double the
+                      'timeInSeconds' value every time a requeuing event is triggered.
+                      If the string value is misspelled or not one of the possible
+                      options, the growth behavior is defaulted to 'none'.
+                    type: string
+                  initialTimeInSeconds:
+                    description: Value to keep track of the initial wait time. Users
+                      cannot set this as it is taken from 'timeInSeconds'.
+                    type: integer
+                  maxNumRequeuings:
+                    default: 0
+                    description: Maximum number of requeuing events allowed. Once
+                      this value is reached (e.g., 'numRequeuings = maxNumRequeuings',
+                      no more requeuing checks are performed and the generic items
+                      are stopped and removed from the cluster (AppWrapper remains
+                      deployed).
+                    type: integer
+                  maxTimeInSeconds:
+                    default: 0
+                    description: Maximum waiting time for requeuing checks.
+                    type: integer
+                  numRequeuings:
+                    default: 0
+                    description: Field to keep track of how many times a requeuing
+                      event has been triggered.
+                    type: integer
+                  timeInSeconds:
+                    default: 300
+                    description: Initial waiting time before requeuing conditions
+                      are checked. This value is specified by the user, but it may
+                      grow as requeuing events happen.
+                    type: integer
+                type: object
+            type: object
+        required:
+        - metadata
+        type: object
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

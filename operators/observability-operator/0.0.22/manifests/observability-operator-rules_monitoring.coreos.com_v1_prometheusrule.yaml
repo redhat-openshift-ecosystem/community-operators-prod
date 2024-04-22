@@ -1,0 +1,52 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/name: observability-operator-rules
+    app.kubernetes.io/part-of: observability-operator
+    prometheus: k8s
+    role: alert-rules
+  name: observability-operator-rules
+spec:
+  groups:
+  - name: observability-operator.rules
+    rules:
+    - alert: ObservabilityOperatorReconcileErrors
+      annotations:
+        description: |
+          Observability Operator controller - {{ $labels.controller }} fails to reconcile.
+          Inspect the observability-operator log for potential root causes.
+        summary: Observability Operator controller - {{ $labels.controller }} fails
+          to reconcile
+      expr: |
+        increase(controller_runtime_reconcile_errors_total{job="observability-operator"}[15m]) > 0
+      for: 15m
+      labels:
+        severity: warning
+    - alert: ObservabilityOperatorReconcileLongerThan10Min
+      annotations:
+        description: |
+          Observability Operator controller reconcilation takes longer than 10 minutes for the controller - {{ $labels.controller }}.
+          Inspect the observability-operator log for potential root causes.
+        summary: Observability Operator controller - {{ $labels.controller }} reconcilation
+          takes too long to reconcile
+      expr: |
+        rate(controller_runtime_reconcile_time_seconds_sum{job="observability-operator"}[5m]) /
+        rate(controller_runtime_reconcile_time_seconds_count{job="observability-operator"}[5m])
+        > 600
+      for: 10m
+      labels:
+        severity: warning
+    - alert: ObservabilityOperatorBacklogNotDrained
+      annotations:
+        description: |
+          The backlog of Observability Operator controller - {{ $labels.name }} is not getting drained; an indication that reconcile loop may be stuck
+          Inspect the observability-operator log for potential root causes.
+        summary: Observability Operator controller - {{ $labels.name }} backlog is
+          not being drained.
+      expr: |
+        rate(workqueue_depth{job="observability-operator"}[15m]) > 0
+      for: 15m
+      labels:
+        severity: critical

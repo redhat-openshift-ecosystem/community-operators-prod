@@ -1,0 +1,71 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/name: codeflare-operator
+    app.kubernetes.io/part-of: codeflare
+  name: quotasubtrees.ibm.com
+spec:
+  group: ibm.com
+  names:
+    kind: QuotaSubtree
+    plural: quotasubtrees
+    shortNames:
+    - qst
+    singular: quotasubtree
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              children:
+                items:
+                  properties:
+                    name:
+                      type: string
+                    namespace:
+                      type: string
+                    quotas:
+                      properties:
+                        disabled:
+                          type: boolean
+                        hardLimit:
+                          type: boolean
+                        requests:
+                          properties:
+                            cpu:
+                              pattern: ^[0-9]*(m)?$
+                              x-kubernetes-int-or-string: true
+                            memory:
+                              pattern: ^[0-9]*(Ei|Pi|Ti|Gi|Mi|Ki|E|P|T|G|M|K)?$
+                              x-kubernetes-int-or-string: true
+                            nvidia.com/gpu:
+                              pattern: ^[0-9]?$
+                              x-kubernetes-int-or-string: true
+                          type: object
+                      type: object
+                  type: object
+                type: array
+              parent:
+                type: string
+              parentNamespace:
+                type: string
+            type: object
+          status:
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

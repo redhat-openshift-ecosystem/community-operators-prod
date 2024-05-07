@@ -208,16 +208,29 @@ metadata:
           "apiVersion": "k8s.streamnative.io/v1alpha1",
           "kind": "OxiaCluster",
           "metadata": {
-            "labels": {
-              "app.kubernetes.io/created-by": "sn-operator",
-              "app.kubernetes.io/instance": "oxiacluster-sample",
-              "app.kubernetes.io/managed-by": "kustomize",
-              "app.kubernetes.io/name": "oxiacluster",
-              "app.kubernetes.io/part-of": "sn-operator"
-            },
-            "name": "oxiacluster-sample"
+            "name": "oxiacluster-example",
+            "namespace": "default"
           },
-          "spec": null
+          "spec": {
+            "image": "streamnative/oxia:main",
+            "imagePullPolicy": "IfNotPresent",
+            "monitoringEnabled": true,
+            "namespaces": [
+              {
+                "initialShardCount": 3,
+                "name": "oxia_ns1",
+                "replicationFactor": 2
+              },
+              {
+                "initialShardCount": 2,
+                "name": "oxia_ns2",
+                "replicationFactor": 2
+              }
+            ],
+            "server": {
+              "replicas": 3
+            }
+          }
         },
         {
           "apiVersion": "k8s.streamnative.io/v1alpha1",
@@ -262,7 +275,16 @@ metadata:
             "namespace": "pulsar"
           },
           "spec": {
-            "image": "streamnative/private-cloud:3.0.1.4"
+            "image": "streamnative/private-cloud:3.0.1.4",
+            "troubleshootings": [
+              {
+                "action": "heapDump",
+                "id": 100000001,
+                "message": "test help dump",
+                "name": "test-broker-0",
+                "scope": "pods"
+              }
+            ]
           }
         },
         {
@@ -340,9 +362,19 @@ metadata:
     capabilities: Auto Pilot
     categories: Streaming & Messaging
     containerImage: quay.io/streamnativeio/sn-operator:v0.3.0
-    createdAt: "2024-04-12T07:28:49Z"
+    createdAt: "2024-05-07T02:51:12Z"
     description: The StreamNative Operator is a commercial operator built for managing
       StreamNative Private Cloud commercial components and enterprise features.
+    features.operators.openshift.io/cnf: "false"
+    features.operators.openshift.io/cni: "false"
+    features.operators.openshift.io/csi: "false"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "false"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
     operators.operatorframework.io/builder: operator-sdk-v1.31.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     support: StreamNative

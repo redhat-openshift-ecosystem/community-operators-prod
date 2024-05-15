@@ -196,12 +196,13 @@ spec:
     - name: ibm-block-csi-operator
       image: quay.io/ibmcsiblock/ibm-block-csi-operator:1.11.2
   version: 1.11.2
-  replaces: ibm-block-csi-operator.v1.11.1
+  skips:
+    - ibm-block-csi-operator.v1.11.1
   maturity: stable
   maintainers:
     - name: IBM Block CSI Team
       email: csi.block1@il.ibm.com
-  minKubeVersion: 1.27.0
+  minKubeVersion: 1.26.0
   provider:
     name: IBM
   links:

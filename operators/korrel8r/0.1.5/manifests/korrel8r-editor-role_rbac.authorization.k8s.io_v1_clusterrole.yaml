@@ -1,0 +1,27 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/name: korrel8r
+  name: korrel8r-editor-role
+rules:
+- apiGroups:
+  - korrel8r.openshift.io
+  resources:
+  - korrel8rs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - korrel8r.openshift.io
+  resources:
+  - korrel8rs/status
+  verbs:
+  - get

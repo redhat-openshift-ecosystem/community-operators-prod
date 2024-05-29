@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: amd-gpu-metrics
+    app.kubernetes.io/component: amd-gpu
+    app.kubernetes.io/name: amd-gpu
+    app.kubernetes.io/part-of: amd-gpu
+  name: amd-gpu-operator-node-metrics
+spec:
+  endpoints:
+  - interval: 30s
+    path: /metrics
+    port: node-metrics
+    scheme: http
+    scrapeTimeout: 20s
+  namespaceSelector:
+    matchNames:
+    - openshift-amd-gpu
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: amd-gpu
+      app.kubernetes.io/name: amd-gpu
+      app.kubernetes.io/part-of: amd-gpu
+      app.kubernetes.io/role: amd-gpu-metrics

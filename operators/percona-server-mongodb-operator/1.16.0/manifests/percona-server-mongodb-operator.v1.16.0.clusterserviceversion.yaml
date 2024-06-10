@@ -278,7 +278,7 @@ spec:
     * **Physical Backups - [configure physical backups](https://docs.percona.com/percona-operator-for-mongodb/backups.html#physical)
 
     * **Automated volume expansion
-   Kubernetes supports the Persistent Volume expansion as a stable feature since v1.24. Using it with the Operator
+    Kubernetes supports the Persistent Volume expansion as a stable feature since v1.24. Using it with the Operator
     previously involved manual operations. Now this is automated, and users can resize their PVCs by just changing
     the value of the resources.requests.storage option in the PerconaServerMongoDB custom resource.
     This feature is in a technical preview stage and is not recommended for production environments.
@@ -345,21 +345,21 @@ spec:
      especially for big data sets. With this release Percona announces the general availability of physical backups and restores for
      Percona Server for MongoDB with the Operator.
 
-      * Automated volume expansion
+    * Automated volume expansion
      Kubernetes supports the Persistent Volume expansion as a stable feature since v1.24. Using it with the Operator previously involved
      manual operations. Now this is automated, and users can resize their PVCs by just changing the value of the resources.requests.storage
      option in the PerconaServerMongoDB custom resource. This feature is in a technical preview stage and is not recommended
      for production environments.
 
-      * Support for MongoDB 7
-      Starting from this release, MongoDB 7.0 is now supported. Read our take on top-5 changes in MongoDB version 7 in this blog post .
+    * Support for MongoDB 7
+     Starting from this release, MongoDB 7.0 is now supported. Read our take on top-5 changes in MongoDB version 7 in this blog post .
 
-      * Support for ARM architecture (technical preview)
+    * Support for ARM architecture (technical preview)
      ARM architecture meets the intensive growth of its usage nowadays, both in a segment of highly efficient cloud computing based on systems
      like AWS Graviton, and the Internet of Things or Edge. Officially certified images for ARM are now available for the Operator,
      as well as Percona Server for MongoDB and Percona Backup for MongoDB, while database monitoring based on PMM Client is yet to follow.
 
-      * Fixing the overloaded allowUnsafeConfigurations flag
+    * Fixing the overloaded allowUnsafeConfigurations flag
      In the previous Operator versions allowUnsafeConfigurations Custom Resource option was used to allow configuring a cluster
      with unsafe parameters, such as starting it with less than 3 replica set instances. In fact, setting this option to true
      resulted in a wide range of reduced safety features without the user’s explicit intent: disabling TLS,

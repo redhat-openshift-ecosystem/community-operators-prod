@@ -14,7 +14,7 @@ metadata:
           "spec": {
             "client": {
               "common": {
-                "image": "registry.connect.redhat.com/dell-emc/connectivity-client-docker-k8s@sha256:eecc2f289bbe3901ec9d1b5af48b0291fe76a9ec1f3d3ce54947fc67ea6d4caa",
+                "image": "registry.connect.redhat.com/dell-emc/connectivity-client-docker-k8s@sha256:fa71eab2a4127ddec447fce2465cafde3fc404662f83bfa92035137b415d7a4f",
                 "imagePullPolicy": "IfNotPresent",
                 "name": "connectivity-client-docker-k8s"
               },
@@ -24,7 +24,7 @@ metadata:
               "forceRemoveClient": true,
               "initContainers": [
                 {
-                  "image": "registry.connect.redhat.com/dell-emc/connectivity-client-docker-k8s@sha256:eecc2f289bbe3901ec9d1b5af48b0291fe76a9ec1f3d3ce54947fc67ea6d4caa",
+                  "image": "registry.connect.redhat.com/dell-emc/connectivity-client-docker-k8s@sha256:fa71eab2a4127ddec447fce2465cafde3fc404662f83bfa92035137b415d7a4f",
                   "imagePullPolicy": "IfNotPresent",
                   "name": "connectivity-client-init"
                 }
@@ -101,7 +101,7 @@ metadata:
                     "value": "debug"
                   }
                 ],
-                "image": "registry.connect.redhat.com/dell-emc/csi-isilon@sha256:1059578fbbf6d000ce744badcaf73833dfa33f50833dd960f864b8e77004ba12",
+                "image": "registry.connect.redhat.com/dell-emc/csi-isilon@sha256:ddf074ca7e7397cbe579d2e1978eb894782dff2f4b5c226836af1ff448bde5b5",
                 "imagePullPolicy": "IfNotPresent"
               },
               "configVersion": "v2.10.1",
@@ -470,7 +470,7 @@ metadata:
                     "value": ""
                   }
                 ],
-                "image": "registry.connect.redhat.com/dell-emc/csi-powermax@sha256:e14e8eb8e742f8fd01c77b35ade39a9940a90ab543d1f416d0524098175176bc",
+                "image": "registry.connect.redhat.com/dell-emc/csi-powermax@sha256:ddf074ca7e7397cbe579d2e1978eb894782dff2f4b5c226836af1ff448bde5b5",
                 "imagePullPolicy": "IfNotPresent"
               },
               "configVersion": "v2.10.1",
@@ -776,7 +776,7 @@ metadata:
                     "value": "debug"
                   }
                 ],
-                "image": "registry.connect.redhat.com/dell-emc/csi-powerstore@sha256:a048b11659d880ddc632e0f1d08e15c5e823c01c69c55ce1ea8205cd5f7796c3",
+                "image": "registry.connect.redhat.com/dell-emc/csi-powerstore@sha256:628dc31220cb8c6866050db0c32d1c29912cd179564ac20de585fdb3cc3336f1",
                 "imagePullPolicy": "IfNotPresent"
               },
               "configVersion": "v2.10.1",
@@ -1070,7 +1070,7 @@ metadata:
                     "value": "false"
                   }
                 ],
-                "image": "registry.connect.redhat.com/dell-emc/csi-vxflexos@sha256:cbe18b25d632c23c243919cb18e87944e8614b7ccd41047f57f766252c6d1579",
+                "image": "registry.connect.redhat.com/dell-emc/csi-vxflexos@sha256:36d608ed0f341230710e17778a8a481b8319906b28b1523f386bdf6a63fd843e",
                 "imagePullPolicy": "IfNotPresent"
               },
               "configVersion": "v2.10.1",
@@ -3691,17 +3691,17 @@ spec:
                 - name: RELATED_IMAGE_dell-csm-operator
                   value: registry.connect.redhat.com/dell-emc/dell-csm-operator@sha256:31de1529604bef1e9f1391585126317a93d3f997dd3a52b93b9dae7ab562bcab
                 - name: RELATED_IMAGE_csi-isilon
-                  value: registry.connect.redhat.com/dell-emc/csi-isilon@sha256:1059578fbbf6d000ce744badcaf73833dfa33f50833dd960f864b8e77004ba12
+                  value: registry.connect.redhat.com/dell-emc/csi-isilon@sha256:ddf074ca7e7397cbe579d2e1978eb894782dff2f4b5c226836af1ff448bde5b5
                 - name: RELATED_IMAGE_csi-powermax
-                  value: registry.connect.redhat.com/dell-emc/csi-powermax@sha256:e14e8eb8e742f8fd01c77b35ade39a9940a90ab543d1f416d0524098175176bc
+                  value: registry.connect.redhat.com/dell-emc/csi-powermax@sha256:ddf074ca7e7397cbe579d2e1978eb894782dff2f4b5c226836af1ff448bde5b5
                 - name: RELATED_IMAGE_csipowermax-reverseproxy
-                  value: registry.connect.redhat.com/dell-emc/csipowermax-reverseproxy@sha256:0b84591887068af0ecaef31970967fea9ea3067e666fe13568abe249896d50f9
+                  value: docker.io/dellemc/csipowermax-reverseproxy@sha256:0b84591887068af0ecaef31970967fea9ea3067e666fe13568abe249896d50f9
                 - name: RELATED_IMAGE_csi-powerstore
-                  value: registry.connect.redhat.com/dell-emc/csi-powerstore@sha256:a048b11659d880ddc632e0f1d08e15c5e823c01c69c55ce1ea8205cd5f7796c3
+                  value: registry.connect.redhat.com/dell-emc/csi-powerstore@sha256:628dc31220cb8c6866050db0c32d1c29912cd179564ac20de585fdb3cc3336f1
                 - name: RELATED_IMAGE_csi-unity
                   value: registry.connect.redhat.com/dell-emc/csi-unity@sha256:12a90ecc4d6f9d3f9b79dee0ca78789a6d7b9af5ff7b6be78ea8d6eb58b99ce4
                 - name: RELATED_IMAGE_csi-vxflexos
-                  value: registry.connect.redhat.com/dell-emc/csi-vxflexos@sha256:cbe18b25d632c23c243919cb18e87944e8614b7ccd41047f57f766252c6d1579
+                  value: registry.connect.redhat.com/dell-emc/csi-vxflexos@sha256:36d608ed0f341230710e17778a8a481b8319906b28b1523f386bdf6a63fd843e
                 - name: RELATED_IMAGE_sdc
                   value: docker.io/dellemc/sdc@sha256:f40b9ba0b34061ab3214b40dbd184f44d09d6e74996a0b311bdb909336d59304
                 - name: RELATED_IMAGE_karavi-authorization-proxy
@@ -3739,7 +3739,7 @@ spec:
                 - name: RELATED_IMAGE_metadataretriever
                   value: registry.connect.redhat.com/dell-emc/csi-metadata-retriever@sha256:ae975df75c5fbf97635aebebe6b293ba532fd196827f135bc2905c533c71945b
                 - name: RELATED_IMAGE_dell-connectivity-client
-                  value: registry.connect.redhat.com/dell-emc/connectivity-client-docker-k8s@sha256:eecc2f289bbe3901ec9d1b5af48b0291fe76a9ec1f3d3ce54947fc67ea6d4caa
+                  value: registry.connect.redhat.com/dell-emc/connectivity-client-docker-k8s@sha256:fa71eab2a4127ddec447fce2465cafde3fc404662f83bfa92035137b415d7a4f
                 - name: RELATED_IMAGE_cert-persister
                   value: docker.io/dellemc/connectivity-cert-persister-k8s@sha256:aaa935f3ba99a91bf5f00c53de5cd69e23716645ea9690f050c4ed80834661fc
                 image: registry.connect.redhat.com/dell-emc/dell-csm-operator@sha256:31de1529604bef1e9f1391585126317a93d3f997dd3a52b93b9dae7ab562bcab
@@ -3805,17 +3805,17 @@ spec:
   relatedImages:
   - image: registry.connect.redhat.com/dell-emc/dell-csm-operator@sha256:31de1529604bef1e9f1391585126317a93d3f997dd3a52b93b9dae7ab562bcab
     name: dell-csm-operator
-  - image: registry.connect.redhat.com/dell-emc/csi-isilon@sha256:1059578fbbf6d000ce744badcaf73833dfa33f50833dd960f864b8e77004ba12
+  - image: registry.connect.redhat.com/dell-emc/csi-isilon@sha256:ddf074ca7e7397cbe579d2e1978eb894782dff2f4b5c226836af1ff448bde5b5
     name: csi-isilon
-  - image: registry.connect.redhat.com/dell-emc/csi-powermax@sha256:e14e8eb8e742f8fd01c77b35ade39a9940a90ab543d1f416d0524098175176bc
+  - image: registry.connect.redhat.com/dell-emc/csi-powermax@sha256:ddf074ca7e7397cbe579d2e1978eb894782dff2f4b5c226836af1ff448bde5b5
     name: csi-powermax
-  - image: registry.connect.redhat.com/dell-emc/csipowermax-reverseproxy@sha256:0b84591887068af0ecaef31970967fea9ea3067e666fe13568abe249896d50f9
+  - image: docker.io/dellemc/csipowermax-reverseproxy@sha256:0b84591887068af0ecaef31970967fea9ea3067e666fe13568abe249896d50f9
     name: csipowermax-reverseproxy
-  - image: registry.connect.redhat.com/dell-emc/csi-powerstore@sha256:a048b11659d880ddc632e0f1d08e15c5e823c01c69c55ce1ea8205cd5f7796c3
+  - image: registry.connect.redhat.com/dell-emc/csi-powerstore@sha256:628dc31220cb8c6866050db0c32d1c29912cd179564ac20de585fdb3cc3336f1
     name: csi-powerstore
   - image: registry.connect.redhat.com/dell-emc/csi-unity@sha256:12a90ecc4d6f9d3f9b79dee0ca78789a6d7b9af5ff7b6be78ea8d6eb58b99ce4
     name: csi-unity
-  - image: registry.connect.redhat.com/dell-emc/csi-vxflexos@sha256:cbe18b25d632c23c243919cb18e87944e8614b7ccd41047f57f766252c6d1579
+  - image: registry.connect.redhat.com/dell-emc/csi-vxflexos@sha256:36d608ed0f341230710e17778a8a481b8319906b28b1523f386bdf6a63fd843e
     name: csi-vxflexos
   - image: docker.io/dellemc/sdc@sha256:f40b9ba0b34061ab3214b40dbd184f44d09d6e74996a0b311bdb909336d59304
     name: sdc
@@ -3853,7 +3853,7 @@ spec:
     name: externalhealthmonitorcontroller
   - image: registry.connect.redhat.com/dell-emc/csi-metadata-retriever@sha256:ae975df75c5fbf97635aebebe6b293ba532fd196827f135bc2905c533c71945b
     name: metadataretriever
-  - image: registry.connect.redhat.com/dell-emc/connectivity-client-docker-k8s@sha256:eecc2f289bbe3901ec9d1b5af48b0291fe76a9ec1f3d3ce54947fc67ea6d4caa
+  - image: registry.connect.redhat.com/dell-emc/connectivity-client-docker-k8s@sha256:fa71eab2a4127ddec447fce2465cafde3fc404662f83bfa92035137b415d7a4f
     name: dell-connectivity-client
   - image: docker.io/dellemc/connectivity-cert-persister-k8s@sha256:aaa935f3ba99a91bf5f00c53de5cd69e23716645ea9690f050c4ed80834661fc
     name: cert-persister

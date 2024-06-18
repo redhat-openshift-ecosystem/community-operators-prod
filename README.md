@@ -9,7 +9,7 @@ This repo is the canonical source for Kubernetes Operators that appear on [OpenS
 consumed by Openshift and OKD to create their sources and built their catalog. To know more about how
 Openshift catalog are built see the [documentation](https://docs.openshift.com/container-platform/4.14/operators/understanding/olm-rh-catalogs.html#olm-rh-catalogs_olm-rh-catalogs).
 
-See our [documentation](https://redhat-openshift-ecosystem.github.io/community-operators-prod/) to find out more about Community operators and contribution.
+See our [documentation](https://redhat-openshift-ecosystem.github.io/operator-pipelines/) to find out more about Community operators and contribution.
 
 ## Add your Operator
 

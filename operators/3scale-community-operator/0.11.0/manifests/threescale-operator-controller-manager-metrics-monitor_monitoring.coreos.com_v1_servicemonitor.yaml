@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: 3scale-api-management
+    control-plane: controller-manager
+  name: threescale-operator-controller-manager-metrics-monitor
+spec:
+  endpoints:
+  - path: /metrics
+    port: metrics
+  selector:
+    matchLabels:
+      app: 3scale-api-management
+      control-plane: controller-manager

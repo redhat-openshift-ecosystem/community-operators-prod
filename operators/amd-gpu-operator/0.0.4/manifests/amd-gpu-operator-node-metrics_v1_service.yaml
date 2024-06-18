@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: amd-gpu
+    app.kubernetes.io/name: amd-gpu
+    app.kubernetes.io/part-of: amd-gpu
+    app.kubernetes.io/role: amd-gpu-metrics
+  name: amd-gpu-operator-node-metrics
+spec:
+  ports:
+  - name: node-metrics
+    port: 9110
+    protocol: TCP
+    targetPort: node-metrics
+  selector:
+    app.kubernetes.io/component: amd-gpu
+    app.kubernetes.io/name: amd-gpu
+    app.kubernetes.io/part-of: amd-gpu
+    app.kubernetes.io/role: amd-gpu-metrics
+status:
+  loadBalancer: {}

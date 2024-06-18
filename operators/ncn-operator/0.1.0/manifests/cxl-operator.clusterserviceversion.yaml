@@ -25,11 +25,12 @@ metadata:
     operators.operatorframework.io/builder: operator-sdk-v1.31.0-ocp
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     containerImage: quay.io/rasen708/ncn-operator:v0.1.0
-    
   name: ncn-operator.v0.1.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
+  replaces: ncn-operator.v0.0.1
+  skips: []
   customresourcedefinitions:
     owned:
     - description: CXL is the Schema for the cxls API
@@ -285,5 +286,3 @@ spec:
   provider:
     name: Antline
   version: 0.1.0
-  skips:
-      - ncn-operator.v0.0.1

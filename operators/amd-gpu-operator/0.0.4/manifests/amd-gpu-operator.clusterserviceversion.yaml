@@ -1,0 +1,302 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "amd.io/v1alpha1",
+          "kind": "DeviceConfig",
+          "metadata": {
+            "name": "dc-internal-registry",
+            "namespace": "openshift-amd-gpu"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2024-05-29T10:03:15Z"
+    operatorframework.io/suggested-namespace: openshift-amd-gpu
+    operators.operatorframework.io/builder: operator-sdk-v1.32.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    repository: https://github.com/yevgeny-shnaidman/amd-gpu-operator
+  name: amd-gpu-operator.v0.0.4
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: DeviceConfig describes how to enable AMD GPU device
+      displayName: DeviceConfig
+      kind: DeviceConfig
+      name: deviceconfigs.amd.io
+      version: v1alpha1
+  description: |-
+    Operator responsible for deploying AMD GPU kernel drivers and device plugin
+    For more information, visit [documentation](https://github.com/yevgeny-shnaidman/amd-gpu-operator/blob/main/README.md)
+  displayName: amd-gpu-operator
+  icon:
+  - base64data: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iMTkwLjgwMyIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBkPSJNMTg3Ljg4OCAxNzguMTIySDE0My41MmwtMTMuNTczLTMyLjczOEg1Ni4wMDNsLTEyLjM2NiAzMi43MzhIMEw2Ni42NjcgMTIuNzc2aDQ3Ljc2MXpNOTEuMTU1IDUyLjI4Nkw2Ni45MTIgMTE2LjUzaDUwLjkxM3ptMjU3LjkwMS0zOS41MWgzNS44OHYxNjUuMzQ2aC00MS4yMTlWNzQuODQybC00NC42MDggNTEuODc3aC02LjMwMWwtNDQuNjA1LTUxLjg3N1YxNzguMTJoLTQxLjIxOVYxMi43NzZoMzUuODhsNTMuMDkyIDYxLjMzNnptMTQwLjMxOSAwYzYwLjM2NCAwIDkxLjM5MSAzNy41NzMgOTEuMzkxIDgyLjkwOSAwIDQ3LjUxNy0zMC4wNTggODIuNDM3LTk2IDgyLjQzN2gtNjguMzY5VjEyLjc3NnptLTMxLjc2MiAxMzUuMDQxaDI2LjkwNmM0MS40NTcgMCA1My44MjMtMjguMTI5IDUzLjgyMy01Mi4zNzcgMC0yOC4zNjgtMTUuMjc2LTUyLjM2My01NC4zMDgtNTIuMzYzaC0yNi40MjJ2MTA0Ljc0em0yMDUuMTU2LTk1LjgzNkw2MTAuNzk3IDBIODAwdjE4OS4yMWwtNTEuOTcyLTUxLjk3NVY1MS45ODF6bS0uMDYxIDEwLjQxNkw2MDkuMiAxMTUuOTAzdjc0Ljg5OWg3NC44ODlsNTMuNTA1LTUzLjUwNmgtNzQuODg2eiIvPjwvc3ZnPg==
+    mediatype: image/svg+xml
+  maintainers:
+  - email: edge-kmm@redhat.com
+    name: RedHat
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - amd.io
+          resources:
+          - deviceconfigs
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - amd.io
+          resources:
+          - deviceconfigs/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - apps
+          resources:
+          - daemonsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - kmm.sigs.x-k8s.io
+          resources:
+          - modules
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - kmm.sigs.x-k8s.io
+          resources:
+          - modules/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: amd-gpu-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/component: amd-gpu
+          app.kubernetes.io/name: amd-gpu
+          app.kubernetes.io/part-of: amd-gpu
+          control-plane: controller-manager
+        name: amd-gpu-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/component: amd-gpu
+              app.kubernetes.io/name: amd-gpu
+              app.kubernetes.io/part-of: amd-gpu
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                app.kubernetes.io/component: amd-gpu
+                app.kubernetes.io/name: amd-gpu
+                app.kubernetes.io/part-of: amd-gpu
+                control-plane: controller-manager
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: node-role.kubernetes.io/control-plane
+                        operator: Exists
+                    - matchExpressions:
+                      - key: node-role.kubernetes.io/master
+                        operator: Exists
+              containers:
+              - args:
+                - --config=controller_manager_config.yaml
+                env:
+                - name: OPERATOR_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                image: quay.io/yshnaidm/amd-gpu-operator:v0.0.4
+                imagePullPolicy: Always
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 384Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                volumeMounts:
+                - mountPath: /controller_manager_config.yaml
+                  name: manager-config
+                  subPath: controller_manager_config.yaml
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.13
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 5m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: amd-gpu-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+              tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/master
+                operator: Equal
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/control-plane
+                operator: Equal
+              volumes:
+              - configMap:
+                  name: amd-gpu-operator-manager-config
+                name: manager-config
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        serviceAccountName: amd-gpu-operator-controller-manager
+      - rules:
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: amd-gpu-operator-kmm-device-plugin
+      - rules:
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: amd-gpu-operator-kmm-module-loader
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - amd-gpu-operator
+  links:
+  - name: Amd Gpu Operator
+    url: https://amd-gpu-operator.domain
+  maturity: alpha
+  provider:
+    name: amd-gpu-operator
+  version: 0.0.4
+  replaces: amd-gpu-operator.v0.0.3

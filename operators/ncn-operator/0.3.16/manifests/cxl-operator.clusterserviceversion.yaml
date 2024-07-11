@@ -212,7 +212,7 @@ spec:
           - list
           - watch
         - apiGroups:
-          - authorization.k8s.io
+          - rbac.authorization.k8s.io
           resources:
           - clusterrolebindings
           verbs:
@@ -221,7 +221,7 @@ spec:
           - get
           - list
         - apiGroups:
-          - authorization.k8s.io
+          - rbac.authorization.k8s.io
           resources:
           - clusterroles
           verbs:
@@ -340,7 +340,7 @@ spec:
                     memory: 256Mi
                   requests:
                     cpu: 1000m
-                    memory: 256Mi
+                    memory: 128Mi
                 securityContext:
                   allowPrivilegeEscalation: false
                   capabilities:

@@ -18,12 +18,27 @@ metadata:
             "name": "cxl-1"
           },
           "spec": null
+        },
+        {
+          "apiVersion": "cxl.antline.com/v1",
+          "kind": "Label",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "cxl-operator",
+              "app.kubernetes.io/instance": "cxl-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "cxl",
+              "app.kubernetes.io/part-of": "cxl-operator"
+            },
+            "name": "label-1"
+          },
+          "spec": null
         }
       ]
     capabilities: Basic Install
     operators.operatorframework.io/builder: operator-sdk-v1.31.0-ocp
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
-  name: ncn-operator.v0.4.0
+  name: ncn-operator.v0.3.18
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -389,7 +404,10 @@ spec:
   - email: jwahn@antlinesoft.com
     name: Antline-Soft
   maturity: alpha
+  minKubeVersion: 1.23.0
   provider:
     name: Antline
-  replaces: ncn-operator.v0.3.14
-  version: 0.4.0
+  # replaces: ncn-operator.v0.3.14
+  skips:
+    - ncn-operator.v0.3.14
+  version: 0.3.18

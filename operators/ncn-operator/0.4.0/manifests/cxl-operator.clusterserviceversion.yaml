@@ -36,15 +36,15 @@ metadata:
         }
       ]
     capabilities: Basic Install
-    createdAt: "2024-07-09T06:09:15Z"
+    categories: Integration & Delivery
+    containerImage: quay.io/rasen708/ncn-operator:v0.3.0
+    createdAt: "2024-07-12T01:02:41Z"
+    description: Provides the ncn extend
     operators.operatorframework.io/builder: operator-sdk-v1.31.0-ocp
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
-    categories: Integration & Delivery
-    containerImage: quay.io/rasen708/ncn-operator:v0.3.2
-    description: Provides the ncn extend
     repository: https://github.com/antline.com/ncn-operator
     support: Antline
-  name: ncn-operator.v0.3.16
+  name: ncn-operator.v0.4.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -211,7 +211,7 @@ spec:
           - list
           - watch
         - apiGroups:
-          - rbac
+          - rbac.authorization.k8s.io
           resources:
           - clusterrolebindings
           verbs:
@@ -220,7 +220,7 @@ spec:
           - get
           - list
         - apiGroups:
-          - rbac
+          - rbac.authorization.k8s.io
           resources:
           - clusterroles
           verbs:
@@ -319,7 +319,7 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.annotations['olm.operatorNamespace']
-                image: quay.io/rasen708/ncn-operator:v0.3.16
+                image: quay.io/rasen708/ncn-operator:v0.4.0
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -335,11 +335,11 @@ spec:
                   periodSeconds: 10
                 resources:
                   limits:
-                    cpu: 500m
-                    memory: 128Mi
+                    cpu: "1"
+                    memory: 256Mi
                   requests:
-                    cpu: 10m
-                    memory: 64Mi
+                    cpu: "1"
+                    memory: 256Mi
                 securityContext:
                   allowPrivilegeEscalation: false
                   capabilities:
@@ -413,4 +413,4 @@ spec:
   provider:
     name: Antline
   replaces: ncn-operator.v0.3.14
-  version: 0.3.16
+  version: 0.4.0

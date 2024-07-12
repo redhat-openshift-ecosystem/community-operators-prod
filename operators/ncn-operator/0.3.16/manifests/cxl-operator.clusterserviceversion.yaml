@@ -36,15 +36,14 @@ metadata:
         }
       ]
     capabilities: Basic Install
-    categories: Integration & Delivery
-    containerImage: quay.io/rasen708/ncn-operator:v0.3.16
-    createdAt: "2024-07-11T11:05:24Z"
-    description: Provides the ncn extend
+    createdAt: "2024-07-09T06:09:15Z"
     operators.operatorframework.io/builder: operator-sdk-v1.31.0-ocp
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    categories: Integration & Delivery
+    containerImage: quay.io/rasen708/ncn-operator:v0.3.2
+    description: Provides the ncn extend
     repository: https://github.com/antline.com/ncn-operator
     support: Antline
-    #console.openshift.io/plugins: '["cxl-console-plugin"]'
   name: ncn-operator.v0.3.16
   namespace: placeholder
 spec:
@@ -320,7 +319,7 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.annotations['olm.operatorNamespace']
-                image: quay.io/rasen708/ncn-operator:v0.3.15
+                image: quay.io/rasen708/ncn-operator:v0.3.16
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -336,11 +335,11 @@ spec:
                   periodSeconds: 10
                 resources:
                   limits:
-                    cpu: 1000m
-                    memory: 256Mi
-                  requests:
-                    cpu: 1000m
+                    cpu: 500m
                     memory: 128Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
                 securityContext:
                   allowPrivilegeEscalation: false
                   capabilities:

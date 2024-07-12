@@ -36,15 +36,9 @@ metadata:
         }
       ]
     capabilities: Basic Install
-    categories: Integration & Delivery
-    containerImage: quay.io/rasen708/ncn-operator:v0.4.0
-    createdAt: "2024-07-12T01:02:41Z"
-    description: Provides the ncn extend
     operators.operatorframework.io/builder: operator-sdk-v1.31.0-ocp
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
-    repository: https://github.com/antline.com/ncn-operator
-    support: Antline
-  name: ncn-operator.v0.4.0
+  name: cxl-operator.v0.4.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -335,10 +329,10 @@ spec:
                   periodSeconds: 10
                 resources:
                   limits:
-                    cpu: "1"
+                    cpu: 1000m
                     memory: 256Mi
                   requests:
-                    cpu: "1"
+                    cpu: 1000m
                     memory: 256Mi
                 securityContext:
                   allowPrivilegeEscalation: false

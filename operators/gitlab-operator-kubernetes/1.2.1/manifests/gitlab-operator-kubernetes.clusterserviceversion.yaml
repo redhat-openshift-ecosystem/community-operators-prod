@@ -44,7 +44,7 @@ metadata:
     categories: Integration & Delivery, Developer Tools
     certified: "true"
     containerImage: registry.gitlab.com/gitlab-org/cloud-native/gitlab-operator:1.2.1
-    createdAt: "2024-07-26T05:21:27Z"
+    createdAt: "2024-07-26T05:22:57Z"
     description: The GitLab operator is responsible for managing the full lifecycle of GitLab instances in your Kubernetes or Openshift container platforms.
     features.operators.openshift.io/cnf: "false"
     features.operators.openshift.io/cni: "false"
@@ -60,6 +60,7 @@ metadata:
     operators.operatorframework.io/builder: operator-sdk-v1.34.1
     operators.operatorframework.io/project_layout: unknown
     repository: https://gitlab.com/gitlab-org/cloud-native/gitlab-operator
+    olm.properties: '[{"type": "olm.maxOpenShiftVersion", "value": "4.15"}]'
   name: gitlab-operator-kubernetes.v1.2.1
   namespace: placeholder
 spec:
@@ -639,3 +640,4 @@ spec:
       targetPort: 9443
       type: ValidatingAdmissionWebhook
       webhookPath: /validate-apps-gitlab-com-v1beta1-gitlab
+  replaces: gitlab-operator-kubernetes.v1.2.0

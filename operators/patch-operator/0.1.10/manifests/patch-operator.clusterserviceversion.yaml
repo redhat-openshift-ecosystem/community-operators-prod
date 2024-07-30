@@ -1,0 +1,351 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "redhatcop.redhat.io/v1alpha1",
+          "kind": "Patch",
+          "metadata": {
+            "name": "test-complex-patch"
+          },
+          "spec": {
+            "patches": {
+              "test-complex-patch": {
+                "patchTemplate": "metadata:\n  annotations:\n    {{ (index . 1).metadata.name }}: {{ (index . 2).metadata.name }}    \n",
+                "patchType": "application/strategic-merge-patch+json",
+                "sourceObjectRefs": [
+                  {
+                    "apiVersion": "v1",
+                    "kind": "Namespace",
+                    "name": "test-patch-operator"
+                  },
+                  {
+                    "apiVersion": "v1",
+                    "kind": "ServiceAccount",
+                    "name": "default",
+                    "namespace": "test-patch-operator"
+                  }
+                ],
+                "targetObjectRef": {
+                  "apiVersion": "v1",
+                  "kind": "ServiceAccount",
+                  "name": "test",
+                  "namespace": "test-patch-operator"
+                }
+              }
+            }
+          }
+        }
+      ]
+    capabilities: Full Lifecycle
+    categories: Security
+    certified: 'false'
+    containerImage: quay.io/redhat-cop/patch-operator@sha256:072abe80c8ce73669ef84d72969fd1713d15b5183a2512139167485d000d4380
+    createdAt: "2024-04-18T13:14:33Z"
+    description: An operator to apply patches to Kubernetes objects in a declarative way.
+    operatorframework.io/cluster-monitoring: 'true'
+    operatorframework.io/suggested-namespace: patch-operator
+    operators.openshift.io/infrastructure-features: '["Disconnected"]'
+    operators.operatorframework.io/builder: operator-sdk-v1.23.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    repository: https://github.com/redhat-cop/patch-operator
+    support: Best Effort
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.arm64: supported
+    operatorframework.io/arch.ppc64le: supported
+    operatorframework.io/arch.s390x: supported
+    operatorframework.io/os.linux: supported
+  name: patch-operator.v0.1.10
+  namespace: placeholder
+spec:
+  annotations:
+    service.beta.openshift.io/inject-cabundle: 'true'
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - kind: Patch
+        name: patches.redhatcop.redhat.io
+        version: v1alpha1
+  description: "The patch operator helps with defining patches in a declarative way. This operator has two main features:\n\n1. [ability to patch an object at creation time via a mutating webhook](#creation-time-patch-injection)\n2. [ability to enforce patches on one or more objects via a controller](#runtime-patch-enforcement)\n \n## Creation-time patch injection\n\nWhy apply a patch at creation time when you could directly create the correct object? The reason is that sometime the correct value depends on configuration set on the specific cluster in which the object is being deployed. For example, an ingress/route hostname might depend on the specific cluster. Consider the following example based on cert-manager:\n \n```yaml\napiVersion: cert-manager.io/v1\nkind: ClusterIssuer\nmetadata:\n  name: letsencrypt-issuer\nspec:\n  acme:\n    server: 'https://acme-v02.api.letsencrypt.org/directory'\n    email: {{ .Values.letsencrypt.email }}\n    privateKeySecretRef:\n      name: letsencrypt-staging\n    solvers:  \n    - dns01:\n        route53:\n          accessKeyID: << access_key >>\n          secretAccessKeySecretRef:\n            name: cert-manager-dns-credentials\n            key: aws_secret_access_key\n          region: << region >>\n          hostedZoneID: << hosted_zone_id >>\n ```\n\nIn this example the fields: `<< access_key >>`, `<< region >>` and `<< hosted_zone_id >>` are dependent on the specific region in which the cluster is being deployed and in many cases they are discoverable from other configurations already present in the cluster. If you want to deploy the above Cluster Issuer object with a gitops approach, then there is no easy way to discover those values. The solution so far is to manually discover those values and create a different gitops configuration for each cluster. But consider if you could look up values at deploy time based on the cluster you are deploying to. Here is how this object might look:\n\n```yaml\napiVersion: cert-manager.io/v1\nkind: ClusterIssuer\nmetadata:\n  name: letsencrypt-issuer\n  namespace: {{ .Release.Namespace }}\n  annotations:\n    \"redhat-cop.redhat.io/patch\": |\n      spec:\n        acme:\n        - dns01:\n            route53:\n              accessKeyID: {{ (lookup \"v1\" \"Secret\" .metadata.namespace \"cert-manager-dns-credentials\").data.aws_access_key_id | b64dec }}\n              secretAccessKeySecretRef:\n                name: cert-manager-dns-credentials\n                key: aws_secret_access_key\n              region: {{ (lookup \"config.openshift.io/v1\" \"Infrastructure\" \"\" \"cluster\").status.platformStatus.aws.region }}\n              hostedZoneID: {{ (lookup \"config.openshift.io/v1\" \"DNS\" \"\" \"cluster\").spec.publicZone.id }} \nspec:\n  acme:\n    server: 'https://acme-v02.api.letsencrypt.org/directory'\n    email: {{ .Values.letsencrypt.email }}\n    privateKeySecretRef:\n      name: letsencrypt-staging\n    solvers:  \n    - dns01:\n        route53:\n          accessKeyID: << access_key >>\n          secretAccessKeySecretRef:\n            name: cert-manager-dns-credentials\n            key: aws_secret_access_key\n          region: << region >>\n          hostedZoneID: << hosted_zone_id >>\n ```\n\nThe annotation specifies a patch that will be applied by a [MutatingWebhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/), as you can see the three values are now looked up from different configurations in the cluster.\n\nTwo annotations influences the behavior of this MutatingWebhook\n \n1. \"redhat-cop.redhat.io/patch\" : this is the patch itself. The patch is evaluated as a template with the object itself as it's only parameter. The template is expressed in golang template notation and supports the same functions as helm template including the [lookup](https://helm.sh/docs/chart_template_guide/functions_and_pipelines/#using-the-lookup-function) function which plays a major role here. The patch must be expressed in yaml for readability. It will be converted to json by the webhook logic.\n2. \"redhat-cop.redhat.io/patch-type\" : this is the type of json patch. The possible values are: `application/json-patch+json`, `application/merge-patch+json` and `application/strategic-merge-patch+json`. If this annotation is omitted it defaults to strategic merge.\n\n### Security Considerations\n \nThe lookup function, if used by the template, is executed with a client which impersonates the user issuing the object creation/update request. This should prevent security permission leakage.\n\n### Installing the creation time webhook\n \nThe creation time webhook is not installed by the operator. This is because there is no way to know which specific object type should be intercepted and intercepting all of the types would be too inefficient. It's up to the administrator then to install the webhook. Here is some guidance.\n\nIf you installed the operator via OLM, use the following webhook template:\n\n```yaml\napiVersion: admissionregistration.k8s.io/v1\n kind: MutatingWebhookConfiguration\nmetadata:\n  name: patch-operator-inject\n  annotations:\n    service.beta.openshift.io/inject-cabundle: \"true\"\nwebhooks:\n - admissionReviewVersions:\n  - v1\n  clientConfig:\n    service:\n      name: patch-operator-webhook-service\n      namespace: patch-operator\n      path: /inject\n  failurePolicy: Fail\n  name: patch-operator-inject.redhatcop.redhat.io\n  rules:\n  - << add your intercepted objects here >>\n  sideEffects: None\n```\n\nIf you installed the operator via the Helm chart and are using cert-manager, use the following webhook template:\n\n```yaml\napiVersion: admissionregistration.k8s.io/v1\n kind: MutatingWebhookConfiguration\nmetadata:\n  name: patch-operator-inject\n  annotations:\n    cert-manager.io/inject-ca-from: '{{ .Release.Namespace }}/webhook-server-cert'\n webhooks:\n- admissionReviewVersions:\n  - v1\n  clientConfig:\n    service:\n      name: patch-operator-webhook-service\n      namespace: patch-operator\n      path: /inject\n  failurePolicy: Fail\n  name: patch-operator-inject.redhatcop.redhat.io\n  rules:\n  - << add your intercepted objects here >>\n  sideEffects: None\n```  \n\nYou should need to enable the webhook only for `CREATE` operations. So for example to enable the webhook on configmaps:\n\n```yaml\n  rules:\n  - apiGroups:\n    - \"\"\n    apiVersions:\n    - v1\n    operations:\n    - CREATE\n    resources:\n    - configmaps\n```\n\n## Runtime patch enforcement\n\nThere are situations when we need to patch pre-existing objects. Again this is a use case that is hard to model with gitops operators which will work only on object that they own. Especially with sophisticated Kubernetes distributions, it is not uncommon that a Kubernetes instance, at installation time, is configured with some default settings. Changing those configurations means patching those objects. For example, let's take the case of OpenShift Oauth configuration. This object is present by default and it is expected to be patched with any newly enabled authentication mechanism. This is how it looks like after installation:\n\n```yaml\napiVersion: config.openshift.io/v1\n kind: OAuth\nmetadata:\n  name: cluster\n  ownerReferences:\n    - apiVersion: config.openshift.io/v1\n      kind: ClusterVersion\n      name: version\n      uid: 9a9d450b-3076-4e30-ac05-a889d6341fc3\n  resourceVersion: '20405124'\n spec: []\n```\n\nIf we need to patch it we can use the patch controller and the `Patch` object as follows:\n\n```yaml\napiVersion: redhatcop.redhat.io/v1alpha1\n kind: Patch\nmetadata:\n  name: gitlab-ocp-oauth-provider\n  namespace: openshift-config\nspec:\n  serviceAccountRef:\n    name: default\n  patches:\n    gitlab-ocp-oauth-provider:\n      targetObjectRef:\n        apiVersion: config.openshift.io/v1\n        kind: OAuth\n        name: cluster\n      patchTemplate: |\n        spec:\n          identityProviders:\n          - name: my-github \n            mappingMethod: claim \n            type: GitHub\n            github:\n              clientID: \"{{ (index . 1).data.client_id | b64dec }}\" \n              clientSecret: \n                name: ocp-github-app-credentials\n              organizations: \n              - my-org\n              teams: []            \n      patchType: application/merge-patch+json\n      sourceObjectRefs:\n      - apiVersion: v1\n        kind: Secret\n        name: ocp-github-app-credentials\n        namespace: openshift-config\n```\n\nThis will cause the OAuth object to be patched and the patch to be enforced. That means that if anything changes on the secret that we use a parameter (which may be rotated) or in Oauth object itself, the patch will be reapplied. In this case we are adding a gitlab authentication provider.\n\n A `patch` has the following fields:\n\n`targetObjectRef` this refers to the object(s) receiving the patch. Mutliple object can be selected based on the following rules:\n \n| Namespaced Type | Namespace | Name | Selection type |\n| --- | --- | --- | --- |\n| yes | null | null | multiple selection across namespaces |\n| yes | null | not null | multiple selection across namespaces where the name corresponds to the passed name |\n| yes | not null | null | multiple selection within a namespace |\n| yes | not null | not nul | single selection |\n| no | N/A | null | multiple selection  |\n| no | N/A | not null | single selection |\n\nSelection can be further narrowed down by filtering by labels and/or annotations using the `labelSelector` and `annotationSelector` fields. The patch will be applied to all of the selected instances.\n\n`sourceObjectRefs` these are the objects that will be watched and become part of the parameters of the patch template. Name and Namespace of sourceRefObjects are interpreted as golang templates with the current target instance and the only parameter. This allows to select different source object for each target object.\n \nSo, for example, with this patch:\n\n```yaml\napiVersion: redhatcop.redhat.io/v1alpha1\n kind: Patch\nmetadata:\n  name: multiple-namespaced-targets-patch\nspec:\n  serviceAccountRef:\n    name: default\n  patches:\n    multiple-namespaced-targets-patch:\n      targetObjectRef:\n        apiVersion: v1\n        kind: ServiceAccount\n        name: deployer\n      patchTemplate: |\n        metadata:\n          annotations:\n            {{ (index . 1).metadata.uid }}: {{ (index . 1) }}\n      patchType: application/strategic-merge-patch+json\n      sourceObjectRefs:\n      - apiVersion: v1\n        kind: ServiceAccount\n        name: default\n        namespace: \"{{ .metadata.namespace }}\"\n        fieldPath: $.metadata.uid\n```\n\nThe `deployer` service accounts from all namespaces are selected as target of this patch, each patch template will receive a different parameter and that is the `default` service account of the same namespace as the namespace of the `deployer` service account being processed.\n\n`sourceObjectRefs` also have the `fieldPath` field which can contain a jsonpath expression. If a value is passed the jsonpath expression will be calculate for the current source object and the result will be passed as parameter of the template.\n\n`patchTemplate` This is the the template that will be evaluated. The result must be a valid patch compatible with the requested type and expressed in yaml for readability. The parameters passed to the template are the target object and then the all of the source object. So if you want to refer to the target object in the template you can use this expression `(index . 0)`. Higher indexes refer to the sourceObjectRef array. The template is expressed in golang template notation and supports the same functions as helm template.\n\n`patchType` is the type of the json patch. The possible values are: `application/json-patch+json`, `application/merge-patch+json` and `application/strategic-merge-patch+json`. If this annotation is omitted it defaults to strategic merge.\n\n### Patch Controller Security Considerations\n\nThe patch enforcement enacted by the patch controller is executed with a client which uses the service account referenced by the `serviceAccountRef` field. So before a patch object can actually work an administrator must have granted the needed permissions to a service account in the same namespace. The `serviceAccountRef` will default to the `default` service account if not specified.\n\n### Patch Controller Performance Considerations\n\nThe patch controller will create a controller-manager and per `Patch` object and a reconciler for each of the `PatchSpec` defined in the array on patches in the `Patch` object.\nThese reconcilers share the same cached client. In order to be able to watch changes on target and source objects of a `PatchSpec`, all of the target and source object type instances will be cached by the client. This is a normal behavior of a controller-manager client, but it implies that if you create patches on object types that have many instances in etcd (Secrets, ServiceAccounts, Namespaces for example), the patch operator instance will require a significant amount of memory. A way to contain this issue is to try to aggregate together `PatchSpec` that deal with the same object types. This will cause those object type instances to cached only once.  \n"
+  displayName: Patch Operator
+  icon:
+    - base64data: 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
+      mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ''
+              resources:
+                - events
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - watch
+            - apiGroups:
+                - ''
+              resources:
+                - groups
+                - serviceaccounts
+                - users
+              verbs:
+                - impersonate
+            - apiGroups:
+                - ''
+              resources:
+                - serviceaccounts/token
+              verbs:
+                - create
+            - apiGroups:
+                - '*'
+              resources:
+                - '*'
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - apiextensions.k8s.io
+              resources:
+                - customresourcedefinitions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - '*'
+              verbs:
+                - impersonate
+            - apiGroups:
+                - redhatcop.redhat.io
+              resources:
+                - patches
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - redhatcop.redhat.io
+              resources:
+                - patches/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - redhatcop.redhat.io
+              resources:
+                - patches/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: controller-manager
+      deployments:
+        - label:
+            control-plane: patch-operator
+          name: patch-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                control-plane: patch-operator
+            strategy: {}
+            template:
+              metadata:
+                labels:
+                  control-plane: patch-operator
+              spec:
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                      - --tls-cert-file=/etc/certs/tls/tls.crt
+                      - --tls-private-key-file=/etc/certs/tls/tls.key
+                    image: quay.io/redhat-cop/kube-rbac-proxy@sha256:c68135620167c41e3d9f6c1d2ca1eb8fa24312b86186d09b8010656b9d25fb47
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    volumeMounts:
+                      - mountPath: /etc/certs/tls
+                        name: tls-cert
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    image: quay.io/redhat-cop/patch-operator@sha256:072abe80c8ce73669ef84d72969fd1713d15b5183a2512139167485d000d4380
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                        scheme: HTTP
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                        scheme: HTTP
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        memory: 500Mi
+                      requests:
+                        cpu: 100m
+                        memory: 100Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: tls-cert
+                    secret:
+                      defaultMode: 420
+                      secretName: patch-operator-certs
+      permissions:
+        - rules:
+            - apiGroups:
+                - ''
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ''
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: controller-manager
+    strategy: deployment
+  installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - gitops
+    - patch
+    - enforcing
+    - declarative
+  links:
+    - name: Patch Operator
+      url: https://github.com/redhat-cop/patch-operator
+    - name: Container Image
+      url: https://quay.io/redhat-cop/patch-operator
+  maintainers:
+    - email: rspazzol@redhat.com
+      name: Raffaele Spazzoli
+  maturity: alpha
+  provider:
+    name: Red Hat Community of Practice
+  version: 0.1.10
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: patch-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mpatch.kb.io
+      rules:
+        - apiGroups:
+            - redhatcop.redhat.io
+          apiVersions:
+            - v1alpha1
+          operations:
+            - CREATE
+          resources:
+            - patches
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-redhatcop-redhat-io-v1alpha1-patch
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: patch-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vpatch.kb.io
+      rules:
+        - apiGroups:
+            - redhatcop.redhat.io
+          apiVersions:
+            - v1alpha1
+          operations:
+            - UPDATE
+          resources:
+            - patches
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-redhatcop-redhat-io-v1alpha1-patch
+  relatedImages:
+    - name: quay.io/redhat-cop/kube-rbac-proxy
+      image: quay.io/redhat-cop/kube-rbac-proxy@sha256:c68135620167c41e3d9f6c1d2ca1eb8fa24312b86186d09b8010656b9d25fb47
+    - name: quay.io/redhat-cop/patch-operator
+      image: quay.io/redhat-cop/patch-operator@sha256:072abe80c8ce73669ef84d72969fd1713d15b5183a2512139167485d000d4380

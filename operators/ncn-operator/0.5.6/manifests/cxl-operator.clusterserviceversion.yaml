@@ -62,7 +62,7 @@ metadata:
     capabilities: Seamless Upgrades
     categories: Integration & Delivery
     console.openshift.io/plugins: '["cxl-console-plugin"]'
-    containerImage: quay.io/rasen708/ncn-operator:v0.5.1
+    containerImage: quay.io/rasen708/ncn-operator:v0.5.2
     createdAt: "2024-08-01T05:45:38Z"
     description: Provides the ncn extend
     operatorframework.io/initialization-resource: |-
@@ -80,19 +80,19 @@ metadata:
     operators.operatorframework.io/builder: operator-sdk-v1.31.0-ocp
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/geunwookim/ncn-operator
-    support: GW
-  name: ncn-operator.v0.5.1
+    support: geunwookim
+  name: ncn-operator.v0.5.6
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
-    - description: CXL is the Schema for the cxls API
+    - description: CXL is  the  Schema for the cxls  API.
       displayName: CXL
       kind: CXL
       name: cxls.cxl.antline.com
       version: v1
-    - description: Label is the Schema for the labels API.
+    - description: Label is the Schema for  the labels API.
       displayName: Node Label
       kind: Label
       name: labels.cxl.antline.com
@@ -489,10 +489,6 @@ spec:
     name: geunwookim
   maturity: betav1
   provider:
-<<<<<<< HEAD
-    name: Gw
-=======
-    name: GW
->>>>>>> origin
+    name: geunwookim
   replaces: ncn-operator.v0.4.3
-  version: 0.5.1
+  version: 0.5.6

@@ -1,24 +1,23 @@
----
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.11.1
   creationTimestamp: null
-  name: cxls.cxl.antline.com
+  name: cmmds.cmmd.gw.com
 spec:
-  group: cxl.antline.com
+  group: cmmd.gw.com
   names:
-    kind: CXL
-    listKind: CXLList
-    plural: cxls
-    singular: cxl
+    kind: CMMD
+    listKind: CMMDList
+    plural: cmmds
+    singular: cmmd
   scope: Namespaced
   versions:
   - name: v1
     schema:
       openAPIV3Schema:
-        description: CXL is the Schema for the cxls API
+        description: CMMD is the Schema for the cmmds API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -33,7 +32,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: CXLSpec defines the desired state of CXL
+            description: CMMDSpec defines the desired state of CMMD
             properties:
               allocate:
                 description: Specify resource allocation manually
@@ -52,7 +51,7 @@ spec:
                 - manual
                 type: string
               enable:
-                description: Whether use of CXL
+                description: Whether use of CMMD
                 type: boolean
               payload:
                 description: Specify user resource manifest. e.g.) Pod, Deployment,
@@ -66,7 +65,7 @@ spec:
             - payload
             type: object
           status:
-            description: CXLStatus defines the observed state of CXL
+            description: CMMDStatus defines the observed state of CMMD
             properties:
               allocateMode:
                 description: AllocateMode

@@ -6,8 +6,8 @@ metadata:
     alm-examples: |-
       [
         {
-          "apiVersion": "cxl.antline.com/v1",
-          "kind": "CXL",
+          "apiVersion": "cmmd.gw.com/v1",
+          "kind": "CMMD",
           "metadata": {
             "name": "my-app",
             "namespace": "my-namespace"
@@ -48,54 +48,54 @@ metadata:
           }
         },
         {
-          "apiVersion": "cxl.antline.com/v1",
+          "apiVersion": "cmmd.gw.com/v1",
           "kind": "Label",
           "metadata": {
             "labels": {
               "machineconfiguration.openshift.io/role": "cmmd"
             },
-            "name": "cxl-node-label",
-            "namespace": "cxl-operator"
+            "name": "cmmd-node-label",
+            "namespace": "socmmd"
           }
         }
       ]
     capabilities: Seamless Upgrades
     categories: Integration & Delivery
-    console.openshift.io/plugins: '["cxl-console-plugin"]'
-    containerImage: quay.io/rasen708/ncn-operator:v0.5.2
+    console.openshift.io/plugins: '["socmmd-console-plugin"]'
+    containerImage: quay.io/rasen708/ncn-operator@sha256:b252335e24c8fbbb7cf453b927af8f918027c5f23c7c6a7da8ab0560913de4bf
     createdAt: "2024-08-01T05:45:38Z"
     description: Provides the ncn extend
     operatorframework.io/initialization-resource: |-
       {
-        "apiVersion": "cxl.antline.com/v1",
+        "apiVersion": "cmmd.gw.com/v1",
         "kind": "Label",
         "metadata": {
-          "name": "cxl-node-label",
-          "namespace": "cxl-operator",
+          "name": "cmmd-node-label",
+          "namespace": "socmmd",
           "labels": {}
         },
         "spec": {}
       }
-    operatorframework.io/suggested-namespace: cxl-operator-system
+    operatorframework.io/suggested-namespace: socmmd-system
     operators.operatorframework.io/builder: operator-sdk-v1.31.0-ocp
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
     repository: https://github.com/geunwookim/ncn-operator
     support: geunwookim
-  name: ncn-operator.v0.5.6
+  name: ncn-operator.v0.5.8
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
-    - description: CXL is  the  Schema for the cxls  API.
-      displayName: CXL
-      kind: CXL
-      name: cxls.cxl.antline.com
+    - description: CMMD is the Schema for the cmmds API
+      displayName: CMMD
+      kind: CMMD
+      name: cmmds.cmmd.gw.com
       version: v1
-    - description: Label is the Schema for  the labels API.
+    - description: Label is the Schema for the labels API
       displayName: Node Label
       kind: Label
-      name: labels.cxl.antline.com
+      name: labels.cmmd.gw.com
       version: v1
   description: This operator is for ncn extend
   displayName: ncn-operator
@@ -222,9 +222,9 @@ spec:
           - update
           - watch
         - apiGroups:
-          - cxl.antline.com
+          - cmmd.gw.com
           resources:
-          - cxls
+          - cmmds
           - labels
           verbs:
           - create
@@ -235,16 +235,16 @@ spec:
           - update
           - watch
         - apiGroups:
-          - cxl.antline.com
+          - cmmd.gw.com
           resources:
-          - cxls/finalizers
+          - cmmds/finalizers
           - labels/finalizers
           verbs:
           - update
         - apiGroups:
-          - cxl.antline.com
+          - cmmd.gw.com
           resources:
-          - cxls/status
+          - cmmds/status
           - labels/status
           verbs:
           - get
@@ -311,17 +311,17 @@ spec:
           - subjectaccessreviews
           verbs:
           - create
-        serviceAccountName: cxl-operator-controller-manager
+        serviceAccountName: socmmd-controller-manager
       deployments:
       - label:
           app.kubernetes.io/component: manager
-          app.kubernetes.io/created-by: cxl-operator
+          app.kubernetes.io/created-by: socmmd
           app.kubernetes.io/instance: controller-manager
           app.kubernetes.io/managed-by: kustomize
           app.kubernetes.io/name: deployment
-          app.kubernetes.io/part-of: cxl-operator
+          app.kubernetes.io/part-of: socmmd
           control-plane: controller-manager
-        name: cxl-operator-controller-manager
+        name: socmmd-controller-manager
         spec:
           replicas: 1
           selector:
@@ -396,7 +396,7 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.annotations['olm.operatorNamespace']
-                image: quay.io/rasen708/ncn-operator:v0.1.5
+                image: quay.io/rasen708/ncn-operator@sha256:b252335e24c8fbbb7cf453b927af8f918027c5f23c7c6a7da8ab0560913de4bf
                 imagePullPolicy: Always
                 livenessProbe:
                   httpGet:
@@ -431,7 +431,7 @@ spec:
                   periodSeconds: 10
               securityContext:
                 runAsNonRoot: true
-              serviceAccountName: cxl-operator-controller-manager
+              serviceAccountName: socmmd-controller-manager
               terminationGracePeriodSeconds: 90
       permissions:
       - rules:
@@ -466,7 +466,7 @@ spec:
           verbs:
           - create
           - patch
-        serviceAccountName: cxl-operator-controller-manager
+        serviceAccountName: socmmd-controller-manager
     strategy: deployment
   installModes:
   - supported: false
@@ -485,10 +485,10 @@ spec:
   - name: NCN Operator
     url: https://ncn-operator.domain
   maintainers:
-  - email: geunwoo.kim@gmail.com
+  - email: geunwookim@gmail.com
     name: geunwookim
   maturity: betav1
   provider:
     name: geunwookim
-  replaces: ncn-operator.v0.4.3
-  version: 0.5.6
+  replaces: ncn-operator.v0.5.6
+  version: 0.5.8

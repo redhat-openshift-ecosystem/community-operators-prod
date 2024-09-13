@@ -204,9 +204,7 @@ spec:
                   capabilities:
                     drop:
                     - ALL
-                  runAsGroup: 14001
                   runAsNonRoot: true
-                  runAsUser: 14001
               - command:
                 - /manager
                 env:
@@ -331,12 +329,9 @@ spec:
                   capabilities:
                     drop:
                     - ALL
-                  runAsGroup: 12001
-                  runAsUser: 12001
+                  runAsNonRoot: true
               securityContext:
-                runAsGroup: 11001
                 runAsNonRoot: true
-                runAsUser: 11001
               serviceAccountName: susql-operator-susql-controller-manager
               terminationGracePeriodSeconds: 10
       permissions:

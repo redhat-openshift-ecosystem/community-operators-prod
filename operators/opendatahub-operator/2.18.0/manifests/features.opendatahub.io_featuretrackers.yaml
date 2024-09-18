@@ -2,7 +2,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.9.2
+    controller-gen.kubebuilder.io/version: v0.16.1
   creationTimestamp: null
   name: featuretrackers.features.opendatahub.io
 spec:
@@ -17,24 +17,29 @@ spec:
   - name: v1
     schema:
       openAPIV3Schema:
-        description: FeatureTracker represents a cluster-scoped resource in the Data
-          Science Cluster, specifically designed for monitoring and managing objects
-          created via the internal Features API. This resource serves a crucial role
-          in cross-namespace resource management, acting as an owner reference for
-          various resources. The primary purpose of the FeatureTracker is to enable
-          efficient garbage collection by Kubernetes. This is essential for ensuring
-          that resources are automatically cleaned up and reclaimed when they are
+        description: |-
+          FeatureTracker represents a cluster-scoped resource in the Data Science Cluster,
+          specifically designed for monitoring and managing objects created via the internal Features API.
+          This resource serves a crucial role in cross-namespace resource management, acting as
+          an owner reference for various resources. The primary purpose of the FeatureTracker
+          is to enable efficient garbage collection by Kubernetes. This is essential for
+          ensuring that resources are automatically cleaned up and reclaimed when they are
           no longer required.
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -58,8 +63,9 @@ spec:
             properties:
               conditions:
                 items:
-                  description: Condition represents the state of the operator's reconciliation
-                    functionality.
+                  description: |-
+                    Condition represents the state of the operator's
+                    reconciliation functionality.
                   properties:
                     lastHeartbeatTime:
                       format: date-time
@@ -83,9 +89,9 @@ spec:
                   type: object
                 type: array
               phase:
-                description: Phase describes the Phase of FeatureTracker reconciliation
-                  state. This is used by OLM UI to provide status information to the
-                  user.
+                description: |-
+                  Phase describes the Phase of FeatureTracker reconciliation state.
+                  This is used by OLM UI to provide status information to the user.
                 type: string
             type: object
         type: object

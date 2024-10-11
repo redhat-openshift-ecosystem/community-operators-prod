@@ -20,9 +20,14 @@ metadata:
         }
       ]
     capabilities: Basic Install
+    certified: "false"
+    containerImage: docker.io/manvi1203/alloydb-omni-operator-bundle:v1.1.1
     createdAt: "2024-10-10T10:34:33Z"
+    description: AlloyDB Omni is a downloadable database software package that lets you deploy a streamlined edition of AlloyDB for PostgreSQL in your own computing environment.
     operators.operatorframework.io/builder: operator-sdk-v1.37.0
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+    repository: https://github.com/GoogleCloudPlatform/alloydb-omni-samples/raw/main/k8s/helm/charts/alloydb-omni-operator
+    support: Google
   name: alloydbomni-operator.v1.1.1
   namespace: placeholder
 spec:
@@ -32,13 +37,13 @@ spec:
     - kind: AlloydbomniOperator
       name: alloydbomnioperators.charts.docker.io
       version: v1alpha1
-  description: AlloyDB Omni 15.5.5 is a downloadable database software package that
+  description: AlloyDB Omni is a downloadable database software package that
     lets you deploy a streamlined edition of AlloyDB for PostgreSQL in your own computing
     environment.
   displayName: alloydb-omni-operator
   icon:
-  - base64data: ""
-    mediatype: ""
+  - base64data: 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
+    mediatype: image/png
   install:
     spec:
       clusterPermissions:
@@ -272,6 +277,8 @@ spec:
     name: Manvi Gupta
   - email: ' jahnaviii@google.com'
     name: Jahnavi Malhotra
+  minKubeVersion: 1.21.0
+  com.redhat.openshift.versions: "4.16"
   maturity: alpha
   provider:
     name: Google

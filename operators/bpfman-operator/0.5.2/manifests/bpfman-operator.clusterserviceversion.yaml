@@ -16,7 +16,7 @@ metadata:
           "spec": {
             "bytecode": {
               "image": {
-                "url": "quay.io/bpfman-bytecode/go-app-counter:latest"
+                "url": "quay.io/bpfman-bytecode/go-app-counter:v0.5.2"
               }
             },
             "nodeselector": {},
@@ -97,7 +97,7 @@ metadata:
             "bpffunctionname": "test_fentry",
             "bytecode": {
               "image": {
-                "url": "quay.io/bpfman-bytecode/fentry:latest"
+                "url": "quay.io/bpfman-bytecode/fentry:v0.5.2"
               }
             },
             "func_name": "do_unlinkat",
@@ -117,7 +117,7 @@ metadata:
             "bpffunctionname": "test_fexit",
             "bytecode": {
               "image": {
-                "url": "quay.io/bpfman-bytecode/fexit:latest"
+                "url": "quay.io/bpfman-bytecode/fexit:v0.5.2"
               }
             },
             "func_name": "do_unlinkat",
@@ -137,7 +137,7 @@ metadata:
             "bpffunctionname": "my_kprobe",
             "bytecode": {
               "image": {
-                "url": "quay.io/bpfman-bytecode/kprobe:latest"
+                "url": "quay.io/bpfman-bytecode/kprobe:v0.5.2"
               }
             },
             "func_name": "try_to_wake_up",
@@ -170,7 +170,7 @@ metadata:
             "bpffunctionname": "pass",
             "bytecode": {
               "image": {
-                "url": "quay.io/bpfman-bytecode/tc_pass:latest"
+                "url": "quay.io/bpfman-bytecode/tc_pass:v0.5.2"
               }
             },
             "direction": "ingress",
@@ -205,7 +205,7 @@ metadata:
             "bpffunctionname": "enter_openat",
             "bytecode": {
               "image": {
-                "url": "quay.io/bpfman-bytecode/tracepoint:latest"
+                "url": "quay.io/bpfman-bytecode/tracepoint:v0.5.2"
               }
             },
             "globaldata": {
@@ -238,7 +238,7 @@ metadata:
             "bpffunctionname": "my_uprobe",
             "bytecode": {
               "image": {
-                "url": "quay.io/bpfman-bytecode/uprobe:latest"
+                "url": "quay.io/bpfman-bytecode/uprobe:v0.5.2"
               }
             },
             "func_name": "syscall",
@@ -271,7 +271,7 @@ metadata:
             "bpffunctionname": "pass",
             "bytecode": {
               "image": {
-                "url": "quay.io/bpfman-bytecode/xdp_pass:latest"
+                "url": "quay.io/bpfman-bytecode/xdp_pass:v0.5.2"
               }
             },
             "globaldata": {
@@ -295,8 +295,8 @@ metadata:
       ]
     capabilities: Basic Install
     categories: OpenShift Optional
-    containerImage: quay.io/bpfman/bpfman-operator:v0.0.0
-    createdAt: "2024-10-10T19:42:33Z"
+    containerImage: quay.io/bpfman/bpfman-operator:v0.5.2
+    createdAt: "2024-10-14T22:02:48Z"
     features.operators.openshift.io/cnf: "false"
     features.operators.openshift.io/cni: "false"
     features.operators.openshift.io/csi: "true"
@@ -399,8 +399,8 @@ spec:
     `warn`, `error`, and `fatal`, defaults to `info`\n- `bpfman.agent.log.level`:
     the log level for the bpfman-agent currently supports `info`, `debug`, and `trace`
     \n\nThe bpfman operator deploys eBPF programs via CRDs. The following CRDs are
-    currently available, \n\n- XdpProgram\n- TcProgram\n- TracepointProgram\n- KprobeProgram\n-
-    UprobeProgram\n- FentryProgram\n- FexitProgram\n\n## More information\n\nPlease
+    currently available, \n\n- BpfApplication\n- XdpProgram\n- TcProgram\n- TracepointProgram\n-
+    KprobeProgram\n- UprobeProgram\n- FentryProgram\n- FexitProgram\n\n## More information\n\nPlease
     checkout the [bpfman community website](https://bpfman.io/) for more information."
   displayName: Bpfman Operator
   icon:
@@ -1063,7 +1063,7 @@ spec:
                 env:
                 - name: GO_LOG
                   value: debug
-                image: quay.io/bpfman/bpfman-operator:latest
+                image: quay.io/bpfman/bpfman-operator:v0.5.2
                 imagePullPolicy: IfNotPresent
                 livenessProbe:
                   httpGet:

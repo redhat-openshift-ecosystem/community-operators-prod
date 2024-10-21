@@ -74,9 +74,10 @@ spec:
                     default: 3
                     description: AutoHealTriggerThreshold is the number of consecutive
                       healthcheck failures on the standby instance that will trigger
-                      automatic healing. Use the EnableAutoHeal flag to completely
-                      disable automatic healing.
-                    minimum: 2
+                      automatic healing. If set to 0, then it will use the system
+                      default value. Use the EnableAutoHeal flag to completely disable
+                      automatic healing.
+                    minimum: 0
                     type: integer
                   enableAutoFailover:
                     default: true
@@ -87,9 +88,9 @@ spec:
                       not be triggered even if the system detects that the primary
                       instance is unhealthy. The default value is `true`. When it
                       is enabled, if the system detects that the primary instance
-                      is unhealthy for the given threshold, it will trigger a failover.
-                      This feature is only applicable if this is a HA DBCluster and
-                      if the standby is healthy.
+                      is unhealthy for the given threshold (90 seconds), it will trigger
+                      a failover. This feature is only applicable if this is a HA
+                      DBCluster and if the standby is healthy.
                     type: boolean
                   enableAutoHeal:
                     default: true
@@ -99,24 +100,15 @@ spec:
                       then autoheal will not be triggered even if the system detects
                       that the standby instance is unhealthy. The default value is
                       `true`. When it is enabled, if the system detects that the standby
-                      instance is unhealthy for the given threshold, it will trigger
-                      an autoheal. This feature is only applicable if this is a HA
-                      DBCluster.
+                      instance is unhealthy for the given threshold (90 seconds),
+                      it will trigger an autoheal. This feature is only applicable
+                      if this is a HA DBCluster.
                     type: boolean
                   enableStandbyAsReadReplica:
                     description: EnableStandbyAsReadReplica determine whether the
                       standbys can accept user queries or not. If set to true, a new
                       endpoint will be created to enable read-only access to the standby(s).
                     type: boolean
-                  healthcheckPeriodSeconds:
-                    default: 30
-                    description: HealthcheckPeriodSeconds is the number of seconds
-                      the healthcheck prober will wait before checking the health
-                      of the primary and standby instances again and updating the
-                      status accordingly.
-                    maximum: 86400
-                    minimum: 1
-                    type: integer
                   numberOfStandbys:
                     default: 0
                     description: "NumberOfStandbys is the number of standbys that
@@ -268,16 +260,6 @@ spec:
                     description: AvailabilityOptions contains adjustable settings
                       for HA features
                     properties:
-                      healthcheckPeriodSeconds:
-                        default: 30
-                        description: HealthcheckPeriodSeconds is the number of seconds
-                          the healthcheck prober will wait before checking the health
-                          of the primary and standby instances again and updating
-                          the status accordingly. This field is propagated down from
-                          the DBCluster's spec
-                        maximum: 86400
-                        minimum: 1
-                        type: integer
                       livenessProbe:
                         default: Enabled
                         description: LivenessProbe enables or disables the liveness
@@ -336,11 +318,6 @@ spec:
                               vertexAIRegion:
                                 type: string
                             type: object
-                          enabled:
-                            default: false
-                            type: boolean
-                        required:
-                        - enabled
                         type: object
                       memoryAgent:
                         properties:
@@ -2897,14 +2874,12 @@ spec:
                   for the database cluster.
                 properties:
                   IsHA:
-                    description: IsHA is set to true when DBClusterSpec HA Availability
-                      setting has at least 1 numberOfStandbys setup.
                     type: boolean
                   IsRegistered:
                     type: boolean
                   RegistrationTime:
                     description: RegistrationTime represents the time the on-prem
-                      dbcluster was registered with the Cloud.
+                      dbcluster was registered with the Cloud
                     type: string
                 type: object
               restoredFrom:

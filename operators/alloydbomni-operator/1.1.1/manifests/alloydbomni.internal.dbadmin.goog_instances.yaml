@@ -120,16 +120,6 @@ spec:
                 description: AvailabilityOptions contains adjustable settings for
                   HA features
                 properties:
-                  healthcheckPeriodSeconds:
-                    default: 30
-                    description: HealthcheckPeriodSeconds is the number of seconds
-                      the healthcheck prober will wait before checking the health
-                      of the primary and standby instances again and updating the
-                      status accordingly. This field is propagated down from the DBCluster's
-                      spec
-                    maximum: 86400
-                    minimum: 1
-                    type: integer
                   livenessProbe:
                     default: Enabled
                     description: LivenessProbe enables or disables the liveness probe
@@ -215,11 +205,6 @@ spec:
                           vertexAIRegion:
                             type: string
                         type: object
-                      enabled:
-                        default: false
-                        type: boolean
-                    required:
-                    - enabled
                     type: object
                   memoryAgent:
                     properties:

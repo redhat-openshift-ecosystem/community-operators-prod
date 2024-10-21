@@ -2,12 +2,12 @@ apiVersion: v1
 kind: Service
 metadata:
   creationTimestamp: null
-  name: alloydbomni-operator-fleet-webhook-service
+  name: local-webhook-service
 spec:
   ports:
   - port: 443
     targetPort: 9443
   selector:
-    fleet-control-plane: controller-manager
+    local-control-plane: controller-manager
 status:
   loadBalancer: {}

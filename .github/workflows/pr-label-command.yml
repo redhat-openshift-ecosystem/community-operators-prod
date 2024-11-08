@@ -5,8 +5,9 @@ on:
     types: [created, edited]
 
 permissions:
+  contents: read
   pull-requests: write
 
 jobs:
-  skip-test-labeler:
+  comment-handler:
     uses: redhat-openshift-ecosystem/github-workflows/.github/workflows/label-command.yml@main

@@ -34,7 +34,7 @@ CONTAINERS_AUTH := $(XDG_RUNTIME_DIR)/containers/auth.json
 # This list can be customized to include the versions that are relevant to the operator
 # DO NOT change this line (except for the versions) if you want to take advantage
 # of the automated catalog promotion
-OCP_VERSIONS=$(shell echo "v4.12 v4.13 v4.14 v4.15 v4.16 v4.17" )
+OCP_VERSIONS=$(shell echo "v4.12 v4.13 v4.14 v4.15 v4.16 v4.17 v4.18" )
 
 
 .PHONY: fbc-onboarding

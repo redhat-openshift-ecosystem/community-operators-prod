@@ -1,6 +1,6 @@
 PREVIOUS_VERSION ?= 3.3.1
 VERSION ?= 3.3.2
-PULLSPEC ?= quay.io/community-operator-pipeline-prod/koku-metrics-operator@sha256:5c501ae285fe463608c4a2ca2d58bd9bb96b8faee7caef1076eee607eeaeb665
+PULLSPEC ?= quay.io/community-operator-pipeline-prod/koku-metrics-operator@sha256:9114f72f6adca60e18616786019d680883bb1c1dc88d317e7adeeec787054469
 
 PDW=$(shell pwd)
 OPERATOR_NAME=koku-metrics-operator
@@ -63,6 +63,10 @@ create-catalog-dir:
 clean: create-catalog-dir
 	find $(CATALOG_DIR) -type d -name ${OPERATOR_NAME} -exec rm -rf {} +
 
+.PHONY: get-bundle
+get-bundle:
+	docker pull quay.io/community-operator-pipeline-prod/koku-metrics-operator:$(VERSION)
+	docker inspect --format '{{.RepoDigests}}' quay.io/community-operator-pipeline-prod/koku-metrics-operator:$(VERSION)
 
 OPM_VERSION=v1.48.0
 OS=$(shell uname -s | tr '[:upper:]' '[:lower:]')

@@ -22,7 +22,7 @@ metadata:
       ]
     capabilities: Basic Install
     categories: Storage,OpenShift Optional
-    containerImage: quay.io/jordigilh/odf-node-recovery-controller:0.0.1
+    containerImage: quay.io/jordigilh/odf-node-recovery-controller@sha256:8f49b0c574c1dac03debb183e33145c6d915c4f9c792b09b30316a5ba4f3b5e9
     createdAt: "2024-11-21T11:07:28Z"
     description: ODF Node Recovery is an operator that assist in the recovery of and
       ODF cluster that has a device replaced
@@ -219,7 +219,7 @@ spec:
                 - --leader-elect
                 command:
                 - /manager
-                image: quay.io/jordigilh/odf-node-recovery-controller:latest
+                image: quay.io/jordigilh/odf-node-recovery-controller@sha256:8f49b0c574c1dac03debb183e33145c6d915c4f9c792b09b30316a5ba4f3b5e9
                 livenessProbe:
                   httpGet:
                     path: /healthz

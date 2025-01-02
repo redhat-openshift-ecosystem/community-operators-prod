@@ -2,36 +2,31 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   labels:
     alloydb-omni: "true"
-  name: instancebackupplans.alloydbomni.internal.dbadmin.goog
+  name: failovers.alloydbomni.internal.dbadmin.goog
 spec:
   group: alloydbomni.internal.dbadmin.goog
   names:
-    kind: InstanceBackupPlan
-    listKind: InstanceBackupPlanList
-    plural: instancebackupplans
-    shortNames:
-    - aooibp
-    singular: instancebackupplan
+    kind: Failover
+    listKind: FailoverList
+    plural: failovers
+    singular: failover
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .status.phase
-      name: Phase
+    - jsonPath: .status.state
+      name: state
       type: string
-    - jsonPath: .status.lastBackupTime
-      name: LastBackupTime
-      type: string
-    - jsonPath: .status.nextBackupTime
-      name: NextBackupTime
+    - jsonPath: .status.internal.phase
+      name: phase
       type: string
     name: v1
     schema:
       openAPIV3Schema:
-        description: InstanceBackupPlan is the Schema for the InstanceBackupPlan API
+        description: Failover is the Schema for the failover API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -46,129 +41,21 @@ spec:
           metadata:
             type: object
           spec:
-            description: InstanceBackupPlanSpec defines the desired state of an AlloyDB
-              Omni InstanceBackupPlan.
+            description: FailoverSpec defines the desired state of postgresql Failover.
             properties:
-              PITREnabled:
-                default: false
-                description: A flag to indicate whether logs replication is enabled
-                  to support point-in-time recovery. Default to False.
-                type: boolean
-              backupLocation:
-                description: BackupLocation specifies the remote object storage location
-                  to store backups. For example, specs to a GCS buckets. Without specifying
-                  this, backups are stored in the backup disk by default.
-                properties:
-                  gcsOptions:
-                    description: GCSOptions is a reference to GCS dependent options.
-                    properties:
-                      bucket:
-                        description: 'Bucket is a required field, (ex: dbs-dump-bucket)
-                          A user is to ensure proper write access to the storage bucket
-                          from within the Operator.'
-                        type: string
-                      key:
-                        description: 'Object key for the dump files. (ex: ods-dump/scottschema.dmp).'
-                        type: string
-                      secretRef:
-                        description: SecretRef is a reference to the secret that stores
-                          GCS access information.
-                        properties:
-                          name:
-                            description: name is unique within a namespace to reference
-                              a secret resource.
-                            type: string
-                          namespace:
-                            description: namespace defines the space within which
-                              the secret name must be unique.
-                            type: string
-                        type: object
-                        x-kubernetes-map-type: atomic
-                    required:
-                    - bucket
-                    - key
-                    type: object
-                  s3Options:
-                    description: 'S3Options is a reference to S3 dependent options
-                      (Ex: S3 Access Secret, End Point, Region).'
-                    properties:
-                      bucket:
-                        description: 'Bucket is a required field, (ex: dbs-dump-bucket)
-                          A user is to ensure proper write access to the storage bucket
-                          from within the Operator.'
-                        type: string
-                      caBundle:
-                        description: CABundle is a pool of PEM encoded CA certs which
-                          will be used to validate the storageGrid's server certificate.
-                        items:
-                          type: string
-                        type: array
-                      endpoint:
-                        description: Endpoint is S3 end point.
-                        type: string
-                      key:
-                        description: 'Object key for the dump files. (ex: ods-dump/scottschema.dmp).'
-                        type: string
-                      region:
-                        description: Region is S3 region the bucket resides in.
-                        type: string
-                      secretRef:
-                        description: SecretRef is a reference to the secret that stores
-                          bucket access information.
-                        properties:
-                          name:
-                            description: name is unique within a namespace to reference
-                              a secret resource.
-                            type: string
-                          namespace:
-                            description: namespace defines the space within which
-                              the secret name must be unique.
-                            type: string
-                        type: object
-                        x-kubernetes-map-type: atomic
-                    required:
-                    - bucket
-                    - key
-                    type: object
-                  type:
-                    description: 'Type of Repository (ex: S3, GCS), which tells the
-                      agent which storage system/API to use.'
-                    enum:
-                    - GCS
-                    - S3
-                    type: string
-                required:
-                - type
-                type: object
-              backupRepository:
-                description: BackupRepository is the name of the GDCH Backup BackupRepository
-                  resource identifying the secondary storage for this `InstanceBackupPlan`.
-                  If not provided, the default "dbs-backup-repository" will be used.
-                type: string
-              backupRetainDays:
-                default: 14
-                description: Number of days after which the service will delete an
-                  InstanceBackup. If specified, an InstanceBackup created under this
-                  InstanceBackupPlan will be automatically deleted after its age reaches
-                  create_time + backup_retain_days. The valid values are from 1 to
-                  90 days. Default to 14 retain days.
-                maximum: 90
-                minimum: 1
-                type: integer
               dbclusterRef:
-                description: The DBCluster this backup plan configures.
+                description: DBClusterRef is the DBCluster name to initiate a failover.
+                  The `Failover` object must be created in the same namespace as the
+                  DBCluster that it references. This field is required for Failover.
                 type: string
-              paused:
-                default: false
-                description: A flag to indicate if the backup creation under this
-                  plan is paused. If set to true, the service will pause the scheduling
-                  of new InstanceBackups under this InstanceBackupPlan. Default to
-                  False.
-                type: boolean
+              newPrimary:
+                description: NewPrimary is the standby instance to promote as the
+                  new primary. If left empty, the system will automatically pick the
+                  best one to failover to.
+                type: string
             type: object
           status:
-            description: InstanceBackupPlanStatus defines the observed state of an
-              AlloyDB Omni InstanceBackupPlan.
+            description: FailoverStatus defines the observed state of postgresql Failover.
             properties:
               conditions:
                 description: Conditions represents the latest available observations
@@ -243,6 +130,11 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              createTime:
+                description: CreateTime is the time that the internal failover workflow
+                  mechanism was created.
+                format: date-time
+                type: string
               criticalIncidents:
                 description: CriticalIncidents is a flat list of all active Critical
                   Incidents.
@@ -332,41 +224,73 @@ spec:
                   - resource
                   type: object
                 type: array
-              lastBackupTime:
-                description: LastBackupTime is the timestamp for the most recently
-                  executed backup.
+              endTime:
+                description: EndTime is the time failover reached its final state.
                 format: date-time
-                nullable: true
                 type: string
-              nextBackupTime:
-                description: NextBackupTime is the timestamp for the next scheduled
-                  backup.
-                format: date-time
-                nullable: true
-                type: string
+              internal:
+                description: Internal is used by the system controllers. You should
+                  not directly depend on the information in this section.
+                properties:
+                  newPrimary:
+                    description: NewPrimary is the instance that we are attempting
+                      to failover to.
+                    type: string
+                  oldPrimary:
+                    description: OldPrimary is the instance that was the primary at
+                      the start of the failover.
+                    type: string
+                  phase:
+                    description: Phase is used to keep track of the current state
+                      of the failover
+                    enum:
+                    - StopPrimary
+                    - PromoteStandby
+                    - ValidateNewPrimary
+                    - UpdateOldPrimaryResources
+                    - UpdateNewPrimaryResources
+                    - Cleanup
+                    - Complete
+                    - UpdateStandbys
+                    - Recreate
+                    type: string
+                required:
+                - newPrimary
+                - oldPrimary
+                type: object
               observedGeneration:
                 description: 'Internal: The generation observed by the controller.'
                 format: int64
                 type: integer
-              phase:
-                description: InstanceBackupPlanPhase is the phase of an InstanceBackupPlan.
-                type: string
               reconciled:
                 description: 'Internal: Whether the resource was reconciled by the
                   controller.'
                 type: boolean
-              recoveryWindow:
-                description: RecoveryWindow is the currently available recovery window.
-                properties:
-                  begin:
-                    description: Begin time.
-                    format: date-time
-                    type: string
-                  end:
-                    description: End time.
-                    format: date-time
-                    type: string
-                type: object
+              startTime:
+                description: StartTime is the time that the failover operation started.
+                format: date-time
+                type: string
+              state:
+                description: State is the current state of the failover operation.
+                  The values are `InProgress`, `Success`, `Failed_RollbackInProgress`,
+                  `Failed_RollbackSuccess`, `Failed_RollbackFailed` `InProgress` means
+                  the failover is still in progress. `Success` means that the failover
+                  has completed. It is complete when the new primary instance is successfully
+                  promoted. `Failed_RollbackInProgress` means that the operator was
+                  unable to promote the new primary instance, and is attempting to
+                  restart the old primary instance. `Failed_RollbackSuccess` means
+                  that the operator was unable to promote the new primary instance,
+                  and successfully restarted the old primary instance. `Failed_RollbackFailed`
+                  means that  the operator was unable to promote the new primary instance,
+                  and were not able to restart the old primary instance. The DBCluster
+                  might need to be manually repaired.
+                enum:
+                - InProgress
+                - Success
+                - Failed_RollbackInProgress
+                - Failed_RollbackSuccess
+                - Failed_RollbackFailed
+                type: string
             type: object
         type: object
     served: true

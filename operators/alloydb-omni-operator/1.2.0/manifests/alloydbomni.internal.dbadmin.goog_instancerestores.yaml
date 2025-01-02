@@ -2,40 +2,36 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   labels:
     alloydb-omni: "true"
-  name: replications.alloydbomni.dbadmin.goog
+  name: instancerestores.alloydbomni.internal.dbadmin.goog
 spec:
-  group: alloydbomni.dbadmin.goog
+  group: alloydbomni.internal.dbadmin.goog
   names:
-    kind: Replication
-    listKind: ReplicationList
-    plural: replications
-    singular: replication
+    kind: InstanceRestore
+    listKind: InstanceRestoreList
+    plural: instancerestores
+    shortNames:
+    - aooir
+    singular: instancerestore
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.dbcluster.name
-      name: DBCluster
+    - jsonPath: .status.phase
+      name: Phase
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+    - jsonPath: .status.completeTime
+      name: CompleteTime
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].reason
-      name: ReadyReason
-      type: string
-    - jsonPath: .status.conditions[?(@.type=="Healthy")].status
-      name: Healthy
-      type: string
-    - jsonPath: .status.conditions[?(@.type=="Healthy")].reason
-      name: HealthyReason
+    - jsonPath: .status.restoredPointInTime
+      name: RestoredPointInTime
       type: string
     name: v1
     schema:
       openAPIV3Schema:
-        description: Replication is the Schema for the Replications API
+        description: InstanceRestore is the Schema for the InstanceRestore API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -50,102 +46,45 @@ spec:
           metadata:
             type: object
           spec:
-            description: ReplicationSpec defines the desired state of Replication
+            description: InstanceRestoreSpec defines the desired state of an AlloyDB
+              Omni InstanceRestore.
             properties:
-              dbcluster:
-                description: DBCluster is the DBCluster this Replication belongs to.
+              clonedDBClusterConfig:
+                description: Settings for the cloned DBCluster. Omit this field will
+                  restore to the DBCluster where backup was taken from.
                 properties:
-                  name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                  dbclusterName:
+                    description: The name of cloned DBCluster.
                     type: string
                 type: object
-                x-kubernetes-map-type: atomic
-              downstream:
-                properties:
-                  control:
-                    description: Control specifies the replication operation to be
-                      taken on this database. This field is required, and the allowed
-                      values are setup, promote, and rewind.
-                    enum:
-                    - setup
-                    - promote
-                    - rewind
-                    type: string
-                  host:
-                    description: Host is the upstream database's connection endpoint
-                      that this database can access for replication.
-                    type: string
-                  password:
-                    description: Password is the reference to the secret storing upstream
-                      database's replication user password.
-                    properties:
-                      name:
-                        description: name is unique within a namespace to reference
-                          a secret resource.
-                        type: string
-                      namespace:
-                        description: namespace defines the space within which the
-                          secret name must be unique.
-                        type: string
-                    type: object
-                    x-kubernetes-map-type: atomic
-                  port:
-                    description: Port is the upstream database's port that this database
-                      can access for replication. Default is 5432.
-                    format: int32
-                    maximum: 65535
-                    minimum: 1
-                    type: integer
-                  replicationSlotName:
-                    description: ReplicationSlotName is the name of the replication
-                      slot created on the upstream database, and will be used by this
-                      database for replication.
-                    type: string
-                  username:
-                    description: Username is the name of the replication user created
-                      on the upstream database, and will be used by this database
-                      to connect to upstream for replication.
-                    type: string
-                required:
-                - control
-                - host
-                - password
-                - replicationSlotName
-                - username
-                type: object
-              upstream:
-                properties:
-                  password:
-                    description: Password is the reference to the secret storing replication
-                      user password. If not provided, a password will be generated
-                      and stored in a secret shown in status.
-                    properties:
-                      name:
-                        description: name is unique within a namespace to reference
-                          a secret resource.
-                        type: string
-                      namespace:
-                        description: namespace defines the space within which the
-                          secret name must be unique.
-                        type: string
-                    type: object
-                    x-kubernetes-map-type: atomic
-                  replicationSlotName:
-                    description: ReplicationSlotName is the name of the replication
-                      slot to be used for replication. If not provided, a replication
-                      slot name will be generated and shown in status.
-                    type: string
-                  username:
-                    description: Username is the name of the replication user to be
-                      used for replication. If not provided, a username will be generated
-                      and shown in status.
-                    type: string
-                type: object
+              instanceBackupRef:
+                description: The InstanceBackup to restore from. InstanceRestore and
+                  the source InstanceBackup should be in the same namespace.
+                type: string
+              pointInTime:
+                description: Previous point-in-time to restore to.
+                format: date-time
+                type: string
+              restoreStrategy:
+                default: Instance
+                description: RestoreStrategy specifies the strategy of InstanceRestore.
+                  WorkloadOnly cannot be used together with PointInTime or ClonedDBClusterConfig.
+                enum:
+                - Instance
+                - WorkloadOnly
+                type: string
+              sourceDBCluster:
+                description: SourceDBCluster to restore from.
+                type: string
             type: object
           status:
-            description: ReplicationStatus defines the observed state of Replication
+            description: InstanceRestoreStatus defines the observed state of an AlloyDB
+              Omni InstanceRestore.
             properties:
+              completeTime:
+                description: Completion time of the restore
+                format: date-time
+                type: string
               conditions:
                 description: Conditions represents the latest available observations
                   of the Entity's current state.
@@ -219,6 +158,10 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              createTime:
+                description: Create time of the underlying Restore.
+                format: date-time
+                type: string
               criticalIncidents:
                 description: CriticalIncidents is a flat list of all active Critical
                   Incidents.
@@ -308,54 +251,27 @@ spec:
                   - resource
                   type: object
                 type: array
-              downstream:
-                type: object
               observedGeneration:
                 description: 'Internal: The generation observed by the controller.'
                 format: int64
                 type: integer
+              phase:
+                description: RestorePhase is the phase of a restore.
+                type: string
+              phaseReason:
+                type: string
               reconciled:
                 description: 'Internal: Whether the resource was reconciled by the
                   controller.'
                 type: boolean
-              upstream:
-                properties:
-                  host:
-                    description: Host is this database's connection endpoint that
-                      downstream databases can access for replication.
-                    type: string
-                  password:
-                    description: Password is the reference to the secret storing this
-                      database's replication user password.
-                    properties:
-                      name:
-                        description: name is unique within a namespace to reference
-                          a secret resource.
-                        type: string
-                      namespace:
-                        description: namespace defines the space within which the
-                          secret name must be unique.
-                        type: string
-                    type: object
-                    x-kubernetes-map-type: atomic
-                  port:
-                    description: Port is this database's port that downstream databases
-                      can access for replication.
-                    format: int32
-                    maximum: 65535
-                    minimum: 1
-                    type: integer
-                  replicationSlotName:
-                    description: ReplicationSlotName is the name of the replication
-                      slot created on this database. Downstream databases can use
-                      this replication slot for replication.
-                    type: string
-                  username:
-                    description: Username is the name of the replication user on this
-                      database. Downstream databases can use this user to connect
-                      to this database for replication.
-                    type: string
-                type: object
+              restoredInstanceName:
+                description: Name of the instance that will be restored
+                type: string
+              restoredPointInTime:
+                description: Actual point-in-time this restore brings the target instance
+                  into. Might be different from value specified in spec.PointInTime.
+                format: date-time
+                type: string
             type: object
         type: object
     served: true

@@ -2,36 +2,40 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   labels:
     alloydb-omni: "true"
-  name: backups.alloydbomni.dbadmin.goog
+  name: replications.alloydbomni.dbadmin.goog
 spec:
   group: alloydbomni.dbadmin.goog
   names:
-    kind: Backup
-    listKind: BackupList
-    plural: backups
-    shortNames:
-    - aoob
-    singular: backup
+    kind: Replication
+    listKind: ReplicationList
+    plural: replications
+    singular: replication
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .status.phase
-      name: Phase
+    - jsonPath: .spec.dbcluster.name
+      name: DBCluster
       type: string
-    - jsonPath: .status.completeTime
-      name: CompleteTime
+    - jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
       type: string
-    - jsonPath: .spec.physicalBackupSpec.backupType
-      name: Type
+    - jsonPath: .status.conditions[?(@.type=="Ready")].reason
+      name: ReadyReason
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Healthy")].status
+      name: Healthy
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Healthy")].reason
+      name: HealthyReason
       type: string
     name: v1
     schema:
       openAPIV3Schema:
-        description: Backup is the Schema for the backups API
+        description: Replication is the Schema for the Replications API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -46,45 +50,104 @@ spec:
           metadata:
             type: object
           spec:
-            description: BackupSpec defines the desired state of Backup.
+            description: ReplicationSpec defines the desired state of Replication
             properties:
-              backupPlanRef:
-                description: Name of the BackupPlan from which this backup was created.
-                  This field is required.
-                type: string
-              dbclusterRef:
-                description: The DBCluster name this backup belongs to. This field
-                  is required.
-                type: string
-              manual:
-                default: false
-                description: Indicate whether this backup is a scheduled or manual
-                  backup. This field is optional. Default to false (scheduled backup)
-                  if not specified.
-                type: boolean
-              physicalBackupSpec:
-                description: PhysicalBackupSpec contains spec for physical backups,
-                  allowing to specify backup type as an enum in {"full","diff","incr"}.
-                  This field is optional. Default to full if not specified.
+              dbcluster:
+                description: DBCluster is the DBCluster this Replication belongs to.
                 properties:
-                  backupType:
-                    default: full
-                    description: BackupType is the type of backup to be created. It's
-                      an enum in {"full","diff","incr"}. Default to full if not specified.
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                    type: string
+                type: object
+                x-kubernetes-map-type: atomic
+              downstream:
+                description: Downstream contains spec for replication downstream database.
+                properties:
+                  control:
+                    description: Control specifies the replication operation to be
+                      taken on this database. This field is required, and the allowed
+                      values are setup, promote, and rewind.
                     enum:
-                    - full
-                    - diff
-                    - incr
+                    - setup
+                    - promote
+                    - rewind
+                    type: string
+                  host:
+                    description: Host is the upstream database's connection endpoint
+                      that this database can access for replication.
+                    type: string
+                  password:
+                    description: Password is the reference to the secret storing upstream
+                      database's replication user password.
+                    properties:
+                      name:
+                        description: name is unique within a namespace to reference
+                          a secret resource.
+                        type: string
+                      namespace:
+                        description: namespace defines the space within which the
+                          secret name must be unique.
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  port:
+                    description: Port is the upstream database's port that this database
+                      can access for replication. Default is 5432.
+                    format: int32
+                    maximum: 65535
+                    minimum: 1
+                    type: integer
+                  replicationSlotName:
+                    description: ReplicationSlotName is the name of the replication
+                      slot created on the upstream database, and will be used by this
+                      database for replication.
+                    type: string
+                  username:
+                    description: Username is the name of the replication user created
+                      on the upstream database, and will be used by this database
+                      to connect to upstream for replication.
+                    type: string
+                required:
+                - control
+                - host
+                - password
+                - replicationSlotName
+                - username
+                type: object
+              upstream:
+                description: Upstream contains spec for replication upstream database.
+                properties:
+                  password:
+                    description: Password is the reference to the secret storing replication
+                      user password. If not provided, a password will be generated
+                      and stored in a secret shown in status.
+                    properties:
+                      name:
+                        description: name is unique within a namespace to reference
+                          a secret resource.
+                        type: string
+                      namespace:
+                        description: namespace defines the space within which the
+                          secret name must be unique.
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  replicationSlotName:
+                    description: ReplicationSlotName is the name of the replication
+                      slot to be used for replication. If not provided, a replication
+                      slot name will be generated and shown in status.
+                    type: string
+                  username:
+                    description: Username is the name of the replication user to be
+                      used for replication. If not provided, a username will be generated
+                      and shown in status.
                     type: string
                 type: object
             type: object
           status:
-            description: BackupStatus defines the observed state of Backup.
+            description: ReplicationStatus defines the observed state of Replication
             properties:
-              completeTime:
-                description: Completion time of the Backup
-                format: date-time
-                type: string
               conditions:
                 description: Conditions represents the latest available observations
                   of the Entity's current state.
@@ -158,10 +221,6 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              createTime:
-                description: Creation time of the Backup
-                format: date-time
-                type: string
               criticalIncidents:
                 description: CriticalIncidents is a flat list of all active Critical
                   Incidents.
@@ -251,37 +310,58 @@ spec:
                   - resource
                   type: object
                 type: array
+              downstream:
+                description: Downstream contains observed state of replication downstream
+                  database.
+                type: object
               observedGeneration:
                 description: 'Internal: The generation observed by the controller.'
                 format: int64
                 type: integer
-              phase:
-                description: BackupPhase is the phase of a backup.
-                type: string
-              physicalBackupStatus:
-                description: PhysicalBackupStatus contains status info that are specific
-                  for physical backups.
-                properties:
-                  backupID:
-                    description: BackupID is the unique id of the physical backup
-                      tracked by pgbackrest
-                    type: string
-                  priorBackup:
-                    description: PriorBackup is the prior backup this backup depends
-                      on.
-                    type: string
-                type: object
               reconciled:
                 description: 'Internal: Whether the resource was reconciled by the
                   controller.'
                 type: boolean
-              retainExpireTime:
-                description: RetainExpireTime defines the time when the Backup will
-                  be automatically deleted. It's an output only field calculated from
-                  `create_time` + `retain_days`, and will be updated accordingly when
-                  the `retain_days` field of a Backup has been updated.
-                format: date-time
-                type: string
+              upstream:
+                description: Upstream contains observed state of replication upstream
+                  database.
+                properties:
+                  host:
+                    description: Host is this database's connection endpoint that
+                      downstream databases can access for replication.
+                    type: string
+                  password:
+                    description: Password is the reference to the secret storing this
+                      database's replication user password.
+                    properties:
+                      name:
+                        description: name is unique within a namespace to reference
+                          a secret resource.
+                        type: string
+                      namespace:
+                        description: namespace defines the space within which the
+                          secret name must be unique.
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  port:
+                    description: Port is this database's port that downstream databases
+                      can access for replication.
+                    format: int32
+                    maximum: 65535
+                    minimum: 1
+                    type: integer
+                  replicationSlotName:
+                    description: ReplicationSlotName is the name of the replication
+                      slot created on this database. Downstream databases can use
+                      this replication slot for replication.
+                    type: string
+                  username:
+                    description: Username is the name of the replication user on this
+                      database. Downstream databases can use this user to connect
+                      to this database for replication.
+                    type: string
+                type: object
             type: object
         type: object
     served: true

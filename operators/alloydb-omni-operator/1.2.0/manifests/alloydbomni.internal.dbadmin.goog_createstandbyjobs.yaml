@@ -2,38 +2,44 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   labels:
     alloydb-omni: "true"
-  name: switchovers.alloydbomni.dbadmin.goog
+  name: createstandbyjobs.alloydbomni.internal.dbadmin.goog
 spec:
-  group: alloydbomni.dbadmin.goog
+  group: alloydbomni.internal.dbadmin.goog
   names:
-    kind: Switchover
-    listKind: SwitchoverList
-    plural: switchovers
-    singular: switchover
+    kind: CreateStandbyJob
+    listKind: CreateStandbyJobList
+    plural: createstandbyjobs
+    singular: createstandbyjob
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .status.state
-      name: state
+    - jsonPath: .spec.currentStep
+      name: CurrentStep
       type: string
-    - jsonPath: .status.internal.phase
-      name: phase
+    - jsonPath: .spec.attempt
+      name: Attempt
+      type: integer
+    - jsonPath: .spec.endTime
+      name: EndTime
       type: string
-    - jsonPath: .status.internal.newPrimary
-      name: newPrimary
+    - jsonPath: .spec.cleanup
+      name: Cleanup
+      type: boolean
+    - jsonPath: .spec.metadata.primaryInstance
+      name: Primary
       type: string
-    - jsonPath: .status.internal.oldPrimary
-      name: oldPrimary
+    - jsonPath: .spec.metadata.standbyInstance
+      name: Standby
       type: string
     name: v1
     schema:
       openAPIV3Schema:
-        description: Switchover represents the parameters and status of a single switchover
-          operation.
+        description: CreateStandbyJob is an internal workflow tracking object. Users
+          should not directly interact with this.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -48,28 +54,49 @@ spec:
           metadata:
             type: object
           spec:
-            description: SwitchoverSpec defines the desired state of Switchover.
             properties:
-              dbclusterRef:
-                description: DBClusterRef is the DBCluster name to initiate a switchover.
-                  The `Switchover` object must be created in the same namespace as
-                  the DBCluster that it references. This field is required for Switchover.
+              attempt:
+                default: 0
+                description: Attempt allows the workflow to smartly retry and choose
+                  to fail if too many retries have occurred
+                type: integer
+              cleanup:
+                default: false
+                description: Cleanup is used to mark this object as safe for deletion.
+                type: boolean
+              currentStep:
+                description: CurrentStep is the current step of the workflow
                 type: string
-              newPrimary:
-                description: // NewPrimary is the standby instance to switch with
-                  the current primary.
+              currentStepTime:
+                description: CurrentStepTime allows us to see when the current step
+                  was initiated which allows us to time out at the step level.
+                format: date-time
                 type: string
-              newPrimaryInstance:
-                description: 'NewPrimaryInstance is the standby instance to switch
-                  with the current primary. Deprecated: Please use NewPrimary field
-                  instead'
+              endTime:
+                description: EndTime is when the workflow has reached a terminal state
+                format: date-time
                 type: string
-              primaryHost:
-                description: PrimaryHost is the IP always point to the primary instance.
+              metadata:
+                additionalProperties:
+                  type: string
+                description: Metadata is intended to allow different workflows to
+                  attach data needed to execute this workflow, e.g. which DBC/instance/
+                  other resource this is attached to
+                type: object
+              requeueTime:
+                description: RequeueTime if set, then tells the reconciler to requeue
+                  this job to run at the specified time
+                format: date-time
                 type: string
+              startTime:
+                description: StartTime is when the workflow began
+                format: date-time
+                type: string
+            required:
+            - attempt
+            - cleanup
             type: object
           status:
-            description: SwitchoverStatus defines the observed state of Switchover.
             properties:
               conditions:
                 description: Conditions represents the latest available observations
@@ -144,11 +171,6 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              createTime:
-                description: CreateTime is the time that the internal switchover workflow
-                  mechanism was created.
-                format: date-time
-                type: string
               criticalIncidents:
                 description: CriticalIncidents is a flat list of all active Critical
                   Incidents.
@@ -238,45 +260,6 @@ spec:
                   - resource
                   type: object
                 type: array
-              endTime:
-                description: EndTime is the time switchover reached its final state.
-                format: date-time
-                type: string
-              internal:
-                description: Internal is used by the system controllers. You should
-                  not directly depend on the information in this section.
-                properties:
-                  newPrimary:
-                    description: NewPrimary is the instance that we are attempting
-                      to switchover to.
-                    type: string
-                  oldPrimary:
-                    description: OldPrimary is the instance that was the primary at
-                      the start of the switchover.
-                    type: string
-                  phase:
-                    description: Phase is used to keep track of the current state
-                      of the switchover
-                    enum:
-                    - UpdateDbcluster
-                    - StopPrimary
-                    - PromoteStandby
-                    - ValidateNewPrimary
-                    - UpdateOldPrimaryResources
-                    - UpdateNewPrimaryResources
-                    - UpdateOldPrimaryConfigs
-                    - Complete
-                    - SyncOldPrimary
-                    - StartOldPrimary
-                    - PreSuccess
-                    - RepointStandbys
-                    - RollbackPrimary
-                    - RollbackStandbys
-                    type: string
-                required:
-                - newPrimary
-                - oldPrimary
-                type: object
               observedGeneration:
                 description: 'Internal: The generation observed by the controller.'
                 format: int64
@@ -285,36 +268,11 @@ spec:
                 description: 'Internal: Whether the resource was reconciled by the
                   controller.'
                 type: boolean
-              startTime:
-                description: StartTime is the time that the switchover operation started.
-                format: date-time
-                type: string
-              state:
-                description: State is the current state of the switchover operation.
-                  The values are `InProgress`, `Success`, `Failed_RollbackInProgress`,
-                  `Failed_RollbackSuccess`, `Failed_RollbackFailed` `InProgress` means
-                  the switchover is still in progress. `Success` means that the switchover
-                  has completed. `Failed_RollbackInProgress` means that the operator
-                  was unable to promote the new primary instance, and is attempting
-                  to restart the old primary instance. `Failed_RollbackSuccess` means
-                  that the operator was unable to promote the new primary instance,
-                  and successfully restarted the old primary instance. `Failed_RollbackFailed`
-                  means that  the operator was unable to promote the new primary instance,
-                  and were not able to restart the old primary instance. The DBCluster
-                  might need to be manually repaired.
-                enum:
-                - InProgress
-                - Success
-                - Failed_RollbackInProgress
-                - Failed_RollbackSuccess
-                - Failed_RollbackFailed
-                type: string
             type: object
         type: object
     served: true
     storage: true
-    subresources:
-      status: {}
+    subresources: {}
 status:
   acceptedNames:
     kind: ""

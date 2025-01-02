@@ -2,20 +2,20 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   labels:
     alloydb-omni: "true"
-  name: instancebackups.alloydbomni.internal.dbadmin.goog
+  name: restores.alloydbomni.dbadmin.goog
 spec:
-  group: alloydbomni.internal.dbadmin.goog
+  group: alloydbomni.dbadmin.goog
   names:
-    kind: InstanceBackup
-    listKind: InstanceBackupList
-    plural: instancebackups
+    kind: Restore
+    listKind: RestoreList
+    plural: restores
     shortNames:
-    - aooib
-    singular: instancebackup
+    - aoor
+    singular: restore
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -25,10 +25,13 @@ spec:
     - jsonPath: .status.completeTime
       name: CompleteTime
       type: string
+    - jsonPath: .status.restoredPointInTime
+      name: RestoredPointInTime
+      type: string
     name: v1
     schema:
       openAPIV3Schema:
-        description: InstanceBackup is the Schema for the InstanceBackup API
+        description: Restore is the Schema for the restores API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -43,41 +46,42 @@ spec:
           metadata:
             type: object
           spec:
-            description: InstanceBackupSpec defines the desired state of an AlloyDB
-              Omni InstanceBackup.
+            description: RestoreSpec defines the desired state of Restore.
             properties:
-              dbclusterRef:
-                description: The DBCluster this backup belongs to
+              backup:
+                description: The Backup to restore from. This field is optional. You
+                  must specify either Backup or PointInTime. If you specify Backup,
+                  then you must leave the ClonedDBClusterConfig field unspecified.
+                  If you specify PointInTime, then you must provide a new DBCluster
+                  name in the ClonedDBClusterConfig field. Otherwise, the Restore
+                  request will be rejected.
                 type: string
-              instanceBackupPlanRef:
-                description: Name of the InstanceBackupPlan from which this backup
-                  was created.
-                type: string
-              manual:
-                default: false
-                description: Indicate whether this backup is a scheduled or manual
-                  backup
-                type: boolean
-              physicalBackupSpec:
-                description: PhysicalBackupSpec contains spec for physical backups.
+              clonedDBClusterConfig:
+                description: Settings for the cloned DBCluster. This lets you specify
+                  the name for the cloned DBCluster. This field is optional. Default
+                  to restore the source DBCluster if not specified.
                 properties:
-                  backupType:
-                    default: full
-                    description: BackupType is the type of backup to be created. It's
-                      an enum in {"full","diff","incr"}. Default to full if not specified.
-                    enum:
-                    - full
-                    - diff
-                    - incr
+                  dbclusterName:
+                    description: The name of cloned DBCluster.
                     type: string
                 type: object
+              pointInTime:
+                description: Previous point in time to restore to. This field is optional.
+                  Default to restore the latest available time point if not specified.
+                format: date-time
+                type: string
+              sourceDBCluster:
+                description: The name of the source DBCluster to restore from. This
+                  field is required.
+                type: string
+            required:
+            - sourceDBCluster
             type: object
           status:
-            description: InstanceBackupStatus defines the observed state of an AlloyDB
-              Omni InstanceBackup.
+            description: RestoreStatus defines the observed state of Restore.
             properties:
               completeTime:
-                description: Completion time of the Backup
+                description: Completion time of the Restore
                 format: date-time
                 type: string
               conditions:
@@ -154,7 +158,7 @@ spec:
                 - type
                 x-kubernetes-list-type: map
               createTime:
-                description: Create time of the underlying Backup.
+                description: Creation time of the Restore
                 format: date-time
                 type: string
               criticalIncidents:
@@ -251,21 +255,8 @@ spec:
                 format: int64
                 type: integer
               phase:
-                description: InstanceBackupPhase is the phase of a backup.
+                description: RestorePhase is the phase of a restore.
                 type: string
-              physicalBackupStatus:
-                description: PhysicalBackupStatus contains status info that are specific
-                  for physical backups.
-                properties:
-                  backupID:
-                    description: BackupID is the unique id of the physical backup
-                      tracked by pgbackrest
-                    type: string
-                  priorBackup:
-                    description: PriorBackup is the prior backup this backup depends
-                      on.
-                    type: string
-                type: object
               reconciled:
                 description: 'Internal: Whether the resource was reconciled by the
                   controller.'

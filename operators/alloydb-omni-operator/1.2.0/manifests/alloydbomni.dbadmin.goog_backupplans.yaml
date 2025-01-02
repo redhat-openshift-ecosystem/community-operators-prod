@@ -2,31 +2,36 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   labels:
     alloydb-omni: "true"
-  name: instanceswitchovers.alloydbomni.internal.dbadmin.goog
+  name: backupplans.alloydbomni.dbadmin.goog
 spec:
-  group: alloydbomni.internal.dbadmin.goog
+  group: alloydbomni.dbadmin.goog
   names:
-    kind: InstanceSwitchover
-    listKind: InstanceSwitchoverList
-    plural: instanceswitchovers
-    singular: instanceswitchover
+    kind: BackupPlan
+    listKind: BackupPlanList
+    plural: backupplans
+    shortNames:
+    - aoobp
+    singular: backupplan
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .status.state
-      name: state
+    - jsonPath: .status.phase
+      name: Phase
       type: string
-    - jsonPath: .status.internal.phase
-      name: phase
+    - jsonPath: .status.lastBackupTime
+      name: LastBackupTime
+      type: string
+    - jsonPath: .status.nextBackupTime
+      name: NextBackupTime
       type: string
     name: v1
     schema:
       openAPIV3Schema:
-        description: InstanceSwitchover is the Schema for the switchover API.
+        description: BackupPlan is the Schema for the backupplans API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -41,24 +46,97 @@ spec:
           metadata:
             type: object
           spec:
-            description: InstanceSwitchoverSpec defines the desired state of postgresql
-              Switchover.
+            description: BackupPlanSpec defines the desired state of BackupPlan.
             properties:
+              backupLocation:
+                description: BackupLocation specifies the remote object storage location
+                  to store backups. For example, specs to a GCS buckets. This field
+                  is optional. By default, backups are stored in the backup disk.
+                properties:
+                  gcsOptions:
+                    description: GCSOptions is a reference to GCS dependent options.
+                    properties:
+                      bucket:
+                        description: 'Bucket is a required field, (ex: dbs-dump-bucket)
+                          A user is to ensure proper write access to the storage bucket
+                          from within the Operator.'
+                        type: string
+                      key:
+                        description: 'Object key for the dump files. (ex: ods-dump/scottschema.dmp).'
+                        type: string
+                      secretRef:
+                        description: SecretRef is a reference to the secret that stores
+                          GCS access information.
+                        properties:
+                          name:
+                            description: name is unique within a namespace to reference
+                              a secret resource.
+                            type: string
+                          namespace:
+                            description: namespace defines the space within which
+                              the secret name must be unique.
+                            type: string
+                        type: object
+                        x-kubernetes-map-type: atomic
+                    required:
+                    - bucket
+                    - key
+                    type: object
+                  type:
+                    description: 'Type of Repository (ex: S3, GCS), which tells the
+                      agent which storage system/API to use.'
+                    enum:
+                    - GCS
+                    - S3
+                    type: string
+                required:
+                - type
+                type: object
+              backupRetainDays:
+                default: 14
+                description: Number of days after which the service will delete a
+                  Backup. If specified, a Backup created under this BackupPlan will
+                  be automatically deleted after its age reaches create_time + backup_retain_days.
+                  The valid values are from 1 to 90 days. Default to 14 retain days
+                  if not specified.
+                maximum: 90
+                minimum: 1
+                type: integer
+              backupSchedules:
+                description: 'Defines the schedules for different types of backups.
+                  Full, Differential and Incremental backup types are supported: https://pgbackrest.org/user-guide.html#concept/backup
+                  This field is optional. By default, take one full backup every day
+                  at midnight.'
+                properties:
+                  differential:
+                    description: 'Defines the Cron schedule for a differential pgBackRest
+                      backup. Follows the standard Cron schedule syntax: https://k8s.io/docs/concepts/workloads/controllers/cron-jobs/#cron-schedule-syntax'
+                    minLength: 6
+                    type: string
+                  full:
+                    description: 'Defines the Cron schedule for a full pgBackRest
+                      backup. Follows the standard Cron schedule syntax: https://k8s.io/docs/concepts/workloads/controllers/cron-jobs/#cron-schedule-syntax'
+                    minLength: 6
+                    type: string
+                  incremental:
+                    description: 'Defines the Cron schedule for an incremental pgBackRest
+                      backup. Follows the standard Cron schedule syntax: https://k8s.io/docs/concepts/workloads/controllers/cron-jobs/#cron-schedule-syntax'
+                    minLength: 6
+                    type: string
+                type: object
               dbclusterRef:
-                description: DBClusterRef is the dbcluster name within the same namespace
-                  to initiate a switchover.
+                description: The DBCluster name this backupplan configures. This field
+                  is required and immutable.
                 type: string
-              newPrimary:
-                description: NewPrimary is the standby instance to switch with the
-                  current primary.
-                type: string
-              primaryHost:
-                description: PrimaryHost is the IP always point to the primary instance.
-                type: string
+              paused:
+                default: false
+                description: A flag to indicate if the backup creation under this
+                  BackupPlan is paused. If set to true, the service will pause the
+                  scheduling of new Backups under this BackupPlan. Default to False.
+                type: boolean
             type: object
           status:
-            description: InstanceSwitchoverStatus defines the observed state of postgresql
-              Switchover.
+            description: BackupPlanStatus defines the observed state of BackupPlan.
             properties:
               conditions:
                 description: Conditions represents the latest available observations
@@ -133,11 +211,6 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              createTime:
-                description: CreateTime is the time the underlying switchover was
-                  created.
-                format: date-time
-                type: string
               criticalIncidents:
                 description: CriticalIncidents is a flat list of all active Critical
                   Incidents.
@@ -227,63 +300,39 @@ spec:
                   - resource
                   type: object
                 type: array
-              endTime:
-                description: EndTime is the time switchover reached its final state.
+              lastBackupTime:
+                description: LastBackupTime is the timestamp for the most recently
+                  executed backup.
                 format: date-time
                 type: string
-              internal:
-                description: Internal is used by the DBS controllers. Users should
-                  not directly depend on the information in this section.
-                properties:
-                  newPrimary:
-                    description: NewPrimary is the instance that we are attempting
-                      to switchover to.
-                    type: string
-                  oldPrimary:
-                    description: OldPrimary is the instance that was the primary at
-                      the start of the switchover.
-                    type: string
-                  phase:
-                    description: Phase is used to keep track of the current state
-                      of the switchover
-                    enum:
-                    - UpdateDbcluster
-                    - StopPrimary
-                    - PromoteStandby
-                    - ValidateNewPrimary
-                    - UpdateOldPrimaryResources
-                    - UpdateNewPrimaryResources
-                    - UpdateOldPrimaryConfigs
-                    - Complete
-                    - SyncOldPrimary
-                    - StartOldPrimary
-                    - PreSuccess
-                    - RepointStandbys
-                    - RollbackPrimary
-                    - RollbackStandbys
-                    type: string
-                type: object
+              nextBackupTime:
+                description: NextBackupTime is the timestamp for the next scheduled
+                  backup.
+                format: date-time
+                type: string
               observedGeneration:
                 description: 'Internal: The generation observed by the controller.'
                 format: int64
                 type: integer
+              phase:
+                description: BackupPlanPhase is the phase of a BackupPlan.
+                type: string
               reconciled:
                 description: 'Internal: Whether the resource was reconciled by the
                   controller.'
                 type: boolean
-              startTime:
-                description: StartTime is the time switchover started.
-                format: date-time
-                type: string
-              state:
-                description: State is the current state of the switchover operation.
-                enum:
-                - InProgress
-                - Success
-                - Failed_RollbackInProgress
-                - Failed_RollbackSuccess
-                - Failed_RollbackFailed
-                type: string
+              recoveryWindow:
+                description: RecoveryWindow is the currently available recovery window.
+                properties:
+                  begin:
+                    description: Begin time.
+                    format: date-time
+                    type: string
+                  end:
+                    description: End time.
+                    format: date-time
+                    type: string
+                type: object
             type: object
         type: object
     served: true

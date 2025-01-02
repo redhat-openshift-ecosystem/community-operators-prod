@@ -2,19 +2,19 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   labels:
     alloydb-omni: "true"
-  name: sidecars.alloydbomni.dbadmin.goog
+  name: sidecars.alloydbomni.internal.dbadmin.goog
 spec:
-  group: alloydbomni.dbadmin.goog
+  group: alloydbomni.internal.dbadmin.goog
   names:
     kind: Sidecar
     listKind: SidecarList
     plural: sidecars
     shortNames:
-    - aoosc
+    - aooisc
     singular: sidecar
   scope: Namespaced
   versions:
@@ -1806,8 +1806,8 @@ spec:
                       type: string
                     imagePullPolicy:
                       description: 'Image pull policy. One of Always, Never, IfNotPresent.
-                        Defaults to Always if :{{ .Chart.Version }} tag is specified,
-                        or IfNotPresent otherwise. Cannot be updated. More info: https://kubernetes.io/docs/concepts/containers/images#updating-images'
+                        Defaults to Always if :latest tag is specified, or IfNotPresent
+                        otherwise. Cannot be updated. More info: https://kubernetes.io/docs/concepts/containers/images#updating-images'
                       type: string
                     lifecycle:
                       description: Actions that the management system should take

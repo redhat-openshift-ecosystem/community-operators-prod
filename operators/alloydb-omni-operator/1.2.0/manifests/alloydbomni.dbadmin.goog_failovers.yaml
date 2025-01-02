@@ -2,36 +2,32 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   labels:
     alloydb-omni: "true"
-  name: backupplans.alloydbomni.dbadmin.goog
+  name: failovers.alloydbomni.dbadmin.goog
 spec:
   group: alloydbomni.dbadmin.goog
   names:
-    kind: BackupPlan
-    listKind: BackupPlanList
-    plural: backupplans
-    shortNames:
-    - aoobp
-    singular: backupplan
+    kind: Failover
+    listKind: FailoverList
+    plural: failovers
+    singular: failover
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .status.phase
-      name: Phase
+    - jsonPath: .status.state
+      name: state
       type: string
-    - jsonPath: .status.lastBackupTime
-      name: LastBackupTime
-      type: string
-    - jsonPath: .status.nextBackupTime
-      name: NextBackupTime
+    - jsonPath: .status.internal.phase
+      name: phase
       type: string
     name: v1
     schema:
       openAPIV3Schema:
-        description: BackupPlan is the Schema for the backupplans API
+        description: Failover represents the parameters and status of a single failover
+          operation.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -46,97 +42,22 @@ spec:
           metadata:
             type: object
           spec:
-            description: BackupPlanSpec defines the desired state of BackupPlan.
+            description: FailoverSpec represents the parameters of a single failover
+              operation.
             properties:
-              backupLocation:
-                description: BackupLocation specifies the remote object storage location
-                  to store backups. For example, specs to a GCS buckets. This field
-                  is optional. By default, backups are stored in the backup disk.
-                properties:
-                  gcsOptions:
-                    description: GCSOptions is a reference to GCS dependent options.
-                    properties:
-                      bucket:
-                        description: 'Bucket is a required field, (ex: dbs-dump-bucket)
-                          A user is to ensure proper write access to the storage bucket
-                          from within the Operator.'
-                        type: string
-                      key:
-                        description: 'Object key for the dump files. (ex: ods-dump/scottschema.dmp).'
-                        type: string
-                      secretRef:
-                        description: SecretRef is a reference to the secret that stores
-                          GCS access information.
-                        properties:
-                          name:
-                            description: name is unique within a namespace to reference
-                              a secret resource.
-                            type: string
-                          namespace:
-                            description: namespace defines the space within which
-                              the secret name must be unique.
-                            type: string
-                        type: object
-                        x-kubernetes-map-type: atomic
-                    required:
-                    - bucket
-                    - key
-                    type: object
-                  type:
-                    description: 'Type of Repository (ex: S3, GCS), which tells the
-                      agent which storage system/API to use.'
-                    enum:
-                    - GCS
-                    - S3
-                    type: string
-                required:
-                - type
-                type: object
-              backupRetainDays:
-                default: 14
-                description: Number of days after which the service will delete a
-                  Backup. If specified, a Backup created under this BackupPlan will
-                  be automatically deleted after its age reaches create_time + backup_retain_days.
-                  The valid values are from 1 to 90 days. Default to 14 retain days
-                  if not specified.
-                maximum: 90
-                minimum: 1
-                type: integer
-              backupSchedules:
-                description: 'Defines the schedules for different types of backups.
-                  Full, Differential and Incremental backup types are supported: https://pgbackrest.org/user-guide.html#concept/backup
-                  This field is optional. By default, take one full backup every day
-                  at midnight.'
-                properties:
-                  differential:
-                    description: 'Defines the Cron schedule for a differential pgBackRest
-                      backup. Follows the standard Cron schedule syntax: https://k8s.io/docs/concepts/workloads/controllers/cron-jobs/#cron-schedule-syntax'
-                    minLength: 6
-                    type: string
-                  full:
-                    description: 'Defines the Cron schedule for a full pgBackRest
-                      backup. Follows the standard Cron schedule syntax: https://k8s.io/docs/concepts/workloads/controllers/cron-jobs/#cron-schedule-syntax'
-                    minLength: 6
-                    type: string
-                  incremental:
-                    description: 'Defines the Cron schedule for an incremental pgBackRest
-                      backup. Follows the standard Cron schedule syntax: https://k8s.io/docs/concepts/workloads/controllers/cron-jobs/#cron-schedule-syntax'
-                    minLength: 6
-                    type: string
-                type: object
               dbclusterRef:
-                description: The DBCluster name this backupplan configures. This field
-                  is required and immutable.
+                description: DBClusterRef is the DBCluster name to initiate a failover.
+                  The `Failover` object must be created in the same namespace as the
+                  DBCluster that it references. This field is required for Failover.
                 type: string
-              paused:
-                default: false
-                description: A flag to indicate if the backup creation under this
-                  BackupPlan is paused. If set to true, the service will pause the
-                  scheduling of new Backups under this BackupPlan. Default to False.
-                type: boolean
+              newPrimary:
+                description: NewPrimary is the standby instance to promote as the
+                  new primary. If left empty, the system will automatically pick the
+                  best one to failover to.
+                type: string
             type: object
           status:
-            description: BackupPlanStatus defines the observed state of BackupPlan.
+            description: FailoverStatus represents the current state of a failover.
             properties:
               conditions:
                 description: Conditions represents the latest available observations
@@ -211,6 +132,11 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              createTime:
+                description: CreateTime is the time that the internal failover workflow
+                  mechanism was created.
+                format: date-time
+                type: string
               criticalIncidents:
                 description: CriticalIncidents is a flat list of all active Critical
                   Incidents.
@@ -300,39 +226,73 @@ spec:
                   - resource
                   type: object
                 type: array
-              lastBackupTime:
-                description: LastBackupTime is the timestamp for the most recently
-                  executed backup.
+              endTime:
+                description: EndTime is the time failover reached its final state.
                 format: date-time
                 type: string
-              nextBackupTime:
-                description: NextBackupTime is the timestamp for the next scheduled
-                  backup.
-                format: date-time
-                type: string
+              internal:
+                description: Internal is used by the system controllers. You should
+                  not directly depend on the information in this section.
+                properties:
+                  newPrimary:
+                    description: NewPrimary is the instance that we are attempting
+                      to failover to.
+                    type: string
+                  oldPrimary:
+                    description: OldPrimary is the instance that was the primary at
+                      the start of the failover.
+                    type: string
+                  phase:
+                    description: Phase is used to keep track of the current state
+                      of the failover
+                    enum:
+                    - StopPrimary
+                    - PromoteStandby
+                    - ValidateNewPrimary
+                    - UpdateOldPrimaryResources
+                    - UpdateNewPrimaryResources
+                    - Cleanup
+                    - Complete
+                    - UpdateStandbys
+                    - Recreate
+                    type: string
+                required:
+                - newPrimary
+                - oldPrimary
+                type: object
               observedGeneration:
                 description: 'Internal: The generation observed by the controller.'
                 format: int64
                 type: integer
-              phase:
-                description: BackupPlanPhase is the phase of a BackupPlan.
-                type: string
               reconciled:
                 description: 'Internal: Whether the resource was reconciled by the
                   controller.'
                 type: boolean
-              recoveryWindow:
-                description: RecoveryWindow is the currently available recovery window.
-                properties:
-                  begin:
-                    description: Begin time.
-                    format: date-time
-                    type: string
-                  end:
-                    description: End time.
-                    format: date-time
-                    type: string
-                type: object
+              startTime:
+                description: StartTime is the time that the failover operation started.
+                format: date-time
+                type: string
+              state:
+                description: State is the current state of the failover operation.
+                  The values are `InProgress`, `Success`, `Failed_RollbackInProgress`,
+                  `Failed_RollbackSuccess`, `Failed_RollbackFailed` `InProgress` means
+                  the failover is still in progress. `Success` means that the failover
+                  has completed. It is complete when the new primary instance is successfully
+                  promoted. `Failed_RollbackInProgress` means that the operator was
+                  unable to promote the new primary instance, and is attempting to
+                  restart the old primary instance. `Failed_RollbackSuccess` means
+                  that the operator was unable to promote the new primary instance,
+                  and successfully restarted the old primary instance. `Failed_RollbackFailed`
+                  means that  the operator was unable to promote the new primary instance,
+                  and were not able to restart the old primary instance. The DBCluster
+                  might need to be manually repaired.
+                enum:
+                - InProgress
+                - Success
+                - Failed_RollbackInProgress
+                - Failed_RollbackSuccess
+                - Failed_RollbackFailed
+                type: string
             type: object
         type: object
     served: true

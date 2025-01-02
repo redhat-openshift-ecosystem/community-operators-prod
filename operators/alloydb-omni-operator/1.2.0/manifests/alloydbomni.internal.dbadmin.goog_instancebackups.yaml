@@ -2,38 +2,33 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   labels:
     alloydb-omni: "true"
-  name: deletestandbyjobs.alloydbomni.internal.dbadmin.goog
+  name: instancebackups.alloydbomni.internal.dbadmin.goog
 spec:
   group: alloydbomni.internal.dbadmin.goog
   names:
-    kind: DeleteStandbyJob
-    listKind: DeleteStandbyJobList
-    plural: deletestandbyjobs
-    singular: deletestandbyjob
+    kind: InstanceBackup
+    listKind: InstanceBackupList
+    plural: instancebackups
+    shortNames:
+    - aooib
+    singular: instancebackup
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.currentStep
-      name: CurrentStep
+    - jsonPath: .status.phase
+      name: Phase
       type: string
-    - jsonPath: .spec.attempt
-      name: Attempt
-      type: integer
-    - jsonPath: .spec.endTime
-      name: EndTime
+    - jsonPath: .status.completeTime
+      name: CompleteTime
       type: string
-    - jsonPath: .spec.cleanup
-      name: Cleanup
-      type: boolean
     name: v1
     schema:
       openAPIV3Schema:
-        description: DeleteStandbyJob is an internal workflow tracking object. Users
-          should not directly interact with this.
+        description: InstanceBackup is the Schema for the InstanceBackup API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -48,50 +43,43 @@ spec:
           metadata:
             type: object
           spec:
+            description: InstanceBackupSpec defines the desired state of an AlloyDB
+              Omni InstanceBackup.
             properties:
-              attempt:
-                default: 0
-                description: Attempt allows the workflow to smartly retry and choose
-                  to fail if too many retries have occurred
-                type: integer
-              cleanup:
+              dbclusterRef:
+                description: The DBCluster this backup belongs to
+                type: string
+              instanceBackupPlanRef:
+                description: Name of the InstanceBackupPlan from which this backup
+                  was created.
+                type: string
+              manual:
                 default: false
-                description: Cleanup is used to mark this object as safe for deletion.
+                description: Indicate whether this backup is a scheduled or manual
+                  backup
                 type: boolean
-              currentStep:
-                description: CurrentStep is the current step of the workflow
-                type: string
-              currentStepTime:
-                description: CurrentStepTime allows us to see when the current step
-                  was initiated which allows us to time out at the step level.
-                format: date-time
-                type: string
-              endTime:
-                description: EndTime is when the workflow has reached a terminal state
-                format: date-time
-                type: string
-              metadata:
-                additionalProperties:
-                  type: string
-                description: Metadata is intended to allow different workflows to
-                  attach data needed to execute this workflow, e.g. which DBC/instance/
-                  other resource this is attached to
+              physicalBackupSpec:
+                description: PhysicalBackupSpec contains spec for physical backups.
+                properties:
+                  backupType:
+                    default: full
+                    description: BackupType is the type of backup to be created. It's
+                      an enum in {"full","diff","incr"}. Default to full if not specified.
+                    enum:
+                    - full
+                    - diff
+                    - incr
+                    type: string
                 type: object
-              requeueTime:
-                description: RequeueTime if set, then tells the reconciler to requeue
-                  this job to run at the specified time
-                format: date-time
-                type: string
-              startTime:
-                description: StartTime is when the workflow began
-                format: date-time
-                type: string
-            required:
-            - attempt
-            - cleanup
             type: object
           status:
+            description: InstanceBackupStatus defines the observed state of an AlloyDB
+              Omni InstanceBackup.
             properties:
+              completeTime:
+                description: Completion time of the Backup
+                format: date-time
+                type: string
               conditions:
                 description: Conditions represents the latest available observations
                   of the Entity's current state.
@@ -165,6 +153,10 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              createTime:
+                description: Create time of the underlying Backup.
+                format: date-time
+                type: string
               criticalIncidents:
                 description: CriticalIncidents is a flat list of all active Critical
                   Incidents.
@@ -258,6 +250,22 @@ spec:
                 description: 'Internal: The generation observed by the controller.'
                 format: int64
                 type: integer
+              phase:
+                description: InstanceBackupPhase is the phase of a backup.
+                type: string
+              physicalBackupStatus:
+                description: PhysicalBackupStatus contains status info that are specific
+                  for physical backups.
+                properties:
+                  backupID:
+                    description: BackupID is the unique id of the physical backup
+                      tracked by pgbackrest
+                    type: string
+                  priorBackup:
+                    description: PriorBackup is the prior backup this backup depends
+                      on.
+                    type: string
+                type: object
               reconciled:
                 description: 'Internal: Whether the resource was reconciled by the
                   controller.'
@@ -266,7 +274,8 @@ spec:
         type: object
     served: true
     storage: true
-    subresources: {}
+    subresources:
+      status: {}
 status:
   acceptedNames:
     kind: ""

@@ -2,43 +2,30 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   labels:
     alloydb-omni: "true"
-  name: dbinstances.alloydbomni.dbadmin.goog
+  name: backuprepositories.alloydbomni.internal.dbadmin.goog
 spec:
-  group: alloydbomni.dbadmin.goog
+  group: alloydbomni.internal.dbadmin.goog
   names:
-    kind: DBInstance
-    listKind: DBInstanceList
-    plural: dbinstances
-    singular: dbinstance
+    kind: BackupRepository
+    listKind: BackupRepositoryList
+    plural: backuprepositories
+    shortNames:
+    - br
+    singular: backuprepository
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.instanceType
-      name: Type
-      type: string
-    - jsonPath: .spec.dbcParent.name
-      name: Parent
-      type: string
-    - jsonPath: .status.endpoints[?(@.name=="Read-Only")].value
-      name: Endpoint
-      type: string
-    - jsonPath: .status.conditions[?(@.type=="Available")].status
-      name: Available
-      type: string
-    - jsonPath: .status.conditions[?(@.type=="Streaming")].status
-      name: Streaming
-      type: string
-    - jsonPath: .status.conditions[?(@.type=="Available")].message
-      name: Message
+    - jsonPath: .status.phase
+      name: Phase
       type: string
     name: v1
     schema:
       openAPIV3Schema:
-        description: DBInstance is the Schema for the DBInstances API
+        description: BackupRepository is the Schema for the backuprepositories API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -53,50 +40,37 @@ spec:
           metadata:
             type: object
           spec:
-            description: DBInstanceSpec defines the desired state of DBInstance
+            description: BackupRepositorySpec defines the desired state of BackupRepository.
             properties:
-              dbcParent:
-                description: DBClusterParent is the DBCluster this DBInstance replicates
-                  from.
-                properties:
-                  name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                      TODO: Add other useful fields. apiVersion, kind, uid?'
-                    type: string
+              component:
+                additionalProperties:
+                  properties:
+                    images:
+                      additionalProperties:
+                        type: string
+                      description: The list of container images in the components
+                      type: object
+                    name:
+                      description: Name of a component
+                      type: string
+                    upgradeScheduledAt:
+                      description: Start time of the upgrade
+                      format: date-time
+                      type: string
+                    version:
+                      description: Version of a component
+                      type: string
+                  required:
+                  - images
+                  - name
+                  type: object
+                description: The list of backup repository components The backup repository
+                  is composed of dataplane and controlPlaneAgent components
                 type: object
-                x-kubernetes-map-type: atomic
-              instanceType:
-                description: InstanceType indicates the type of the DBInstance. Currently
-                  only supports "ReadPool" type.
-                enum:
-                - ReadPool
-                type: string
-              isStopped:
-                description: "IsStopped stops the DBNodes in this DBInstance when
-                  true. This field is optional and defaults to false. Stopping the
-                  DBCluster's Primary DBNode does not automatically stop the DBNodes
-                  of ReadPool DBInstances. \n When stopped, the compute resources
-                  (CPU, memory) of the instance are released. However, the DBNode
-                  still keeps the storage resource."
-                type: boolean
-              nodeCount:
-                default: 1
-                description: NodeCount determines the number of DBNodes that should
-                  be created for this DBInstance.
-                maximum: 20
-                minimum: 0
-                type: integer
-              progressTimeout:
-                default: 30m
-                description: "ProgressTimeout determines the number of seconds the
-                  controller will attempt to provision a DBNode, or which a DBNode
-                  could be not-ready for, before it considers the DBNode to have failed.
-                  \n A value of 0 means that no timeout will be used."
-                type: string
               resources:
-                description: Resource specifices the resources used for the Instances
-                  (i.e, DBNodes) belonging to this DBInstance. If omitted, the instance
-                  will use the same resources as the DBCluster's Primary Instance.
+                description: Resources specifies resources used by the backup repository
+                  server. This field is optional. By default, recommended resource
+                  settings will be used.
                 properties:
                   cpu:
                     anyOf:
@@ -227,12 +201,10 @@ spec:
                     x-kubernetes-int-or-string: true
                 type: object
               schedulingconfig:
-                description: "SchedulingConfig specifies how the instance should be
-                  scheduled on Kubernetes nodes. If omitted, the instance will use
-                  the same scheduling config as the DBCluster's Primary Instance.
-                  \n When any field inside the scheduling config changes, it can lead
-                  to rescheduling of the k8s pod onto a different node based on the
-                  config."
+                description: "SchedulingConfig specifies how the backup repository
+                  pod should be scheduled on Kubernetes nodes. \n When any field inside
+                  the scheduling config changes, it can lead to rescheduling of the
+                  k8s pod onto a different node based on the config."
                 properties:
                   nodeaffinity:
                     description: NodeAffinity describes node affinity scheduling rules
@@ -1101,12 +1073,168 @@ spec:
                       type: object
                     type: array
                 type: object
-            required:
-            - nodeCount
             type: object
           status:
-            description: DBInstanceStatus defines the observed state of DBInstance
+            description: BackupRepositoryStatus defines the observed state of BackupRepository.
             properties:
+              ActiveComponents:
+                additionalProperties:
+                  properties:
+                    images:
+                      additionalProperties:
+                        type: string
+                      description: The list of container images in the components
+                      type: object
+                    name:
+                      description: Name of a component
+                      type: string
+                    upgradeScheduledAt:
+                      description: Start time of the upgrade
+                      format: date-time
+                      type: string
+                    version:
+                      description: Version of a component
+                      type: string
+                  required:
+                  - images
+                  - name
+                  - version
+                  type: object
+                description: ActiveComponents stores the information of current components
+                  in the backup repository
+                type: object
+              allocatedResources:
+                description: AllocatedResources represents the current configuration
+                  of memory/CPU/disks
+                properties:
+                  cpu:
+                    anyOf:
+                    - type: integer
+                    - type: string
+                    description: The amount of CPU allocated to the database container.
+                      This field is required.
+                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                    x-kubernetes-int-or-string: true
+                  disks:
+                    description: The specifications of the disks allocated to the
+                      database container. This field is required.
+                    items:
+                      description: DiskSpec defines the desired state of a disk.
+                      properties:
+                        accessModes:
+                          description: "AccessModes contains the desired access modes
+                            for the volume. \n Refer to https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes
+                            for more information."
+                          items:
+                            type: string
+                          type: array
+                        annotations:
+                          additionalProperties:
+                            type: string
+                          description: "Additional annotations added to the Persistent
+                            Volume Claim. This field is optional. \n This allows to
+                            integrate with other tools."
+                          type: object
+                        name:
+                          description: "Name of the disk. This field is required.
+                            \n The allowed values are: \"DataDisk\", \"LogDisk\" ,
+                            \"BackupDisk\" and \"ObsDisk\"."
+                          enum:
+                          - DataDisk
+                          - LogDisk
+                          - BackupDisk
+                          - ObsDisk
+                          - BackupRepoDisk
+                          type: string
+                        selector:
+                          description: "A label query over volumes to consider for
+                            binding. This field is optional. \n If this field is set,
+                            then the volume with matching labels is used as the backing
+                            volume for the disk. \n Refer to https://kubernetes.io/docs/reference/kubernetes-api/config-and-storage-resources/persistent-volume-claim-v1/#PersistentVolumeClaimSpec
+                            for more information."
+                          properties:
+                            matchExpressions:
+                              description: matchExpressions is a list of label selector
+                                requirements. The requirements are ANDed.
+                              items:
+                                description: A label selector requirement is a selector
+                                  that contains values, a key, and an operator that
+                                  relates the key and values.
+                                properties:
+                                  key:
+                                    description: key is the label key that the selector
+                                      applies to.
+                                    type: string
+                                  operator:
+                                    description: operator represents a key's relationship
+                                      to a set of values. Valid operators are In,
+                                      NotIn, Exists and DoesNotExist.
+                                    type: string
+                                  values:
+                                    description: values is an array of string values.
+                                      If the operator is In or NotIn, the values array
+                                      must be non-empty. If the operator is Exists
+                                      or DoesNotExist, the values array must be empty.
+                                      This array is replaced during a strategic merge
+                                      patch.
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                - key
+                                - operator
+                                type: object
+                              type: array
+                            matchLabels:
+                              additionalProperties:
+                                type: string
+                              description: matchLabels is a map of {key,value} pairs.
+                                A single {key,value} in the matchLabels map is equivalent
+                                to an element of matchExpressions, whose key field
+                                is "key", the operator is "In", and the values array
+                                contains only "value". The requirements are ANDed.
+                              type: object
+                          type: object
+                          x-kubernetes-map-type: atomic
+                        size:
+                          description: "Disk size in bytes for example, \"10Gi\" for
+                            10 Gibibytes. This field is required. \n The allowed size
+                            unit prefixes are: \"Ki\", \"Mi\", \"Gi\", \"Ti, \"Pi\"
+                            and \"Ei\" for 2-base. Also \"K\", \"M\", \"G\", \"T,
+                            \"P\" and \"E\" for 10-base. See https://en.wikipedia.org/wiki/Unit_prefix."
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          type: string
+                        storageClass:
+                          description: "StorageClass points to a particular CSI storage
+                            class. This field is optional. \n If the field is not
+                            set, then the default CSI storage class for the Kubernetes
+                            cluster is used. If there is no default for the Kubernetes
+                            cluster,  then the Persistence Volume Claim will fail
+                            and the database cluster will fail to provision. \n You
+                            can read more about storage classes in https://kubernetes.io/docs/concepts/storage/storage-classes."
+                          type: string
+                        volumeName:
+                          description: "VolumeName is the binding reference to the
+                            Persistent Volume tied to this disk. This field is optional.
+                            \n This allows to reuse an existing volume. \n Note that
+                            if this field is specified, the value \"storageClass\"
+                            will not take effect. You can learn more about this in
+                            https://kubernetes.io/docs/concepts/storage/persistent-volumes/#binding."
+                          type: string
+                      required:
+                      - name
+                      - size
+                      type: object
+                    type: array
+                  memory:
+                    anyOf:
+                    - type: integer
+                    - type: string
+                    description: The amount of memory allocated to the database container.
+                      This field is required.
+                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                    x-kubernetes-int-or-string: true
+                type: object
               conditions:
                 description: Conditions represents the latest available observations
                   of the Entity's current state.
@@ -1269,30 +1397,13 @@ spec:
                   - resource
                   type: object
                 type: array
-              endpoints:
-                description: Endpoints are the endpoints from which the DBNodes in
-                  the DBInstance can be accessed.
-                items:
-                  description: Endpoint represents a access point through which user
-                    can access the database.
-                  properties:
-                    name:
-                      description: Name contains the name of the endpoint
-                      type: string
-                    value:
-                      description: Value contains the endpoint information.
-                      type: string
-                  required:
-                  - name
-                  type: object
-                type: array
-                x-kubernetes-list-map-keys:
-                - name
-                x-kubernetes-list-type: map
               observedGeneration:
                 description: 'Internal: The generation observed by the controller.'
                 format: int64
                 type: integer
+              phase:
+                description: Phase is a summary of current state of the Instance.
+                type: string
               reconciled:
                 description: 'Internal: Whether the resource was reconciled by the
                   controller.'

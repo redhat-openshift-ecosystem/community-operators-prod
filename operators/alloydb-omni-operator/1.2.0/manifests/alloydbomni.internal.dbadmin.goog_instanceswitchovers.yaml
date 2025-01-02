@@ -2,18 +2,18 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.13.0
+    controller-gen.kubebuilder.io/version: (unknown)
   creationTimestamp: null
   labels:
     alloydb-omni: "true"
-  name: failovers.alloydbomni.internal.dbadmin.goog
+  name: instanceswitchovers.alloydbomni.internal.dbadmin.goog
 spec:
   group: alloydbomni.internal.dbadmin.goog
   names:
-    kind: Failover
-    listKind: FailoverList
-    plural: failovers
-    singular: failover
+    kind: InstanceSwitchover
+    listKind: InstanceSwitchoverList
+    plural: instanceswitchovers
+    singular: instanceswitchover
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -26,7 +26,7 @@ spec:
     name: v1
     schema:
       openAPIV3Schema:
-        description: Failover is the Schema for the failover API.
+        description: InstanceSwitchover is the Schema for the switchover API.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -41,21 +41,24 @@ spec:
           metadata:
             type: object
           spec:
-            description: FailoverSpec defines the desired state of postgresql Failover.
+            description: InstanceSwitchoverSpec defines the desired state of postgresql
+              Switchover.
             properties:
               dbclusterRef:
-                description: DBClusterRef is the DBCluster name to initiate a failover.
-                  The `Failover` object must be created in the same namespace as the
-                  DBCluster that it references. This field is required for Failover.
+                description: DBClusterRef is the dbcluster name within the same namespace
+                  to initiate a switchover.
                 type: string
               newPrimary:
-                description: NewPrimary is the standby instance to promote as the
-                  new primary. If left empty, the system will automatically pick the
-                  best one to failover to.
+                description: NewPrimary is the standby instance to switch with the
+                  current primary.
+                type: string
+              primaryHost:
+                description: PrimaryHost is the IP always point to the primary instance.
                 type: string
             type: object
           status:
-            description: FailoverStatus defines the observed state of postgresql Failover.
+            description: InstanceSwitchoverStatus defines the observed state of postgresql
+              Switchover.
             properties:
               conditions:
                 description: Conditions represents the latest available observations
@@ -131,8 +134,8 @@ spec:
                 - type
                 x-kubernetes-list-type: map
               createTime:
-                description: CreateTime is the time that the internal failover workflow
-                  mechanism was created.
+                description: CreateTime is the time the underlying switchover was
+                  created.
                 format: date-time
                 type: string
               criticalIncidents:
@@ -225,38 +228,40 @@ spec:
                   type: object
                 type: array
               endTime:
-                description: EndTime is the time failover reached its final state.
+                description: EndTime is the time switchover reached its final state.
                 format: date-time
                 type: string
               internal:
-                description: Internal is used by the system controllers. You should
+                description: Internal is used by the DBS controllers. Users should
                   not directly depend on the information in this section.
                 properties:
                   newPrimary:
                     description: NewPrimary is the instance that we are attempting
-                      to failover to.
+                      to switchover to.
                     type: string
                   oldPrimary:
                     description: OldPrimary is the instance that was the primary at
-                      the start of the failover.
+                      the start of the switchover.
                     type: string
                   phase:
                     description: Phase is used to keep track of the current state
-                      of the failover
+                      of the switchover
                     enum:
+                    - UpdateDbcluster
                     - StopPrimary
                     - PromoteStandby
                     - ValidateNewPrimary
                     - UpdateOldPrimaryResources
                     - UpdateNewPrimaryResources
-                    - Cleanup
+                    - UpdateOldPrimaryConfigs
                     - Complete
-                    - UpdateStandbys
-                    - Recreate
+                    - SyncOldPrimary
+                    - StartOldPrimary
+                    - PreSuccess
+                    - RepointStandbys
+                    - RollbackPrimary
+                    - RollbackStandbys
                     type: string
-                required:
-                - newPrimary
-                - oldPrimary
                 type: object
               observedGeneration:
                 description: 'Internal: The generation observed by the controller.'
@@ -267,23 +272,11 @@ spec:
                   controller.'
                 type: boolean
               startTime:
-                description: StartTime is the time that the failover operation started.
+                description: StartTime is the time switchover started.
                 format: date-time
                 type: string
               state:
-                description: State is the current state of the failover operation.
-                  The values are `InProgress`, `Success`, `Failed_RollbackInProgress`,
-                  `Failed_RollbackSuccess`, `Failed_RollbackFailed` `InProgress` means
-                  the failover is still in progress. `Success` means that the failover
-                  has completed. It is complete when the new primary instance is successfully
-                  promoted. `Failed_RollbackInProgress` means that the operator was
-                  unable to promote the new primary instance, and is attempting to
-                  restart the old primary instance. `Failed_RollbackSuccess` means
-                  that the operator was unable to promote the new primary instance,
-                  and successfully restarted the old primary instance. `Failed_RollbackFailed`
-                  means that  the operator was unable to promote the new primary instance,
-                  and were not able to restart the old primary instance. The DBCluster
-                  might need to be manually repaired.
+                description: State is the current state of the switchover operation.
                 enum:
                 - InProgress
                 - Success

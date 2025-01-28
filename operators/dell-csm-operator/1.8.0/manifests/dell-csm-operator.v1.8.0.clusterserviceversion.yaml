@@ -3139,16 +3139,36 @@ spec:
             displayName: Name
             path: modules[0].name
         statusDescriptors:
-          - description: ControllerStatus is the status of Controller pods
-            displayName: ControllerStatus
-            path: controllerStatus
+          - description: Number of Available Controller pods
+            displayName: Available
+            path: controllerStatus.available
             x-descriptors:
-              - urn:alm:descriptor:com.tectonic.ui:podStatuses
-          - description: NodeStatus is the status of Controller pods
-            displayName: NodeStatus
-            path: nodeStatus
+              - urn:alm:descriptor:text
+          - description: Number of Desired Controller pods
+            displayName: Desired
+            path: controllerStatus.desired
             x-descriptors:
-              - urn:alm:descriptor:com.tectonic.ui:podStatuses
+              - urn:alm:descriptor:text
+          - description: Number of Failed Controller pods
+            displayName: Failed
+            path: controllerStatus.failed
+            x-descriptors:
+              - urn:alm:descriptor:text
+          - description: Number of Available Node pods
+            displayName: Available
+            path: nodeStatus.available
+            x-descriptors:
+              - urn:alm:descriptor:text
+          - description: Number of Desired Node pods
+            displayName: Desired
+            path: nodeStatus.desired
+            x-descriptors:
+              - urn:alm:descriptor:text
+          - description: Number of Failed Node pods
+            displayName: Failed
+            path: nodeStatus.failed
+            x-descriptors:
+              - urn:alm:descriptor:text
           - description: State is the state of the driver installation
             displayName: State
             path: state

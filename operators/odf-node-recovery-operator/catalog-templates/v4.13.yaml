@@ -1,0 +1,14 @@
+schema: olm.template.basic
+name: odf-node-recovery-operator
+entries:
+  - schema: olm.package
+    name: odf-node-recovery-operator
+    defaultChannel: alpha
+  - entries:
+      - name: odf-node-recovery-operator.v0.0.2
+    name: alpha
+    package: odf-node-recovery-operator
+    schema: olm.channel
+  - schema: olm.bundle
+    image: quay.io/community-operator-pipeline-prod/odf-node-recovery-operator@sha256:b7e3476fd38e3babe7ce2856b73089b0973b327dd6045a47d892740b06f5b7d1
+  # v.0.0.2

@@ -3211,12 +3211,6 @@ spec:
     spec:
       clusterPermissions:
         - rules:
-            - apiGroups:
-                - "*"
-              resources:
-                - "*"
-              verbs:
-                - "*"
             - nonResourceURLs:
                 - /metrics
               verbs:
@@ -3271,7 +3265,7 @@ spec:
             - apiGroups:
                 - ""
               resourceNames:
-                replaces: dell-csm-operator-controller-manager
+                - dell-csm-operator-controller-manager
               resources:
                 - deployments/finalizers
               verbs:

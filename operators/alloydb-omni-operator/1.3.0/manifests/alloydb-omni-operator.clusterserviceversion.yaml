@@ -439,6 +439,68 @@ spec:
   description: |-
     AlloyDB Omni is a database that lets you deploy a streamlined edition of AlloyDB for PostgreSQL in your own computing environment. While being 100% compatible with PostgreSQL applications and tools, AlloyDB Omni delivers higher performance for both OLTP and OLAP workloads and makes administration easy with a number of autopilots. AlloyDB AI provides powerful tools to build generative AI applications with the ability to create, store, and index vector embeddings right in your database.
 
+    Before installing the operator, you need to manually create the cert-manager resources in your cluster as this is a strict dependency for our operator. For this, follow these steps:
+    ```
+    kubectl create ns ${NAMESPACE:?}
+    ```
+    ```
+    kubectl apply -f - <<EOF
+    apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      name: alloydbomni-selfsigned-cluster-issuer
+    spec:
+      selfSigned: {}
+    ---
+    apiVersion: cert-manager.io/v1
+    kind: Issuer
+    metadata:
+      name: fleet-selfsigned-issuer
+      namespace: ${NAMESPACE:?}
+    spec:
+      selfSigned: {}
+    ---
+    apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: fleet-serving-cert
+      namespace: ${NAMESPACE:?}
+    spec:
+      dnsNames:
+      - fleet-webhook-service.alloydb-omni-system.svc
+      - fleet-webhook-service.alloydb-omni-system.svc.cluster.local
+      issuerRef:
+        kind: Issuer
+        name: fleet-selfsigned-issuer
+      secretName: fleet-webhook-server-cert
+    ---
+    apiVersion: cert-manager.io/v1
+    kind: Issuer
+    metadata:
+      name: local-selfsigned-issuer
+      namespace: ${NAMESPACE:?}
+    spec:
+      selfSigned: {}
+    ---
+    apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: local-serving-cert
+      namespace: ${NAMESPACE:?}
+    spec:
+      dnsNames:
+      - local-webhook-service.alloydb-omni-system.svc
+      - local-webhook-service.alloydb-omni-system.svc.cluster.local
+      issuerRef:
+        kind: Issuer
+        name: local-selfsigned-issuer
+      secretName: local-webhook-server-cert
+    EOF
+    ```
+    Replace the following:
+    * `NAMESPACE` : the namespace where you have installed your operator. Suggested namespace: `alloydb-omni-system`.
+    
+    
     After you install the AlloyDB Omni operator on your Kubernetes cluster, you can create an AlloyDB Omni database cluster. For each database cluster you create, you must first create a password secret using the following format:
 
     ```

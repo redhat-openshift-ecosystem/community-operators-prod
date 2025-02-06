@@ -439,10 +439,14 @@ spec:
   description: |-
     AlloyDB Omni is a database that lets you deploy a streamlined edition of AlloyDB for PostgreSQL in your own computing environment. While being 100% compatible with PostgreSQL applications and tools, AlloyDB Omni delivers higher performance for both OLTP and OLAP workloads and makes administration easy with a number of autopilots. AlloyDB AI provides powerful tools to build generative AI applications with the ability to create, store, and index vector embeddings right in your database.
 
-    Before installing the operator, you need to manually create the cert-manager resources in your cluster as this is a strict dependency for our operator. For this, follow these steps:
+    ## Post-installation\
+
+    After installing the operator, you need to manually create the cert-manager resources in your cluster as this is a strict dependency for our operator. For this, follow these steps:
+
     ```
     kubectl create ns ${NAMESPACE:?}
     ```
+
     ```
     kubectl apply -f - <<EOF
     apiVersion: cert-manager.io/v1
@@ -497,9 +501,13 @@ spec:
       secretName: local-webhook-server-cert
     EOF
     ```
+
     Replace the following:
     * `NAMESPACE` : the namespace where you have installed your operator. Suggested namespace: `alloydb-omni-system`.
 
+    If you are using Red Hat OpenShift, proceed with following [these][post-installation] steps after installing the operator.
+    
+    ## Creating a database cluster
 
     After you install the AlloyDB Omni operator on your Kubernetes cluster, you can create an AlloyDB Omni database cluster. For each database cluster you create, you must first create a password secret using the following format:
 
@@ -519,12 +527,6 @@ spec:
     * `DB_CLUSTER_NAMESPACE` (Optional): the namespace where you want to create the database cluster. For example, `my-db-cluster-namespace`.
     * `ENCODED_PASSWORD`: the database login password for the default postgres user role, encoded as a base64 string. For example, `Q2hhbmdlTWUxMjM=` for password `ChangeMe123`.
 
-    For more details on DBCluster creation, please visit AlloyDB Omni on Kubernetes documentation.
-
-    ## Red Hat OpenShift reconciliation steps
-    Follow [these][post-installation] steps after installing the operator.
-
-    ## Creating a database cluster
     Follow [these][database-cluster] steps for creating a database cluster.
 
     ## Connect to AlloyDB Omni running on Kubernetes

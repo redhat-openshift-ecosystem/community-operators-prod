@@ -67,7 +67,7 @@ catalogs: ${BINDIR}/render_catalogs.sh ${BINDIR}/opm ${BINDIR}/yq clean
 # all FBC must pass opm validation in order to be able to be used in a catalog
 .PHONY: validate-catalogs
 validate-catalogs: ${BINDIR}/opm
-	@find ${TOPDIR}/catalogs -type d -name fbc-test-operator -exec \
+	@find ${TOPDIR}/catalogs -type d -name ${OPERATOR_NAME} -exec \
 		sh -c '${BINDIR}/opm validate $$(dirname "{}") && echo "✅ Catalog validation passed: {}" || echo "❌ Catalog validation failed: {}"' \;
 
 .PHONY: create-catalog-dir

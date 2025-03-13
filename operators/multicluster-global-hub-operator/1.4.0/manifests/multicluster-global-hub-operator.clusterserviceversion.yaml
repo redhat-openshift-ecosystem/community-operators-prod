@@ -1,0 +1,1046 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "global-hub.open-cluster-management.io/v1alpha1",
+          "kind": "ManagedClusterMigration",
+          "metadata": {
+            "name": "migration-sample"
+          },
+          "spec": {}
+        },
+        {
+          "apiVersion": "operator.open-cluster-management.io/v1alpha1",
+          "kind": "MulticlusterGlobalHubAgent",
+          "metadata": {
+            "name": "multiclusterglobalhubagent"
+          },
+          "spec": {
+            "transportConfigSecretName": "transport-config"
+          }
+        },
+        {
+          "apiVersion": "operator.open-cluster-management.io/v1alpha4",
+          "kind": "MulticlusterGlobalHub",
+          "metadata": {
+            "name": "multiclusterglobalhub"
+          },
+          "spec": {
+            "dataLayer": {
+              "postgres": {
+                "retention": "18m"
+              }
+            }
+          }
+        }
+      ]
+    capabilities: Seamless Upgrades
+    categories: Integration & Delivery,OpenShift Optional
+    certified: "false"
+    containerImage: quay.io/stolostron/multicluster-global-hub-operator@sha256:085e9fc6cdc6a42df10a38856c8ccff25e5acffaba67ef95da72027e90e507fc
+    createdAt: "2025-02-14T08:24:47Z"
+    description: Manages the installation and upgrade of the Multicluster Global Hub.
+    features.operators.openshift.io/cnf: "false"
+    features.operators.openshift.io/cni: "false"
+    features.operators.openshift.io/csi: "false"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/initialization-resource: '{"apiVersion":"operator.open-cluster-management.io/v1alpha4",
+      "kind":"MulticlusterGlobalHub","metadata":{"name":"multiclusterglobalhub","namespace":"multicluster-global-hub"},
+      "spec": {}}'
+    operatorframework.io/suggested-namespace: multicluster-global-hub
+    operators.openshift.io/infrastructure-features: '["disconnected", "fips"]'
+    operators.openshift.io/valid-subscription: '["OpenShift Platform Plus", "Red Hat
+      Advanced Cluster Management for Kubernetes"]'
+    operators.operatorframework.io/builder: operator-sdk-v1.34.1
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    repository: https://github.com/stolostron/multicluster-global-hub
+    support: Red Hat
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.arm64: supported
+    operatorframework.io/arch.ppc64le: supported
+    operatorframework.io/arch.s390x: supported
+    operatorframework.io/os.linux: supported
+  name: multicluster-global-hub-operator.v1.4.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: ManagedClusterMigration is a global hub resource that allows you
+        to migrate managed clusters from one hub to another
+      displayName: Managed Cluster Migration
+      kind: ManagedClusterMigration
+      name: managedclustermigrations.global-hub.open-cluster-management.io
+      resources:
+      - kind: Deployment
+        name: multicluster-global-hub-manager
+        version: v1
+      specDescriptors:
+      - description: IncludedManagedClusters is a list of managed clusters that you
+          want to migrate
+        displayName: Included Managed Clusters
+        path: includedManagedClusters
+      - description: To defines which hub cluster the managed clusters migrate to
+        displayName: To
+        path: to
+      statusDescriptors:
+      - description: Conditions represents the latest available observations of the
+          current state
+        displayName: Conditions
+        path: conditions
+      version: v1alpha1
+    - description: MulticlusterGlobalHubAgent is the Schema for the multiclusterglobalhubagents
+        API
+      displayName: Multicluster Global Hub Agent
+      kind: MulticlusterGlobalHubAgent
+      name: multiclusterglobalhubagents.operator.open-cluster-management.io
+      resources:
+      - kind: Deployment
+        name: multicluster-global-hub-operator
+        version: v1
+      specDescriptors:
+      - description: ImagePullPolicy specifies the pull policy of the multicluster
+          global hub agent image
+        displayName: Image Pull Policy
+        path: imagePullPolicy
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:imagePullPolicy
+      - description: ImagePullSecret specifies the pull secret of the multicluster
+          global hub agent image
+        displayName: Image Pull Secret
+        path: imagePullSecret
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - description: Tolerations causes all components to tolerate any taints
+        displayName: Tolerations
+        path: tolerations
+      - description: TransportConfigSecretName specifies the secret which is used
+          to connect to the global hub Kafka. You can get kafka.yaml content using
+          `tools/generate-kafka-config.sh` from the global hub environment. Then you
+          can create the secret in the current environment by running `kubectl create
+          secret generic transport-config -n "multicluster-global-hub" --from-file=kafka.yaml="./kafka.yaml"`
+        displayName: Transport Config Secret Name
+        path: transportConfigSecretName
+      statusDescriptors:
+      - description: Conditions represents the latest available observations of the
+          current state
+        displayName: Conditions
+        path: conditions
+      version: v1alpha1
+    - description: MulticlusterGlobalHub defines the configuration for an instance
+        of the multiCluster global hub
+      displayName: Multicluster Global Hub
+      kind: MulticlusterGlobalHub
+      name: multiclusterglobalhubs.operator.open-cluster-management.io
+      resources:
+      - kind: Deployment
+        name: multicluster-global-hub-operator
+        version: v1
+      specDescriptors:
+      - description: 'AvailabilityType specifies deployment replication for improved
+          availability. Options are: Basic and High (default)'
+        displayName: Availability Configuration
+        path: availabilityConfig
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:select:High
+        - urn:alm:descriptor:com.tectonic.ui:select:Basic
+      - description: DataLayerSpec can be configured to use a different data layer
+        displayName: Data Layer Spec
+        path: dataLayer
+      - description: EnableMetrics enables the metrics for the global hub created
+          kafka and postgres components. If the user provides the kafka and postgres,
+          then the enablemetrics variable is useless.
+        displayName: Enable Metrics
+        path: enableMetrics
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: ImagePullPolicy specifies the pull policy of the multicluster
+          global hub images
+        displayName: Image Pull Policy
+        path: imagePullPolicy
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:imagePullPolicy
+      - description: ImagePullSecret specifies the pull secret of the multicluster
+          global hub images
+        displayName: Image Pull Secret
+        path: imagePullSecret
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - description: InstallAgentOnLocal determines whether deploy the Global Hub
+          Agent on the local hub cluster or not. If set to true, the Global Hub Agent
+          will be installed on the local hub cluster only. If set to false, the Global
+          Hub Agent will not be installed on the local hub cluster. Currently, switching
+          the value of this field is not supported after the Global Hub is installed.
+        displayName: Install Agent On Local
+        path: installAgentOnLocal
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Tolerations causes all components to tolerate any taints
+        displayName: Tolerations
+        path: tolerations
+      statusDescriptors:
+      - description: Conditions represents the latest available observations of the
+          current state
+        displayName: Conditions
+        path: conditions
+      version: v1alpha4
+  description: |
+    The Multicluster Global Hub Operator contains the components of multicluster global hub. The Operator deploys all of the required components for global multicluster management. The components include `multicluster-global-hub-manager` and `multicluster-global-hub-grafana` in the global hub cluster and `multicluster-global-hub-agent` in the managed hub clusters.
+    The Operator also deploys the strimzi kafka and crunchy postgres if you do not bring your own kafka and postgres.
+
+    ## Prerequisites
+    - Red Hat Advanced Cluster Management for Kubernetes needs to be installed. You can find the support matrix in the official document.
+
+    ## How to Install
+    Install the Multicluster Global Hub Operator by following the instructions that are displayed after you select the Install button.
+    A pod will be created in `multicluster-global-hub` namespace:
+    ```
+    $ kubectl get pods -n multicluster-global-hub
+    NAME                                                             READY   STATUS    RESTARTS   AGE
+    multicluster-global-hub-operator-5ccbbc878d-98fdp                1/1     Running   0          19s
+    ```
+    The operator is now providing new Custom Resources Definitions: `multiclusterglobalhubs.operator.open-cluster-management.io`
+
+    ## Using the Multicluster Global Hub Operator
+    After installed the operator, create an instance of the MulticlusterGlobalHub resource to instantiate the Multicluster Global Hub.
+    Once an instance of the MulticlusterGlobalHub is created, the following pods are created in the `multicluster-global-hub` namespace:
+    ```
+    $ kubectl get pods -n multicluster-global-hub
+    NAME                                                    READY   STATUS    RESTARTS   AGE
+    kafka-entity-operator-68dcd446f4-pg257                  3/3     Running   0          19m
+    kafka-kraft-0                                           1/1     Running   0          20m
+    kafka-kraft-1                                           1/1     Running   0          20m
+    kafka-kraft-2                                           1/1     Running   0          20m
+    multicluster-global-hub-grafana-5b7cfb6876-5rcnn        2/2     Running   0          19m
+    multicluster-global-hub-grafana-5b7cfb6876-wq99v        2/2     Running   0          19m
+    multicluster-global-hub-manager-7f56d78c49-hzfvw        1/1     Running   0          19m
+    multicluster-global-hub-manager-7f56d78c49-wbkzl        1/1     Running   0          19m
+    multicluster-global-hub-operator-768bd5bd4f-59xjd       1/1     Running   0          22m
+    multicluster-global-hub-postgresql-0                    2/2     Running   0          22m
+    strimzi-cluster-operator-v0.43.0-6fff49d5b5-5j22r       1/1     Running   0          22m
+    ```
+    ## Documentation
+    For documentation about installing and using the Multicluster GlobalHub Operator with Red Hat Advanced Cluster Management for
+    Kubernetes, see [Multicluser GlobalHub Documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.9/html-single/multicluster_global_hub/index#doc-wrapper) in the Red Hat Advanced Cluster Management
+    documentation.
+
+    ## Support & Troubleshooting
+    Product support, which includes Support Cases, Product Pages, and Knowledgebase articles, is available when you have
+    a [Red Hat Advanced Cluster Management](https://www.redhat.com/en/technologies/management/advanced-cluster-management)
+    subscription.
+  displayName: Multicluster Global Hub Operator
+  icon:
+  - base64data: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA3MjEuMTUgNzIxLjE1Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2RiMzkyNzt9LmNscy0ye2ZpbGw6I2NiMzYyODt9LmNscy0ze2ZpbGw6I2ZmZjt9LmNscy00e2ZpbGw6I2UzZTNlMjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPlByb2R1Y3RfSWNvbi1SZWRfSGF0QWR2YW5jZWRfQ2x1c3Rlcl9NYW5hZ2VtZW50X2Zvcl9LdWJlcm5ldGVzLVJHQjwvdGl0bGU+PGcgaWQ9IkxheWVyXzEiIGRhdGEtbmFtZT0iTGF5ZXIgMSI+PGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSIzNjAuNTciIGN5PSIzNjAuNTciIHI9IjM1OC41OCIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTYxNC4xMywxMDcsMTA3LDYxNC4xM2MxNDAsMTQwLDM2Ny4wNywxNDAsNTA3LjExLDBTNzU0LjE2LDI0Ny4wNiw2MTQuMTMsMTA3WiIvPjxyZWN0IGNsYXNzPSJjbHMtMyIgeD0iMzMwLjg3IiB5PSIyODAuNiIgd2lkdGg9IjIwMy4xNyIgaGVpZ2h0PSIyMCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTc4LjkgMzkwLjUyKSByb3RhdGUoLTQ0Ljk2KSIvPjxyZWN0IGNsYXNzPSJjbHMtMyIgeD0iMzA2LjYzIiB5PSIxNjcuODMiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMDQuNDciIHRyYW5zZm9ybT0idHJhbnNsYXRlKC04NS4zMyAxNjIuMjcpIHJvdGF0ZSgtMjUuNDUpIi8+PHJlY3QgY2xhc3M9ImNscy0zIiB4PSIxNjIuOTgiIHk9IjM2NC4xIiB3aWR0aD0iMTk4LjI4IiBoZWlnaHQ9IjIwIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNDIuMzkgMzMuNjEpIHJvdGF0ZSgtNi43OSkiLz48cmVjdCBjbGFzcz0iY2xzLTMiIHg9IjI0NS4xIiB5PSI0NTEuNTQiIHdpZHRoPSIyMDAuNjIiIGhlaWdodD0iMjAiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xNjMuMDEgNzMzLjI2KSByb3RhdGUoLTgxLjMxKSIvPjxyZWN0IGNsYXNzPSJjbHMtMyIgeD0iNDQzLjg1IiB5PSIzMDMuNzYiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMDcuMDQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xMDkuOTcgNjM5LjU4KSByb3RhdGUoLTY0LjMpIi8+PGNpcmNsZSBjbGFzcz0iY2xzLTMiIGN4PSI1MDQuMzQiIGN5PSIyMTguODMiIHI9IjQ0LjA4Ii8+PGNpcmNsZSBjbGFzcz0iY2xzLTMiIGN4PSIyNzIuNyIgY3k9IjE3Ny43NSIgcj0iNDQuMDgiLz48Y2lyY2xlIGNsYXNzPSJjbHMtMyIgY3g9IjU0Ny4xMiIgY3k9IjQ1Mi4xNyIgcj0iNDQuMDgiLz48Y2lyY2xlIGNsYXNzPSJjbHMtMyIgY3g9IjE2My42OCIgY3k9IjM4NS44MiIgcj0iNDQuMDgiLz48Y2lyY2xlIGNsYXNzPSJjbHMtMyIgY3g9IjMzMC4yNiIgY3k9IjU2MC43IiByPSI0NC4wOCIvPjxwYXRoIGNsYXNzPSJjbHMtNCIgZD0iTTQ0NC45NCwyNzkuOTIsMjc2LjE5LDQ0OC42N0ExMTkuMzIsMTE5LjMyLDAsMCwwLDQ0NC45NCwyNzkuOTJaIi8+PHBhdGggY2xhc3M9ImNscy0zIiBkPSJNMzc1LjY4LDI0NS43NmExMTkuMzMsMTE5LjMzLDAsMCwwLTk5LjQ5LDIwMi45MUw0NDQuOTQsMjc5LjkyQTExOC44OSwxMTguODksMCwwLDAsMzc1LjY4LDI0NS43NloiLz48L2c+PC9zdmc+
+    mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        - apiGroups:
+          - policy.open-cluster-management.io
+          resources:
+          - policies
+          - policies/status
+          - policies/finalizers
+          - placementbindings
+          - placementbindings/finalizers
+          verbs:
+          - get
+          - list
+          - watch
+          - update
+          - patch
+        - apiGroups:
+          - apps.open-cluster-management.io
+          resources:
+          - placementrules
+          - placementrules/status
+          - subscriptionstatuses
+          - subscriptionstatuses/status
+          - subscriptionreports
+          - subscriptionreports/status
+          - subscriptions/finalizers
+          verbs:
+          - create
+          - get
+          - list
+          - watch
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - cluster.open-cluster-management.io
+          resources:
+          - placements
+          - placements/finalizers
+          - placements/status
+          - placementdecisions
+          - placementdecisions/status
+          verbs:
+          - create
+          - get
+          - list
+          - watch
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - configmaps
+          - events
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - cluster.open-cluster-management.io
+          resources:
+          - managedclustersets
+          - managedclustersets/finalizers
+          - managedclustersetbindings
+          - managedclustersetbindings/finalizers
+          - placements
+          - placements/finalizers
+          verbs:
+          - get
+          - list
+          - watch
+          - update
+        - apiGroups:
+          - apps.open-cluster-management.io
+          resources:
+          - placementrules
+          - placementrules/finalizers
+          verbs:
+          - get
+          - list
+          - watch
+          - update
+        - apiGroups:
+          - apps.open-cluster-management.io
+          resources:
+          - subscriptions
+          - channels
+          verbs:
+          - get
+          - list
+          - watch
+          - update
+        - apiGroups:
+          - app.k8s.io
+          resources:
+          - applications
+          verbs:
+          - get
+          - list
+          - watch
+          - update
+        - apiGroups:
+          - apiextensions.k8s.io
+          resources:
+          - customresourcedefinitions
+          verbs:
+          - get
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - namespaces
+          - persistentvolumeclaims
+          - pods
+          - secrets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - delete
+          - deletecollection
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - serviceaccounts
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - addon.open-cluster-management.io
+          resources:
+          - addondeploymentconfigs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - addon.open-cluster-management.io
+          resources:
+          - clustermanagementaddons
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - addon.open-cluster-management.io
+          resources:
+          - managedclusteraddons
+          verbs:
+          - create
+          - delete
+          - deletecollection
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - addon.open-cluster-management.io
+          resources:
+          - managedclusteraddons/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - addon.open-cluster-management.io
+          resources:
+          - managedclusteraddons/status
+          verbs:
+          - patch
+          - update
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - mutatingwebhookconfigurations
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - apiextensions.k8s.io
+          resources:
+          - customresourcedefinitions
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - app.k8s.io
+          resources:
+          - applications
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - apps.open-cluster-management.io
+          resources:
+          - channels
+          - subscriptions
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+        - apiGroups:
+          - apps.open-cluster-management.io
+          resources:
+          - placementrules
+          - subscriptionreports
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - authentication.open-cluster-management.io
+          resources:
+          - managedserviceaccounts
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+          - get
+        - apiGroups:
+          - certificates.k8s.io
+          resources:
+          - certificatesigningrequests
+          - certificatesigningrequests/approval
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - certificates.k8s.io
+          resources:
+          - certificatesigningrequests/status
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - certificates.k8s.io
+          resources:
+          - signers
+          verbs:
+          - approve
+        - apiGroups:
+          - certificates.k8s.io
+          resourceNames:
+          - open-cluster-management.io/globalhub-signer
+          resources:
+          - signers
+          verbs:
+          - sign
+        - apiGroups:
+          - cluster.open-cluster-management.io
+          resources:
+          - clusterclaims
+          - managedclusters
+          - managedclustersetbindings
+          - placements
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - cluster.open-cluster-management.io
+          resources:
+          - managedclusters/finalizers
+          - managedclustersets
+          - placementdecisions
+          - placementdecisions/finalizers
+          - placements/finalizers
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - cluster.open-cluster-management.io
+          resourceNames:
+          - global
+          resources:
+          - managedclustersets/bind
+          verbs:
+          - create
+          - delete
+        - apiGroups:
+          - config.open-cluster-management.io
+          resources:
+          - klusterletconfigs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - clusterversions
+          - infrastructures
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - global-hub.open-cluster-management.io
+          resources:
+          - managedclustermigrations
+          verbs:
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - image.openshift.io
+          resources:
+          - imagestreams
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - internal.open-cluster-management.io
+          resources:
+          - managedclusterinfos
+          verbs:
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - kafka.strimzi.io
+          resources:
+          - kafkanodepools
+          - kafkas
+          - kafkatopics
+          - kafkausers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - podmonitors
+          - prometheusrules
+          - servicemonitors
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resourceNames:
+          - k8s
+          resources:
+          - prometheuses/api
+          verbs:
+          - create
+          - get
+          - update
+        - apiGroups:
+          - operator.open-cluster-management.io
+          resources:
+          - clustermanagers
+          - multiclusterhubs
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - operator.open-cluster-management.io
+          resources:
+          - multiclusterglobalhubagents
+          - multiclusterglobalhubs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - operator.open-cluster-management.io
+          resources:
+          - multiclusterglobalhubagents/finalizers
+          - multiclusterglobalhubs/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - operator.open-cluster-management.io
+          resources:
+          - multiclusterglobalhubagents/status
+          - multiclusterglobalhubs/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - operators.coreos.com
+          resources:
+          - clusterserviceversions
+          verbs:
+          - delete
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - operators.coreos.com
+          resources:
+          - subscriptions
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - packages.operators.coreos.com
+          resources:
+          - packagemanifests
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - policy.open-cluster-management.io
+          resources:
+          - placementbindings
+          - policies
+          - policyautomations
+          - policysets
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - postgres-operator.crunchydata.com
+          resources:
+          - postgresclusters
+          verbs:
+          - create
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          - clusterroles
+          - rolebindings
+          - roles
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - work.open-cluster-management.io
+          resources:
+          - manifestworks
+          verbs:
+          - create
+          - delete
+          - deletecollection
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        serviceAccountName: multicluster-global-hub-operator
+      deployments:
+      - label:
+          name: multicluster-global-hub-operator
+        name: multicluster-global-hub-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              name: multicluster-global-hub-operator
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: multicluster-global-hub-operator
+              labels:
+                name: multicluster-global-hub-operator
+            spec:
+              containers:
+              - args:
+                - --leader-election
+                command:
+                - multicluster-global-hub-operator
+                env:
+                - name: POD_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: RELATED_IMAGE_MULTICLUSTER_GLOBAL_HUB_MANAGER
+                  value: quay.io/stolostron/multicluster-global-hub-manager@sha256:4cd602ff6f8dd951848dc8a95c856004295c9f4710f77d4dafcc0735c1492395
+                - name: RELATED_IMAGE_MULTICLUSTER_GLOBAL_HUB_AGENT
+                  value: quay.io/stolostron/multicluster-global-hub-agent@sha256:8dfc33dfed33a85733ee5e02dcd4f05662c75263791e0961ba17cbb3d0c340c9
+                - name: RELATED_IMAGE_GRAFANA
+                  value: quay.io/stolostron/grafana@sha256:719b320a05d10158fadce5ae2fc6e4254a18957a6608b6f81e876cf46d3a6897
+                - name: RELATED_IMAGE_POSTGRESQL
+                  value: quay.io/stolostron/postgresql-16@sha256:db2f73275f9cc0f2d262fadb8e8a5da72b089f9d22f7c859bb1364d9f9a8b622
+                - name: RELATED_IMAGE_INVENTORY_API
+                  value: quay.io/redhat-services-prod/project-kessel-tenant/kessel-inventory/inventory-api@sha256:6a55a1919ecd92d94e05c12be1b6450956f5fda2ce17af7027cac3806c4970a4
+                - name: RELATED_IMAGE_POSTGRES_EXPORTER
+                  value: quay.io/prometheuscommunity/postgres-exporter@sha256:386b12d19eab2a37d7cd8ca8b4c7491cc7a830d9581f49af6c98a393da9605e6
+                image: quay.io/stolostron/multicluster-global-hub-operator@sha256:085e9fc6cdc6a42df10a38856c8ccff25e5acffaba67ef95da72027e90e507fc
+                imagePullPolicy: Always
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: multicluster-global-hub-operator
+                ports:
+                - containerPort: 9443
+                  name: webhook-server
+                  protocol: TCP
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  requests:
+                    cpu: 1m
+                    memory: 100Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                volumeMounts:
+                - mountPath: /tmp/k8s-webhook-server/serving-certs
+                  name: webhook-certs
+                  readOnly: true
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: multicluster-global-hub-operator
+              terminationGracePeriodSeconds: 10
+              volumes:
+              - name: webhook-certs
+                secret:
+                  defaultMode: 420
+                  secretName: multicluster-global-hub-webhook-certs
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - services
+          - services/finalizers
+          - endpoints
+          - events
+          - configmaps
+          - secrets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - get
+          - create
+        - apiGroups:
+          - apps
+          resourceNames:
+          - multicluster-global-hub-manager
+          resources:
+          - deployments/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - create
+          - update
+          - delete
+        serviceAccountName: multicluster-global-hub-operator
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: false
+    type: AllNamespaces
+  keywords:
+  - multicluster-global-hub
+  - multiple-hubs
+  links:
+  - name: Multicluster Global Hub Operator
+    url: https://github.com/stolostron/multicluster-global-hub
+  maintainers:
+  - email: acm-contact@redhat.com
+    name: acm-contact
+  maturity: stable
+  provider:
+    name: Red Hat, Inc
+    url: https://github.com/stolostron/multicluster-global-hub
+  version: 1.4.0
+  relatedImages:
+  - image: quay.io/stolostron/multicluster-global-hub-manager@sha256:4cd602ff6f8dd951848dc8a95c856004295c9f4710f77d4dafcc0735c1492395
+    name: multicluster-global-hub-manager
+  - image: quay.io/stolostron/multicluster-global-hub-agent@sha256:8dfc33dfed33a85733ee5e02dcd4f05662c75263791e0961ba17cbb3d0c340c9
+    name: multicluster-global-hub-agent
+  - image: quay.io/stolostron/multicluster-global-hub-operator@sha256:085e9fc6cdc6a42df10a38856c8ccff25e5acffaba67ef95da72027e90e507fc
+    name: multicluster-global-hub-operator
+  - image: quay.io/stolostron/grafana@sha256:719b320a05d10158fadce5ae2fc6e4254a18957a6608b6f81e876cf46d3a6897
+    name: grafana
+  - image: quay.io/stolostron/postgresql-16@sha256:db2f73275f9cc0f2d262fadb8e8a5da72b089f9d22f7c859bb1364d9f9a8b622
+    name: postgresql
+  - image: quay.io/redhat-services-prod/project-kessel-tenant/kessel-inventory/inventory-api@sha256:6a55a1919ecd92d94e05c12be1b6450956f5fda2ce17af7027cac3806c4970a4
+    name: inventory-api
+  - image: quay.io/prometheuscommunity/postgres-exporter@sha256:386b12d19eab2a37d7cd8ca8b4c7491cc7a830d9581f49af6c98a393da9605e6
+    name: postgres-exporter
+  replaces: multicluster-global-hub-operator.v1.3.0

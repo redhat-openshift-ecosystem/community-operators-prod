@@ -51,6 +51,20 @@ metadata:
                 "entryClass":"org.apache.flink.streaming.examples.statemachine.StateMachineExample"
             }
           }
+        },
+        {
+          "apiVersion": "flink.apache.org/v1beta1",
+          "kind": "FlinkStateSnapshot",
+          "metadata": {
+            "name": "example-savepoint"
+          },
+          "spec": {
+            "savepoint": {
+              "alreadyExists": true,
+              "disposeOnDelete": false,
+              "path": "/flink-data/savepoints/savepoint-98682a-21931bf10c39"
+            }
+          }
         }
       ]
     alm-examples-metadata: |-

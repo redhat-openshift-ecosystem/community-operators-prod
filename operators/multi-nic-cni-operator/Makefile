@@ -118,3 +118,38 @@ OPM_VERSION ?= v1.46.0
 ${BINDIR}/opm:
 	if [ ! -d ${BINDIR} ]; then mkdir -p ${BINDIR}; fi
 	curl -sLO https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/$(OS)-$(ARCH)-opm && chmod +x $(OS)-$(ARCH)-opm && mv $(OS)-$(ARCH)-opm ${BINDIR}/opm
+
+# push new version to community multi-nic-cni-operator
+# use VERSION as an arg to the push-bundle target: make push-bundle VERSION=x.x.x
+.PHONY: push-bundle
+push-bundle:
+	@if [ -z "${VERSION}" ]; then \
+		echo "Error: Version is not set"; \
+		exit 1; \
+	fi; \
+	{ \
+		# Clone the git repository \
+		git clone https://github.com/foundation-model-stack/multi-nic-cni.git multi-nic-cni-operator && \
+		# Change to the cloned directory \
+		cd multi-nic-cni-operator && \
+		# Checkout the specified release branch \
+		git checkout release-v${VERSION} && \
+		 # Build the opm binary \
+		make opm && \
+		# Tidy and vendor Go modules \
+		go mod tidy && \
+		go mod vendor && \
+		# Execute the make bundle command \
+		make bundle && \
+		# Return to the original directory \
+		cd .. && \
+		# Create the target directory for the specified version \
+		mkdir -p ${VERSION} && \
+		# Copy the generated bundle directory to the target directory \
+		cp -r multi-nic-cni-operator/bundle ${VERSION} && \
+		# Copy the bundle.Dockerfile to the target directory \
+		cp multi-nic-cni-operator/bundle.Dockerfile ${VERSION} && \
+		# Remove the cloned git repository \
+		rm -rf multi-nic-cni-operator; \
+	}
+

@@ -120,36 +120,57 @@ ${BINDIR}/opm:
 	curl -sLO https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/$(OS)-$(ARCH)-opm && chmod +x $(OS)-$(ARCH)-opm && mv $(OS)-$(ARCH)-opm ${BINDIR}/opm
 
 # push new version to community multi-nic-cni-operator
-# use VERSION as an arg to the push-bundle target: make push-bundle VERSION=x.x.x
+# update version-info.mk file with the new version before running this target
+include version-info.mk
+
 .PHONY: push-bundle
 push-bundle:
-	@if [ -z "${VERSION}" ]; then \
+	if [ -z "${VERSION}" ]; then \
 		echo "Error: Version is not set"; \
 		exit 1; \
 	fi; \
-	{ \
-		# Clone the git repository \
-		git clone https://github.com/foundation-model-stack/multi-nic-cni.git multi-nic-cni-operator && \
-		# Change to the cloned directory \
-		cd multi-nic-cni-operator && \
-		# Checkout the specified release branch \
-		git checkout release-v${VERSION} && \
-		 # Build the opm binary \
-		make opm && \
-		# Tidy and vendor Go modules \
-		go mod tidy && \
-		go mod vendor && \
-		# Execute the make bundle command \
-		make bundle && \
-		# Return to the original directory \
-		cd .. && \
-		# Create the target directory for the specified version \
-		mkdir -p ${VERSION} && \
-		# Copy the generated bundle directory to the target directory \
-		cp -r multi-nic-cni-operator/bundle ${VERSION} && \
-		# Copy the bundle.Dockerfile to the target directory \
-		cp multi-nic-cni-operator/bundle.Dockerfile ${VERSION} && \
-		# Remove the cloned git repository \
-		rm -rf multi-nic-cni-operator; \
-	}
+	if [ -z "${OLD_VERSION}" ]; then \
+		echo "Error: OLD_VERSION is not set"; \
+		exit 1; \
+	fi; \
+	if [ -z "${CHANNELS}" ]; then \
+		echo "Error: CHANNELS is not set"; \
+		exit 1; \
+	fi; \
+	# Clone the git repository \
+	git clone https://github.com/foundation-model-stack/multi-nic-cni.git multi-nic-cni-operator && \
+	# Change to the cloned directory \
+	cd multi-nic-cni-operator && \
+	# Checkout the specified release branch \
+	git checkout release-v${VERSION} && \
+	# Build the opm binary \
+	make opm && \
+	# Tidy and vendor Go modules \
+	go mod tidy && \
+	go mod vendor && \
+	# Execute the make bundle command \
+	make bundle && \
+	# Return to the original directory \
+	cd ..; \
+	# Check if the ${VERSION} directory exists and delete it \
+	if [ -d "${VERSION}" ]; then \
+		echo "Directory ${VERSION} exists and will be deleted"; \
+		rm -rf ${VERSION}; \
+	fi; \
+	# Create the target directory for the specified version \
+	mkdir -p ${VERSION}; \
+	# Copy the generated bundle directory to the target directory \
+	cp -r multi-nic-cni-operator/bundle ${VERSION}; \
+	# Copy the bundle.Dockerfile to the target directory \
+	cp multi-nic-cni-operator/bundle.Dockerfile ${VERSION}; \
+	# Create the release-config.yaml file \
+	echo "---" > ${VERSION}/release-config.yaml; \
+	echo "catalog_templates:" >> ${VERSION}/release-config.yaml; \
+	for version in ${OCP_VERSIONS}; do \
+		echo "  - template_name: $${version}.yaml" >> ${VERSION}/release-config.yaml; \
+		echo "    channels: [${CHANNELS}]" >> ${VERSION}/release-config.yaml; \
+		echo "    replaces: multi-nic-cni-operator.${OLD_VERSION}" >> ${VERSION}/release-config.yaml; \
+	done; \
+	# Remove the cloned git repository \
+	rm -rf multi-nic-cni-operator
 

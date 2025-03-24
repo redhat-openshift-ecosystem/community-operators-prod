@@ -160,7 +160,7 @@ push-bundle:
 	# Create the target directory for the specified version \
 	mkdir -p ${VERSION}; \
 	# Copy the generated bundle directory to the target directory \
-	cp -r multi-nic-cni-operator/bundle ${VERSION}; \
+	cp -r multi-nic-cni-operator/bundle/* ${VERSION}; \
 	# Copy the bundle.Dockerfile to the target directory \
 	cp multi-nic-cni-operator/bundle.Dockerfile ${VERSION}; \
 	# Create the release-config.yaml file \

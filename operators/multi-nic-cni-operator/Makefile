@@ -137,12 +137,10 @@ push-bundle:
 		echo "Error: CHANNELS is not set"; \
 		exit 1; \
 	fi; \
-	# Clone the git repository \
-	git clone https://github.com/foundation-model-stack/multi-nic-cni.git multi-nic-cni-operator && \
+	# Checkout the git repository with release branch \
+	git clone -b release-v${VERSION} https://github.com/foundation-model-stack/multi-nic-cni.git multi-nic-cni-operator && \
 	# Change to the cloned directory \
 	cd multi-nic-cni-operator && \
-	# Checkout the specified release branch \
-	git checkout release-v${VERSION} && \
 	# Build the opm binary \
 	make opm && \
 	# Tidy and vendor Go modules \
@@ -159,8 +157,8 @@ push-bundle:
 	fi; \
 	# Create the target directory for the specified version \
 	mkdir -p ${VERSION}; \
-	# Copy the generated bundle directory to the target directory \
-	cp -r multi-nic-cni-operator/bundle ${VERSION}; \
+	# Copy the subdirectories under the generated bundle directory to the target directory \
+	cp -r multi-nic-cni-operator/bundle/* ${VERSION}; \
 	# Copy the bundle.Dockerfile to the target directory \
 	cp multi-nic-cni-operator/bundle.Dockerfile ${VERSION}; \
 	# Create the release-config.yaml file \
@@ -169,7 +167,7 @@ push-bundle:
 	for version in ${OCP_VERSIONS}; do \
 		echo "  - template_name: $${version}.yaml" >> ${VERSION}/release-config.yaml; \
 		echo "    channels: [${CHANNELS}]" >> ${VERSION}/release-config.yaml; \
-		echo "    replaces: multi-nic-cni-operator.${OLD_VERSION}" >> ${VERSION}/release-config.yaml; \
+		echo "    replaces: multi-nic-cni-operator.v${OLD_VERSION}" >> ${VERSION}/release-config.yaml; \
 	done; \
 	# Remove the cloned git repository \
 	rm -rf multi-nic-cni-operator

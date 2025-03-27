@@ -510,7 +510,7 @@ spec:
                     command:
                       - ndb-operator-webhook
                     image: >-
-                      container-registry.oracle.com/mysql/community-ndb-operator:9.1.0-1.6.0
+                      container-registry.oracle.com/mysql/community-ndb-operator@sha256:b562dc3303ffae9f4dab1d73fd0fe05833bdaa8b731af4227da81af617c75c6b
                     imagePullPolicy: IfNotPresent
                     name: ndb-operator-webhook
                     ports:
@@ -521,6 +521,18 @@ spec:
                         port: 9443
                         scheme: HTTPS
                     resources: {}
+                    env:
+                      - name: OPERATOR_ENV
+                        value: prod
+                      - name: WATCH_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.annotations['olm.targetNamespaces']
+                      - name: CURRENT_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+
                 serviceAccountName: ndb-operator-webhook-sa
         - label:
             app: ndb-operator

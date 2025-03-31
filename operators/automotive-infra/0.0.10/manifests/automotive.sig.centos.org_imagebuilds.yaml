@@ -1,0 +1,100 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: imagebuilds.automotive.sig.centos.org
+spec:
+  group: automotive.sig.centos.org
+  names:
+    kind: ImageBuild
+    listKind: ImageBuilds
+    plural: imagebuilds
+    shortNames:
+    - ib
+    - ibs
+    singular: imagebuild
+  scope: Namespaced
+  versions:
+  - name: v1
+    schema:
+      openAPIV3Schema:
+        description: ImageBuild is the Schema for the imagebuilds API
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Spec defines the desired state of ImageBuild
+            properties:
+              automotive_osbuild_image:
+                type: string
+              cron:
+                properties:
+                  build_command:
+                    description: Build command to run for scheduled builds
+                    type: string
+                  schedule:
+                    description: Cron schedule for builds (e.g., '0 2 * * *' for 2
+                      AM daily)
+                    type: string
+                required:
+                - schedule
+                - build_command
+                type: object
+              publishers:
+                properties:
+                  azure:
+                    properties:
+                      container:
+                        type: string
+                      secret:
+                        type: string
+                    required:
+                    - secret
+                    - container
+                    type: object
+                  registry:
+                    properties:
+                      repository_url:
+                        type: string
+                      secret:
+                        type: string
+                    required:
+                    - secret
+                    - repository_url
+                    type: object
+                  s3:
+                    properties:
+                      bucket:
+                        type: string
+                      secret:
+                        type: string
+                    required:
+                    - secret
+                    - bucket
+                    type: object
+                type: object
+              storage_class:
+                type: string
+            required:
+            - automotive_osbuild_image
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+          status:
+            description: Status defines the observed state of ImageBuild
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

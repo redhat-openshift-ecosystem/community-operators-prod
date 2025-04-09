@@ -56,7 +56,7 @@ metadata:
             "name": "dbcluster-sample"
           },
           "spec": {
-            "databaseVersion": "15.7.0",
+            "databaseVersion": "16.3.0",
             "primarySpec": {
               "adminUser": {
                 "passwordRef": {
@@ -265,13 +265,19 @@ metadata:
               {
                 "args": [
                   "-c",
-                  "while true; do echo echo $(date -u) 'test' \u003e\u003e /dev/null; sleep 5; done"
+                  "while [ true ]\ndo\ndate\nset -x\nls -lh /logs/diagnostic\nset +x\ndone\n"
                 ],
                 "command": [
                   "/bin/sh"
                 ],
                 "image": "busybox",
-                "name": "sidecar-sample"
+                "name": "sidecar-sample",
+                "volumeMounts": [
+                  {
+                    "mountPath": "/logs",
+                    "name": "obsdisk"
+                  }
+                ]
               }
             ]
           }
@@ -288,10 +294,11 @@ metadata:
           }
         }
       ]
-    capabilities: Basic Install
+    capabilities: Deep Insights
+    categories: Database
     createdAt: "2025-04-08T16:31:24Z"
     operators.operatorframework.io/builder: operator-sdk-v1.37.0
-    operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+    operators.operatorframework.io/project_layout: unknown
     operators.operatorframework.io/internal-objects: '["backuprepositories.alloydbomni.internal.dbadmin.goog", "failovers.alloydbomni.internal.dbadmin.goog", "instancebackupplans.alloydbomni.internal.dbadmin.goog","instancebackups.alloydbomni.internal.dbadmin.goog","instancerestores.alloydbomni.internal.dbadmin.goog","instances.alloydbomni.internal.dbadmin.goog","instanceswitchovers.alloydbomni.internal.dbadmin.goog","lrojobs.alloydbomni.internal.dbadmin.goog","replicationconfigs.alloydbomni.internal.dbadmin.goog","sidecars.alloydbomni.internal.dbadmin.goog","createstandbyjobs.alloydbomni.internal.dbadmin.goog","deletestandbyjobs.alloydbomni.internal.dbadmin.goog"]'
     operatorframework.io/suggested-namespace: alloydb-omni-system
   name: alloydb-omni-operator.v1.4.0
@@ -1849,6 +1856,7 @@ spec:
     name: Google Cloud
   maturity: stable
   minKubeVersion: 1.21.0
+  replaces: alloydb-omni-operator.v1.3.0
   provider:
     name: Google
     url: https://cloud.google.com/alloydb/omni

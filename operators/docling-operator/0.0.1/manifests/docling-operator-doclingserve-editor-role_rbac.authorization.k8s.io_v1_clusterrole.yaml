@@ -1,0 +1,27 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: docling-operator
+  name: docling-operator-doclingserve-editor-role
+rules:
+- apiGroups:
+  - docling.github.io
+  resources:
+  - doclingserves
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - docling.github.io
+  resources:
+  - doclingserves/status
+  verbs:
+  - get

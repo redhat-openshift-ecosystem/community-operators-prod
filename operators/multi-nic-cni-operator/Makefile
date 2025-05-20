@@ -58,7 +58,7 @@ fbc-onboarding: clean
 #     - template_name: semver.yaml
 #       catalog_names: ["v4.13", "v4.17"]
 #       type: olm.semver
-catalogs: ${BINDIR}/render_catalogs.sh ${BINDIR}/opm ${BINDIR}/yq clean
+catalogs: render_catalogs.sh ${BINDIR}/opm ${BINDIR}/yq clean
 	@echo "Rendering catalogs from templates"
 	@${BINDIR}/render_catalogs.sh
 
@@ -94,8 +94,8 @@ ${BINDIR}/yq:
 	if [ ! -d ${BINDIR} ]; then mkdir -p ${BINDIR}; fi
 	curl -sLO https://github.com/mikefarah/yq/releases/download/$(YQ_VERSION)/yq_$(OS)_$(ARCH) && mv yq_$(OS)_$(ARCH) ${BINDIR}/yq && chmod +x ${BINDIR}/yq
 
-.PHONY: ${BINDIR}/render_catalogs.sh
-${BINDIR}/render_catalogs.sh:
+.PHONY: render_catalogs.sh
+render_catalogs.sh:
 	@echo "Downloading render_catalogs.sh script"
 	if [ ! -d ${BINDIR} ]; then mkdir -p ${BINDIR}; fi
 	curl -sLO https://raw.githubusercontent.com/redhat-openshift-ecosystem/operator-pipelines/main/fbc/render_catalogs.sh

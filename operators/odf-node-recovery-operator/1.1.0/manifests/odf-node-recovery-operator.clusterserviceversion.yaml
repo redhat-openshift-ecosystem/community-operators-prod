@@ -1,0 +1,318 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "odf.openshift.io/v1alpha1",
+          "kind": "NodeRecovery",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "odf-node-recovery-operator",
+              "app.kubernetes.io/instance": "noderecovery-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "noderecovery",
+              "app.kubernetes.io/part-of": "odf-node-recovery-operator"
+            },
+            "name": "noderecovery-sample"
+          },
+          "spec": null
+        }
+      ]
+    capabilities: Basic Install
+    categories: Storage,OpenShift Optional
+    description: ODF Node Recovery is an operator that assist in the recovery of and ODF cluster that has a device or a node replaced
+    operators.operatorframework.io/builder: operator-sdk-v1.25.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    repository: https://github.com/jordigilh/odf-node-recovery-operator
+  name: odf-node-recovery-operator.v1.1.0
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: NodeRecovery is the Schema for the noderecoveries API
+        displayName: Node Recovery
+        kind: NodeRecovery
+        name: noderecoveries.odf.openshift.io
+        version: v1alpha1
+  description: |
+    ODF Node Recovery is an operator that assist in the recovery of an
+    ODF cluster in these 2 scenarios:
+    * <a href="https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/4.14/html-single/replacing_devices/index"> Device replacement<a/>
+    * <a href="https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/4.14/html-single/replacing_nodes/index"> Node replacement</a>
+  displayName: ODF Node Recovery Operator
+  icon:
+    - base64data: PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTQ1Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2UwMDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPlJlZEhhdC1Mb2dvLUhhdC1Db2xvcjwvdGl0bGU+PHBhdGggZD0iTTE1Ny43Nyw2Mi42MWExNCwxNCwwLDAsMSwuMzEsMy40MmMwLDE0Ljg4LTE4LjEsMTcuNDYtMzAuNjEsMTcuNDZDNzguODMsODMuNDksNDIuNTMsNTMuMjYsNDIuNTMsNDRhNi40Myw2LjQzLDAsMCwxLC4yMi0xLjk0bC0zLjY2LDkuMDZhMTguNDUsMTguNDUsMCwwLDAtMS41MSw3LjMzYzAsMTguMTEsNDEsNDUuNDgsODcuNzQsNDUuNDgsMjAuNjksMCwzNi40My03Ljc2LDM2LjQzLTIxLjc3LDAtMS4wOCwwLTEuOTQtMS43My0xMC4xM1oiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMjcuNDcsODMuNDljMTIuNTEsMCwzMC42MS0yLjU4LDMwLjYxLTE3LjQ2YTE0LDE0LDAsMCwwLS4zMS0zLjQybC03LjQ1LTMyLjM2Yy0xLjcyLTcuMTItMy4yMy0xMC4zNS0xNS43My0xNi42QzEyNC44OSw4LjY5LDEwMy43Ni41LDk3LjUxLjUsOTEuNjkuNSw5MCw4LDgzLjA2LDhjLTYuNjgsMC0xMS42NC01LjYtMTcuODktNS42LTYsMC05LjkxLDQuMDktMTIuOTMsMTIuNSwwLDAtOC40MSwyMy43Mi05LjQ5LDI3LjE2QTYuNDMsNi40MywwLDAsMCw0Mi41Myw0NGMwLDkuMjIsMzYuMywzOS40NSw4NC45NCwzOS40NU0xNjAsNzIuMDdjMS43Myw4LjE5LDEuNzMsOS4wNSwxLjczLDEwLjEzLDAsMTQtMTUuNzQsMjEuNzctMzYuNDMsMjEuNzdDNzguNTQsMTA0LDM3LjU4LDc2LjYsMzcuNTgsNTguNDlhMTguNDUsMTguNDUsMCwwLDEsMS41MS03LjMzQzIyLjI3LDUyLC41LDU1LC41LDc0LjIyYzAsMzEuNDgsNzQuNTksNzAuMjgsMTMzLjY1LDcwLjI4LDQ1LjI4LDAsNTYuNy0yMC40OCw1Ni43LTM2LjY1LDAtMTIuNzItMTEtMjcuMTYtMzAuODMtMzUuNzgiLz48L3N2Zz4=
+      mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+            - apiGroups:
+                - ""
+              resources:
+                - nodes
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - persistentvolumeclaims
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - persistentvolumes
+              verbs:
+                - delete
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - delete
+                - deletecollection
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods/exec
+              verbs:
+                - create
+            - apiGroups:
+                - ""
+              resources:
+                - pods/log
+              verbs:
+                - get
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - config.openshift.io
+              resources:
+                - clusterversions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - ocs.openshift.io
+              resources:
+                - ocsinitializations
+                - storageclusters
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - odf.openshift.io
+              resources:
+                - noderecoveries
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - odf.openshift.io
+              resources:
+                - noderecoveries/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - odf.openshift.io
+              resources:
+                - noderecoveries/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - template.openshift.io
+              resources:
+                - templates
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: odf-node-recovery-operator-controller-manager
+        - rules:
+            - nonResourceURLs:
+                - /metrics
+              verbs:
+                - get
+          serviceAccountName: odf-node-recovery-operator-metrics-reader
+      deployments:
+        - label:
+            app.kubernetes.io/managed-by: kustomize
+            app.kubernetes.io/name: odf-node-recovery-operator
+            control-plane: controller-manager
+          name: odf-node-recovery-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app.kubernetes.io/name: odf-node-recovery-operator
+                control-plane: controller-manager
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  app.kubernetes.io/name: odf-node-recovery-operator
+                  control-plane: controller-manager
+              spec:
+                containers:
+                  - args:
+                      - --metrics-bind-address=:8443
+                      - --leader-elect
+                      - --health-probe-bind-address=:8081
+                    command:
+                      - /manager
+                    image: quay.io/jordigilh/odf-node-recovery-controller@sha256:4164fafa9bb1c4d6121f4c5fc700fa2827c3994ca98a65d641471a2a46d4f59c
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 10m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                securityContext:
+                  runAsNonRoot: true
+                  seccompProfile:
+                    type: RuntimeDefault
+                serviceAccountName: odf-node-recovery-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: odf-node-recovery-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - odf
+    - node recovery
+  links:
+    - name: GitHub Repository
+      url: https://github.com/jordigilh/odf-node-recovery-operator
+  maintainers:
+    - email: support@redhat.com
+      name: Red Hat
+  maturity: alpha
+  minKubeVersion: 1.25.0
+  provider:
+    name: Red Hat, Inc.
+    url: www.redhat.com
+  relatedImages:
+    - image: quay.io/jordigilh/odf-node-recovery-controller@sha256:4164fafa9bb1c4d6121f4c5fc700fa2827c3994ca98a65d641471a2a46d4f59c
+      name: manager
+  version: 1.1.0

@@ -1,0 +1,184 @@
+---
+defaultChannel: alpha
+name: odf-node-recovery-operator
+schema: olm.package
+---
+entries:
+- name: odf-node-recovery-operator.v1.0.0
+- name: odf-node-recovery-operator.v1.1.0
+  replaces: odf-node-recovery-operator.v1.0.0
+name: alpha
+package: odf-node-recovery-operator
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/odf-node-recovery-operator@sha256:d737e4d678d765524a6050c9de39b7476ae3aacadfe1e71a8167d7be888c9e03
+name: odf-node-recovery-operator.v1.0.0
+package: odf-node-recovery-operator
+properties:
+- type: olm.gvk
+  value:
+    group: odf.openshift.io
+    kind: NodeRecovery
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: odf-node-recovery-operator
+    version: 1.0.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "odf.openshift.io/v1alpha1",
+            "kind": "NodeRecovery",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/created-by": "odf-node-recovery-operator",
+                "app.kubernetes.io/instance": "noderecovery-sample",
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "noderecovery",
+                "app.kubernetes.io/part-of": "odf-node-recovery-operator"
+              },
+              "name": "noderecovery-sample"
+            },
+            "spec": null
+          }
+        ]
+      capabilities: Basic Install
+      categories: Storage,OpenShift Optional
+      containerImage: quay.io/jordigilh/odf-node-recovery-controller:1.0.0
+      createdAt: "2025-03-25T19:19:33Z"
+      description: ODF Node Recovery is an operator that assist in the recovery of
+        and ODF cluster that has a device or a node replaced
+      operators.operatorframework.io/builder: operator-sdk-v1.39.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/jordigilh/odf-node-recovery-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - kind: NodeRecovery
+        name: noderecoveries.odf.openshift.io
+        version: v1alpha1
+    description: |
+      ODF Node Recovery is an operator that assist in the recovery of an
+      ODF cluster in these 2 scenarios:
+      * <a href="https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/4.14/html-single/replacing_devices/index"> Device replacement<a/>
+      * <a href="https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/4.14/html-single/replacing_nodes/index"> Node replacement</a>
+    displayName: ODF Node Recovery Operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - odf
+    - node recovery
+    links:
+    - name: GitHub Repository
+      url: https://github.com/jordigilh/odf-node-recovery-operator
+    maintainers:
+    - email: support@redhat.com
+      name: Red Hat
+    maturity: alpha
+    minKubeVersion: 1.25.0
+    provider:
+      name: Red Hat, Inc.
+      url: www.redhat.com
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/odf-node-recovery-operator@sha256:d737e4d678d765524a6050c9de39b7476ae3aacadfe1e71a8167d7be888c9e03
+  name: ""
+- image: quay.io/jordigilh/odf-node-recovery-controller:1.0.0
+  name: ""
+- image: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9@sha256:29201e85bd41642b72c7c0ce915e40aad90823d0efc3e7bbab9c351c92c74341
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/odf-node-recovery-operator@sha256:77b0ef6110a71da56216719ceed0f448257dec9633c98d7dfabc1038b23b6e29
+name: odf-node-recovery-operator.v1.1.0
+package: odf-node-recovery-operator
+properties:
+- type: olm.gvk
+  value:
+    group: odf.openshift.io
+    kind: NodeRecovery
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: odf-node-recovery-operator
+    version: 1.1.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "odf.openshift.io/v1alpha1",
+            "kind": "NodeRecovery",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/created-by": "odf-node-recovery-operator",
+                "app.kubernetes.io/instance": "noderecovery-sample",
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "noderecovery",
+                "app.kubernetes.io/part-of": "odf-node-recovery-operator"
+              },
+              "name": "noderecovery-sample"
+            },
+            "spec": null
+          }
+        ]
+      capabilities: Basic Install
+      categories: Storage,OpenShift Optional
+      description: ODF Node Recovery is an operator that assist in the recovery of
+        and ODF cluster that has a device or a node replaced
+      operators.operatorframework.io/builder: operator-sdk-v1.25.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/jordigilh/odf-node-recovery-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: NodeRecovery is the Schema for the noderecoveries API
+        displayName: Node Recovery
+        kind: NodeRecovery
+        name: noderecoveries.odf.openshift.io
+        version: v1alpha1
+    description: |
+      ODF Node Recovery is an operator that assist in the recovery of an
+      ODF cluster in these 2 scenarios:
+      * <a href="https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/4.14/html-single/replacing_devices/index"> Device replacement<a/>
+      * <a href="https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/4.14/html-single/replacing_nodes/index"> Node replacement</a>
+    displayName: ODF Node Recovery Operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - odf
+    - node recovery
+    links:
+    - name: GitHub Repository
+      url: https://github.com/jordigilh/odf-node-recovery-operator
+    maintainers:
+    - email: support@redhat.com
+      name: Red Hat
+    maturity: alpha
+    minKubeVersion: 1.25.0
+    provider:
+      name: Red Hat, Inc.
+      url: www.redhat.com
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/odf-node-recovery-operator@sha256:77b0ef6110a71da56216719ceed0f448257dec9633c98d7dfabc1038b23b6e29
+  name: ""
+- image: quay.io/jordigilh/odf-node-recovery-controller@sha256:4164fafa9bb1c4d6121f4c5fc700fa2827c3994ca98a65d641471a2a46d4f59c
+  name: manager
+schema: olm.bundle

@@ -1,0 +1,328 @@
+---
+defaultChannel: alpha
+icon:
+  base64data: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iMTkwLjgwMyIgeG1sbnM6dj0iaHR0cHM6Ly92ZWN0YS5pby9uYW5vIj48cGF0aCBkPSJNMTg3Ljg4OCAxNzguMTIySDE0My41MmwtMTMuNTczLTMyLjczOEg1Ni4wMDNsLTEyLjM2NiAzMi43MzhIMEw2Ni42NjcgMTIuNzc2aDQ3Ljc2MXpNOTEuMTU1IDUyLjI4Nkw2Ni45MTIgMTE2LjUzaDUwLjkxM3ptMjU3LjkwMS0zOS41MWgzNS44OHYxNjUuMzQ2aC00MS4yMTlWNzQuODQybC00NC42MDggNTEuODc3aC02LjMwMWwtNDQuNjA1LTUxLjg3N1YxNzguMTJoLTQxLjIxOVYxMi43NzZoMzUuODhsNTMuMDkyIDYxLjMzNnptMTQwLjMxOSAwYzYwLjM2NCAwIDkxLjM5MSAzNy41NzMgOTEuMzkxIDgyLjkwOSAwIDQ3LjUxNy0zMC4wNTggODIuNDM3LTk2IDgyLjQzN2gtNjguMzY5VjEyLjc3NnptLTMxLjc2MiAxMzUuMDQxaDI2LjkwNmM0MS40NTcgMCA1My44MjMtMjguMTI5IDUzLjgyMy01Mi4zNzcgMC0yOC4zNjgtMTUuMjc2LTUyLjM2My01NC4zMDgtNTIuMzYzaC0yNi40MjJ2MTA0Ljc0em0yMDUuMTU2LTk1LjgzNkw2MTAuNzk3IDBIODAwdjE4OS4yMWwtNTEuOTcyLTUxLjk3NVY1MS45ODF6bS0uMDYxIDEwLjQxNkw2MDkuMiAxMTUuOTAzdjc0Ljg5OWg3NC44ODlsNTMuNTA1LTUzLjUwNmgtNzQuODg2eiIvPjwvc3ZnPg==
+  mediatype: image/svg+xml
+name: amd-gpu-operator
+schema: olm.package
+---
+entries:
+- name: amd-gpu-operator.v0.0.1
+- name: amd-gpu-operator.v0.0.2
+  replaces: amd-gpu-operator.v0.0.1
+- name: amd-gpu-operator.v0.0.3
+  replaces: amd-gpu-operator.v0.0.2
+- name: amd-gpu-operator.v0.0.4
+  replaces: amd-gpu-operator.v0.0.3
+name: alpha
+package: amd-gpu-operator
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/amd-gpu-operator@sha256:30f54ee5f11fe2f4a040b0e9f0456e067f74be54fdeb6daa280a17353af3f625
+name: amd-gpu-operator.v0.0.1
+package: amd-gpu-operator
+properties:
+- type: olm.gvk
+  value:
+    group: amd.io
+    kind: DeviceConfig
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: amd-gpu-operator
+    version: 0.0.1
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "amd.io/v1alpha1",
+            "kind": "DeviceConfig",
+            "metadata": {
+              "name": "dc-internal-registry",
+              "namespace": "openshift-amd-gpu"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      containerImage: quay.io/yshnaidm/amd-gpu-operator:latest
+      createdAt: "2024-01-16T13:08:15Z"
+      description: operator resposible for deploying AMD GPU kernel drivers and device
+        plugin
+      operatorframework.io/suggested-namespace: openshift-amd-gpu
+      operators.operatorframework.io/builder: operator-sdk-v1.32.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/yevgeny-shnaidman/amd-gpu-operator
+      support: RedHat
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: DeviceConfig describes how to enable AMD GPU device
+        displayName: DeviceConfig
+        kind: DeviceConfig
+        name: deviceconfigs.amd.io
+        version: v1alpha1
+    description: operator resposible for deploying AMD GPU kernel drivers and device
+      plugin
+    displayName: amd-gpu-operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - amd-gpu-operator
+    links:
+    - name: Amd Gpu Operator
+      url: https://amd-gpu-operator.domain
+    maintainers:
+    - email: edge-kmm@redhat.com
+      name: RedHat
+    maturity: alpha
+    provider:
+      name: amd-gpu-operator
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/amd-gpu-operator@sha256:30f54ee5f11fe2f4a040b0e9f0456e067f74be54fdeb6daa280a17353af3f625
+  name: ""
+- image: quay.io/yshnaidm/amd-gpu-operator:latest
+  name: ""
+- image: registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.13
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/amd-gpu-operator@sha256:cfd706e3dc2832914902300ad317fef13ec3b95be0d8ad616f1eaec44f6e8ba5
+name: amd-gpu-operator.v0.0.2
+package: amd-gpu-operator
+properties:
+- type: olm.gvk
+  value:
+    group: amd.io
+    kind: DeviceConfig
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: amd-gpu-operator
+    version: 0.0.2
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "amd.io/v1alpha1",
+            "kind": "DeviceConfig",
+            "metadata": {
+              "name": "dc-internal-registry",
+              "namespace": "openshift-amd-gpu"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      containerImage: quay.io/yshnaidm/amd-gpu-operator:v0.0.2
+      createdAt: "2024-01-16T13:08:15Z"
+      description: Operator responsible for deploying AMD GPU kernel drivers and device
+        plugin
+      operatorframework.io/suggested-namespace: openshift-amd-gpu
+      operators.operatorframework.io/builder: operator-sdk-v1.32.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/yevgeny-shnaidman/amd-gpu-operator
+      support: RedHat
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: DeviceConfig describes how to enable AMD GPU device
+        displayName: DeviceConfig
+        kind: DeviceConfig
+        name: deviceconfigs.amd.io
+        version: v1alpha1
+    description: Operator responsible for deploying AMD GPU kernel drivers and device
+      plugin
+    displayName: AMD GPU Operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - amd-gpu-operator
+    links:
+    - name: Amd Gpu Operator
+      url: https://amd-gpu-operator.domain
+    maintainers:
+    - email: edge-kmm@redhat.com
+      name: RedHat
+    maturity: alpha
+    provider:
+      name: amd-gpu-operator
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/amd-gpu-operator@sha256:cfd706e3dc2832914902300ad317fef13ec3b95be0d8ad616f1eaec44f6e8ba5
+  name: ""
+- image: quay.io/yshnaidm/amd-gpu-operator:v0.0.2
+  name: ""
+- image: registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.13
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/amd-gpu-operator@sha256:316aa50f382badc1a078c705620d22089dde6ac5e48fee0ceae410b56eefdafb
+name: amd-gpu-operator.v0.0.3
+package: amd-gpu-operator
+properties:
+- type: olm.gvk
+  value:
+    group: amd.io
+    kind: DeviceConfig
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: amd-gpu-operator
+    version: 0.0.3
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "amd.io/v1alpha1",
+            "kind": "DeviceConfig",
+            "metadata": {
+              "name": "dc-internal-registry",
+              "namespace": "openshift-amd-gpu"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      containerImage: quay.io/yshnaidm/amd-gpu-operator:v0.0.3
+      createdAt: "2024-01-16T13:08:15Z"
+      description: Operator responsible for deploying AMD GPU kernel drivers and device
+        plugin
+      operatorframework.io/suggested-namespace: openshift-amd-gpu
+      operators.operatorframework.io/builder: operator-sdk-v1.32.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/yevgeny-shnaidman/amd-gpu-operator
+      support: RedHat
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: DeviceConfig describes how to enable AMD GPU device
+        displayName: DeviceConfig
+        kind: DeviceConfig
+        name: deviceconfigs.amd.io
+        version: v1alpha1
+    description: |-
+      Operator responsible for deploying AMD GPU kernel drivers and device plugin.
+      For more information, visit [documentation](https://github.com/yevgeny-shnaidman/amd-gpu-operator/blob/main/README.md)
+    displayName: AMD GPU Operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - amd-gpu-operator
+    links:
+    - name: Amd Gpu Operator
+      url: https://amd-gpu-operator.domain
+    maintainers:
+    - email: edge-kmm@redhat.com
+      name: RedHat
+    maturity: alpha
+    provider:
+      name: amd-gpu-operator
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/amd-gpu-operator@sha256:316aa50f382badc1a078c705620d22089dde6ac5e48fee0ceae410b56eefdafb
+  name: ""
+- image: quay.io/yshnaidm/amd-gpu-operator:v0.0.3
+  name: ""
+- image: registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.13
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/amd-gpu-operator@sha256:2124207fe6f3c96b9996b945fa256c6411a224017fda153a1d20bbbdc261c16e
+name: amd-gpu-operator.v0.0.4
+package: amd-gpu-operator
+properties:
+- type: olm.gvk
+  value:
+    group: amd.io
+    kind: DeviceConfig
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: amd-gpu-operator
+    version: 0.0.4
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "amd.io/v1alpha1",
+            "kind": "DeviceConfig",
+            "metadata": {
+              "name": "dc-internal-registry",
+              "namespace": "openshift-amd-gpu"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      createdAt: "2024-05-29T10:03:15Z"
+      operatorframework.io/suggested-namespace: openshift-amd-gpu
+      operators.operatorframework.io/builder: operator-sdk-v1.32.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/yevgeny-shnaidman/amd-gpu-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: DeviceConfig describes how to enable AMD GPU device
+        displayName: DeviceConfig
+        kind: DeviceConfig
+        name: deviceconfigs.amd.io
+        version: v1alpha1
+    description: |-
+      Operator responsible for deploying AMD GPU kernel drivers and device plugin
+      For more information, visit [documentation](https://github.com/yevgeny-shnaidman/amd-gpu-operator/blob/main/README.md)
+    displayName: amd-gpu-operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - amd-gpu-operator
+    links:
+    - name: Amd Gpu Operator
+      url: https://amd-gpu-operator.domain
+    maintainers:
+    - email: edge-kmm@redhat.com
+      name: RedHat
+    maturity: alpha
+    provider:
+      name: amd-gpu-operator
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/amd-gpu-operator@sha256:2124207fe6f3c96b9996b945fa256c6411a224017fda153a1d20bbbdc261c16e
+  name: ""
+- image: quay.io/yshnaidm/amd-gpu-operator:v0.0.4
+  name: ""
+- image: registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.13
+  name: ""
+schema: olm.bundle

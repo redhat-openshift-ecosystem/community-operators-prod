@@ -13,22 +13,23 @@ entries:
     replaces: multi-nic-cni-operator.v1.0.2
   - name: multi-nic-cni-operator.v1.2.2
     replaces: multi-nic-cni-operator.v1.2.1
-  name: alpha
-  package: multi-nic-cni-operator
-  schema: olm.channel
-- entries:
-  - name: multi-nic-cni-operator.v1.2.5
-  - name: multi-nic-cni-operator.v1.2.6
-    replaces: multi-nic-cni-operator.v1.2.5
   - name: multi-nic-cni-operator.v1.2.7
-    replaces: multi-nic-cni-operator.v1.2.6
-  name: alpha-1.2
+    replaces: multi-nic-cni-operator.v1.2.2
+  - name: multi-nic-cni-operator.v1.2.8
+    replaces: multi-nic-cni-operator.v1.2.7
+  - name: multi-nic-cni-operator.v1.3.0
+    replaces: multi-nic-cni-operator.v1.2.8
+  name: alpha
   package: multi-nic-cni-operator
   schema: olm.channel
 - entries:
   - name: multi-nic-cni-operator.v1.1.0
   - name: multi-nic-cni-operator.v1.2.0
     replaces: multi-nic-cni-operator.v1.1.0
+  - name: multi-nic-cni-operator.v1.2.3
+    replaces: multi-nic-cni-operator.v1.2.0
+  - name: multi-nic-cni-operator.v1.2.6
+    replaces: multi-nic-cni-operator.v1.2.3
   name: beta
   package: multi-nic-cni-operator
   schema: olm.channel
@@ -38,12 +39,11 @@ entries:
     replaces: multi-nic-cni-operator.v1.0.3
   - name: multi-nic-cni-operator.v1.0.5
     replaces: multi-nic-cni-operator.v1.0.4
-  name: stable
-  package: multi-nic-cni-operator
-  schema: olm.channel
-- entries:
   - name: multi-nic-cni-operator.v1.2.4
-  name: stable-1.2
+    replaces: multi-nic-cni-operator.v1.0.5
+  - name: multi-nic-cni-operator.v1.2.5
+    replaces: multi-nic-cni-operator.v1.2.4
+  name: stable
   package: multi-nic-cni-operator
   schema: olm.channel
 - image: 
@@ -71,13 +71,21 @@ entries:
     quay.io/openshift-community-operators/multi-nic-cni-operator@sha256:b0c63a70993df477b1e04c989ee09fa5cd12e65339043a6616346d484fe84d89
   schema: olm.bundle
 - image: 
+    quay.io/community-operator-pipeline-prod/multi-nic-cni-operator@sha256:215dd76b906ed3af409b47d11cbbb3e1e77e56a37872316750379e7fe7bcc1b0
+  schema: olm.bundle
+- image: 
     quay.io/community-operator-pipeline-prod/multi-nic-cni-operator@sha256:ab62ca14df6dc776ebef248585bada4e7ed86c9ad22345880cf4a8b2a681a033
   schema: olm.bundle
 - image: 
     quay.io/community-operator-pipeline-prod/multi-nic-cni-operator@sha256:937ea51b1cb4924d363dc6592fc285862bb9479dbc259bea2d59b83c1a7f8250
   schema: olm.bundle
+- image: 
+    quay.io/community-operator-pipeline-prod/multi-nic-cni-operator@sha256:6b7a1e34c33b16c464745f70658a10d6ea3d96099c1e2ab008e96589ef73e7eb
+  schema: olm.bundle
 - schema: olm.bundle
   image: quay.io/community-operator-pipeline-prod/multi-nic-cni-operator:1.2.6
 - schema: olm.bundle
   image: quay.io/community-operator-pipeline-prod/multi-nic-cni-operator:1.2.7
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/multi-nic-cni-operator:1.2.8
 schema: olm.template.basic

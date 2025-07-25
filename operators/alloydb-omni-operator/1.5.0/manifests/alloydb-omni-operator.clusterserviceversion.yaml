@@ -78,46 +78,6 @@ metadata:
         },
         {
           "apiVersion": "alloydbomni.dbadmin.goog/v1",
-          "kind": "DBCluster",
-          "metadata": {
-            "name": "dbcluster-sample"
-          },
-          "spec": {
-            "availability": {
-              "enableStandbyAsReadReplica": true,
-              "numberOfStandbys": 1
-            },
-            "databaseVersion": "16.8.0",
-            "primarySpec": {
-              "adminUser": {
-                "passwordRef": {
-                  "name": "db-pw-dbcluster-sample"
-                }
-              },
-              "resources": {
-                "cpu": 1,
-                "disks": [
-                  {
-                    "name": "DataDisk",
-                    "size": "10Gi"
-                  }
-                ],
-                "memory": "5Gi"
-              },
-              "schedulingconfig": {
-                "topologySpreadConstraints": [
-                  {
-                    "maxSkew": 1,
-                    "topologyKey": "topology.kubernetes.io/zone",
-                    "whenUnsatisfiable": "DoNotSchedule"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        {
-          "apiVersion": "alloydbomni.dbadmin.goog/v1",
           "kind": "DBInstance",
           "metadata": {
             "name": "dbcluster-sample-rp-1"

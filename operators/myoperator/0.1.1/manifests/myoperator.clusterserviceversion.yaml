@@ -2,7 +2,20 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    alm-examples: '[]'
+    alm-examples: |
+      [
+        {
+          "apiVersion": "apps.psj.dev/v1",
+          "kind": "MyApp",
+          "metadata": {
+            "name": "example-myapp"
+          },
+          "spec": {
+            "replicas": 1,
+            "message": "hello world"
+          }
+        }
+      ]
     capabilities: Basic Install
     createdAt: "2025-07-31T07:01:58Z"
     operators.operatorframework.io/builder: operator-sdk-v1.35.0
@@ -10,6 +23,8 @@ metadata:
   name: myoperator.v0.1.1
   namespace: placeholder
 spec:
+  displayName: MyApp Operator
+  minKubeVersion: "1.22.0"
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
@@ -17,11 +32,12 @@ spec:
       kind: MyApp
       name: myapps.apps.psj.dev
       version: v1
+      description: A custom resource to manage MyApp instances    
   description: QATeam
   displayName: MyApp Operator
-  icon:
-  - base64data: ""
-    mediatype: ""
+   icon:
+  - base64data: iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==
+    mediatype: image/png
   install:
     spec:
       clusterPermissions:
@@ -118,7 +134,7 @@ spec:
                 - --leader-elect
                 command:
                 - /manager
-                image: sjpark00/myoperator:v0.1.1
+                image: registry.connect.redhat.com/dreamqa/myoperator:v0.1.1
                 livenessProbe:
                   httpGet:
                     path: /healthz

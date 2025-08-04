@@ -5,6 +5,7 @@ metadata:
   name: myoperator.v0.1.1
   namespace: placeholder
   annotations:
+    com.redhat.openshift.versions: "v4.8"
     alm-examples: |
       [
         {
@@ -23,6 +24,11 @@ metadata:
     createdAt: "2025-07-31T07:01:58Z"
     operators.operatorframework.io/builder: operator-sdk-v1.35.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    categories: "Operator,MyApp"
+    containerImage: "registry.connect.redhat.com/dreamqa/myoperator:v0.1.1"
+    repository: "https://github.com/dreamQAQC/myoperator"
+    support: "sjpark00@dreamsecurity.com"
+    description: "MyApp Operator that syncs spec to status."
 spec:
   displayName: MyApp Operator
   description: >
@@ -39,7 +45,7 @@ spec:
     - name: Myoperator
       url: https://myoperator.domain
   provider:
-    name: QA
+    name: DreamSecurity
   maintainers:
     - name: psj
       email: sjpark00@dreamsecurity.com

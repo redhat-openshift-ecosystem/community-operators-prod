@@ -5,31 +5,33 @@ metadata:
   name: myoperator.v0.1.1
   namespace: placeholder
   annotations:
-  com.redhat.openshift.versions: "v4.9"
-  alm-examples: |
-    [
-      {
-        "apiVersion": "apps.psj.dev/v1",
-        "kind": "MyApp",
-        "metadata": {
-          "name": "example-myapp"
-        },
-        "spec": {
-          "replicas": 1,
-          "message": "hello world"
+    olm.skipRange: '>=0.1.0 <0.1.1'
+    com.redhat.openshift.versions: "v4.9"
+    alm-examples: |
+      [
+        {
+          "apiVersion": "apps.psj.dev/v1",
+          "kind": "MyApp",
+          "metadata": {
+            "name": "example-myapp"
+          },
+          "spec": {
+            "replicas": 1,
+            "message": "hello world"
+          }
         }
-      }
-    ]
-  capabilities: Basic Install
-  createdAt: "2025-07-31T07:01:58Z"
-  operators.operatorframework.io/builder: operator-sdk-v1.35.0
-  operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
-  categories: "Security"
-  containerImage: "registry.connect.redhat.com/sjpark00/myoperator:v0.1.1"
-  repository: "https://github.com/dreamQAQC/myoperator"
-  support: "sjpark00@dreamsecurity.com"
-  description: "MyApp Operator that syncs spec to status."
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-07-31T07:01:58Z"
+    operators.operatorframework.io/builder: operator-sdk-v1.35.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    categories: "Security"
+    containerImage: "registry.connect.redhat.com/sjpark00/myoperator:v0.1.1"
+    repository: "https://github.com/dreamQAQC/myoperator"
+    support: "sjpark00@dreamsecurity.com"
+    description: "MyApp Operator that syncs spec to status."
 spec:
+  replaces: myoperator.v0.1.0
   displayName: MyApp Operator
   description: >
     A lightweight Kubernetes Operator that syncs Spec input to Status output

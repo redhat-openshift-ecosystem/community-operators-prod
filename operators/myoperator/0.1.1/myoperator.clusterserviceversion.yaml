@@ -2,6 +2,8 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
+  name: myoperator.v0.1.1
+  namespace: placeholder
   annotations:
     alm-examples: |
       [
@@ -21,75 +23,71 @@ metadata:
     createdAt: "2025-07-31T07:01:58Z"
     operators.operatorframework.io/builder: operator-sdk-v1.35.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
-  name: myoperator.v0.1.1
-  namespace: placeholder
 spec:
   displayName: MyApp Operator
-  minKubeVersion: "1.22.0"
-  apiservicedefinitions: {}
-  customresourcedefinitions:
-    owned:
-      - displayName: My App
-        kind: MyApp
-        name: myapps.apps.psj.dev
-        version: v1
-        description: A custom resource to manage MyApp instances
-  maintainers:
-    - name: psj
-      email: sjpark00@dreamsecurity.com
-  provider:
-    name: QA
   description: >
     A lightweight Kubernetes Operator that syncs Spec input to Status output
     for custom MyApp resources.
+  version: 0.1.1
+  maturity: alpha
+  minKubeVersion: "1.22.0"
+  keywords:
+    - kubernetes
+    - operator
+    - myapp
+  links:
+    - name: Myoperator
+      url: https://myoperator.domain
+  provider:
+    name: QA
+  maintainers:
+    - name: psj
+      email: sjpark00@dreamsecurity.com
   icon:
-    - base64data: |-
-        iVBORw0KGgoAAAANSUhEUgAAADsAAAA0CAIAAAC7EdcxAAAACXBIWXMAAA7EAAAOxAGVKw4b
-        AAAN+ElEQVRo3tVafVRUR7Kv6hlg
+    - base64data: iVBORw0KGgoAAAANSUhEUgAAADsAAAA0CAIAAAC7EdcxAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAN+ElEQVRo3tVafVRUR7Kv6hlg
       mediatype: image/png
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - name: myapps.apps.psj.dev
+        version: v1
+        kind: MyApp
+        displayName: My App
+        description: A custom resource to manage MyApp instances
   install:
+    strategy: deployment
     spec:
+      serviceAccountName: myoperator-controller-manager
       clusterPermissions:
-        - rules:
-            - apiGroups:
-                - apps.psj.dev
-              resources:
-                - myapps
-              verbs:
-                - create
-                - delete
-                - get
-                - list
-                - patch
-                - update
-                - watch
-            - apiGroups:
-                - apps.psj.dev
-              resources:
-                - myapps/finalizers
-              verbs:
-                - update
-            - apiGroups:
-                - apps.psj.dev
-              resources:
-                - myapps/status
-              verbs:
-                - get
-                - patch
-                - update
-            - apiGroups:
-                - authentication.k8s.io
-              resources:
-                - tokenreviews
-              verbs:
-                - create
-            - apiGroups:
-                - authorization.k8s.io
-              resources:
-                - subjectaccessreviews
-              verbs:
-                - create
-          serviceAccountName: myoperator-controller-manager
+        - serviceAccountName: myoperator-controller-manager
+          rules:
+            - apiGroups: ["apps.psj.dev"]
+              resources: ["myapps"]
+              verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+            - apiGroups: ["apps.psj.dev"]
+              resources: ["myapps/finalizers"]
+              verbs: ["update"]
+            - apiGroups: ["apps.psj.dev"]
+              resources: ["myapps/status"]
+              verbs: ["get", "patch", "update"]
+            - apiGroups: ["authentication.k8s.io"]
+              resources: ["tokenreviews"]
+              verbs: ["create"]
+            - apiGroups: ["authorization.k8s.io"]
+              resources: ["subjectaccessreviews"]
+              verbs: ["create"]
+      permissions:
+        - serviceAccountName: myoperator-controller-manager
+          rules:
+            - apiGroups: [""]
+              resources: ["configmaps"]
+              verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+            - apiGroups: ["coordination.k8s.io"]
+              resources: ["leases"]
+              verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+            - apiGroups: [""]
+              resources: ["events"]
+              verbs: ["create", "patch"]
       deployments:
         - name: myoperator-controller-manager
           label:
@@ -113,6 +111,10 @@ spec:
                 labels:
                   control-plane: controller-manager
               spec:
+                serviceAccountName: myoperator-controller-manager
+                terminationGracePeriodSeconds: 10
+                securityContext:
+                  runAsNonRoot: true
                 containers:
                   - name: kube-rbac-proxy
                     image: gcr.io/kubebuilder/kube-rbac-proxy:v0.15.0
@@ -135,8 +137,7 @@ spec:
                     securityContext:
                       allowPrivilegeEscalation: false
                       capabilities:
-                        drop:
-                          - ALL
+                        drop: ["ALL"]
                   - name: manager
                     image: registry.connect.redhat.com/dreamqa/myoperator:v0.1.1
                     command:
@@ -145,7 +146,6 @@ spec:
                       - --health-probe-bind-address=:8081
                       - --metrics-bind-address=127.0.0.1:8080
                       - --leader-elect
-                    ports: []
                     livenessProbe:
                       httpGet:
                         path: /healthz
@@ -168,63 +168,13 @@ spec:
                     securityContext:
                       allowPrivilegeEscalation: false
                       capabilities:
-                        drop:
-                          - ALL
-                securityContext:
-                  runAsNonRoot: true
-                serviceAccountName: myoperator-controller-manager
-                terminationGracePeriodSeconds: 10
-      permissions:
-        - rules:
-            - apiGroups:
-                - ""
-              resources:
-                - configmaps
-              verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
-            - apiGroups:
-                - coordination.k8s.io
-              resources:
-                - leases
-              verbs:
-                - get
-                - list
-                - watch
-                - create
-                - update
-                - patch
-                - delete
-            - apiGroups:
-                - ""
-              resources:
-                - events
-              verbs:
-                - create
-                - patch
-          serviceAccountName: myoperator-controller-manager
-    strategy: deployment
+                        drop: ["ALL"]
   installModes:
-    - supported: false
-      type: OwnNamespace
-    - supported: false
-      type: SingleNamespace
-    - supported: false
-      type: MultiNamespace
-    - supported: true
-      type: AllNamespaces
-  keywords:
-    - kubernetes
-    - operator
-    - myapp
-  links:
-    - name: Myoperator
-      url: >
-         https://myoperator.domain
-  maturity: alpha
-  version: 0.1.1
+    - type: OwnNamespace
+      supported: false
+    - type: SingleNamespace
+      supported: false
+    - type: MultiNamespace
+      supported: false
+    - type: AllNamespaces
+      supported: true

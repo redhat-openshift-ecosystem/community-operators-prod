@@ -1,0 +1,456 @@
+---
+defaultChannel: stable
+name: coherence-operator
+schema: olm.package
+---
+entries:
+- name: coherence-operator.v3.4.3
+- name: coherence-operator.v3.5.0
+  replaces: coherence-operator.v3.4.3
+- name: coherence-operator.v3.5.2
+  replaces: coherence-operator.v3.5.0
+name: stable
+package: coherence-operator
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/coherence-operator:3.4.3
+name: coherence-operator.v3.4.3
+package: coherence-operator
+properties:
+- type: olm.gvk
+  value:
+    group: coherence.oracle.com
+    kind: Coherence
+    version: v1
+- type: olm.gvk
+  value:
+    group: coherence.oracle.com
+    kind: CoherenceJob
+    version: v1
+- type: olm.package
+  value:
+    packageName: coherence-operator
+    version: 3.4.3
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "coherence.oracle.com/v1",
+            "kind": "Coherence",
+            "metadata": {
+              "name": "coherence-sample"
+            },
+            "spec": {
+              "replicas": 3
+            }
+          },
+          {
+            "apiVersion": "coherence.oracle.com/v1",
+            "kind": "CoherenceJob",
+            "metadata": {
+              "name": "coherence-job-sample"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          }
+        ]
+      capabilities: Full Lifecycle
+      categories: Database
+      certified: "false"
+      containerImage: ghcr.io/oracle/coherence-operator:3.4.3
+      createdAt: "2025-03-25T11:32:18Z"
+      description: The Oracle Coherence Kubernetes Operator enables easy management
+        of Coherence clusters in a Kubernetes environment.
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "true"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operators.openshift.io/infrastructure-features: '["disconnected"]'
+      operators.operatorframework.io/builder: operator-sdk-v1.39.2
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/oracle/coherence-operator
+      support: Oracle Corporation
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Coherence is the top level schema for the Coherence API and custom
+          resource definition (CRD).
+        displayName: Coherence
+        kind: Coherence
+        name: coherence.coherence.oracle.com
+        version: v1
+      - description: |-
+          CoherenceJob is the top level schema for the CoherenceJob API and custom resource definition (CRD)
+          for configuring Coherence Job workloads.
+        displayName: Coherence Job
+        kind: CoherenceJob
+        name: coherencejob.coherence.oracle.com
+        version: v1
+    description: |
+      The Oracle Coherence Kubernetes Operator enables easy management of Coherence clusters in a Kubernetes environment.
+
+      ### Installation Guide & Configuration
+
+      For the complete installation guide and all configuration options please refer to
+      [Coherence Operator Documentation](https://oracle.github.io/coherence-operator/docs/latest/#/about/01_overview).
+    displayName: Coherence Kubernetes Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - Coherence
+    - Oracle
+    - In Memory Data
+    - Caching
+    links:
+    - name: Coherence Kubernetes Operator
+      url: https://oracle.github.io/coherence-operator/docs/latest
+    - name: Oracle Coherence
+      url: https://coherence.community
+    maintainers:
+    - email: jonathan.knight@oracle.com
+      name: Jonathan Knight
+    maturity: mature
+    minKubeVersion: 1.26.0
+    provider:
+      name: Oracle Corporation
+      url: https://github.com/oracle/coherence-operator
+relatedImages:
+- image: ghcr.io/oracle/coherence-operator:3.4.3
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/coherence-operator:3.4.3
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/coherence-operator:3.5.0
+name: coherence-operator.v3.5.0
+package: coherence-operator
+properties:
+- type: olm.gvk
+  value:
+    group: coherence.oracle.com
+    kind: Coherence
+    version: v1
+- type: olm.gvk
+  value:
+    group: coherence.oracle.com
+    kind: CoherenceJob
+    version: v1
+- type: olm.package
+  value:
+    packageName: coherence-operator
+    version: 3.5.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "coherence.oracle.com/v1",
+            "kind": "Coherence",
+            "metadata": {
+              "name": "coherence-sample"
+            },
+            "spec": {
+              "replicas": 3
+            }
+          },
+          {
+            "apiVersion": "coherence.oracle.com/v1",
+            "kind": "CoherenceJob",
+            "metadata": {
+              "name": "coherence-job-sample"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          }
+        ]
+      capabilities: Full Lifecycle
+      categories: Database
+      certified: "false"
+      containerImage: container-registry.oracle.com/middleware/coherence-operator:3.5.0
+      createdAt: "2025-05-13T12:53:28Z"
+      description: The Oracle Coherence Kubernetes Operator enables easy management
+        of Coherence clusters in a Kubernetes environment.
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "true"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/os.linux: supported
+      operators.openshift.io/infrastructure-features: '["disconnected"]'
+      operators.operatorframework.io/builder: operator-sdk-v1.39.2
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/oracle/coherence-operator
+      support: Oracle Corporation
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Coherence is the top level schema for the Coherence API and custom
+          resource definition (CRD).
+        displayName: Coherence
+        kind: Coherence
+        name: coherence.coherence.oracle.com
+        resources:
+        - kind: StatefulSet
+          name: coherence-cluster
+          version: v1
+        specDescriptors:
+        - description: The desired number of member Pods for the cluster.
+          displayName: Replicas
+          path: replicas
+        statusDescriptors:
+        - description: The desired number of member Pods for the deployment.
+          displayName: Replicas
+          path: replicas
+        - displayName: ReadyReplicas
+          path: readyReplicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:readyReplicas
+        version: v1
+      - description: |-
+          CoherenceJob is the top level schema for the CoherenceJob API and custom resource definition (CRD)
+          for configuring Coherence Job workloads.
+        displayName: Coherence Job
+        kind: CoherenceJob
+        name: coherencejob.coherence.oracle.com
+        resources:
+        - kind: Job
+          name: coherence-job
+          version: v1
+        specDescriptors:
+        - description: The desired number of Pods for the job.
+          displayName: Replicas
+          path: replicas
+        statusDescriptors:
+        - description: The desired number of Pods for the job.
+          displayName: Replicas
+          path: replicas
+        - displayName: ReadyReplicas
+          path: readyReplicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:readyReplicas
+        version: v1
+    description: |
+      The Oracle Coherence Kubernetes Operator enables easy management of Coherence clusters in a Kubernetes environment.
+
+      ### Installation Guide & Configuration
+
+      For the complete installation guide and all configuration options please refer to
+      [Coherence Operator Documentation](https://oracle.github.io/coherence-operator/docs/latest/#/about/01_overview).
+    displayName: Coherence Kubernetes Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - Coherence
+    - Oracle
+    - In Memory Data
+    - Caching
+    links:
+    - name: Coherence Kubernetes Operator
+      url: https://oracle.github.io/coherence-operator/docs/latest
+    - name: Oracle Coherence
+      url: https://coherence.community
+    maintainers:
+    - email: jonathan.knight@oracle.com
+      name: Jonathan Knight
+    maturity: mature
+    minKubeVersion: 1.26.0
+    provider:
+      name: Oracle Corporation
+      url: https://github.com/oracle/coherence-operator
+relatedImages:
+- image: container-registry.oracle.com/middleware/coherence-operator:3.5.0
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/coherence-operator:3.5.0
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/coherence-operator:3.5.2
+name: coherence-operator.v3.5.2
+package: coherence-operator
+properties:
+- type: olm.gvk
+  value:
+    group: coherence.oracle.com
+    kind: Coherence
+    version: v1
+- type: olm.gvk
+  value:
+    group: coherence.oracle.com
+    kind: CoherenceJob
+    version: v1
+- type: olm.package
+  value:
+    packageName: coherence-operator
+    version: 3.5.2
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "coherence.oracle.com/v1",
+            "kind": "Coherence",
+            "metadata": {
+              "name": "coherence-sample"
+            },
+            "spec": {
+              "replicas": 3
+            }
+          },
+          {
+            "apiVersion": "coherence.oracle.com/v1",
+            "kind": "CoherenceJob",
+            "metadata": {
+              "name": "coherence-job-sample"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          }
+        ]
+      capabilities: Full Lifecycle
+      categories: Database
+      certified: "false"
+      containerImage: container-registry.oracle.com/middleware/coherence-operator:3.5.2
+      createdAt: "2025-06-26T14:23:17Z"
+      description: The Oracle Coherence Kubernetes Operator enables easy management
+        of Coherence clusters in a Kubernetes environment.
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "true"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/os.linux: supported
+      operators.openshift.io/infrastructure-features: '["disconnected"]'
+      operators.operatorframework.io/builder: operator-sdk-v1.40.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/oracle/coherence-operator
+      support: Oracle Corporation
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Coherence is the top level schema for the Coherence API and custom
+          resource definition (CRD).
+        displayName: Coherence
+        kind: Coherence
+        name: coherence.coherence.oracle.com
+        resources:
+        - kind: StatefulSet
+          name: coherence-cluster
+          version: v1
+        specDescriptors:
+        - description: The desired number of member Pods for the cluster.
+          displayName: Replicas
+          path: replicas
+        statusDescriptors:
+        - description: The desired number of member Pods for the deployment.
+          displayName: Replicas
+          path: replicas
+        - displayName: ReadyReplicas
+          path: readyReplicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:readyReplicas
+        version: v1
+      - description: |-
+          CoherenceJob is the top level schema for the CoherenceJob API and custom resource definition (CRD)
+          for configuring Coherence Job workloads.
+        displayName: Coherence Job
+        kind: CoherenceJob
+        name: coherencejob.coherence.oracle.com
+        resources:
+        - kind: Job
+          name: coherence-job
+          version: v1
+        specDescriptors:
+        - description: The desired number of Pods for the job.
+          displayName: Replicas
+          path: replicas
+        statusDescriptors:
+        - description: The desired number of Pods for the job.
+          displayName: Replicas
+          path: replicas
+        - displayName: ReadyReplicas
+          path: readyReplicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:readyReplicas
+        version: v1
+    description: |
+      The Oracle Coherence Kubernetes Operator enables easy management of Coherence clusters in a Kubernetes environment.
+
+      ### Installation Guide & Configuration
+
+      For the complete installation guide and all configuration options please refer to
+      [Coherence Operator Documentation](https://oracle.github.io/coherence-operator/docs/latest/#/about/01_overview).
+    displayName: Coherence Kubernetes Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - Coherence
+    - Oracle
+    - In Memory Data
+    - Caching
+    links:
+    - name: Coherence Kubernetes Operator
+      url: https://oracle.github.io/coherence-operator/docs/latest
+    - name: Oracle Coherence
+      url: https://coherence.community
+    maintainers:
+    - email: jonathan.knight@oracle.com
+      name: Jonathan Knight
+    maturity: mature
+    minKubeVersion: 1.26.0
+    provider:
+      name: Oracle Corporation
+      url: https://github.com/oracle/coherence-operator
+relatedImages:
+- image: container-registry.oracle.com/middleware/coherence-operator:3.5.2
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/coherence-operator:3.5.2
+  name: ""
+schema: olm.bundle

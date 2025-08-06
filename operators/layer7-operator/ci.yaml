@@ -1,7 +1,20 @@
 ---
-# Use `replaces-mode` or `semver-mode`. Once you switch to `semver-mode`, there is no easy way back.
-updateGraph: replaces-mode
 addReviewers: true
+fbc:
+  enabled: true
+  catalog_mapping:
+    - template_name: v4.16.yaml
+      catalog_names: ["v4.16"]
+      type: olm.template.basic
+    - template_name: v4.17.yaml
+      catalog_names: ["v4.17"]
+      type: olm.template.basic
+    - template_name: v4.18.yaml
+      catalog_names: ["v4.18"]
+      type: olm.template.basic
+    - template_name: v4.19.yaml
+      catalog_names: ["v4.19", v4.20]
+      type: olm.template.basic
 reviewers:
   - burbanski
   - Gazza7205

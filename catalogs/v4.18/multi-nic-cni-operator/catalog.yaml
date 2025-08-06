@@ -12,17 +12,13 @@ entries:
   replaces: multi-nic-cni-operator.v1.0.2
 - name: multi-nic-cni-operator.v1.2.2
   replaces: multi-nic-cni-operator.v1.2.1
-name: alpha
-package: multi-nic-cni-operator
-schema: olm.channel
----
-entries:
-- name: multi-nic-cni-operator.v1.2.5
-- name: multi-nic-cni-operator.v1.2.6
-  replaces: multi-nic-cni-operator.v1.2.5
 - name: multi-nic-cni-operator.v1.2.7
-  replaces: multi-nic-cni-operator.v1.2.6
-name: alpha-1.2
+  replaces: multi-nic-cni-operator.v1.2.2
+- name: multi-nic-cni-operator.v1.2.8
+  replaces: multi-nic-cni-operator.v1.2.7
+- name: multi-nic-cni-operator.v1.3.0
+  replaces: multi-nic-cni-operator.v1.2.8
+name: alpha
 package: multi-nic-cni-operator
 schema: olm.channel
 ---
@@ -30,6 +26,10 @@ entries:
 - name: multi-nic-cni-operator.v1.1.0
 - name: multi-nic-cni-operator.v1.2.0
   replaces: multi-nic-cni-operator.v1.1.0
+- name: multi-nic-cni-operator.v1.2.3
+  replaces: multi-nic-cni-operator.v1.2.0
+- name: multi-nic-cni-operator.v1.2.6
+  replaces: multi-nic-cni-operator.v1.2.3
 name: beta
 package: multi-nic-cni-operator
 schema: olm.channel
@@ -40,13 +40,11 @@ entries:
   replaces: multi-nic-cni-operator.v1.0.3
 - name: multi-nic-cni-operator.v1.0.5
   replaces: multi-nic-cni-operator.v1.0.4
-name: stable
-package: multi-nic-cni-operator
-schema: olm.channel
----
-entries:
 - name: multi-nic-cni-operator.v1.2.4
-name: stable-1.2
+  replaces: multi-nic-cni-operator.v1.0.5
+- name: multi-nic-cni-operator.v1.2.5
+  replaces: multi-nic-cni-operator.v1.2.4
+name: stable
 package: multi-nic-cni-operator
 schema: olm.channel
 ---
@@ -4585,6 +4583,617 @@ relatedImages:
   name: ""
 schema: olm.bundle
 ---
+image: quay.io/community-operator-pipeline-prod/multi-nic-cni-operator@sha256:215dd76b906ed3af409b47d11cbbb3e1e77e56a37872316750379e7fe7bcc1b0
+name: multi-nic-cni-operator.v1.2.3
+package: multi-nic-cni-operator
+properties:
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: CIDR
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: Config
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: DeviceClass
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: HostInterface
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: IPPool
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: MultiNicNetwork
+    version: v1
+- type: olm.package
+  value:
+    packageName: multi-nic-cni-operator
+    version: 1.2.3
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "CIDR",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "multi-nic-cni-operator-ipvlanl3",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "cidr": [
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.244.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.0-26",
+                      "podCIDR": "192.168.0.0/26"
+                    },
+                    {
+                      "hostIP": "10.244.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.64-26",
+                      "podCIDR": "192.168.0.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 0,
+                  "netAddress": "10.244.0.0/16",
+                  "vlanCIDR": "192.168.0.0/18"
+                },
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.0.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.0-26",
+                      "podCIDR": "192.168.64.0/26"
+                    },
+                    {
+                      "hostIP": "10.0.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.64-26",
+                      "podCIDR": "192.168.64.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 1,
+                  "netAddress": "10.0.0.0/16",
+                  "vlanCIDR": "192.168.64.0/18"
+                }
+              ],
+              "config": {
+                "hostBlock": 8,
+                "interfaceBlock": 2,
+                "masterNets": [],
+                "name": "multi-nic-cni-operator-ipvlanl3",
+                "subnet": "192.168.0.0/16",
+                "type": "ipvlan",
+                "vlanMode": "l3"
+              }
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "CIDR",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "ipvlanl3"
+            },
+            "spec": {
+              "cidr": [
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.244.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.0-26",
+                      "podCIDR": "192.168.0.0/26"
+                    },
+                    {
+                      "hostIP": "10.244.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.64-26",
+                      "podCIDR": "192.168.0.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 0,
+                  "netAddress": "10.244.0.0/16",
+                  "vlanCIDR": "192.168.0.0/18"
+                },
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.0.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.0-26",
+                      "podCIDR": "192.168.64.0/26"
+                    },
+                    {
+                      "hostIP": "10.0.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.64-26",
+                      "podCIDR": "192.168.64.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 1,
+                  "netAddress": "10.0.0.0/16",
+                  "vlanCIDR": "192.168.64.0/18"
+                }
+              ],
+              "config": {
+                "hostBlock": 8,
+                "interfaceBlock": 2,
+                "masterNets": [],
+                "name": "multi-nic-cni-operator-ipvlanl3",
+                "subnet": "192.168.0.0/16",
+                "type": "ipvlan",
+                "vlanMode": "l3"
+              }
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "Config",
+            "metadata": {
+              "annotations": {
+                "note": "The resource with default settings will be auto-created by multi-nic-cni-operator-controller-manager.\nPlease modify if need.\n"
+              },
+              "name": "multi-nic-cni-operator-multi-nicd",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "addRoutePath": "/addl3",
+              "cniType": "multi-nic",
+              "contextTimeoutMinutes": 2,
+              "daemon": {
+                "env": [
+                  {
+                    "name": "DAEMON_PORT",
+                    "value": "11000"
+                  },
+                  {
+                    "name": "RT_TABLE_PATH",
+                    "value": "/opt/rt_tables"
+                  }
+                ],
+                "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.2.3",
+                "mounts": [
+                  {
+                    "hostpath": "/var/lib/cni/bin",
+                    "name": "cnibin",
+                    "podpath": "/host/opt/cni/bin"
+                  },
+                  {
+                    "hostpath": "/var/lib/kubelet/device-plugins",
+                    "name": "device-plugin",
+                    "podpath": "/var/lib/kubelet/device-plugins"
+                  },
+                  {
+                    "hostpath": "/etc/iproute2/rt_tables",
+                    "name": "rt-tables",
+                    "podpath": "/opt/rt_tables"
+                  }
+                ],
+                "port": 11000,
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "50Mi"
+                  }
+                },
+                "securityContext": {
+                  "privileged": true
+                }
+              },
+              "deleteRoutePath": "/deletel3",
+              "getInterfacePath": "/interface",
+              "ipamType": "multi-nic-ipam",
+              "joinPath": "/join",
+              "logLevel": 4,
+              "longReconcileMinutes": 10,
+              "normalReconcileMinutes": 1,
+              "urgentReconcileSeconds": 5
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "Config",
+            "metadata": {
+              "annotations": {
+                "note": "The resource with default settings will be auto-created by multi-nic-cni-operator-controller-manager.\nPlease modify if need.\n"
+              },
+              "name": "multi-nicd"
+            },
+            "spec": {
+              "addRoutePath": "/addl3",
+              "cniType": "multi-nic",
+              "contextTimeoutMinutes": 2,
+              "daemon": {
+                "env": [
+                  {
+                    "name": "DAEMON_PORT",
+                    "value": "11000"
+                  },
+                  {
+                    "name": "RT_TABLE_PATH",
+                    "value": "/opt/rt_tables"
+                  }
+                ],
+                "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.2.3",
+                "mounts": [
+                  {
+                    "hostpath": "/var/lib/cni/bin",
+                    "name": "cnibin",
+                    "podpath": "/host/opt/cni/bin"
+                  },
+                  {
+                    "hostpath": "/var/lib/kubelet/device-plugins",
+                    "name": "device-plugin",
+                    "podpath": "/var/lib/kubelet/device-plugins"
+                  },
+                  {
+                    "hostpath": "/etc/iproute2/rt_tables",
+                    "name": "rt-tables",
+                    "podpath": "/opt/rt_tables"
+                  }
+                ],
+                "port": 11000,
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "50Mi"
+                  }
+                },
+                "securityContext": {
+                  "privileged": true
+                }
+              },
+              "deleteRoutePath": "/deletel3",
+              "getInterfacePath": "/interface",
+              "ipamType": "multi-nic-ipam",
+              "joinPath": "/join",
+              "logLevel": 4,
+              "longReconcileMinutes": 10,
+              "normalReconcileMinutes": 1,
+              "urgentReconcileSeconds": 5
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "DeviceClass",
+            "metadata": {
+              "name": "multi-nic-cni-operator-highspeed",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "ids": [
+                {
+                  "products": [
+                    "1019",
+                    "101d"
+                  ],
+                  "vendor": "15b3"
+                },
+                {
+                  "products": [
+                    "efa0",
+                    "efa1"
+                  ],
+                  "vendor": "1d0f"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "DeviceClass",
+            "metadata": {
+              "name": "highspeed"
+            },
+            "spec": {
+              "ids": [
+                {
+                  "products": [
+                    "1019",
+                    "101d"
+                  ],
+                  "vendor": "15b3"
+                },
+                {
+                  "products": [
+                    "efa0",
+                    "efa1"
+                  ],
+                  "vendor": "1d0f"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "HostInterface",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "multi-nic-cni-operator-node-1",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "hostName": "node-1",
+              "interfaces": [
+                {
+                  "hostIP": "10.0.0.168",
+                  "interfaceName": "eth1",
+                  "netAddress": "10.0.0.0/16",
+                  "pciAddress": "0000:00:04.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                },
+                {
+                  "hostIP": "10.1.0.168",
+                  "interfaceName": "eth2",
+                  "netAddress": "10.1.0.0/16",
+                  "pciAddress": "0000:00:05.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "HostInterface",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "node-1"
+            },
+            "spec": {
+              "hostName": "node-1",
+              "interfaces": [
+                {
+                  "hostIP": "10.0.0.168",
+                  "interfaceName": "eth1",
+                  "netAddress": "10.0.0.0/16",
+                  "pciAddress": "0000:00:04.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                },
+                {
+                  "hostIP": "10.1.0.168",
+                  "interfaceName": "eth2",
+                  "netAddress": "10.1.0.0/16",
+                  "pciAddress": "0000:00:05.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "IPPool",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "multi-nic-cni-operator-ipvlanl3-192.168.0.0-26",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "allocations": [],
+              "excludes": [],
+              "hostName": "node-1",
+              "interfaceName": "eth1",
+              "netAttachDef": "multi-nic-cni-operator-ipvlanl3",
+              "podCIDR": "192.168.0.0/26",
+              "vlanCIDR": "192.168.0.0/18"
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "IPPool",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "ipvlanl3-192.168.0.0-26"
+            },
+            "spec": {
+              "allocations": [],
+              "excludes": [],
+              "hostName": "node-1",
+              "interfaceName": "eth1",
+              "netAttachDef": "multi-nic-cni-operator-ipvlanl3",
+              "podCIDR": "192.168.0.0/26",
+              "vlanCIDR": "192.168.0.0/18"
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "MultiNicNetwork",
+            "metadata": {
+              "name": "multi-nic-cni-operator-ipvlanl3",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "ipam": "{\n  \"type\": \"multi-nic-ipam\",\n  \"hostBlock\": 8, \n  \"interfaceBlock\": 2,\n  \"vlanMode\": \"l3\"\n}\n",
+              "multiNICIPAM": true,
+              "plugin": {
+                "args": {
+                  "mode": "l3"
+                },
+                "cniVersion": "0.3.0",
+                "type": "ipvlan"
+              },
+              "subnet": "192.168.0.0/16"
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "MultiNicNetwork",
+            "metadata": {
+              "name": "ipvlanl3"
+            },
+            "spec": {
+              "ipam": "{\n  \"type\": \"multi-nic-ipam\",\n  \"hostBlock\": 8, \n  \"interfaceBlock\": 2,\n  \"vlanMode\": \"l3\"\n}\n",
+              "multiNICIPAM": true,
+              "plugin": {
+                "args": {
+                  "mode": "l3"
+                },
+                "cniVersion": "0.3.0",
+                "type": "ipvlan"
+              },
+              "subnet": "192.168.0.0/16"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: Networking
+      containerImage: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.2.3
+      createdAt: "2024-04-10T09:53:22Z"
+      description: Automate container multi-network configuration
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operators.operatorframework.io/builder: operator-sdk-v1.34.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: http://github.com/foundation-model-stack/multi-nic-cni
+      support: Foundation Model Stack Team
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: CIDR is the Schema for the cidrs API
+        displayName: CIDR
+        kind: CIDR
+        name: cidrs.multinic.fms.io
+        version: v1
+      - description: Config is the Schema for the configs API
+        displayName: Config
+        kind: Config
+        name: configs.multinic.fms.io
+        version: v1
+      - description: DeviceClass is the Schema for the deviceclasses API
+        displayName: Device Class
+        kind: DeviceClass
+        name: deviceclasses.multinic.fms.io
+        version: v1
+      - description: HostInterface is the Schema for the hostinterfaces API
+        displayName: Host Interface
+        kind: HostInterface
+        name: hostinterfaces.multinic.fms.io
+        version: v1
+      - description: IPPool is the Schema for the ippools API
+        displayName: IPPool
+        kind: IPPool
+        name: ippools.multinic.fms.io
+        version: v1
+      - description: MultiNicNetwork is the Schema for the multinicnetworks API
+        displayName: Multi Nic Network
+        kind: MultiNicNetwork
+        name: multinicnetworks.multinic.fms.io
+        version: v1
+    description: "Multi-NIC CNI Operator helps to attaching secondary network interfaces
+      that is linked to \ndifferent network interfaces on host (NIC) to pod provides
+      benefits of network segmentation \nand top-up network bandwidth in the containerization
+      system.\n\nMulti-NIC CNI is the CNI plugin operating on top of Multus CNI. \nHowever,
+      instead of defining and handling each secondary network interface one by one,
+      \nthis CNI automatically discovers all available secondary interfaces and handles
+      them as a NIC pool. \nWith this manner, it can provide the following benefits.\n\ni)
+      Common secondary network definition: User can manage only one network definition
+      for \n   multiple secondary interfaces with a common CNI main plugin such as
+      ipvlan, macvlan, and sr-iov.\n\nii) Common NAT-bypassing network solution: All
+      secondary NICs on each host can be assigned \n    with non-conflict CIDR and
+      non-conflict L3 routing configuration that can omit an overlay networking overhead.
+      \n    Particularyly, the CNI is built-in with L3 IPVLAN solution composing of
+      the following functionalities.\n\n    1. Interface-host-devision CIDR Computation:
+      compute allocating CIDR range for each host and each interface \n       from
+      a single global subnet with the number of bits for hosts and for interface.\n
+      \   2. L3 Host Route Configuration: configure L3 routes (next hop via dev) in
+      host route table according to the computed CIDR.\n    3. Distributed IP Allocation
+      Management: manage IP allocation/deallocation distributedly via the communication
+      \n       between CNI program and daemon at each host.\n\niii) Policy-based secondary
+      network attachment: Instead of statically set the desired \n     host's master
+      interface name one by one, user can define a policy on attaching multiple secondary
+      network \n     interfaces such as specifying only the number of desired interfaces,
+      filtering only highspeed NICs.\n\n## Instructions\n\nPlease check the [User
+      Guide](https://foundation-model-stack.github.io/multi-nic-cni/user_guide/)"
+    displayName: multi-nic-cni-operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - multi-nic
+    - cni
+    - network
+    links:
+    - name: Multi-NIC CNI Operator
+      url: https://github.com/foundation-model-stack/multi-nic-cni
+    maintainers:
+    - email: sunyanan.choochotkaew1@ibm.com
+      name: Sunyanan Choochotkaew
+    - email: chiba@jp.ibm.com
+      name: Tatsuhiro Chiba
+    maturity: alpha
+    minKubeVersion: 1.25.0
+    provider:
+      name: Foundation Model Stack
+relatedImages:
+- image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
+  name: ""
+- image: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.2.3
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/multi-nic-cni-operator@sha256:215dd76b906ed3af409b47d11cbbb3e1e77e56a37872316750379e7fe7bcc1b0
+  name: ""
+schema: olm.bundle
+---
 image: quay.io/community-operator-pipeline-prod/multi-nic-cni-operator@sha256:ab62ca14df6dc776ebef248585bada4e7ed86c9ad22345880cf4a8b2a681a033
 name: multi-nic-cni-operator.v1.2.4
 package: multi-nic-cni-operator
@@ -6986,5 +7595,1218 @@ relatedImages:
 - image: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.2.7
   name: ""
 - image: quay.io/community-operator-pipeline-prod/multi-nic-cni-operator:1.2.7
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/multi-nic-cni-operator:1.2.8
+name: multi-nic-cni-operator.v1.2.8
+package: multi-nic-cni-operator
+properties:
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: CIDR
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: Config
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: DeviceClass
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: HostInterface
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: IPPool
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: MultiNicNetwork
+    version: v1
+- type: olm.package
+  value:
+    packageName: multi-nic-cni-operator
+    version: 1.2.8
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "CIDR",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "multi-nic-cni-operator-ipvlanl3",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "cidr": [
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.244.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.0-26",
+                      "podCIDR": "192.168.0.0/26"
+                    },
+                    {
+                      "hostIP": "10.244.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.64-26",
+                      "podCIDR": "192.168.0.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 0,
+                  "netAddress": "10.244.0.0/16",
+                  "vlanCIDR": "192.168.0.0/18"
+                },
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.0.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.0-26",
+                      "podCIDR": "192.168.64.0/26"
+                    },
+                    {
+                      "hostIP": "10.0.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.64-26",
+                      "podCIDR": "192.168.64.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 1,
+                  "netAddress": "10.0.0.0/16",
+                  "vlanCIDR": "192.168.64.0/18"
+                }
+              ],
+              "config": {
+                "hostBlock": 8,
+                "interfaceBlock": 2,
+                "masterNets": [],
+                "name": "multi-nic-cni-operator-ipvlanl3",
+                "subnet": "192.168.0.0/16",
+                "type": "ipvlan",
+                "vlanMode": "l3"
+              }
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "CIDR",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "ipvlanl3"
+            },
+            "spec": {
+              "cidr": [
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.244.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.0-26",
+                      "podCIDR": "192.168.0.0/26"
+                    },
+                    {
+                      "hostIP": "10.244.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.64-26",
+                      "podCIDR": "192.168.0.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 0,
+                  "netAddress": "10.244.0.0/16",
+                  "vlanCIDR": "192.168.0.0/18"
+                },
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.0.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.0-26",
+                      "podCIDR": "192.168.64.0/26"
+                    },
+                    {
+                      "hostIP": "10.0.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.64-26",
+                      "podCIDR": "192.168.64.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 1,
+                  "netAddress": "10.0.0.0/16",
+                  "vlanCIDR": "192.168.64.0/18"
+                }
+              ],
+              "config": {
+                "hostBlock": 8,
+                "interfaceBlock": 2,
+                "masterNets": [],
+                "name": "multi-nic-cni-operator-ipvlanl3",
+                "subnet": "192.168.0.0/16",
+                "type": "ipvlan",
+                "vlanMode": "l3"
+              }
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "Config",
+            "metadata": {
+              "annotations": {
+                "note": "The resource with default settings will be auto-created by multi-nic-cni-operator-controller-manager.\nPlease modify if need.\n"
+              },
+              "name": "multi-nic-cni-operator-multi-nicd",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "addRoutePath": "/addl3",
+              "cniType": "multi-nic",
+              "contextTimeoutMinutes": 2,
+              "daemon": {
+                "env": [
+                  {
+                    "name": "DAEMON_PORT",
+                    "value": "11000"
+                  },
+                  {
+                    "name": "RT_TABLE_PATH",
+                    "value": "/opt/rt_tables"
+                  }
+                ],
+                "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.2.8",
+                "mounts": [
+                  {
+                    "hostpath": "/var/lib/cni/bin",
+                    "name": "cnibin",
+                    "podpath": "/host/opt/cni/bin"
+                  },
+                  {
+                    "hostpath": "/var/lib/kubelet/device-plugins",
+                    "name": "device-plugin",
+                    "podpath": "/var/lib/kubelet/device-plugins"
+                  },
+                  {
+                    "hostpath": "/etc/iproute2/rt_tables",
+                    "name": "rt-tables",
+                    "podpath": "/opt/rt_tables"
+                  }
+                ],
+                "port": 11000,
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "50Mi"
+                  }
+                },
+                "securityContext": {
+                  "privileged": true
+                }
+              },
+              "deleteRoutePath": "/deletel3",
+              "getInterfacePath": "/interface",
+              "ipamType": "multi-nic-ipam",
+              "joinPath": "/join",
+              "logLevel": 4,
+              "longReconcileMinutes": 10,
+              "normalReconcileMinutes": 1,
+              "urgentReconcileSeconds": 5
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "Config",
+            "metadata": {
+              "annotations": {
+                "note": "The resource with default settings will be auto-created by multi-nic-cni-operator-controller-manager.\nPlease modify if need.\n"
+              },
+              "name": "multi-nicd"
+            },
+            "spec": {
+              "addRoutePath": "/addl3",
+              "cniType": "multi-nic",
+              "contextTimeoutMinutes": 2,
+              "daemon": {
+                "env": [
+                  {
+                    "name": "DAEMON_PORT",
+                    "value": "11000"
+                  },
+                  {
+                    "name": "RT_TABLE_PATH",
+                    "value": "/opt/rt_tables"
+                  }
+                ],
+                "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.2.8",
+                "mounts": [
+                  {
+                    "hostpath": "/var/lib/cni/bin",
+                    "name": "cnibin",
+                    "podpath": "/host/opt/cni/bin"
+                  },
+                  {
+                    "hostpath": "/var/lib/kubelet/device-plugins",
+                    "name": "device-plugin",
+                    "podpath": "/var/lib/kubelet/device-plugins"
+                  },
+                  {
+                    "hostpath": "/etc/iproute2/rt_tables",
+                    "name": "rt-tables",
+                    "podpath": "/opt/rt_tables"
+                  }
+                ],
+                "port": 11000,
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "50Mi"
+                  }
+                },
+                "securityContext": {
+                  "privileged": true
+                }
+              },
+              "deleteRoutePath": "/deletel3",
+              "getInterfacePath": "/interface",
+              "ipamType": "multi-nic-ipam",
+              "joinPath": "/join",
+              "logLevel": 4,
+              "longReconcileMinutes": 10,
+              "normalReconcileMinutes": 1,
+              "urgentReconcileSeconds": 5
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "DeviceClass",
+            "metadata": {
+              "name": "multi-nic-cni-operator-highspeed",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "ids": [
+                {
+                  "products": [
+                    "1019",
+                    "101d"
+                  ],
+                  "vendor": "15b3"
+                },
+                {
+                  "products": [
+                    "efa0",
+                    "efa1"
+                  ],
+                  "vendor": "1d0f"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "DeviceClass",
+            "metadata": {
+              "name": "highspeed"
+            },
+            "spec": {
+              "ids": [
+                {
+                  "products": [
+                    "1019",
+                    "101d"
+                  ],
+                  "vendor": "15b3"
+                },
+                {
+                  "products": [
+                    "efa0",
+                    "efa1"
+                  ],
+                  "vendor": "1d0f"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "HostInterface",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "multi-nic-cni-operator-node-1",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "hostName": "node-1",
+              "interfaces": [
+                {
+                  "hostIP": "10.0.0.168",
+                  "interfaceName": "eth1",
+                  "netAddress": "10.0.0.0/16",
+                  "pciAddress": "0000:00:04.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                },
+                {
+                  "hostIP": "10.1.0.168",
+                  "interfaceName": "eth2",
+                  "netAddress": "10.1.0.0/16",
+                  "pciAddress": "0000:00:05.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "HostInterface",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "node-1"
+            },
+            "spec": {
+              "hostName": "node-1",
+              "interfaces": [
+                {
+                  "hostIP": "10.0.0.168",
+                  "interfaceName": "eth1",
+                  "netAddress": "10.0.0.0/16",
+                  "pciAddress": "0000:00:04.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                },
+                {
+                  "hostIP": "10.1.0.168",
+                  "interfaceName": "eth2",
+                  "netAddress": "10.1.0.0/16",
+                  "pciAddress": "0000:00:05.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "IPPool",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "multi-nic-cni-operator-ipvlanl3-192.168.0.0-26",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "allocations": [],
+              "excludes": [],
+              "hostName": "node-1",
+              "interfaceName": "eth1",
+              "netAttachDef": "multi-nic-cni-operator-ipvlanl3",
+              "podCIDR": "192.168.0.0/26",
+              "vlanCIDR": "192.168.0.0/18"
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "IPPool",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "ipvlanl3-192.168.0.0-26"
+            },
+            "spec": {
+              "allocations": [],
+              "excludes": [],
+              "hostName": "node-1",
+              "interfaceName": "eth1",
+              "netAttachDef": "multi-nic-cni-operator-ipvlanl3",
+              "podCIDR": "192.168.0.0/26",
+              "vlanCIDR": "192.168.0.0/18"
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "MultiNicNetwork",
+            "metadata": {
+              "name": "multi-nic-cni-operator-ipvlanl3",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "ipam": "{\n  \"type\": \"multi-nic-ipam\",\n  \"hostBlock\": 8, \n  \"interfaceBlock\": 2,\n  \"vlanMode\": \"l3\"\n}\n",
+              "multiNICIPAM": true,
+              "plugin": {
+                "args": {
+                  "mode": "l3"
+                },
+                "cniVersion": "0.3.0",
+                "type": "ipvlan"
+              },
+              "subnet": "192.168.0.0/16"
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "MultiNicNetwork",
+            "metadata": {
+              "name": "ipvlanl3"
+            },
+            "spec": {
+              "ipam": "{\n  \"type\": \"multi-nic-ipam\",\n  \"hostBlock\": 8, \n  \"interfaceBlock\": 2,\n  \"vlanMode\": \"l3\"\n}\n",
+              "multiNICIPAM": true,
+              "plugin": {
+                "args": {
+                  "mode": "l3"
+                },
+                "cniVersion": "0.3.0",
+                "type": "ipvlan"
+              },
+              "subnet": "192.168.0.0/16"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: Networking
+      containerImage: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.2.8
+      createdAt: "2025-07-08T14:41:47Z"
+      operators.operatorframework.io/builder: operator-sdk-v1.39.2
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: CIDR is the Schema for the cidrs API
+        displayName: CIDR
+        kind: CIDR
+        name: cidrs.multinic.fms.io
+        version: v1
+      - description: Config is the Schema for the configs API
+        displayName: Config
+        kind: Config
+        name: configs.multinic.fms.io
+        version: v1
+      - description: DeviceClass is the Schema for the deviceclasses API
+        displayName: Device Class
+        kind: DeviceClass
+        name: deviceclasses.multinic.fms.io
+        version: v1
+      - description: HostInterface is the Schema for the hostinterfaces API
+        displayName: Host Interface
+        kind: HostInterface
+        name: hostinterfaces.multinic.fms.io
+        version: v1
+      - description: IPPool is the Schema for the ippools API
+        displayName: IPPool
+        kind: IPPool
+        name: ippools.multinic.fms.io
+        version: v1
+      - description: MultiNicNetwork is the Schema for the multinicnetworks API
+        displayName: Multi Nic Network
+        kind: MultiNicNetwork
+        name: multinicnetworks.multinic.fms.io
+        version: v1
+    description: "Multi-NIC CNI Operator helps to attaching secondary network interfaces
+      that is linked to \ndifferent network interfaces on host (NIC) to pod provides
+      benefits of network segmentation \nand top-up network bandwidth in the containerization
+      system.\n\nMulti-NIC CNI is the CNI plugin operating on top of Multus CNI. \nHowever,
+      instead of defining and handling each secondary network interface one by one,
+      \nthis CNI automatically discovers all available secondary interfaces and handles
+      them as a NIC pool. \nWith this manner, it can provide the following benefits.\n\ni)
+      Common secondary network definition: User can manage only one network definition
+      for \n   multiple secondary interfaces with a common CNI main plugin such as
+      ipvlan, macvlan, and sr-iov.\n\nii) Common NAT-bypassing network solution: All
+      secondary NICs on each host can be assigned \n    with non-conflict CIDR and
+      non-conflict L3 routing configuration that can omit an overlay networking overhead.
+      \n    Particularyly, the CNI is built-in with L3 IPVLAN solution composing of
+      the following functionalities.\n\n    1. Interface-host-devision CIDR Computation:
+      compute allocating CIDR range for each host and each interface \n       from
+      a single global subnet with the number of bits for hosts and for interface.\n
+      \   2. L3 Host Route Configuration: configure L3 routes (next hop via dev) in
+      host route table according to the computed CIDR.\n    3. Distributed IP Allocation
+      Management: manage IP allocation/deallocation distributedly via the communication
+      \n       between CNI program and daemon at each host.\n\niii) Policy-based secondary
+      network attachment: Instead of statically set the desired \n     host's master
+      interface name one by one, user can define a policy on attaching multiple secondary
+      network \n     interfaces such as specifying only the number of desired interfaces,
+      filtering only highspeed NICs.\n\n## Instructions\n\nPlease check the [User
+      Guide](https://foundation-model-stack.github.io/multi-nic-cni/user_guide/)"
+    displayName: multi-nic-cni-operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - multi-nic
+    - cni
+    - network
+    links:
+    - name: Multi-NIC CNI Operator
+      url: https://github.com/foundation-model-stack/multi-nic-cni
+    maintainers:
+    - email: sunyanan.choochotkaew1@ibm.com
+      name: Sunyanan Choochotkaew
+    - email: chiba@jp.ibm.com
+      name: Tatsuhiro Chiba
+    - email: minzhang@redhat.com
+      name: Min Zhang
+    - email: ebendror@redhat.com
+      name: Eran Ben Dror
+    maturity: alpha
+    provider:
+      name: Foundation Model Stack
+relatedImages:
+- image: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.2.8
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/multi-nic-cni-operator:1.2.8
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/multi-nic-cni-operator@sha256:6b7a1e34c33b16c464745f70658a10d6ea3d96099c1e2ab008e96589ef73e7eb
+name: multi-nic-cni-operator.v1.3.0
+package: multi-nic-cni-operator
+properties:
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: CIDR
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: Config
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: DeviceClass
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: HostInterface
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: IPPool
+    version: v1
+- type: olm.gvk
+  value:
+    group: multinic.fms.io
+    kind: MultiNicNetwork
+    version: v1
+- type: olm.package
+  value:
+    packageName: multi-nic-cni-operator
+    version: 1.3.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "CIDR",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "multi-nic-cni-operator-ipvlanl3",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "cidr": [
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.244.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.0-26",
+                      "podCIDR": "192.168.0.0/26"
+                    },
+                    {
+                      "hostIP": "10.244.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.64-26",
+                      "podCIDR": "192.168.0.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 0,
+                  "netAddress": "10.244.0.0/16",
+                  "vlanCIDR": "192.168.0.0/18"
+                },
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.0.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.0-26",
+                      "podCIDR": "192.168.64.0/26"
+                    },
+                    {
+                      "hostIP": "10.0.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.64-26",
+                      "podCIDR": "192.168.64.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 1,
+                  "netAddress": "10.0.0.0/16",
+                  "vlanCIDR": "192.168.64.0/18"
+                }
+              ],
+              "config": {
+                "hostBlock": 8,
+                "interfaceBlock": 2,
+                "masterNets": [],
+                "name": "multi-nic-cni-operator-ipvlanl3",
+                "subnet": "192.168.0.0/16",
+                "type": "ipvlan",
+                "vlanMode": "l3"
+              }
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "CIDR",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "ipvlanl3"
+            },
+            "spec": {
+              "cidr": [
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.244.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.0-26",
+                      "podCIDR": "192.168.0.0/26"
+                    },
+                    {
+                      "hostIP": "10.244.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth1",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.0.64-26",
+                      "podCIDR": "192.168.0.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 0,
+                  "netAddress": "10.244.0.0/16",
+                  "vlanCIDR": "192.168.0.0/18"
+                },
+                {
+                  "hosts": [
+                    {
+                      "hostIP": "10.0.0.168",
+                      "hostIndex": 0,
+                      "hostName": "node-1",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.0-26",
+                      "podCIDR": "192.168.64.0/26"
+                    },
+                    {
+                      "hostIP": "10.0.0.167",
+                      "hostIndex": 1,
+                      "hostName": "node-2",
+                      "interfaceName": "eth2",
+                      "ippool": "multi-nic-cni-operator-ipvlanl3-192.168.64.64-26",
+                      "podCIDR": "192.168.64.64/26"
+                    }
+                  ],
+                  "interfaceIndex": 1,
+                  "netAddress": "10.0.0.0/16",
+                  "vlanCIDR": "192.168.64.0/18"
+                }
+              ],
+              "config": {
+                "hostBlock": 8,
+                "interfaceBlock": 2,
+                "masterNets": [],
+                "name": "multi-nic-cni-operator-ipvlanl3",
+                "subnet": "192.168.0.0/16",
+                "type": "ipvlan",
+                "vlanMode": "l3"
+              }
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "Config",
+            "metadata": {
+              "annotations": {
+                "note": "The resource with default settings will be auto-created by multi-nic-cni-operator-controller-manager.\nPlease modify if need.\n"
+              },
+              "name": "multi-nic-cni-operator-multi-nicd",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "addRoutePath": "/addl3",
+              "cniType": "multi-nic",
+              "contextTimeoutMinutes": 2,
+              "daemon": {
+                "env": [
+                  {
+                    "name": "DAEMON_PORT",
+                    "value": "11000"
+                  },
+                  {
+                    "name": "RT_TABLE_PATH",
+                    "value": "/opt/rt_tables"
+                  }
+                ],
+                "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.3.0",
+                "mounts": [
+                  {
+                    "hostpath": "/var/lib/cni/bin",
+                    "name": "cnibin",
+                    "podpath": "/host/opt/cni/bin"
+                  },
+                  {
+                    "hostpath": "/var/lib/kubelet/device-plugins",
+                    "name": "device-plugin",
+                    "podpath": "/var/lib/kubelet/device-plugins"
+                  },
+                  {
+                    "hostpath": "/etc/iproute2/rt_tables",
+                    "name": "rt-tables",
+                    "podpath": "/opt/rt_tables"
+                  }
+                ],
+                "port": 11000,
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "50Mi"
+                  }
+                },
+                "securityContext": {
+                  "privileged": true
+                }
+              },
+              "deleteRoutePath": "/deletel3",
+              "getInterfacePath": "/interface",
+              "ipamType": "multi-nic-ipam",
+              "joinPath": "/join",
+              "logLevel": 4,
+              "longReconcileMinutes": 10,
+              "normalReconcileMinutes": 1,
+              "urgentReconcileSeconds": 5
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "Config",
+            "metadata": {
+              "annotations": {
+                "note": "The resource with default settings will be auto-created by multi-nic-cni-operator-controller-manager.\nPlease modify if need.\n"
+              },
+              "name": "multi-nicd"
+            },
+            "spec": {
+              "addRoutePath": "/addl3",
+              "cniType": "multi-nic",
+              "contextTimeoutMinutes": 2,
+              "daemon": {
+                "env": [
+                  {
+                    "name": "DAEMON_PORT",
+                    "value": "11000"
+                  },
+                  {
+                    "name": "RT_TABLE_PATH",
+                    "value": "/opt/rt_tables"
+                  }
+                ],
+                "image": "ghcr.io/foundation-model-stack/multi-nic-cni-daemon:v1.3.0",
+                "mounts": [
+                  {
+                    "hostpath": "/var/lib/cni/bin",
+                    "name": "cnibin",
+                    "podpath": "/host/opt/cni/bin"
+                  },
+                  {
+                    "hostpath": "/var/lib/kubelet/device-plugins",
+                    "name": "device-plugin",
+                    "podpath": "/var/lib/kubelet/device-plugins"
+                  },
+                  {
+                    "hostpath": "/etc/iproute2/rt_tables",
+                    "name": "rt-tables",
+                    "podpath": "/opt/rt_tables"
+                  }
+                ],
+                "port": 11000,
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "50Mi"
+                  }
+                },
+                "securityContext": {
+                  "privileged": true
+                }
+              },
+              "deleteRoutePath": "/deletel3",
+              "getInterfacePath": "/interface",
+              "ipamType": "multi-nic-ipam",
+              "joinPath": "/join",
+              "logLevel": 4,
+              "longReconcileMinutes": 10,
+              "normalReconcileMinutes": 1,
+              "urgentReconcileSeconds": 5
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "DeviceClass",
+            "metadata": {
+              "name": "multi-nic-cni-operator-highspeed",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "ids": [
+                {
+                  "products": [
+                    "1019",
+                    "101d"
+                  ],
+                  "vendor": "15b3"
+                },
+                {
+                  "products": [
+                    "efa0",
+                    "efa1"
+                  ],
+                  "vendor": "1d0f"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "DeviceClass",
+            "metadata": {
+              "name": "highspeed"
+            },
+            "spec": {
+              "ids": [
+                {
+                  "products": [
+                    "1019",
+                    "101d"
+                  ],
+                  "vendor": "15b3"
+                },
+                {
+                  "products": [
+                    "efa0",
+                    "efa1"
+                  ],
+                  "vendor": "1d0f"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "HostInterface",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "multi-nic-cni-operator-node-1",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "hostName": "node-1",
+              "interfaces": [
+                {
+                  "hostIP": "10.0.0.168",
+                  "interfaceName": "eth1",
+                  "netAddress": "10.0.0.0/16",
+                  "pciAddress": "0000:00:04.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                },
+                {
+                  "hostIP": "10.1.0.168",
+                  "interfaceName": "eth2",
+                  "netAddress": "10.1.0.0/16",
+                  "pciAddress": "0000:00:05.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "HostInterface",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "node-1"
+            },
+            "spec": {
+              "hostName": "node-1",
+              "interfaces": [
+                {
+                  "hostIP": "10.0.0.168",
+                  "interfaceName": "eth1",
+                  "netAddress": "10.0.0.0/16",
+                  "pciAddress": "0000:00:04.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                },
+                {
+                  "hostIP": "10.1.0.168",
+                  "interfaceName": "eth2",
+                  "netAddress": "10.1.0.0/16",
+                  "pciAddress": "0000:00:05.0",
+                  "product": "1000",
+                  "vendor": "1af4"
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "IPPool",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "multi-nic-cni-operator-ipvlanl3-192.168.0.0-26",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "allocations": [],
+              "excludes": [],
+              "hostName": "node-1",
+              "interfaceName": "eth1",
+              "netAttachDef": "multi-nic-cni-operator-ipvlanl3",
+              "podCIDR": "192.168.0.0/26",
+              "vlanCIDR": "192.168.0.0/18"
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "IPPool",
+            "metadata": {
+              "annotations": {
+                "note": "This resource will be auto-generated and controlled by multi-nic-cni-operator-controller-manager.\nDo not create/modify.\n"
+              },
+              "name": "ipvlanl3-192.168.0.0-26"
+            },
+            "spec": {
+              "allocations": [],
+              "excludes": [],
+              "hostName": "node-1",
+              "interfaceName": "eth1",
+              "netAttachDef": "multi-nic-cni-operator-ipvlanl3",
+              "podCIDR": "192.168.0.0/26",
+              "vlanCIDR": "192.168.0.0/18"
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "MultiNicNetwork",
+            "metadata": {
+              "name": "multi-nic-cni-operator-ipvlanl3",
+              "namespace": "multi-nic-cni-operator-system"
+            },
+            "spec": {
+              "ipam": "{\n  \"type\": \"multi-nic-ipam\",\n  \"hostBlock\": 8, \n  \"interfaceBlock\": 2,\n  \"vlanMode\": \"l3\"\n}\n",
+              "multiNICIPAM": true,
+              "plugin": {
+                "args": {
+                  "mode": "l3"
+                },
+                "cniVersion": "0.3.0",
+                "type": "ipvlan"
+              },
+              "subnet": "192.168.0.0/16"
+            }
+          },
+          {
+            "apiVersion": "multinic.fms.io/v1",
+            "kind": "MultiNicNetwork",
+            "metadata": {
+              "name": "ipvlanl3"
+            },
+            "spec": {
+              "ipam": "{\n  \"type\": \"multi-nic-ipam\",\n  \"hostBlock\": 8, \n  \"interfaceBlock\": 2,\n  \"vlanMode\": \"l3\"\n}\n",
+              "multiNICIPAM": true,
+              "plugin": {
+                "args": {
+                  "mode": "l3"
+                },
+                "cniVersion": "0.3.0",
+                "type": "ipvlan"
+              },
+              "subnet": "192.168.0.0/16"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: Networking
+      containerImage: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.3.0
+      createdAt: "2024-04-17T04:51:40Z"
+      description: Automate container multi-network configuration
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operators.operatorframework.io/builder: operator-sdk-v1.34.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: http://github.com/foundation-model-stack/multi-nic-cni
+      support: Foundation Model Stack Team
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: CIDR is the Schema for the cidrs API
+        displayName: CIDR
+        kind: CIDR
+        name: cidrs.multinic.fms.io
+        version: v1
+      - description: Config is the Schema for the configs API
+        displayName: Config
+        kind: Config
+        name: configs.multinic.fms.io
+        version: v1
+      - description: DeviceClass is the Schema for the deviceclasses API
+        displayName: Device Class
+        kind: DeviceClass
+        name: deviceclasses.multinic.fms.io
+        version: v1
+      - description: HostInterface is the Schema for the hostinterfaces API
+        displayName: Host Interface
+        kind: HostInterface
+        name: hostinterfaces.multinic.fms.io
+        version: v1
+      - description: IPPool is the Schema for the ippools API
+        displayName: IPPool
+        kind: IPPool
+        name: ippools.multinic.fms.io
+        version: v1
+      - description: MultiNicNetwork is the Schema for the multinicnetworks API
+        displayName: Multi Nic Network
+        kind: MultiNicNetwork
+        name: multinicnetworks.multinic.fms.io
+        version: v1
+    description: "Multi-NIC CNI Operator helps to attaching secondary network interfaces
+      that is linked to \ndifferent network interfaces on host (NIC) to pod provides
+      benefits of network segmentation \nand top-up network bandwidth in the containerization
+      system.\n\nMulti-NIC CNI is the CNI plugin operating on top of Multus CNI. \nHowever,
+      instead of defining and handling each secondary network interface one by one,
+      \nthis CNI automatically discovers all available secondary interfaces and handles
+      them as a NIC pool. \nWith this manner, it can provide the following benefits.\n\ni)
+      Common secondary network definition: User can manage only one network definition
+      for \n   multiple secondary interfaces with a common CNI main plugin such as
+      ipvlan, macvlan, and sr-iov.\n\nii) Common NAT-bypassing network solution: All
+      secondary NICs on each host can be assigned \n    with non-conflict CIDR and
+      non-conflict L3 routing configuration that can omit an overlay networking overhead.
+      \n    Particularyly, the CNI is built-in with L3 IPVLAN solution composing of
+      the following functionalities.\n\n    1. Interface-host-devision CIDR Computation:
+      compute allocating CIDR range for each host and each interface \n       from
+      a single global subnet with the number of bits for hosts and for interface.\n
+      \   2. L3 Host Route Configuration: configure L3 routes (next hop via dev) in
+      host route table according to the computed CIDR.\n    3. Distributed IP Allocation
+      Management: manage IP allocation/deallocation distributedly via the communication
+      \n       between CNI program and daemon at each host.\n\niii) Policy-based secondary
+      network attachment: Instead of statically set the desired \n     host's master
+      interface name one by one, user can define a policy on attaching multiple secondary
+      network \n     interfaces such as specifying only the number of desired interfaces,
+      filtering only highspeed NICs.\n\n## Instructions\n\nPlease check the [User
+      Guide](https://foundation-model-stack.github.io/multi-nic-cni/user_guide/)"
+    displayName: multi-nic-cni-operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - multi-nic
+    - cni
+    - network
+    links:
+    - name: Multi-NIC CNI Operator
+      url: https://github.com/foundation-model-stack/multi-nic-cni
+    maintainers:
+    - email: sunyanan.choochotkaew1@ibm.com
+      name: Sunyanan Choochotkaew
+    - email: chiba@jp.ibm.com
+      name: Tatsuhiro Chiba
+    maturity: alpha
+    minKubeVersion: 1.25.0
+    provider:
+      name: Foundation Model Stack
+relatedImages:
+- image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
+  name: ""
+- image: ghcr.io/foundation-model-stack/multi-nic-cni-controller:v1.3.0
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/multi-nic-cni-operator@sha256:6b7a1e34c33b16c464745f70658a10d6ea3d96099c1e2ab008e96589ef73e7eb
   name: ""
 schema: olm.bundle

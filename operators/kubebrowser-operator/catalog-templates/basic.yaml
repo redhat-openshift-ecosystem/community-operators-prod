@@ -1,0 +1,15 @@
+---
+schema: olm.template.basic
+entries:
+  - schema: olm.package
+    name: kubebrowser
+    defaultChannel: alpha
+
+  - schema: olm.channel
+    package: kubebrowser
+    name: alpha
+    entries:
+      - name: kubebrowser.v0.0.1
+
+  - schema: olm.bundle
+    image: ghcr.io/kubebrowser/operator-bundle@sha256:95335dabec09bccd191ae038092a7f74caec4c978620a2005bd95d2fada2cb49

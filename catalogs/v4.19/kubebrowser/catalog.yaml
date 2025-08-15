@@ -1,0 +1,151 @@
+---
+defaultChannel: alpha
+name: kubebrowser
+schema: olm.package
+---
+entries:
+- name: kubebrowser.v0.0.1
+name: alpha
+package: kubebrowser
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/kubebrowser:0.0.1
+name: kubebrowser.v0.0.1
+package: kubebrowser
+properties:
+- type: olm.gvk
+  value:
+    group: core.kubebrowser.io
+    kind: Browser
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: core.kubebrowser.io
+    kind: BrowserSystem
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: kubebrowser
+    version: 0.0.1
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: '[{"apiVersion":"core.kubebrowser.io/v1alpha1","kind":"BrowserSystem","metadata":{"name":"sample"},"spec":{"enableApiService":true,"enableConsolePlugin":true}},{"apiVersion":"core.kubebrowser.io/v1alpha1","kind":"Browser","metadata":{"name":"sample"},"spec":{"started":false,"browserResources":{"requests":{"cpu":"100m","memory":"500Mi"}}}}]'
+      capabilities: Basic Install
+      categories: Developer Tools,OpenShift Optional
+      containerImage: ghcr.io/kubebrowser/system-manager:0.0.1
+      createdAt: "2025-08-14T15:39:56Z"
+      description: Provides integrated web browsing functionality
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/proxy-aware: "true"
+      operatorframework.io/initialization-resource: '{"apiVersion": "core.kubebrowser.io/v1alpha1","kind":
+        "BrowserSystem","metadata": {"name": "browsersystem"},"spec": {}}'
+      operatorframework.io/suggested-namespace: kubebrowser
+      operators.openshift.io/infrastructure-features: '["disconnected", "proxy-aware"]'
+      operators.operatorframework.io/builder: operator-sdk-v1.40.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/kubebrowser/operator
+      support: None
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Deploys a browser instance
+        kind: Browser
+        name: browsers.core.kubebrowser.io
+        version: v1alpha1
+      - description: Configures resources needed for running Browsers
+        kind: BrowserSystem
+        name: browsersystems.core.kubebrowser.io
+        version: v1alpha1
+    description: |-
+      ## About
+
+      This operator integrates a full web-browsing capability directly into your cluster.
+      It introduces a `Browser` custom resource that deploys a Chromium browser inside a pod.
+      A built-in console plugin provides a page with VNC access to the browser, letting you browse the web directly from within your cluster environment.
+      A sidecar REST API allows programmatic remote control of the browser.
+      Without this operator, testing a service typically required creating a `Route`, exec’ing into another pod and running `curl`, or setting up a port-forward. Now you can simply open a browser from inside the cluster.
+
+      ## Features
+
+      - Deploys Chromium browsers inside pods
+      - Provides a REST API for remote browser control
+      - Adds a **Networking -> Browsers** page to the web console for web browsing
+
+      ## Purpose
+
+      The Browser Operator makes it easy to:
+
+      - Test services from within the cluster
+      - Validate network connectivity across namespaces
+      - Verify access to external services
+      - Debug routing, DNS, and access issues directly from the cluster’s perspective
+
+      ## Installing
+
+      After installing the the operator, create a `BrowserSystem` instance. Configure the fields in `.spec` needed, otherwise leave it blank for defaults.
+
+      ```yaml
+      apiVersion: core.kubebrowser.io/v1alpha1
+      kind: BrowserSystem
+      metadata:
+        name: browsersystem
+        namespace: kubebrowser
+      spec:
+        enableApiService: true
+        enableConsolePlugin: true
+      ```
+
+      ## Usage
+
+      Once the operator is installed and the `BrowserSystem` is deployed, you may create a `Browser` resource.
+
+      ```
+      apiVersion: core.kubebrowser.io/v1alpha1
+      kind: Browser
+      metadata:
+        name: mybrowser
+      spec:
+        started: false
+      ```
+
+      If you've configured your `BrowserSystem` to enable the console plugin, you should see and be able to use your browser in the [_browsers_](/browsers) page (accessible under _>Networking>Browsers_).
+    displayName: KubeBrowser Operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - operator
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Github
+      url: https://github.com/kubebrowser
+    maintainers:
+    - email: devmohamed2000@email.com
+      name: Mohamed Fall
+    maturity: alpha
+    minKubeVersion: 1.23.0
+    provider:
+      name: Kubebrowser
+      url: https://github.com/kubebrowser
+relatedImages:
+- image: ghcr.io/kubebrowser/browser-api:0.0.1
+  name: browser-api
+- image: ghcr.io/kubebrowser/browser-manager:0.0.1
+  name: browser-manager
+- image: ghcr.io/kubebrowser/console-plugin:0.0.1
+  name: console-plugin
+- image: ghcr.io/kubebrowser/system-manager:0.0.1
+  name: manager
+- image: quay.io/community-operator-pipeline-prod/kubebrowser:0.0.1
+  name: ""
+schema: olm.bundle

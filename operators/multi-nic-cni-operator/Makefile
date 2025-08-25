@@ -110,7 +110,7 @@ include version-info.mk
 # This list can be customized to include the versions that are relevant to the operator
 # DO NOT change this line (except for the versions) if you want to take advantage
 # of the automated catalog promotion
-OCP_VERSIONS=$(shell echo "v4.12 v4.13 v4.14 v4.15 v4.16 v4.17 v4.18 v4.19" )
+OCP_VERSIONS=$(shell echo "v4.12 v4.13 v4.14 v4.15 v4.16 v4.17 v4.18 v4.19 v4.20" )
 
 .PHONY: push-bundle
 push-bundle:

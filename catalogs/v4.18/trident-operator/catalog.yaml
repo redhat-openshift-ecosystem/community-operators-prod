@@ -22,6 +22,8 @@ entries:
   replaces: trident-operator.v25.2.1
 - name: trident-operator.v25.6.1
   replaces: trident-operator.v25.6.0
+- name: trident-operator.v25.6.2
+  replaces: trident-operator.v25.6.1
 name: stable
 package: trident-operator
 schema: olm.channel
@@ -821,5 +823,107 @@ relatedImages:
 - image: docker.io/netapp/trident-operator:25.06.1
   name: ""
 - image: quay.io/community-operator-pipeline-prod/trident-operator:25.6.1
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/trident-operator:25.6.2
+name: trident-operator.v25.6.2
+package: trident-operator
+properties:
+- type: olm.gvk
+  value:
+    group: trident.netapp.io
+    kind: TridentConfigurator
+    version: v1
+- type: olm.gvk
+  value:
+    group: trident.netapp.io
+    kind: TridentOrchestrator
+    version: v1
+- type: olm.package
+  value:
+    packageName: trident-operator
+    version: 25.6.2
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |
+        [
+          {
+            "apiVersion": "trident.netapp.io/v1",
+            "kind": "TridentOrchestrator",
+            "metadata": {
+              "name": "trident"
+            },
+            "spec": {
+              "IPv6": false,
+              "debug": true,
+              "nodePrep": [],
+              "imagePullSecrets": [],
+              "imageRegistry": "",
+              "namespace": "trident",
+              "silenceAutosupport": false
+            }
+          }
+        ]
+      capabilities: Seamless Upgrades
+      categories: Storage
+      containerImage: docker.io/netapp/trident-operator:25.06.2
+      createdAt: "2025-08-03"
+      description: Trident Operator, to manage NetApp Trident installations
+      operatorhub.io/ui-metadata-max-k8s-version: "1.33"
+      repository: https://github.com/netapp/trident
+      support: NetApp
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Used to deploy Astra Trident.
+        displayName: Trident Orchestrator
+        kind: TridentOrchestrator
+        name: tridentorchestrators.trident.netapp.io
+        version: v1
+      - description: Automates AWS FSxN backend configuration
+        displayName: Trident Configurator
+        kind: TridentConfigurator
+        name: tridentconfigurators.trident.netapp.io
+        version: v1
+    description: |
+      NetApp Trident is an open source storage provisioner and orchestrator maintained by NetApp. It enables you to create storage volumes for containerized applications managed by Docker and Kubernetes. For full release information, including patch release changes, see https://docs.netapp.com/us-en/trident/trident-rn.html.
+    displayName: NetApp Trident
+    installModes:
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - NetApp
+    - ONTAP
+    - Trident
+    - storage
+    - performance
+    - open source
+    - Astra
+    - Cloud Native
+    - AWS
+    - Azure
+    - GCP
+    - Cloud Volumes
+    links:
+    - name: GitHub Repository
+      url: https://github.com/NetApp/trident
+    - name: Trident documentation
+      url: https://docs.netapp.com/us-en/trident/index.html
+    - name: Support policy
+      url: https://mysupport.netapp.com/site/info/version-support
+    - name: Release Notes
+      url: https://docs.netapp.com/us-en/trident/trident-rn.html
+    maintainers:
+    - email: ng-astra-product@netapp.com
+      name: NetApp
+    provider:
+      name: NetApp, Inc.
+      url: https://www.netapp.com/
+relatedImages:
+- image: docker.io/netapp/trident-operator:25.06.2
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/trident-operator:25.6.2
   name: ""
 schema: olm.bundle

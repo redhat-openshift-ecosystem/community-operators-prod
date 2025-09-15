@@ -5,8 +5,8 @@ metadata:
     alm-examples: "[\n  {\n    \"apiVersion\": \"apps.gitlab.com/v1beta2\",\n    \"kind\": \"Runner\",\n    \"metadata\": {\n      \"name\": \"gitlab-runner-example\",\n      \"namespace\": \"gitlab-system\"\n    },\n    \"spec\": {\n      \"gitlabUrl\": \"https://gitlab.example.com\",\n      \"token\": \"runner-token-secret\",\n      \"tags\": \"kubernetes,example\",\n      \"concurrent\": 10,\n      \"imagePullPolicy\": \"IfNotPresent\"\n    }\n  }\n]\n"
     capabilities: Deep Insights
     categories: Integration & Delivery, Developer Tools
-    containerImage: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:e14d147daf18568ed6e09c699cafdeb740e12fb5b12db4758148e44bccc486b7
-    createdAt: "2025-09-11T14:34:36Z"
+    containerImage: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:1a3845093adb459aa921b574a8ba6067b5b8c2580201d91123a762b951024bb1
+    createdAt: "2025-09-15T12:07:42Z"
     description: GitLab Runner operator manages lifecycle of GitLab Runner instances
     features.operators.openshift.io/cnf: "false"
     features.operators.openshift.io/cni: "false"
@@ -463,7 +463,7 @@ spec:
                       - name: RELATED_IMAGE_GITLAB_RUNNER_HELPER
                         value: registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-helper-ocp@sha256:eb65706a984d8e0117bab2bf012342eae01435449506e5b98946b199f55ea91a
                       - name: RELATED_IMAGE_GITLAB_RUNNER_OPERATOR
-                        value: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:e14d147daf18568ed6e09c699cafdeb740e12fb5b12db4758148e44bccc486b7
+                        value: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:1a3845093adb459aa921b574a8ba6067b5b8c2580201d91123a762b951024bb1
                       - name: RELATED_IMAGE_KUBE_RBAC_PROXY
                         value: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/openshift4/ose-kube-rbac-proxy@sha256:bb84ead437042603254efcb703442be8500a9450b10bbcaaee81b48a6ed869ea
                       - name: OPERATOR_NAMESPACE
@@ -474,7 +474,7 @@ spec:
                         valueFrom:
                           fieldRef:
                             fieldPath: metadata.annotations['olm.targetNamespaces']
-                    image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:e14d147daf18568ed6e09c699cafdeb740e12fb5b12db4758148e44bccc486b7
+                    image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:1a3845093adb459aa921b574a8ba6067b5b8c2580201d91123a762b951024bb1
                     name: manager
                     resources:
                       limits:
@@ -561,26 +561,26 @@ spec:
     name: GitLab, Inc.
     url: https://gitlab.com
   relatedImages:
-    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/openshift4/ose-kube-rbac-proxy@sha256:bb84ead437042603254efcb703442be8500a9450b10bbcaaee81b48a6ed869ea
-      name: kube-rbac-proxy
-    - image: registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-ocp@sha256:ef420cb3800000173b7558d8188f17340cd64a4056c7d93f2e84c723406b5446
-      name: gitlab_runner
-    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/openshift4/ose-kube-rbac-proxy@sha256:bb84ead437042603254efcb703442be8500a9450b10bbcaaee81b48a6ed869ea
-      name: kube_rbac_proxy
-    - image: registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-helper-ocp@sha256:eb65706a984d8e0117bab2bf012342eae01435449506e5b98946b199f55ea91a
-      name: gitlab_runner_helper
-    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:e14d147daf18568ed6e09c699cafdeb740e12fb5b12db4758148e44bccc486b7
-      name: gitlab_runner_operator
-    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:e14d147daf18568ed6e09c699cafdeb740e12fb5b12db4758148e44bccc486b7
-      name: gl-openshift/gitlab-runner-operator/gitlab-runner-operator-e14d147daf18568ed6e09c699cafdeb740e12fb5b12db4758148e44bccc486b7-annotation
-    - image: registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-ocp@sha256:ef420cb3800000173b7558d8188f17340cd64a4056c7d93f2e84c723406b5446
-      name: gitlab-runner
     - image: registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-helper-ocp@sha256:eb65706a984d8e0117bab2bf012342eae01435449506e5b98946b199f55ea91a
       name: gitlab-runner-helper
-    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:e14d147daf18568ed6e09c699cafdeb740e12fb5b12db4758148e44bccc486b7
+    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:1a3845093adb459aa921b574a8ba6067b5b8c2580201d91123a762b951024bb1
       name: gitlab-runner-operator
-    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:e14d147daf18568ed6e09c699cafdeb740e12fb5b12db4758148e44bccc486b7
+    - image: registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-ocp@sha256:ef420cb3800000173b7558d8188f17340cd64a4056c7d93f2e84c723406b5446
+      name: gitlab_runner
+    - image: registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-helper-ocp@sha256:eb65706a984d8e0117bab2bf012342eae01435449506e5b98946b199f55ea91a
+      name: gitlab_runner_helper
+    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:1a3845093adb459aa921b574a8ba6067b5b8c2580201d91123a762b951024bb1
+      name: gl-openshift/gitlab-runner-operator/gitlab-runner-operator-1a3845093adb459aa921b574a8ba6067b5b8c2580201d91123a762b951024bb1-annotation
+    - image: registry.gitlab.com/gitlab-org/ci-cd/gitlab-runner-ubi-images/gitlab-runner-ocp@sha256:ef420cb3800000173b7558d8188f17340cd64a4056c7d93f2e84c723406b5446
+      name: gitlab-runner
+    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/openshift4/ose-kube-rbac-proxy@sha256:bb84ead437042603254efcb703442be8500a9450b10bbcaaee81b48a6ed869ea
+      name: kube-rbac-proxy
+    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:1a3845093adb459aa921b574a8ba6067b5b8c2580201d91123a762b951024bb1
       name: manager
+    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/gitlab-runner-operator@sha256:1a3845093adb459aa921b574a8ba6067b5b8c2580201d91123a762b951024bb1
+      name: gitlab_runner_operator
+    - image: registry.gitlab.com/gitlab-org/gl-openshift/gitlab-runner-operator/openshift4/ose-kube-rbac-proxy@sha256:bb84ead437042603254efcb703442be8500a9450b10bbcaaee81b48a6ed869ea
+      name: kube_rbac_proxy
   skips:
     - gitlab-runner-operator.v1.39.0
   version: 1.40.0

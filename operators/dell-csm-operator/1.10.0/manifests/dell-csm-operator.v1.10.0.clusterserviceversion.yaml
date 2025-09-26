@@ -32,8 +32,8 @@ metadata:
                     "hostname": "csm-authorization.com",
                     "leaderElection": true,
                     "name": "proxy-server",
-                    "opa": "openpolicyagent/opa@sha256:2b1c4b231f6dfa6a2baea4af4109203b10cd4b65e836d72f03bfe5d8dfce7095",
-                    "opaKubeMgmt": "openpolicyagent/kube-mgmt@sha256:f5bf223771237756a56168729defb608ec2941c9b701d1f1af96f9ae82966517",
+                    "opa": "docker.io/openpolicyagent/opa@sha256:2b1c4b231f6dfa6a2baea4af4109203b10cd4b65e836d72f03bfe5d8dfce7095",
+                    "opaKubeMgmt": "docker.io/openpolicyagent/kube-mgmt@sha256:f5bf223771237756a56168729defb608ec2941c9b701d1f1af96f9ae82966517",
                     "openTelemetryCollectorAddress": "",
                     "privateKey": "",
                     "proxyServerIngress": [
@@ -53,9 +53,9 @@ metadata:
                     "tenantServiceReplicas": 1
                   },
                   {
-                    "commander": "rediscommander/redis-commander@sha256:19cd0c49f418779fa2822a0496c5e6516d0c792effc39ed20089e6268477e40a",
+                    "commander": "docker.io/rediscommander/redis-commander@sha256:19cd0c49f418779fa2822a0496c5e6516d0c792effc39ed20089e6268477e40a",
                     "name": "redis",
-                    "redis": "redis:8.2.0-alpine",
+                    "redis": "docker.io/library/redis@sha256:7521abdff715d396aa482183942f3fe643344287c29ccb66eee16ac08a92190f",
                     "redisCommander": "rediscommander",
                     "redisName": "redis-csm",
                     "redisReplicas": 5,
@@ -250,7 +250,7 @@ metadata:
                   "name": "snapshotter"
                 },
                 {
-                  "image": "registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:a6f7f53e9528fa60a8f0d9f7d29b71ecf4404914a50415fe9769ef544c45b729",
+                  "image": "registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:6de94d91a17a401b5f2e5cdf7bb50cd053521deaf1e189340d21c4249e8c4bf1",
                   "name": "csi-metadata-retriever"
                 },
                 {
@@ -626,7 +626,7 @@ metadata:
                   "name": "snapshotter"
                 },
                 {
-                  "image": "registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:a6f7f53e9528fa60a8f0d9f7d29b71ecf4404914a50415fe9769ef544c45b729",
+                  "image": "registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:6de94d91a17a401b5f2e5cdf7bb50cd053521deaf1e189340d21c4249e8c4bf1",
                   "name": "csi-metadata-retriever"
                 },
                 {
@@ -990,7 +990,7 @@ metadata:
                   "name": "snapshotter"
                 },
                 {
-                  "image": "registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:a6f7f53e9528fa60a8f0d9f7d29b71ecf4404914a50415fe9769ef544c45b729",
+                  "image": "registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:6de94d91a17a401b5f2e5cdf7bb50cd053521deaf1e189340d21c4249e8c4bf1",
                   "name": "csi-metadata-retriever"
                 },
                 {
@@ -1333,7 +1333,7 @@ metadata:
                   "name": "snapshotter"
                 },
                 {
-                  "image": "registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:a6f7f53e9528fa60a8f0d9f7d29b71ecf4404914a50415fe9769ef544c45b729",
+                  "image": "registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:6de94d91a17a401b5f2e5cdf7bb50cd053521deaf1e189340d21c4249e8c4bf1",
                   "name": "csi-metadata-retriever"
                 },
                 {
@@ -1506,7 +1506,7 @@ metadata:
                   "name": "snapshotter"
                 },
                 {
-                  "image": "registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:a6f7f53e9528fa60a8f0d9f7d29b71ecf4404914a50415fe9769ef544c45b729",
+                  "image": "registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:6de94d91a17a401b5f2e5cdf7bb50cd053521deaf1e189340d21c4249e8c4bf1",
                   "name": "csi-metadata-retriever"
                 },
                 {
@@ -4546,7 +4546,7 @@ spec:
                       - name: RELATED_IMAGE_externalhealthmonitorcontroller
                         value: registry.k8s.io/sig-storage/csi-external-health-monitor-controller@sha256:ce054c6fade575e9d4dbd4c3d65b9c5d1b05160aacfb9cf8d8cac51d73f3ccea
                       - name: RELATED_IMAGE_metadataretriever
-                        value: registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:a6f7f53e9528fa60a8f0d9f7d29b71ecf4404914a50415fe9769ef544c45b729
+                        value: registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:6de94d91a17a401b5f2e5cdf7bb50cd053521deaf1e189340d21c4249e8c4bf1
                       - name: RELATED_IMAGE_nginx
                         value: quay.io/nginx/nginx-unprivileged@sha256:f9dfa9c20b2b0b7c5cc830374f22f23dee3f750b6c5291ca7e0330b5c88e6403
                       - name: RELATED_IMAGE_redis-commander
@@ -4674,14 +4674,16 @@ spec:
       name: resizer
     - image: registry.k8s.io/sig-storage/csi-external-health-monitor-controller@sha256:ce054c6fade575e9d4dbd4c3d65b9c5d1b05160aacfb9cf8d8cac51d73f3ccea
       name: externalhealthmonitorcontroller
-    - image: registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:a6f7f53e9528fa60a8f0d9f7d29b71ecf4404914a50415fe9769ef544c45b729
+    - image: registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:6de94d91a17a401b5f2e5cdf7bb50cd053521deaf1e189340d21c4249e8c4bf1
       name: metadataretriever
     - image: quay.io/nginx/nginx-unprivileged@sha256:f9dfa9c20b2b0b7c5cc830374f22f23dee3f750b6c5291ca7e0330b5c88e6403
       name: nginx
-    - image: rediscommander/redis-commander@sha256:19cd0c49f418779fa2822a0496c5e6516d0c792effc39ed20089e6268477e40a
+    - image: docker.io/library/redis@sha256:7521abdff715d396aa482183942f3fe643344287c29ccb66eee16ac08a92190f
+      name: redis
+    - image: docker.io/rediscommander/redis-commander@sha256:19cd0c49f418779fa2822a0496c5e6516d0c792effc39ed20089e6268477e40a
       name: redis-commander
-    - image: openpolicyagent/opa@sha256:2b1c4b231f6dfa6a2baea4af4109203b10cd4b65e836d72f03bfe5d8dfce7095
+    - image: docker.io/openpolicyagent/opa@sha256:2b1c4b231f6dfa6a2baea4af4109203b10cd4b65e836d72f03bfe5d8dfce7095
       name: opa
-    - image: openpolicyagent/kube-mgmt@sha256:f5bf223771237756a56168729defb608ec2941c9b701d1f1af96f9ae82966517
+    - image: docker.io/openpolicyagent/kube-mgmt@sha256:f5bf223771237756a56168729defb608ec2941c9b701d1f1af96f9ae82966517
       name: kube-mgmt
   version: 1.10.0

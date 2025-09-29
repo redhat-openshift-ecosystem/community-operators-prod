@@ -7,7 +7,11 @@ entries:
     name: dell-csm-operator
     schema: olm.package
   - entries:
+      - name: dell-csm-operator.v1.4.4
+      - name: dell-csm-operator.v1.5.1
+        replaces: dell-csm-operator.v1.4.4
       - name: dell-csm-operator.v1.6.1
+        replaces: dell-csm-operator.v1.5.1
       - name: dell-csm-operator.v1.7.0
         replaces: dell-csm-operator.v1.6.1
       - name: dell-csm-operator.v1.8.0
@@ -27,6 +31,10 @@ entries:
     name: stable
     package: dell-csm-operator
     schema: olm.channel
+  - image: quay.io/community-operator-pipeline-prod/dell-csm-operator@sha256:591783c32b80332a08b76e3cfc5656d66b8ef7de00ae2944a0fd80b8e4ea0b7b
+    schema: olm.bundle
+  - image: quay.io/community-operator-pipeline-prod/dell-csm-operator@sha256:053427b038f9cbacde70892d63ab69082bdc34e2f03ea1a6711621e5e537e996
+    schema: olm.bundle
   - image: quay.io/community-operator-pipeline-prod/dell-csm-operator@sha256:00bf3de2b55e4634b567968226ae4e65e0ea280cc050120da26c7639fdd6aa16
     schema: olm.bundle
   - image: quay.io/community-operator-pipeline-prod/dell-csm-operator@sha256:bea5894fabe009ab715a565284d1ba93147120d73b9d5d4783f4340e1675f929

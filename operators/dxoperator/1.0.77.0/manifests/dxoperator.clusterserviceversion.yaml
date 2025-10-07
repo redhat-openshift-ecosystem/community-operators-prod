@@ -2,7 +2,7 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
-  name: dxoperator.v1.0.69
+  name: dxoperator.v1.0.77
   namespace: placeholder
   annotations:
     alm-examples: >-
@@ -42,22 +42,23 @@ spec:
 
     Features:
 
-    - ***Cloud Native:*** Built on cloud native concepts like microservice 
-      architecture, immutable infrastructure, and declarative 
-      configuration 
-    - ***Advanced Architecture:*** Patented technology gives you 
-      unmatched flexibility and control over how you architect your SQL 
+    - ***Cloud Native:*** Built on cloud native concepts like microservice
+      architecture, immutable infrastructure, and declarative
+      configuration
+    - ***Advanced Architecture:*** Patented technology gives you
+      unmatched flexibility and control over how you architect your SQL
       Server Availability Group in K8s
-    - ***High Availability:*** Our enterprise-grade SQL Server clustering 
-      technology enables fully automated failover in seconds for SQL 
+    - ***High Availability:*** Our enterprise-grade SQL Server clustering
+      technology enables fully automated failover in seconds for SQL
       Server Availability Groups
 
     ## Prerequisites for enabling this Operator
 
     To create a DxEnterpriseSqlAg deployment, the following are required:
 
-    - A DxEnterprise license key with Availability Group management 
-      features and tunnels enabled -- [Request a free developer license](https://dh2i.com/dxoperator-sql-server-operator-for-kubernetes/)
+    - A DxEnterprise license key with Availability Group management
+      features and tunnels enabled -- [Request a free developer license]
+      (https://dh2i.com/dxoperator-sql-server-operator-for-kubernetes/)
     - Persistent volumes, for storing the SQL Server data
 
     - A secret on your Kubernetes cluster that contains SQL Server credentials (`MSSQL_SA_PASSWORD`)
@@ -65,17 +66,15 @@ spec:
 
     - Optional: A ConfigMap containing the SQL Server configuration 
       file, for advanced options
-    - Optional: DxAdmin installed on a Windows machine. Installation 
+    - Optional: DxAdmin installed on a Windows machine. Installation
       instructions for DxAdmin can be found in DH2i documentation
 
-    ## Additional Information 
+    ## Additional Information
 
-    Visit our [DxOperator Quick Start Guide](https://support.dh2i.com/dxoperator/guides/dxoperator-qsg/)
+    Visit our [DxOperator OpenShift Quick Start Guide](https://support.dh2i.com/dxoperator/guides/dxesqlag-openshift/)
 
-    Before creating an Availability Group, reference SQL Server's [quorum considerations](https://support.dh2i.com/docs/v23.0/kbs/sql_server/availability_groups/quorum-considerations-for-sql-server-availability-groups)
-    when determining the quantity of replicas to deploy.
   maturity: stable
-  version: 1.0.69
+  version: 1.0.77
   replaces: ''
   skips: []
   minKubeVersion: 1.26.0
@@ -217,7 +216,7 @@ spec:
                         value: /apiserver.local.config/certificates/apiserver.crt
                       - name: KESTREL__ENDPOINTS__HTTPS__URL
                         value: https://0.0.0.0:5001
-                    image: intreg.dh2i.com/dh2i/dxoperator:1.0
+                    image: docker.io/dh2i/dxoperator:1.0.77.0-rhel8
                     imagePullPolicy: Always
                     livenessProbe:
                       httpGet:

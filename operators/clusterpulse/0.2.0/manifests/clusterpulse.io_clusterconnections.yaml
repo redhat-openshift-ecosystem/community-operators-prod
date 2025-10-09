@@ -1,0 +1,116 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: clusterconnections.clusterpulse.io
+spec:
+  group: clusterpulse.io
+  names:
+    kind: ClusterConnection
+    plural: clusterconnections
+    shortNames:
+    - cc
+    singular: clusterconnection
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.displayName
+      name: Display Name
+      type: string
+    - jsonPath: .spec.endpoint
+      name: Endpoint
+      type: string
+    - jsonPath: .status.phase
+      name: Status
+      type: string
+    - jsonPath: .status.health
+      name: Health
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              credentialsRef:
+                description: Reference to secret containing credentials
+                properties:
+                  name:
+                    description: Name of the secret
+                    type: string
+                  namespace:
+                    description: Namespace of the secret (defaults to same namespace)
+                    type: string
+                required:
+                - name
+                type: object
+              displayName:
+                description: Human-friendly name for the cluster
+                type: string
+              endpoint:
+                description: Cluster API endpoint URL
+                pattern: ^https://.*
+                type: string
+              labels:
+                additionalProperties:
+                  type: string
+                description: Labels for cluster categorization
+                type: object
+              monitoring:
+                description: Monitoring configuration
+                properties:
+                  interval:
+                    default: 30
+                    description: Reconciliation interval in seconds
+                    minimum: 30
+                    type: integer
+                  timeout:
+                    default: 10
+                    description: Connection timeout in seconds
+                    minimum: 5
+                    type: integer
+                type: object
+            required:
+            - endpoint
+            - credentialsRef
+            type: object
+          status:
+            properties:
+              health:
+                enum:
+                - healthy
+                - degraded
+                - unhealthy
+                - unknown
+                type: string
+              lastSyncTime:
+                format: date-time
+                type: string
+              message:
+                type: string
+              namespaces:
+                type: integer
+              nodes:
+                type: integer
+              phase:
+                enum:
+                - Connected
+                - Disconnected
+                - Error
+                - Unknown
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

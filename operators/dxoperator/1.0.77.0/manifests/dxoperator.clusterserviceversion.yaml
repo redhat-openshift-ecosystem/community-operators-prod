@@ -1,0 +1,302 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  name: dxoperator.v1.0.77
+  namespace: placeholder
+  annotations:
+    alm-examples: >-
+      [{"apiVersion":"dh2i.com/v1","kind":"DxEnterpriseSqlAg","metadata":{"name":"dxesqlag"},"spec":{"synchronousReplicas":3,"asynchronousReplicas":0,"configurationOnlyReplicas":0,"availabilityGroupName":"AG1","availabilityGroupOptions":null,"availabilityGroupClusterType":"EXTERNAL","createLoadBalancers":true,"template":{"metadata":{"labels":{"label":"example"},"annotations":{"annotation":"example"}},"spec":{"dxEnterpriseContainer":{"image":"docker.io/dh2i/dxe:latest","imagePullPolicy":"Always","acceptEula":false,"clusterSecret":null,"vhostName":"VHOST1","joinExistingCluster":false,"volumeClaimConfiguration":{"storageClassName":null,"resources":{"requests":{"storage":"1Gi"}}}},"mssqlServerContainer":{"image":"mcr.microsoft.com/mssql/server:latest","imagePullPolicy":"Always","mssqlSecret":null,"acceptEula":false,"mssqlPID":"Developer","mssqlConfigMap":null,"volumeClaimConfiguration":{"storageClassName":null,"resources":{"requests":{"storage":"2Gi"}}}}}}}}]
+    k8sMinVersion: ''
+    k8sMaxVersion: ''
+    categories: Database
+    certified: 'false'
+    createdAt: "2025-10-07T12:00:00Z"
+    description: >-
+      DxOperator by DH2i automates the lifecycle of cloud-native Microsoft SQL
+      Server Availability Group database operations.
+    containerImage: docker.io/dh2i/dxoperator:1.0.77.0-rhel8
+    support: 'https://support.dh2i.com'
+    capabilities: Basic Install
+    repository: 'https://hub.docker.com/r/dh2i/dxoperator'
+    operators.openshift.io/valid-subscription: |
+      This operator requires valid licenses for DxEnterprise and Microsoft SQL Server.
+      Ensure that you have appropriate commercial entitlements for both products before deploying this operator.
+      Use of this operator indicates acceptance of the DxEnterprise and SQL Server license terms.
+    features.operators.openshift.io/disconnected: "false"
+    features.operators.openshift.io/fips-compliant: "false"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+spec:
+  displayName: DxOperator
+  description: >
+    ## Deploy Highly Available SQL Server Containers
+
+    SQL Server availability groups ensure high uptime and minimize data  loss by providing
+    data replication and automatic failover between  multiple instances of SQL Server.
+    This feature provides:
+
+    - High availability and failover when a pod/node/instance fails
+
+    - Data replication for off-site disaster recovery
+
+    ## DxOperator by DH2i
+
+    DxOperator by DH2i automates the deployment of SQL Server  Availability Groups
+    in Kubernetes and effortlessly integrates your  workloads into the DxEnterprise
+    HA clustering framework. This gives  you the flexibility to deploy SQL Server
+    workloads on any operating  system, server configuration, or cloud to maximize
+    performance  without fear of downtime or data loss.
+
+    Features:
+
+    - ***Cloud Native:*** Built on cloud native concepts like microservice
+      architecture, immutable infrastructure, and declarative
+      configuration
+    - ***Advanced Architecture:*** Patented technology gives you
+      unmatched flexibility and control over how you architect your SQL
+      Server Availability Group in K8s
+    - ***High Availability:*** Our enterprise-grade SQL Server clustering
+      technology enables fully automated failover in seconds for SQL
+      Server Availability Groups
+
+    ## Prerequisites for enabling this Operator
+
+    To create a DxEnterpriseSqlAg deployment, the following are required:
+
+    - A DxEnterprise license key with Availability Group management
+      features and tunnels enabled -- [Request a free developer license]
+      (https://dh2i.com/dxoperator-sql-server-operator-for-kubernetes/)
+    - Persistent volumes, for storing the SQL Server data
+
+    - A secret on your Kubernetes cluster that contains SQL Server credentials (`MSSQL_SA_PASSWORD`)
+    and your DxEnterprise cluster password (`DX_PASSKEY`)
+
+    - Optional: A ConfigMap containing the SQL Server configuration
+      file, for advanced options
+    - Optional: DxAdmin installed on a Windows machine. Installation
+      instructions for DxAdmin can be found in DH2i documentation
+
+    ## Additional Information
+
+    Visit our [DxOperator OpenShift Quick Start Guide](https://support.dh2i.com/dxoperator/guides/dxesqlag-openshift/)
+
+  maturity: stable
+  version: 1.0.77
+  skips: []
+  minKubeVersion: 1.26.0
+  keywords:
+    - sql server
+    - availability group
+    - always on
+    - availability
+    - mssql
+  maintainers:
+    - name: DH2i Support
+      email: support@dh2i.com
+  provider:
+    name: DH2i Company
+  labels: {}
+  selector:
+    matchLabels: {}
+  links:
+    - name: Home Page
+      url: https://dh2i.com
+  icon:
+    - base64data: >-
+        PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MDAiIGhlaWdodD0iNDg3IiB2aWV3Qm94PSIwIDAgNTAwIDQ4NyI+PGcgdHJhbnNmb3JtPSJzY2FsZSguNDMzMzQpIj48cGF0aCBkPSJNNTc0LjU2Ni4wMjNjLTcuMDM2LjE4My0xMy44NDQgMi41ODktMTkuOTIzIDYuMDM0QzQxMi42MjggNzYuOTk2IDI3MC42MDggMTQ3LjkyNSAxMjguNTk1IDIxOC44N2MtMTAuMTYxIDUuNzI4LTE3LjY3OCAxNS44OTctMjAuMjA1IDI3LjI4My0xLjI5OCA1LjQzLTIuNTUgMTAuODczLTMuODY1IDE2LjNBMjk5MzgzMy41MzkgMjk5MzgzMy41MzkgMCAwIDAgLjYyOSA2OTguOTE0Yy0yLjEwNiAxMS42MjQgMS4xNDggMjQuMDkyIDguNjk2IDMzLjE4NSAyNy4wMjMgMzQuMDQ4IDU0LjAzNiA2OC4xMDggODEuMDU2IDEwMi4xNkMxNjIuNTkgOTI1LjI2NSAyMzQuNzg2IDEwMTYuMjgxIDMwNyAxMTA3LjI4MWM3Ljk2MyA4Ljk1OCAyMC4wMDUgMTQuMDcgMzEuOTc2IDEzLjY2NyA1NC42ODItLjAyOCAxMDkuMzY0IDAgMTY0LjA0Ni0uMDEgMTA1LjE5NyAwIDIxMC4zOTQuMDEgMzE1LjU5MS0uMDEgMTEuODA0LS42NyAyMy4xNzMtNi43MSAzMC4zMzktMTYuMTE1IDczLjI5My05MS40MjYgMTQ2LjU5NS0xODIuODUxIDIxOS44NzgtMjc0LjI4OCAyNS44MzEtMzIuMjMxIDUxLjY3LTY0LjQ1NiA3Ny40OTYtOTYuNjkxIDYuODQ0LTkuNjAxIDkuMjA0LTIyLjI0MyA2LjI2MS0zMy42NjMtMy40OTYtMTQuODA2LTYuOTgtMjkuNjE2LTEwLjQ4LTQ0LjQyMS0zMi43MjktMTM4LjY2Mi02NS40NTktMjc3LjMyMy05OC4xODctNDE1Ljk4NS0xLjUxOC0xLjc1Ni0yLjA4Mi00LjA5My0zLjQ1NC01Ljk0OC00LjU2Ny03LjY4My0xMS42OTQtMTMuNzI3LTE5Ljg3My0xNy4yNzVBMjYwMDcxMy4xMTYgMjYwMDcxMy4xMTYgMCAwIDAgNTkyLjIwMyAzLjIxNkM1ODYuNjg2Ljc1NiA1ODAuNTc3LS4xNjIgNTc0LjU2Ni4wMjNaIiBzdHlsZT0iZmlsbDojZmZmIi8+PHBhdGggZD0iTTEwMTEuNDYgMjMzLjMxYy0xLjI2LTUuMzUtNi4zMy0xMS43NC0xMS4yNS0xNC4xOUw1NjkuMTkgNC40NmMtNC45Mi0yLjQ1LTEyLjk4LTIuNDUtMTcuOSAwbC00MjkuOCAyMTQuNjVjLTQuOTIgMi40Ni05Ljk5IDguODUtMTEuMjYgMTQuMkwyLjMyIDY4Ni41NWMtMS4yNyA1LjM1LjQ4IDEzLjI1IDMuOSAxNy41NmwyOTcuOTkgMzc1LjYzYzMuNDIgNC4zMSAxMC43MSA3LjgzIDE2LjIxIDcuODNoNDgwLjg3YzUuNSAwIDEyLjgxLTMuNTEgMTYuMjYtNy44bDI5Ny45MS0zNzEuNThjMy40NC00LjI5IDUuMjItMTIuMTggMy45Ni0xNy41M2wtMTA3Ljk1LTQ1Ny4zNVptLTM4LjY4IDQ4MS4yNGM0Ljc4IDIuNzMgNi4yNiA4Ljc0IDMuMjkgMTMuMzhMODk5Ljg0IDg0Ni45Yy0yLjk3IDQuNjMtOS4zIDYuMTktMTQuMDggMy40NmwtNjkuMzctMzkuNThjLTQuNzgtMi43My0xMi42My0yLjgtMTcuNDYtLjE2bC0xNDAuNjIgNzYuOTFjLTQuODMgMi42NC04Ljc3IDkuMy04Ljc3IDE0Ljh2ODUuMjdjMCA1LjUtNC41IDEwLTEwIDEwSDQ5MS4zNWMtNS41IDAtMTAtNC41LTEwLTEwdi03Ny44OGMwLTUuNS0zLjk1LTEyLjE1LTguNzktMTQuNzhsLTE0Ny45NC04MC40MWMtNC44My0yLjYzLTEyLjY5LTIuNTUtMTcuNDcuMThsLTYyLjQ1IDM1LjYzYy00Ljc4IDIuNzMtMTEuMTEgMS4xNy0xNC4wOC0zLjQ2bC03Ni4yMy0xMTguOTdjLTIuOTctNC42My0xLjQ5LTEwLjY1IDMuMjktMTMuMzhsNTkuODctMzQuMTVjNC43OC0yLjczIDguNjktOS40NiA4LjY5LTE0Ljk2VjQ4NC4wN2MwLTUuNS0zLjkxLTEyLjIzLTguNjktMTQuOTZsLTY2LjAyLTM3LjY3Yy00Ljc4LTIuNzMtNi4yNi04Ljc0LTMuMjktMTMuMzhsNzYuMjMtMTE4Ljk3YzIuOTctNC42MyA5LjMtNi4xOSAxNC4wOC0zLjQ2bDc0IDQyLjIxYzQuNzggMi43MyAxMi42NCAyLjggMTcuNDYuMTZsMTQyLjU3LTc3LjgzYzQuODMtMi42NCA4Ljc4LTkuMjkgOC43OC0xNC43OVYxNzguOGMwLTUuNSA0LjUtMTAgMTAtMTBoMTQ4LjE5YzUuNSAwIDEwIDQuNSAxMCAxMHY2OS4zMmMwIDUuNSAzLjk2IDEyLjE0IDguOCAxNC43NmwxNDAuNjEgNzYuMDFjNC44NCAyLjYyIDEyLjcxIDIuNTMgMTcuNDgtLjJsNzUuNDktNDMuMDdjNC43OC0yLjczIDExLjExLTEuMTcgMTQuMDggMy40Nmw3Ni4yMyAxMTguOTdjMi45NyA0LjYzIDEuNDkgMTAuNjUtMy4yOSAxMy4zOGwtNzAuNjkgNDAuMzNjLTQuNzggMi43My04LjY5IDkuNDYtOC42OSAxNC45NnYxNzYuMDJjMCA1LjUgMy45MSAxMi4yMyA4LjY5IDE0Ljk2bDY0LjU0IDM2LjgyeiIgc3R5bGU9ImZpbGw6IzFlMmY1ZiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTYuMDYyIDE1LjM3MSkiLz48cGF0aCBkPSJNNTY1LjI0MiAzMDMuMDA5Yy02OC44NjkgMC0xMzAuMjI2IDI1LjAzMy0xNzcuODc0IDY2LjMxOGw2NC40MiA2NC40MmMzMS4wNzktMjUgNzAuNDYzLTQwLjA4NiAxMTMuNDU0LTQwLjA4NiA0MS43ODggMCA4MS42NTkgMTQuODg2IDExMi43NTUgMzkuNTY0bDY0LjQ2MS02NC40NjZjLTQ3LjYwNC00MC45NDctMTA5LjQ5OS02NS43NS0xNzcuMjE2LTY1Ljc1em0yMDUuNTEyIDk0LjAyOC02NC4yNzIgNjQuMjY3YzI1LjA1OCAzMS4wOTIgNDAuMDY5IDcwLjYyOSA0MC4wNjkgMTEzLjY2NiAwIDQ0Ljg5NS0xNS4wNzMgODIuNzAxLTQwLjA1NSAxMTMuNDg1bDY0LjQzIDY0LjQzYzQxLjI5LTQ3LjY5MiA2Ni4yNzMtMTA5Ljg4MiA2Ni4yNzMtMTc3LjkwNiAwLTY2LjA2Ni0yNS4wODYtMTI5LjkyNS02Ni40NDUtMTc3Ljk0MnptLTQxMS42MjMuNjIyYy00MS4wMDYgNDcuNjItNjUuODUgMTA5LjU0Mi02NS44NSAxNzcuMzExIDAgNjkuMTM3IDI0LjgxIDEyOS44MzUgNjUuNzUgMTc3LjIybDY0LjM0LTY0LjMzOWMtMjQuNjc3LTMwLjk3Mi0zOS40NDItNzAuMjAyLTM5LjQ0Mi0xMTIuODgxIDAtNDIuNzI3IDE0LjgxNy04MS45OCAzOS41NS0xMTIuOTY3bC02NC4zNDgtNjQuMzQ0em05Mi41MzEgMzE4LjQ2Ni02NC4zOTggNjQuMzk4YzQ3LjcgNDEuMzQzIDEwOS44OTQgNjYuNDA4IDE3Ny45NzggNjYuNDA4IDY2LjM2NiAwIDEyOS41MTktMjQuODI0IDE3Ny4zMjUtNjUuODM2bC02NC4zNDQtNjQuMzQ0Yy0zMC45OTMgMjQuNzI4LTcwLjI1MiAzOS41MjgtMTEyLjk4IDM5LjUyOC00NC4zMjEgMC04Mi42ODQtMTUuMTEtMTEzLjU4LTQwLjE1NHoiIHN0eWxlPSJmaWxsOiNlNDdkMjUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE2LjA2MiAxNS4zNzEpIi8+PGNpcmNsZSBjeD0iNTY3LjQzIiBjeT0iNTc3LjQ3IiByPSI5My4yMSIgc3R5bGU9ImZpbGw6IzI1M2Y5OCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTMuODcyIDEyLjg3MSkiLz48L2c+PC9zdmc+Cg==
+      mediatype: image/svg+xml
+  customresourcedefinitions:
+    owned:
+      - name: dxenterprisesqlags.dh2i.com
+        displayName: DxEnterpriseSqlAg
+        kind: DxEnterpriseSqlAg
+        version: v1
+        description: DxEnterprise SQL Server Availability Group
+        resources:
+          - version: v1
+            kind: Service
+          - version: v1
+            kind: Pod
+          - version: v1
+            kind: Secret
+          - version: v1
+            kind: ConfigMap
+        specDescriptors:
+          - displayName: DxEnterprise Secret
+            description: >-
+              The secret containing a DX_PASSKEY, DX_LICENSE, and optional
+              DX_OTPK environment variable(s).
+            path: template.spec.dxEnterpriseContainer.clusterSecret
+            x-descriptors: [urn:alm:descriptor:io.kubernetes:Secret]
+          - displayName: SQL Server Secret
+            description: The secret containing the MSSQL_SA_PASSWORD environment variable.
+            path: template.spec.mssqlServerContainer.mssqlSecret
+            x-descriptors: [urn:alm:descriptor:io.kubernetes:Secret]
+          - displayName: SQL Server Configuration
+            description: >-
+              The name of the ConfigMap that contains configuration info for the
+              mssql.conf file
+            path: template.spec.mssqlServerContainer.mssqlConfigMap
+            x-descriptors: [urn:alm:descriptor:io.kubernetes:ConfigMap]
+          - displayName: DxEnterprise Image Pull Policy
+            description: Pull policy for the DxEnterprise container image
+            path: template.spec.dxEnterpriseContainer.imagePullPolicy
+            x-descriptors: [urn:alm:descriptor:com.tectonic.ui:imagePullPolicy]
+          - displayName: SQL Server Image Pull Policy
+            description: Pull policy for the SQL Server container image
+            path: template.spec.mssqlServerContainer.imagePullPolicy
+            x-descriptors: [urn:alm:descriptor:com.tectonic.ui:imagePullPolicy]
+        statusDescriptors: []
+    required: []
+  install:
+    strategy: deployment
+    spec:
+      permissions: []
+      clusterPermissions:
+        - serviceAccountName: dxoperator-service-account
+          rules:
+            - apiGroups: ['', dh2i.com, coordination.k8s.io]
+              resources:
+                - pods
+                - persistentvolumeclaims
+                - dxenterprisesqlags
+                - leases
+              verbs: ['*']
+            - apiGroups: ['']
+              resources: [services]
+              verbs: ['*']
+            - apiGroups: ['']
+              resources: [secrets, configmaps]
+              verbs: ['*']
+            - apiGroups: ['']
+              resources: [events]
+              verbs: [create, get, list, update]
+            - apiGroups: [apps]
+              resources: [deployments]
+              verbs: [get, list]
+            - apiGroups: ['']
+              resources: [pods/status]
+              verbs: [get, patch, update]
+            - apiGroups: ['']
+              resources: [services/status]
+              verbs: [get, patch, update]
+            - apiGroups: ['']
+              resources: [persistentvolumeclaims/status]
+              verbs: [get, patch, update]
+            - apiGroups: [dh2i.com]
+              resources: [dxenterprisesqlags/status]
+              verbs: [get, patch, update]
+            - apiGroups: [dh2i.com]
+              resources: [dxenterprisesqlags/status]
+              verbs: [get, patch, update]
+            - apiGroups: [apps]
+              resources: [deployments/status]
+              verbs: [get, patch, update]
+      deployments:
+        - name: dxoperator-operator
+          spec:
+            replicas: 1
+            revisionHistoryLimit: 0
+            selector:
+              matchLabels:
+                operator: dxoperator
+                operator-element: operator-instance
+            template:
+              metadata:
+                labels:
+                  operator: dxoperator
+                  operator-element: operator-instance
+              spec:
+                serviceAccountName: dxoperator-service-account
+                containers:
+                  - env:
+                      - name: POD_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+                      - name: KESTREL__ENDPOINTS__HTTP__URL
+                        value: http://0.0.0.0:5000
+                      - name: KESTREL__ENDPOINTS__HTTPS__CERTIFICATE__KEYPATH
+                        value: /apiserver.local.config/certificates/apiserver.key
+                      - name: KESTREL__ENDPOINTS__HTTPS__CERTIFICATE__PATH
+                        value: /apiserver.local.config/certificates/apiserver.crt
+                      - name: KESTREL__ENDPOINTS__HTTPS__URL
+                        value: https://0.0.0.0:5001
+                    image: docker.io/dh2i/dxoperator:1.0.77.0-rhel8
+                    imagePullPolicy: Always
+                    livenessProbe:
+                      httpGet:
+                        path: /health
+                        port: http
+                      initialDelaySeconds: 30
+                      timeoutSeconds: 1
+                    name: operator
+                    ports:
+                      - containerPort: 5000
+                        name: http
+                      - containerPort: 5001
+                        name: webhook-server
+                    readinessProbe:
+                      httpGet:
+                        path: /ready
+                        port: http
+                      initialDelaySeconds: 15
+                      timeoutSeconds: 1
+                    resources:
+                      limits:
+                        cpu: 100m
+                        memory: 128Mi
+                      requests:
+                        cpu: 100m
+                        memory: 64Mi
+                terminationGracePeriodSeconds: 10
+  installModes:
+    - type: OwnNamespace
+      supported: false
+    - type: SingleNamespace
+      supported: false
+    - type: MultiNamespace
+      supported: false
+    - type: AllNamespaces
+      supported: true
+  webhookdefinitions:
+    - type: ValidatingAdmissionWebhook
+      generateName: dxoperator.v1.sqlagentity.validator
+      deploymentName: dxoperator-operator
+      failurePolicy: Fail
+      matchPolicy: Exact
+      reinvocationPolicy: Never
+      webhookPath: /dh2i.com/v1/dxenterprisesqlags/validator/validate
+      containerPort: 443
+      targetPort: 5001
+      admissionReviewVersions: [v1]
+      rules:
+        - apiGroups: [dh2i.com]
+          apiVersions: [v1]
+          operations: [CREATE, UPDATE]
+          resources: [dxenterprisesqlags]
+          scope: '*'
+      sideEffects: None
+      timeoutSeconds: 10
+    - type: MutatingAdmissionWebhook
+      generateName: dxoperator.v1.sqlagentity.mutator
+      deploymentName: dxoperator-operator
+      failurePolicy: Fail
+      matchPolicy: Exact
+      reinvocationPolicy: Never
+      webhookPath: /dh2i.com/v1/dxenterprisesqlags/mutator/mutate
+      containerPort: 443
+      targetPort: 5001
+      admissionReviewVersions: [v1]
+      rules:
+        - apiGroups: [dh2i.com]
+          apiVersions: [v1]
+          operations: [CREATE, UPDATE]
+          resources: [dxenterprisesqlags]
+          scope: '*'
+      sideEffects: None
+      timeoutSeconds: 10

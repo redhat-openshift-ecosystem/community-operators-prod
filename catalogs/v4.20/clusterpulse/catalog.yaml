@@ -1,16 +1,34 @@
 ---
-defaultChannel: alpha
+defaultChannel: fast-v0.2
 name: clusterpulse
 schema: olm.package
 ---
 entries:
-- name: clusterpulse.v0.1.0
-name: alpha
+- name: clusterpulse.v0.2.0
+name: candidate-v0
 package: clusterpulse
 schema: olm.channel
 ---
-image: quay.io/community-operator-pipeline-prod/clusterpulse:0.1.0
-name: clusterpulse.v0.1.0
+entries:
+- name: clusterpulse.v0.2.0
+name: candidate-v0.2
+package: clusterpulse
+schema: olm.channel
+---
+entries:
+- name: clusterpulse.v0.2.0
+name: fast-v0
+package: clusterpulse
+schema: olm.channel
+---
+entries:
+- name: clusterpulse.v0.2.0
+name: fast-v0.2
+package: clusterpulse
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/clusterpulse:0.2.0
+name: clusterpulse.v0.2.0
 package: clusterpulse
 properties:
 - type: olm.gvk
@@ -36,7 +54,7 @@ properties:
 - type: olm.package
   value:
     packageName: clusterpulse
-    version: 0.1.0
+    version: 0.2.0
 - type: olm.csv.metadata
   value:
     annotations:
@@ -115,6 +133,7 @@ properties:
               },
               "frontend": {
                 "config": {
+                  "enableAnonymousAccess": false,
                   "features": {
                     "devTools": false,
                     "mockData": false,
@@ -172,8 +191,12 @@ properties:
               },
               "redis": {
                 "enabled": true,
-                "volumePermissions": {
-                  "enabled": true
+                "global": {
+                  "compatibility": {
+                    "openshift": {
+                      "adaptSecurityContext": "force"
+                    }
+                  }
                 }
               }
             }
@@ -294,8 +317,8 @@ properties:
         ]
       capabilities: Basic Install
       categories: Monitoring
-      containerImage: docker.io/clusterpulse/clusterpulse-operator:0.1.0
-      createdAt: "2025-09-26T21:09:27Z"
+      containerImage: docker.io/clusterpulse/clusterpulse-operator:0.2.0
+      createdAt: "2025-10-09T19:47:02Z"
       description: Provides OpenShift cluster health monitoring
       operators.operatorframework.io/builder: operator-sdk-v1.41.1
       operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
@@ -652,8 +675,8 @@ properties:
     provider:
       name: ClusterPulse
 relatedImages:
-- image: docker.io/clusterpulse/clusterpulse-operator:0.1.0
+- image: docker.io/clusterpulse/clusterpulse-operator:0.2.0
   name: ""
-- image: quay.io/community-operator-pipeline-prod/clusterpulse:0.1.0
+- image: quay.io/community-operator-pipeline-prod/clusterpulse:0.2.0
   name: ""
 schema: olm.bundle

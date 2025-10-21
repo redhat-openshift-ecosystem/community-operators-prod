@@ -1,0 +1,339 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "k8s.aws/v1alpha1",
+          "kind": "DeviceConfig",
+          "metadata": {
+            "name": "device-config",
+            "namespace": "ai-operator-on-aws"
+          },
+          "spec": {
+            "customSchedulerImage": "public.ecr.aws/eks-distro/kubernetes/kube-scheduler:v1.28.5-eks-1-28-latest",
+            "devicePluginImage": "public.ecr.aws/neuron/neuron-device-plugin:2.23.30.0",
+            "driversImage": "ghcr.io/awslabs/kmod-with-kmm-for-ai-chips-on-aws/neuron-driver:2.24.7.0-ocp4.19.9",
+            "schedulerExtensionImage": "public.ecr.aws/neuron/neuron-scheduler:2.23.30.0",
+            "selector": {
+              "feature.node.kubernetes.io/aws-neuron": "true"
+            },
+            "useInTreeDrivers": false
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-10-04T19:14:55Z"
+    operatorframework.io/suggested-namespace: ai-operator-on-aws
+    operators.operatorframework.io/builder: operator-sdk-v1.32.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    support: RedHat
+    description: |-
+      AWS Neuron operator is resposible for deploying AWS Neuron kernel drivers, device plugin and customed scheduler
+  name: aws-neuron-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: DeviceConfig
+      name: deviceconfigs.k8s.aws
+      version: v1alpha1
+  description: Aws Neuron Operator description. TODO.
+  displayName: Aws Neuron Operator
+  icon:
+  - base64data: "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNDBweCIgaGVpZ2h0PSI0MHB4IiB2aWV3Qm94PSIwIDAgNDAgNDAiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+SWNvbi1BcmNoaXRlY3R1cmUtR3JvdXAvMzIvQVdTLUNsb3VkLWxvZ29fMzJfRGFyazwvdGl0bGU+CiAgICA8ZyBpZD0iSWNvbi1BcmNoaXRlY3R1cmUtR3JvdXAvMzIvQVdTLUNsb3VkLWxvZ29fMzIiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPgogICAgICAgIDxyZWN0IGlkPSJSZWN0YW5nbGUiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PC9yZWN0PgogICAgICAgIDxwYXRoIGQ9Ik0zMi42OTgyLDIzLjkwMDggQzMzLjA1OTIsMjQuMzY5OCAzMi4yOTgyLDI2LjI5OTggMzEuOTU3MiwyNy4xNjM4IEMzMS44NTMyLDI3LjQyNTggMzIuMDc1MiwyNy41Mjg4IDMyLjMwNzIsMjcuMzMxOCBDMzMuODIwMiwyNi4wNDc4IDM0LjIxMjIsMjMuMzU2OCAzMy45MDEyLDIyLjk2ODggQzMzLjU5NDIsMjIuNTgyOCAzMC45NTAyLDIyLjI1MTggMjkuMzM4MiwyMy40MDA4IEMyOS4wODkyLDIzLjU3NzggMjkuMTMyMiwyMy44MjE4IDI5LjQwNzIsMjMuNzg5OCBDMzAuMzE1MiwyMy42Nzc4IDMyLjMzODIsMjMuNDMyOCAzMi42OTgyLDIzLjkwMDggTDMyLjY5ODIsMjMuOTAwOCBaIE0zMS44NTYyLDI1LjkwOTggQzMyLjM3NDIsMjUuNTMxOCAzMS45MzAyLDI0Ljk2ODggMzEuNDAyMiwyNS4xODk4IEMyNy44ODkyLDI2LjY1MzggMjQuMDc1MiwyNy4zNjI4IDIwLjYwMjIsMjcuMzYyOCBDMTUuNDU5MiwyNy4zNjI4IDEwLjQ3NTIsMjUuOTczOCA2LjQ0NjIsMjMuNjY3OCBDNi4wOTQyLDIzLjQ2NTggNS44MzMyLDIzLjgyMjggNi4xMjcyLDI0LjA4MTggQzkuODYwMiwyNy4zOTc4IDE0Ljc5NjIsMjkuMzkwOCAyMC4yNzQyLDI5LjM5MDggQzI0LjE4NDIsMjkuMzkwOCAyOC43MjUyLDI4LjE4MjggMzEuODU2MiwyNS45MDk4IEwzMS44NTYyLDI1LjkwOTggWiBNMjkuNzEyMiwyMC42OTQ4IEMyOS4yMTQyLDIwLjY5NDggMjguNzI3MiwyMC42NDE4IDI4LjI1MzIsMjAuNTMzOCBDMjcuNzc3MiwyMC40MjQ4IDI3LjQxMzIsMjAuMzAxOCAyNy4xNjAyLDIwLjE2MDggQzI3LjAwNTIsMjAuMDc2OCAyNi45MDgyLDE5Ljk4ODggMjYuODY5MiwxOS45MDI4IEMyNi44MzEyLDE5LjgxNDggMjYuODExMiwxOS43Mjg4IDI2LjgxMTIsMTkuNjQyOCBMMjYuODExMiwxOS4xNzM4IEMyNi44MTEyLDE4Ljk3OTggMjYuODg0MiwxOC44ODA4IDI3LjAyNzIsMTguODgwOCBDMjcuMDgyMiwxOC44ODA4IDI3LjE0MDIsMTguODkzOCAyNy4yMDAyLDE4LjkxMzggQzI3LjI2MTIsMTguOTM2OCAyNy4zNDEyLDE4Ljk2ODggMjcuNDQxMiwxOS4wMTE4IEMyNy43NjEyLDE5LjE1MjggMjguMTA4MiwxOS4yNTk4IDI4LjQ4NTIsMTkuMzM1OCBDMjguODYxMiwxOS40MTA4IDI5LjIzNjIsMTkuNDQ4OCAyOS42MTEyLDE5LjQ0ODggQzMwLjIwODIsMTkuNDQ4OCAzMC42NjkyLDE5LjM0NjggMzAuOTk1MiwxOS4xNDA4IEMzMS4zMjIyLDE4LjkzNjggMzEuNDg0MiwxOC42NDU4IDMxLjQ4NDIsMTguMjY3OCBDMzEuNDg0MiwxOC4wMDc4IDMxLjM5OTIsMTcuNzkyOCAzMS4yMjcyLDE3LjYxODggQzMxLjA1NjIsMTcuNDQ0OCAzMC43MzgyLDE3LjI4NTggMzAuMjc1MiwxNy4xMzM4IEwyOC45MDAyLDE2LjcxMjggQzI4LjIwMzIsMTYuNDk2OCAyNy42OTgyLDE2LjE4MzggMjcuMzgzMiwxNS43NzQ4IEMyNy4wNjgyLDE1LjM2MjggMjYuOTExMiwxNC45MTU4IDI2LjkxMTIsMTQuNDI3OCBDMjYuOTExMiwxNC4wNDA4IDI2Ljk5NjIsMTMuNjk4OCAyNy4xNjkyLDEzLjQwMDggQzI3LjMzOTIsMTMuMTAzOCAyNy41NjQyLDEyLjg1MDggMjcuODQ1MiwxMi42Mzk4IEMyOC4xMzAyLDEyLjQyOTggMjguNDU5MiwxMi4yNzE4IDI4LjgzNDIsMTIuMTYxOCBDMjkuMjA4MiwxMi4wNTQ4IDI5LjYwNjIsMTEuOTk5OCAzMC4wMjYyLDExLjk5OTggQzMwLjIzNjIsMTEuOTk5OCAzMC40NDkyLDEyLjAxMzggMzAuNjY2MiwxMi4wNDA4IEMzMC44ODEyLDEyLjA2NjggMzEuMDg1MiwxMi4xMDI4IDMxLjI3ODIsMTIuMTQ1OCBDMzEuNDcxMiwxMi4xOTA4IDMxLjY1MTIsMTIuMjM4OCAzMS44MTYyLDEyLjI5MTggQzMxLjk4MjIsMTIuMzQ2OCAzMi4xMTQyLDEyLjQwMDggMzIuMjE1MiwxMi40NTM4IEMzMi4zNDYyLDEyLjUyODggMzIuNDM5MiwxMi42MDQ4IDMyLjQ5NjIsMTIuNjgwOCBDMzIuNTUxMiwxMi43NTU4IDMyLjU3OTIsMTIuODU3OCAzMi41NzkyLDEyLjk4ODggTDMyLjU3OTIsMTMuNDI0OCBDMzIuNTc5MiwxMy42MTk4IDMyLjUwNzIsMTMuNzE1OCAzMi4zNjIyLDEzLjcxNTggQzMyLjI4NTIsMTMuNzE1OCAzMi4xNjUyLDEzLjY3OTggMzEuOTk4MiwxMy42MDM4IEMzMS40NTgyLDEzLjM2NDggMzAuODQ4MiwxMy4yNDc4IDMwLjE3NzIsMTMuMjQ3OCBDMjkuNjM1MiwxMy4yNDc4IDI5LjIxNDIsMTMuMzMzOCAyOC45MTYyLDEzLjUwNTggQzI4LjYxNzIsMTMuNjc5OCAyOC40NjgyLDEzLjk1NDggMjguNDY4MiwxNC4zMzI4IEMyOC40NjgyLDE0LjU5MDggMjguNTYyMiwxNC44MDk4IDI4Ljc1MTIsMTQuOTg3OCBDMjguOTM5MiwxNS4xNjU4IDI5LjI4NjIsMTUuMzM1OCAyOS43OTUyLDE1LjQ5ODggTDMxLjEzNzIsMTUuOTIwOCBDMzEuODIyMiwxNi4xMzQ4IDMyLjMxMTIsMTYuNDMyOCAzMi42MDMyLDE2LjgwODggQzMyLjg5NzIsMTcuMTg3OCAzMy4wNDQyLDE3LjYxODggMzMuMDQ0MiwxOC4xMDM4IEMzMy4wNDQyLDE4LjUwNDggMzIuOTYxMiwxOC44NjM4IDMyLjc5NDIsMTkuMTgxOCBDMzIuNjI4MiwxOS41MDA4IDMyLjM5OTIsMTkuNzcxOCAzMi4xMDUyLDE5Ljk5ODggQzMxLjgxMzIsMjAuMjI1OCAzMS40NjMyLDIwLjM5NzggMzEuMDU0MiwyMC41MTY4IEMzMC42NDQyLDIwLjYzNjggMzAuMTk3MiwyMC42OTQ4IDI5LjcxMjIsMjAuNjk0OCBMMjkuNzEyMiwyMC42OTQ4IFogTTE3LjU0NzIsMjAuNDUwOCBDMTcuMzgxMiwyMC40NTA4IDE3LjI2MDIsMjAuNDIzOCAxNy4xODIyLDIwLjM2MzggQzE3LjEwNDIsMjAuMzAyOCAxNy4wMzgyLDIwLjE4MjggMTYuOTgzMiwxOS45OTg4IEwxNC43NjEyLDEyLjg0MTggQzE0LjcwODIsMTIuNjU3OCAxNC42NzkyLDEyLjUzNDggMTQuNjc5MiwxMi40NzA4IEMxNC42NzkyLDEyLjMxOTggMTQuNzU3MiwxMi4yNDM4IDE0LjkxMjIsMTIuMjQzOCBMMTUuODM5MiwxMi4yNDM4IEMxNi4wMTYyLDEyLjI0MzggMTYuMTQwMiwxMi4yNzM4IDE2LjIxMzIsMTIuMzMzOCBDMTYuMjg0MiwxMi4zOTE4IDE2LjM0NzIsMTIuNTExOCAxNi40MDIyLDEyLjY5NzggTDE3Ljk5MzIsMTguODE3OCBMMTkuNDcwMiwxMi42OTc4IEMxOS41MTQyLDEyLjUxMTggMTkuNTc0MiwxMi4zOTE4IDE5LjY1MTIsMTIuMzMzOCBDMTkuNzI4MiwxMi4yNzM4IDE5Ljg1NTIsMTIuMjQzOCAyMC4wMzEyLDEyLjI0MzggTDIwLjc5NjIsMTIuMjQzOCBDMjAuOTcxMiwxMi4yNDM4IDIxLjA5ODIsMTIuMjczOCAyMS4xNzYyLDEyLjMzMzggQzIxLjI1MzIsMTIuMzkxOCAyMS4zMTQyLDEyLjUxMTggMjEuMzU4MiwxMi42OTc4IEwyMi44NTEyLDE4Ljg5ODggTDI0LjQ5MTIsMTIuNjk3OCBDMjQuNTQ2MiwxMi41MTE4IDI0LjYwOTIsMTIuMzkxOCAyNC42ODEyLDEyLjMzMzggQzI0Ljc1NDIsMTIuMjczOCAyNC44NzcyLDEyLjI0MzggMjUuMDU0MiwxMi4yNDM4IEwyNS45MzIyLDEyLjI0MzggQzI2LjA4ODIsMTIuMjQzOCAyNi4xNjUyLDEyLjMxOTggMjYuMTY1MiwxMi40NzA4IEMyNi4xNjUyLDEyLjUxMTggMjYuMTU4MiwxMi41NjE4IDI2LjE0OTIsMTIuNjE0OCBDMjYuMTM2MiwxMi42NzA4IDI2LjExNjIsMTIuNzQ1OCAyNi4wODEyLDEyLjg0MTggTDIzLjc5NTIsMTkuOTk4OCBDMjMuNzQwMiwyMC4xODI4IDIzLjY3MzIsMjAuMzAyOCAyMy41OTUyLDIwLjM2MzggQzIzLjUxODIsMjAuNDIzOCAyMy4zOTYyLDIwLjQ1MDggMjMuMjMxMiwyMC40NTA4IEwyMi40MTgyLDIwLjQ1MDggQzIyLjI0MjIsMjAuNDUwOCAyMi4xMTUyLDIwLjQyMDggMjIuMDM4MiwyMC4zNTY4IEMyMS45NjEyLDIwLjI5MTggMjEuOTAwMiwyMC4xNjU4IDIxLjg1NjIsMTkuOTgzOCBMMjAuMzgwMiwxNC4wMjM4IEwxOC45MjMyLDE5Ljk4MzggQzE4Ljg3OTIsMjAuMTY1OCAxOC44MTcyLDIwLjI5MTggMTguNzQwMiwyMC4zNTY4IEMxOC42NjIyLDIwLjQyMDggMTguNTM2MiwyMC40NTA4IDE4LjM1OTIsMjAuNDUwOCBMMTcuNTQ3MiwyMC40NTA4IFogTTkuOTM5MiwxOS40NDg4IEMxMC4yNTAyLDE5LjQ0ODggMTAuNTc1MiwxOS4zOTE4IDEwLjkxODIsMTkuMjc4OCBDMTEuMjYwMiwxOS4xNjQ4IDExLjU1ODIsMTguOTY4OCAxMS44MTIyLDE4LjY4NjggQzExLjk2ODIsMTguNTE0OCAxMi4wNzQyLDE4LjMxNzggMTIuMTM2MiwxOC4wOTU4IEMxMi4xOTYyLDE3Ljg3NTggMTIuMjI1MiwxNy42MDg4IDEyLjIyNTIsMTcuMjk0OCBMMTIuMjI1MiwxNi45MDY4IEMxMS45NTEyLDE2Ljg0MTggMTEuNjYxMiwxNi43OTA4IDExLjM1NjIsMTYuNzUyOCBDMTEuMDUyMiwxNi43MTU4IDEwLjc1NzIsMTYuNjk1OCAxMC40NjkyLDE2LjY5NTggQzkuODQwMiwxNi42OTU4IDkuMzY5MiwxNi44MTk4IDkuMDYxMiwxNy4wNjg4IEM4Ljc1MjIsMTcuMzE2OCA4LjU5NjIsMTcuNjcxOCA4LjU5NjIsMTguMTM4OCBDOC41OTYyLDE4LjU2OTggOC43MTMyLDE4Ljg5NDggOC45NDUyLDE5LjExNjggQzkuMTc3MiwxOS4zMzg4IDkuNTA5MiwxOS40NDg4IDkuOTM5MiwxOS40NDg4IEw5LjkzOTIsMTkuNDQ4OCBaIE0xMy43ODUyLDE4LjA0MDggQzEzLjc4NTIsMTguMzg1OCAxMy44MjAyLDE4LjY1OTggMTMuODkyMiwxOC44NjU4IEMxMy45NjUyLDE5LjA3MTggMTQuMDY3MiwxOS4yOTM4IDE0LjE5OTIsMTkuNTI5OCBDMTQuMjQzMiwxOS42MDU4IDE0LjI2NTIsMTkuNjc1OCAxNC4yNjUyLDE5LjczODggQzE0LjI2NTIsMTkuODM3OCAxNC4yMDQyLDE5LjkyOTggMTQuMDgzMiwyMC4wMTQ4IEwxMy40ODYyLDIwLjQwNDggQzEzLjM5ODIsMjAuNDU3OCAxMy4zMTUyLDIwLjQ4NTggMTMuMjM4MiwyMC40ODU4IEMxMy4xMzcyLDIwLjQ4NTggMTMuMDQ0MiwyMC40NDI4IDEyLjk1NjIsMjAuMzU2OCBDMTIuODIyMiwyMC4yMjU4IDEyLjcxMDIsMjAuMDgzOCAxMi42MTcyLDE5LjkyNjggQzEyLjUyMTIsMTkuNzcwOCAxMi40MjUyLDE5LjU4NzggMTIuMzI2MiwxOS4zODI4IEMxMS41ODUyLDIwLjIzNTggMTAuNjU4MiwyMC42NjI4IDkuNTQyMiwyMC42NjI4IEM4Ljc0NjIsMjAuNjYyOCA4LjExNjIsMjAuNDQyOCA3LjY1MTIsMTkuOTk4OCBDNy4xODgyLDE5LjU1NjggNi45NTYyLDE4Ljk2MjggNi45NTYyLDE4LjIxODggQzYuOTU2MiwxNy40MzE4IDcuMjQzMiwxNi43OTU4IDcuODE5MiwxNi4zMTU4IEM4LjM5MjIsMTUuODM1OCA5LjE2NzIsMTUuNTk0OCAxMC4xMzgyLDE1LjU5NDggQzEwLjQ1OTIsMTUuNTk0OCAxMC43OTMyLDE1LjYxOTggMTEuMTQxMiwxNS42Njc4IEMxMS40ODgyLDE1LjcxNTggMTEuODUxMiwxNS43ODQ4IDEyLjIyNTIsMTUuODcwOCBMMTIuMjI1MiwxNS4xOTE4IEMxMi4yMjUyLDE0LjQ4OTggMTIuMDc4MiwxMy45OTU4IDExLjc3OTIsMTMuNzA4OCBDMTEuNDgxMiwxMy40MjI4IDEwLjk2ODIsMTMuMjgwOCAxMC4yMzkyLDEzLjI4MDggQzkuOTA2MiwxMy4yODA4IDkuNTY2MiwxMy4zMTk4IDkuMjE4MiwxMy40MDA4IEM4Ljg3MTIsMTMuNDgxOCA4LjUzMDIsMTMuNTg2OCA4LjE5OTIsMTMuNzE1OCBDOC4wNDQyLDEzLjc4MDggNy45MzMyLDEzLjgyMTggNy44NjgyLDEzLjgzNzggQzcuODAyMiwxMy44NTM4IDcuNzUyMiwxMy44NjE4IDcuNzE5MiwxMy44NjE4IEM3LjU4NzIsMTMuODYxOCA3LjUxOTIsMTMuNzY1OCA3LjUxOTIsMTMuNTY5OCBMNy41MTkyLDEzLjExNzggQzcuNTE5MiwxMi45NjU4IDcuNTQzMiwxMi44NTc4IDcuNTg3MiwxMi43OTQ4IEM3LjYzMTIsMTIuNzI4OCA3LjcxOTIsMTIuNjYzOCA3Ljg1MjIsMTIuNTk5OCBDOC4xODMyLDEyLjQzNjggOC41ODEyLDEyLjI5NjggOS4wNDQyLDEyLjE3ODggQzkuNTA5MiwxMi4wNTk4IDEwLjAwMDIsMTEuOTk5OCAxMC41MjAyLDExLjk5OTggQzExLjY0NjIsMTEuOTk5OCAxMi40NzIyLDEyLjI1MjggMTIuOTk3MiwxMi43NTI4IEMxMy41MjEyLDEzLjI1NDggMTMuNzg1MiwxNC4wMTI4IDEzLjc4NTIsMTUuMDI3OCBMMTMuNzg1MiwxOC4wNDA4IFoiIGlkPSJGaWxsLTEiIGZpbGw9IiMyMzJGM0UiPjwvcGF0aD4KICAgIDwvZz4KPC9zdmc+"
+    mediatype: "image/svg+xml"
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - apps
+          resources:
+          - daemonsets
+          - deployments
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - k8s.aws
+          resources:
+          - deviceconfigs
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - k8s.aws
+          resources:
+          - deviceconfigs/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - kmm.sigs.x-k8s.io
+          resources:
+          - modules
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - kmm.sigs.x-k8s.io
+          resources:
+          - modules/status
+          verbs:
+          - get
+          - patch
+          - update
+        serviceAccountName: awslabs-gpu-operator-controller-manager
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - create
+          - get
+          - list
+          - update
+        serviceAccountName: awslabs-gpu-operator-neuron-scheduler
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - nodes
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - nodes/status
+          verbs:
+          - get
+          - patch
+          - update
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - get
+          - patch
+          - update
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - bindings
+          - pods/binding
+          verbs:
+          - create
+        serviceAccountName: awslabs-gpu-operator-neuron-scheduler-extension
+      deployments:
+      - label:
+          app.kubernetes.io/component: aws-neuron
+          app.kubernetes.io/created-by: operator-for-ai-chips-on-aws
+          app.kubernetes.io/instance: controller-manager
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: aws-neuron
+          app.kubernetes.io/part-of: aws-neuron
+          control-plane: controller-manager
+        name: awslabs-gpu-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/component: aws-neuron
+              app.kubernetes.io/name: aws-neuron
+              app.kubernetes.io/part-of: aws-neuron
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                app.kubernetes.io/component: aws-neuron
+                app.kubernetes.io/name: aws-neuron
+                app.kubernetes.io/part-of: aws-neuron
+                control-plane: controller-manager
+            spec:
+              affinity:
+                nodeAffinity:
+                  preferredDuringSchedulingIgnoredDuringExecution:
+                  - preference:
+                      matchExpressions:
+                      - key: node-role.kubernetes.io/control-plane
+                        operator: Exists
+                    weight: 1
+                  - preference:
+                      matchExpressions:
+                      - key: node-role.kubernetes.io/master
+                        operator: Exists
+                    weight: 1
+              containers:
+              - args:
+                - --config=controller_manager_config.yaml
+                command:
+                - /manager
+                env:
+                - name: OPERATOR_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                image: quay.io/edge-infrastructure/aws-neuron-operator:v0.0.1
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                volumeMounts:
+                - mountPath: /controller_manager_config.yaml
+                  name: manager-config
+                  subPath: controller_manager_config.yaml
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: awslabs-gpu-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+              volumes:
+              - configMap:
+                  name: awslabs-gpu-operator-manager-config-th6m486d84
+                name: manager-config
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: awslabs-gpu-operator-controller-manager
+      - rules:
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: awslabs-gpu-operator-kmm-device-plugin
+      - rules:
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: awslabs-gpu-operator-kmm-module-loader
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - aws-neuron-operator
+  links:
+  - name: Aws Neuron Operator
+    url: https://aws-neuron-operator.domain
+  maintainers:
+  - email: your@email.com
+    name: Maintainer Name
+  maturity: alpha
+  provider:
+    name: Provider Name
+    url: https://your.domain
+  version: 0.0.1

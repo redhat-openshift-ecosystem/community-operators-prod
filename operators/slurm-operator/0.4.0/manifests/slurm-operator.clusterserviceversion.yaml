@@ -6,6 +6,69 @@ metadata:
       [
         {
           "apiVersion": "slinky.slurm.net/v1alpha1",
+          "kind": "Accounting",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "app.kubernetes.io/part-of": "slurm",
+              "app.kubernetes.io/version": "25.05",
+              "helm.sh/chart": "slurm-0.4.0"
+            },
+            "name": "slurm",
+            "namespace": "slurm"
+          },
+          "spec": {
+            "initconf": {
+              "image": "ghcr.io/slinkyproject/sackd:25.05-ubuntu24.04",
+              "resources": {}
+            },
+            "jwtHs256KeyRef": {
+              "key": "jwt_hs256.key",
+              "name": "slurm-auth-jwths256"
+            },
+            "slurmKeyRef": {
+              "key": "slurm.key",
+              "name": "slurm-auth-slurm"
+            },
+            "slurmdbd": {
+              "args": [],
+              "image": "ghcr.io/slinkyproject/slurmdbd:25.05-ubuntu24.04",
+              "resources": {}
+            },
+            "storageConfig": {
+              "database": "slurm_acct_db",
+              "host": "mariadb",
+              "passwordKeyRef": {
+                "key": "password",
+                "name": "mariadb-password"
+              },
+              "port": 3306,
+              "username": "slurm"
+            },
+            "template": {
+              "metadata": {
+                "labels": {
+                  "app.kubernetes.io/managed-by": "Helm",
+                  "app.kubernetes.io/part-of": "slurm",
+                  "app.kubernetes.io/version": "25.05",
+                  "helm.sh/chart": "slurm-0.4.0"
+                }
+              },
+              "spec": {
+                "affinity": {},
+                "imagePullSecrets": null,
+                "initContainers": [],
+                "nodeSelector": {
+                  "kubernetes.io/os": "linux"
+                },
+                "priorityClassName": null,
+                "tolerations": []
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "slinky.slurm.net/v1alpha1",
           "kind": "Controller",
           "metadata": {
             "labels": {
@@ -18,6 +81,10 @@ metadata:
             "namespace": "slurm"
           },
           "spec": {
+            "accountingRef": {
+              "name": "slurm",
+              "namespace": "slurm"
+            },
             "epilogScriptRefs": null,
             "extraConf": "PartitionName=all Nodes=ALL Default=YES MaxTime=UNLIMITED State=UP\n",
             "jwtHs256KeyRef": {
@@ -261,7 +328,7 @@ metadata:
     categories: AI/Machine Learning, Big Data
     certified: "false"
     containerImage: ghcr.io/slinkyproject/slurm-operator:0.4.0
-    createdAt: "2025-10-23T17:32:21Z"
+    createdAt: "2025-10-24T14:44:10Z"
     description: Run Slurm on Kubernetes, by SchedMD. A Slinky project.
     features.operators.openshift.io/disconnected: "false"
     features.operators.openshift.io/fips-compliant: "false"
@@ -270,7 +337,22 @@ metadata:
     features.operators.openshift.io/token-auth-aws: "false"
     features.operators.openshift.io/token-auth-azure: "false"
     features.operators.openshift.io/token-auth-gcp: "false"
-    operatorframework.io/suggested-namespace: slinky
+    operatorframework.io/suggested-namespace-template: |-
+      {
+        "apiVersion": "v1",
+        "kind": "Namespace",
+        "metadata": {
+          "name": "slinky",
+          "labels": {
+            "pod-security.kubernetes.io/enforce": "privileged",
+            "pod-security.kubernetes.io/audit": "privileged",
+            "pod-security.kubernetes.io/warn": "privileged",
+          },
+          "annotations": {
+            "openshift.io/node-selector": ""
+          },
+        }
+      }
     operators.operatorframework.io/builder: operator-sdk-v1.39.2
     operators.operatorframework.io/project_layout: unknown
     repository: https://github.com/redhat-hpc/slinky-on-openshift

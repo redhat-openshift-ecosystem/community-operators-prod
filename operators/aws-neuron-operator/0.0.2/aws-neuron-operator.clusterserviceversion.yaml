@@ -1,0 +1,364 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "k8s.aws/v1alpha1",
+          "kind": "DeviceConfig",
+          "metadata": {
+            "name": "device-config",
+            "namespace": "ai-operator-on-aws"
+          },
+          "spec": {
+            "customSchedulerImage": "public.ecr.aws/eks-distro/kubernetes/kube-scheduler:v1.28.5-eks-1-28-latest",
+            "devicePluginImage": "public.ecr.aws/neuron/neuron-device-plugin:2.23.30.0",
+            "driversImage": "ghcr.io/awslabs/kmod-with-kmm-for-ai-chips-on-aws/neuron-driver:2.22.2.0",
+            "schedulerExtensionImage": "public.ecr.aws/neuron/neuron-scheduler:2.23.30.0",
+            "selector": {
+              "feature.node.kubernetes.io/aws-neuron": "true"
+            },
+            "useInTreeDrivers": false
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-10-27T12:17:40Z"
+    operators.operatorframework.io/builder: operator-sdk-v1.32.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    operatorframework.io/suggested-namespace: ai-operator-on-aws
+  name: aws-neuron-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - kind: DeviceConfig
+        name: deviceconfigs.k8s.aws
+        version: v1alpha1
+  description: Aws Neuron Operator description. TODO.
+  displayName: Aws Neuron Operator
+  icon:
+    - base64data: ""
+      mediatype: ""
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - apps
+              resources:
+                - daemonsets
+                - deployments
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - watch
+            - apiGroups:
+                - k8s.aws
+              resources:
+                - deviceconfigs
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - k8s.aws
+              resources:
+                - deviceconfigs/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - kmm.sigs.x-k8s.io
+              resources:
+                - modules
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - kmm.sigs.x-k8s.io
+              resources:
+                - modules/status
+              verbs:
+                - get
+                - patch
+                - update
+          serviceAccountName: awslabs-gpu-operator-controller-manager
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - create
+                - get
+                - list
+                - update
+            - apiGroups:
+                - ""
+              resources:
+                - nodes/status
+              verbs:
+                - get
+                - patch
+                - update
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - get
+                - list
+                - watch
+                - patch
+                - update
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - privileged
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+          serviceAccountName: awslabs-gpu-operator-neuron-scheduler
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - nodes
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - nodes/status
+              verbs:
+                - get
+                - patch
+                - update
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - get
+                - patch
+                - update
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - bindings
+                - pods/binding
+              verbs:
+                - create
+          serviceAccountName: awslabs-gpu-operator-neuron-scheduler-extension
+      deployments:
+        - label:
+            app.kubernetes.io/component: aws-neuron
+            app.kubernetes.io/created-by: operator-for-ai-chips-on-aws
+            app.kubernetes.io/instance: controller-manager
+            app.kubernetes.io/managed-by: kustomize
+            app.kubernetes.io/name: aws-neuron
+            app.kubernetes.io/part-of: aws-neuron
+            control-plane: controller-manager
+          name: awslabs-gpu-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app.kubernetes.io/component: aws-neuron
+                app.kubernetes.io/name: aws-neuron
+                app.kubernetes.io/part-of: aws-neuron
+                control-plane: controller-manager
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  app.kubernetes.io/component: aws-neuron
+                  app.kubernetes.io/name: aws-neuron
+                  app.kubernetes.io/part-of: aws-neuron
+                  control-plane: controller-manager
+              spec:
+                affinity:
+                  nodeAffinity:
+                    preferredDuringSchedulingIgnoredDuringExecution:
+                      - preference:
+                          matchExpressions:
+                            - key: node-role.kubernetes.io/control-plane
+                              operator: Exists
+                        weight: 1
+                      - preference:
+                          matchExpressions:
+                            - key: node-role.kubernetes.io/master
+                              operator: Exists
+                        weight: 1
+                containers:
+                  - args:
+                      - --config=controller_manager_config.yaml
+                    command:
+                      - /manager
+                    env:
+                      - name: OPERATOR_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+                    image: quay.io/edge-infrastructure/aws-neuron-operator:v0.0.1
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 10m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                    volumeMounts:
+                      - mountPath: /controller_manager_config.yaml
+                        name: manager-config
+                        subPath: controller_manager_config.yaml
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: awslabs-gpu-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - configMap:
+                      name: awslabs-gpu-operator-manager-config-th6m486d84
+                    name: manager-config
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: awslabs-gpu-operator-controller-manager
+        - rules:
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - privileged
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+          serviceAccountName: awslabs-gpu-operator-kmm-device-plugin
+        - rules:
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - privileged
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+          serviceAccountName: awslabs-gpu-operator-kmm-module-loader
+    strategy: deployment
+  installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - aws-neuron-operator
+  links:
+    - name: Aws Neuron Operator
+      url: https://aws-neuron-operator.domain
+  maintainers:
+    - email: your@email.com
+      name: Maintainer Name
+  maturity: alpha
+  provider:
+    name: Provider Name
+    url: https://your.domain
+  version: 0.0.1

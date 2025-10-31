@@ -4,16 +4,16 @@ ddapiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
-    alm-examples: >
+    alm-examples: >-
       [{"apiVersion": "mysql.oracle.com/v1","kind": "NdbCluster","metadata":
       {"name": "example-ndb"},"spec": {"redundancyLevel": 2,"dataNode":
       {"nodeCount": 2},"mysqlNode": {"nodeCount":2}}}]
     capabilities: Seamless Upgrades
     categories: Database
-    containerImage: >
+    containerImage: >-
       container-registry.oracle.com/mysql/community-ndb-operator@sha256:480fd52dd505e1692bf7482ea847590ca147453c2849fe20a0417eebde86369a
     createdAt: '2025-10-27T14:57:54Z'
-    description: >
+    description: >-
       The MySQL NDB Operator is a Kubernetes operator for managing a MySQL NDB
       Cluster setup inside a Kubernetes Cluster.
     operators.operatorframework.io/builder: operator-sdk-v1.37.0
@@ -390,7 +390,7 @@ spec:
                       - -service=ndb-operator-webhook-service
                     command:
                       - ndb-operator-webhook
-                    image: >
+                    image: >-
                       container-registry.oracle.com/mysql/community-ndb-operator@sha256:480fd52dd505e1692bf7482ea847590ca147453c2849fe20a0417eebde86369a
                     imagePullPolicy: IfNotPresent
                     name: ndb-operator-webhook
@@ -445,13 +445,13 @@ spec:
                       - name: WATCH_NAMESPACE
                         valueFrom:
                           fieldRef:
-                            fieldPath: >
+                            fieldPath: >-
                               metadata.annotations['olm.targetNamespaces']
                       - name: NDB_OPERATOR_IMAGE
-                        value: >
+                        value: >-
                           container-registry.oracle.com/mysql/community-ndb-operator@sha256:480fd52dd505e1692bf7482ea847590ca147453c2849fe20a0417eebde86369a
                       - name: NDB_OPERATOR_IMAGE_PULL_SECRET_NAME
-                    image: >
+                    image: >-
                       container-registry.oracle.com/mysql/community-ndb-operator@sha256:480fd52dd505e1692bf7482ea847590ca147453c2849fe20a0417eebde86369a
                     imagePullPolicy: IfNotPresent
                     name: ndb-operator-controller

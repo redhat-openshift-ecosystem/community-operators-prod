@@ -114,7 +114,7 @@ OCP_VERSIONS=$(shell echo "v4.12 v4.13 v4.14 v4.15 v4.16 v4.17 v4.18 v4.19 v4.20
 
 .PHONY: push-bundle
 push-bundle:
-	if [ -z "${VERSION}" ]; then \
+	@if [ -z "${VERSION}" ]; then \
 		echo "Error: Version is not set"; \
 		exit 1; \
 	fi; \
@@ -126,37 +126,36 @@ push-bundle:
 		echo "Error: CHANNELS is not set"; \
 		exit 1; \
 	fi; \
-	# Checkout the git repository with release branch \
+	echo "Checkout the git repository with release branch"
 	git clone -b release-v${VERSION} https://github.com/foundation-model-stack/multi-nic-cni.git multi-nic-cni-operator && \
-	# Change to the cloned directory \
-	cd multi-nic-cni-operator && \
-	# Build the opm binary \
+	echo "Change to the cloned directory" && \
+	pushd multi-nic-cni-operator && \
+	echo "Build the opm binary" && \
 	make opm && \
-	# Tidy and vendor Go modules \
-	go mod tidy && \
-	go mod vendor && \
-	# Execute the make bundle command \
+	echo "Tidy and vendor Go modules" && \
+	go mod tidy && go mod vendor && \
+	echo "Execute the make bundle command" && \
 	make bundle && \
-	# Return to the original directory \
-	cd ..; \
-	# Check if the ${VERSION} directory exists and delete it \
+	echo "Return to the original directory" && \
+	popd
+	@echo "Check if the ${VERSION} directory exists and delete it"
 	if [ -d "${VERSION}" ]; then \
 		echo "Directory ${VERSION} exists and will be deleted"; \
 		rm -rf ${VERSION}; \
-	fi; \
-	# Create the target directory for the specified version \
-	mkdir -p ${VERSION}; \
-	# Copy the subdirectories under the generated bundle directory to the target directory \
-	cp -r multi-nic-cni-operator/bundle/* ${VERSION}; \
-	# Copy the bundle.Dockerfile to the target directory \
-	cp multi-nic-cni-operator/bundle.Dockerfile ${VERSION}; \
-	# Create the release-config.yaml file \
-	echo "---" > ${VERSION}/release-config.yaml; \
-	echo "catalog_templates:" >> ${VERSION}/release-config.yaml; \
+	fi;
+	@echo "Create the target directory for the specified version"
+	mkdir -p ${VERSION};
+	@echo "Copy the subdirectories under the generated bundle directory to the target directory"
+	cp -r multi-nic-cni-operator/bundle/* ${VERSION};
+	@echo "Copy the bundle.Dockerfile to the target directory"
+	cp multi-nic-cni-operator/bundle.Dockerfile ${VERSION};
+	@echo "Create the release-config.yaml file"
+	echo "---" > ${VERSION}/release-config.yaml;
+	echo "catalog_templates:" >> ${VERSION}/release-config.yaml;
 	for version in ${OCP_VERSIONS}; do \
 		echo "  - template_name: $${version}.yaml" >> ${VERSION}/release-config.yaml; \
 		echo "    channels: [${CHANNELS}]" >> ${VERSION}/release-config.yaml; \
 		echo "    replaces: multi-nic-cni-operator.v${OLD_VERSION}" >> ${VERSION}/release-config.yaml; \
-	done; \
-	# Remove the cloned git repository \
+	done;
+	@echo "Remove the cloned git repository"
 	rm -rf multi-nic-cni-operator

@@ -24,14 +24,15 @@ metadata:
     features.operators.openshift.io/token-auth-gcp: 'false'
     repository: https://github.com/stolostron/stolostron
     containerImage: quay.io/stolostron/multiclusterhub-operator@sha256:b00318c5b7b8cd04dc80df188e466853d9c007c854fc16fe5c49c3118b87b348
-  name: stolostron.v0.8.0
+  name: stolostron.v0.8.2
   namespace: placeholder
   labels:
     operatorframework.io/arch.amd64: supported
     operatorframework.io/os.linux: supported
 spec:
   displayName: Stolostron
-  version: 0.8.0
+  version: 0.8.2
+  replaces: stolostron.v0.8.0
   provider:
     name: Red Hat
   maintainers:
@@ -2052,7 +2053,7 @@ spec:
                 - name: OPERAND_IMAGE_VOLSYNC_ADDON_CONTROLLER
                   value: quay.io/stolostron/volsync-addon-controller@sha256:c95a7e58c42d5ae875cbd7359af0397f2d3cd740c6608240bf4020de1ba73a0e
                 - name: OPERATOR_VERSION
-                  value: 0.8.0
+                  value: 0.8.2
                 - name: OPERATOR_PACKAGE
                   value: stolostron
                 image: quay.io/stolostron/multiclusterhub-operator@sha256:b00318c5b7b8cd04dc80df188e466853d9c007c854fc16fe5c49c3118b87b348

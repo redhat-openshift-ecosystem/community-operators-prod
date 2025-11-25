@@ -1,0 +1,14 @@
+---
+schema: olm.template.basic
+entries:
+- schema: olm.package
+  name: multicluster-global-hub-operator
+  defaultChannel: stable
+- schema: olm.channel
+  name: stable
+  package: multicluster-global-hub-operator
+  entries:
+  - name: multicluster-global-hub-operator.v1.6.0
+- schema: olm.bundle
+  image: 
+    quay.io/community-operator-pipeline-prod/multicluster-global-hub-operator:1.6.0

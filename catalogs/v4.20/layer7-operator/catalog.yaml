@@ -10,6 +10,8 @@ entries:
 - name: layer7-operator.v1.2.0
 - name: layer7-operator.v1.2.1
   replaces: layer7-operator.v1.2.0
+- name: layer7-operator.v1.2.2
+  replaces: layer7-operator.v1.2.1
 name: preview
 package: layer7-operator
 schema: olm.channel
@@ -934,5 +936,460 @@ relatedImages:
 - image: docker.io/caapim/layer7-operator:v1.2.1
   name: layer7-operator
 - image: quay.io/community-operator-pipeline-prod/layer7-operator:1.2.1
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/layer7-operator:1.2.2
+name: layer7-operator.v1.2.2
+package: layer7-operator
+properties:
+- type: olm.gvk
+  value:
+    group: security.brcmlabs.com
+    kind: Gateway
+    version: v1
+- type: olm.gvk
+  value:
+    group: security.brcmlabs.com
+    kind: L7Api
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: security.brcmlabs.com
+    kind: L7Portal
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: security.brcmlabs.com
+    kind: L7StateStore
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: security.brcmlabs.com
+    kind: Repository
+    version: v1
+- type: olm.package
+  value:
+    packageName: layer7-operator
+    version: 1.2.2
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "security.brcmlabs.com/v1",
+            "kind": "Gateway",
+            "metadata": {
+              "name": "ssg"
+            },
+            "spec": {
+              "app": {
+                "image": "docker.io/caapim/gateway:11.1.3",
+                "management": {
+                  "cluster": {
+                    "hostname": "gateway.brcmlabs.com",
+                    "password": "7layer"
+                  },
+                  "password": "7layer",
+                  "username": "admin"
+                },
+                "replicas": 1,
+                "service": {
+                  "ports": [
+                    {
+                      "name": "https",
+                      "port": 8443,
+                      "protocol": "TCP",
+                      "targetPort": 8443
+                    },
+                    {
+                      "name": "management",
+                      "port": 9443,
+                      "protocol": "TCP",
+                      "targetPort": 9443
+                    }
+                  ],
+                  "type": "LoadBalancer"
+                }
+              },
+              "license": {
+                "accept": false,
+                "secretName": "gateway-license"
+              },
+              "version": "11.1.3"
+            },
+            "status": {}
+          },
+          {
+            "apiVersion": "security.brcmlabs.com/v1",
+            "kind": "Repository",
+            "metadata": {
+              "name": "my-repository"
+            },
+            "spec": {
+              "auth": {},
+              "branch": "main",
+              "enabled": true,
+              "endpoint": "https://github.com/\u003cusername\u003e/\u003crepository\u003e",
+              "type": "git"
+            }
+          },
+          {
+            "apiVersion": "security.brcmlabs.com/v1alpha1",
+            "kind": "L7Api",
+            "metadata": {
+              "name": "l7api-sample"
+            },
+            "spec": {
+              "deploymentTags": [
+                "ssg",
+                "ssg1"
+              ],
+              "graphmanBundle": "jsongz",
+              "portalPublished": false,
+              "serviceUrl": "/v1/api"
+            }
+          },
+          {
+            "apiVersion": "security.brcmlabs.com/v1alpha1",
+            "kind": "L7Portal",
+            "metadata": {
+              "name": "dev-portal"
+            },
+            "spec": {
+              "auth": {},
+              "deploymentTags": [
+                "ssg"
+              ],
+              "enabled": true,
+              "endpoint": "dev-ssg.brcmlabs.com",
+              "enrollmentBundle": "",
+              "portalTenant": "portal"
+            }
+          },
+          {
+            "apiVersion": "security.brcmlabs.com/v1alpha1",
+            "kind": "L7StateStore",
+            "metadata": {
+              "name": "state-store-example"
+            },
+            "spec": {
+              "redis": {
+                "database": 0,
+                "groupName": "l7gw",
+                "masterPassword": "7layer",
+                "standalone": {
+                  "host": "redis-standalone",
+                  "port": 6379
+                },
+                "storeId": "test",
+                "type": "standalone"
+              },
+              "type": "redis"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: Security
+      certified: "false"
+      containerImage: docker.io/caapim/layer7-operator:v1.2.2
+      createdAt: "2025-11-28T13:43:31Z"
+      description: The Layer7 Operator covers all aspects of deploying, maintaining
+        and upgrading Layer7 API Gateways in Kubernetes.
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "false"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "true"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: layer7-operator-system
+      operators.openshift.io/valid-subscription: Layer7 (Broadcom) API Gateway license
+      operators.operatorframework.io/builder: operator-sdk-v1.42.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/caapim/layer7-operator
+      support: Broadcom Community
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Gateway is the Schema for the Gateway Custom Resource
+        displayName: Gateway
+        kind: Gateway
+        name: gateways.security.brcmlabs.com
+        resources:
+        - kind: ConfigMaps
+          name: ""
+          version: v1
+        - kind: Deployment
+          name: ""
+          version: apps/v1
+        - kind: HorizontalPodAutoscaler
+          name: ""
+          version: autoscaling/v2
+        - kind: Ingress
+          name: ""
+          version: networking/v1
+        - kind: PodDisruptionBudget
+          name: ""
+          version: policy/v1
+        - kind: Secrets
+          name: ""
+          version: v1
+        - kind: Service
+          name: ""
+          version: v1
+        - kind: ServiceAccount
+          name: ""
+          version: v1
+        specDescriptors:
+        - description: App contains application specific configuration for the Gateway
+            and its deployment
+          displayName: App
+          path: app
+        - description: License for the Major version of Gateway
+          displayName: License
+          path: license
+        - description: |-
+            Version references the Gateway release that this Operator is intended to be used with
+            while all supported container gateway versions will work, some functionality will not be available
+          displayName: Version
+          path: version
+        statusDescriptors:
+        - displayName: Portal Sync Status
+          path: PortalSyncStatus
+        - description: Conditions store the status conditions of Gateway instances
+          displayName: Conditions
+          path: conditions
+        - displayName: Gateway
+          path: gateway
+        - description: Image of the Gateway
+          displayName: Image
+          path: image
+        - description: |-
+            Management Pod is a Gateway with a special annotation is used as a selector for the
+            management service and applying singleton resources
+          displayName: Management Pod
+          path: managementPod
+        - displayName: Phase
+          path: phase
+        - displayName: Ready
+          path: ready
+        - description: Replicas is the number of Gateway Pods
+          displayName: Replicas
+          path: replicas
+        - displayName: Repository Status
+          path: repositoryStatus
+        - displayName: State
+          path: state
+        - description: Version of the Gateway
+          displayName: Version
+          path: version
+        version: v1
+      - description: L7Api is the Schema for the l7apis API
+        displayName: L7 Api
+        kind: L7Api
+        name: l7apis.security.brcmlabs.com
+        resources:
+        - kind: ConfigMaps
+          name: ""
+          version: v1
+        - kind: Secrets
+          name: ""
+          version: v1
+        specDescriptors:
+        - description: DeploymentTags target Gateway deployments that this API should
+            be published to
+          displayName: DeploymentTags
+          path: deploymentTags
+        - description: |-
+            GraphmanBundle associated with this API
+            currently limited to Service and Fragments
+            auto generated when PortalMeta is set and PortalPublished is true
+          displayName: GraphmanBundle
+          path: graphmanBundle
+        - description: L7Portal is the L7Portal that this API is associated with when
+            Portal Published is true
+          displayName: L7Portal
+          path: l7Portal
+        - description: PortalPublished
+          displayName: PortalPublished
+          path: portalPublished
+        - description: ServiceUrl on the API Gateway
+          displayName: ServiceUrl
+          path: serviceUrl
+        version: v1alpha1
+      - description: L7Portal is the Schema for the l7portals API
+        displayName: L7 Portal
+        kind: L7Portal
+        name: l7portals.security.brcmlabs.com
+        resources:
+        - kind: ConfigMaps
+          name: ""
+          version: v1
+        specDescriptors:
+        - description: Auth - Portal credentials
+          displayName: Auth
+          path: auth
+        - description: Deployment Tags - determines which Gateway deployments these
+            APIs will be applied to
+          displayName: DeploymentTags
+          path: deploymentTags
+        - description: Enabled - if enabled this Portal and its APIs will be synced
+          displayName: Enabled
+          path: enabled
+        - description: Endoint - Portal endpoint
+          displayName: Endpoint
+          path: endpoint
+        - description: EnrollmentBundle - allows a custom enrollment bundle to be
+            set in the Portal CR
+          displayName: EnrollmentBundle
+          path: enrollmentBundle
+        - description: Labels - Custom Labels
+          displayName: Labels
+          path: labels
+        - description: PortalTenant is the tenantId of the API Developer Portal
+          displayName: PortalTenant
+          path: portalTenant
+        - description: SyncIntervalSeconds how often the Portal CR is reconciled.
+            Default is 10 seconds
+          displayName: SyncIntervalSeconds
+          path: syncIntervalSeconds
+        version: v1alpha1
+      - description: L7StateStore is the Schema for the l7statestores API
+        displayName: L7 State Store
+        kind: L7StateStore
+        name: l7statestores.security.brcmlabs.com
+        specDescriptors:
+        - description: Redis state store configuration
+          displayName: Redis
+          path: redis
+        - description: StateStoreType currently only supports Redis
+          displayName: StateStoreType
+          path: type
+        version: v1alpha1
+      - description: Repository is the Schema for the repositories API
+        displayName: Repository
+        kind: Repository
+        name: repositories.security.brcmlabs.com
+        resources:
+        - kind: ConfigMaps
+          name: ""
+          version: v1
+        - kind: Secrets
+          name: ""
+          version: v1
+        specDescriptors:
+        - description: Annotations - Custom Annotations
+          displayName: Annotations
+          path: annotations
+        - description: Auth contains a reference to the credentials required to connect
+            to your Git repository
+          displayName: Auth
+          path: auth
+        - description: |-
+            Branch - specify which branch to clone
+            if branch and tag are both specified branch will take precedence and tag will be ignored
+            if branch and tag are both missing the entire repository will be cloned
+          displayName: Branch
+          path: branch
+        - description: Enabled - if enabled this repository will be synced
+          displayName: Enabled
+          path: enabled
+        - description: Endoint - Git repository endpoint
+          displayName: Endpoint
+          path: endpoint
+        - description: Labels - Custom Labels
+          displayName: Labels
+          path: labels
+        - description: LocalReference lets the Repository controller use a local Kubernetes
+            Secret as a repository source
+          displayName: LocalReference
+          path: localReference
+        - description: Remote Name - defaults to "origin"
+          displayName: RemoteName
+          path: remoteName
+        - description: |-
+            StateStoreKey where the repository is stored in the L7StateStore
+            this only takes effect if type is statestore
+          displayName: StateStoreReference
+          path: stateStoreKey
+        - description: |-
+            StateStoreReference which L7StateStore connection should be used to store or retrieve this key
+            if type is statestore this reference will read everything from the state store
+          displayName: StateStoreReference
+          path: stateStoreReference
+        - description: RepositorySyncConfig defines how often this repository is synced
+          displayName: RepositorySyncConfig
+          path: sync
+        - description: |-
+            Tag - clone a specific tag.
+            tags do not change, once cloned this will not be checked for updates
+          displayName: Tag
+          path: tag
+        - description: Type of Repository - git, http, local, statestore
+          displayName: Type
+          path: type
+        statusDescriptors:
+        - description: Commit is either current git commit that has been synced or
+            a sha1sum of the http repository contents
+          displayName: Commit
+          path: commit
+        - description: Ready to apply to Gateway Deployments
+          displayName: Ready
+          path: ready
+        - description: StateStoreSynced whether or not the state store has been written
+            to correctly
+          displayName: State Store Synced
+          path: stateStoreSynced
+        - description: StorageSecretName is the Kubernetes Secret that this repository
+            is stored in
+          displayName: Storage Secret Name
+          path: storageSecretName
+        - description: Updated the last time this repository was successfully updated
+          displayName: Updated
+          path: updated
+        version: v1
+    description: |
+      The [Layer7 Operator](https://github.com/CAAPIM/layer7-operator) covers all aspects of deploying, maintaining and upgrading Layer7 API Gateways in Kubernetes. The Layer7 Operator is exclusive to Kubernetes and utilizes the Container Gateway with specific emphasis on running in Ephemeral mode (without an external MySQL policy database).
+
+      ## Getting Started
+      This [Getting Started](https://github.com/CAAPIM/layer7-operator/wiki/Getting-Started) guide covers a simple introduction to the Layer7 Operator. You can find more documentation [here](https://github.com/CAAPIM/layer7-operator/wiki).
+    displayName: Layer7 Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - layer7-operator
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Layer7 Operator
+      url: https://github.com/caapim/layer7-operator
+    maintainers:
+    - email: gary.vermeulen@broadcom.com
+      name: Gary Vermeulen
+    maturity: alpha
+    provider:
+      name: Broadcom
+      url: https://www.broadcom.com/
+relatedImages:
+- image: docker.io/caapim/gateway:11.1.3
+  name: gateway
+- image: docker.io/caapim/graphman-static-init:1.0.4
+  name: graphman-static-init
+- image: docker.io/caapim/layer7-operator:v1.2.2
+  name: layer7-operator
+- image: quay.io/community-operator-pipeline-prod/layer7-operator:1.2.2
   name: ""
 schema: olm.bundle

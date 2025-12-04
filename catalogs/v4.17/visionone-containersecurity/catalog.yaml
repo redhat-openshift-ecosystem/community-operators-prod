@@ -12,6 +12,8 @@ entries:
   replaces: visionone-containersecurity.v0.0.1
 - name: visionone-containersecurity.v0.0.3
   replaces: visionone-containersecurity.v0.0.2
+- name: visionone-containersecurity.v0.0.4
+  replaces: visionone-containersecurity.v0.0.3
 name: alpha
 package: visionone-containersecurity
 schema: olm.channel
@@ -20,6 +22,8 @@ entries:
 - name: visionone-containersecurity.v0.0.2
 - name: visionone-containersecurity.v0.0.3
   replaces: visionone-containersecurity.v0.0.2
+- name: visionone-containersecurity.v0.0.4
+  replaces: visionone-containersecurity.v0.0.3
 name: stable
 package: visionone-containersecurity
 schema: olm.channel
@@ -1343,5 +1347,424 @@ relatedImages:
 - image: public.ecr.aws/trendmicro/container-security/visionone-containersecurity-operator:v0.0.3
   name: ""
 - image: quay.io/community-operator-pipeline-prod/visionone-containersecurity:0.0.3
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/visionone-containersecurity:0.0.4
+name: visionone-containersecurity.v0.0.4
+package: visionone-containersecurity
+properties:
+- type: olm.gvk
+  value:
+    group: container-security.trendmicro.com
+    kind: VisionOneContainerSecurity
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: visionone-containersecurity
+    version: 0.0.4
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "container-security.trendmicro.com/v1alpha1",
+            "kind": "VisionOneContainerSecurity",
+            "metadata": {
+              "name": "sample",
+              "namespace": "trendmicro-system"
+            },
+            "spec": {
+              "visionOne": {
+                "bootstrapToken": "",
+                "clusterRegistrationKey": false,
+                "endpoint": "https://api.xdr.trendmicro.com/external/v2/direct/vcs/external/vcs",
+                "exclusion": {
+                  "namespaces": [
+                    "kube-system",
+                    "openshift",
+                    "openshift-apiserver",
+                    "openshift-apiserver-operator",
+                    "openshift-aqua",
+                    "openshift-authentication",
+                    "openshift-authentication-operator",
+                    "openshift-backplane",
+                    "openshift-backplane-cee",
+                    "openshift-backplane-srep",
+                    "openshift-build-test",
+                    "openshift-cloud-credential-operator",
+                    "openshift-cloud-ingress-operator",
+                    "openshift-cluster-csi-drivers",
+                    "openshift-cluster-machine-approver",
+                    "openshift-cluster-node-tuning-operator",
+                    "openshift-cluster-samples-operator",
+                    "openshift-cluster-storage-operator",
+                    "openshift-cluster-version",
+                    "openshift-codeready-workspaces",
+                    "openshift-config",
+                    "openshift-config-managed",
+                    "openshift-config-operator",
+                    "openshift-console",
+                    "openshift-console-operator",
+                    "openshift-console-user-settings",
+                    "openshift-controller-manager",
+                    "openshift-controller-manager-operator",
+                    "openshift-custom-domains-operator",
+                    "openshift-customer-monitoring",
+                    "openshift-dns",
+                    "openshift-dns-operator",
+                    "openshift-etcd",
+                    "openshift-etcd-operator",
+                    "openshift-host-network",
+                    "openshift-image-registry",
+                    "openshift-infra",
+                    "openshift-ingress",
+                    "openshift-ingress-canary",
+                    "openshift-ingress-operator",
+                    "openshift-insights",
+                    "openshift-kni-infra",
+                    "openshift-kube-apiserver",
+                    "openshift-kube-apiserver-operator",
+                    "openshift-kube-controller-manager",
+                    "openshift-kube-controller-manager-operator",
+                    "openshift-kube-scheduler",
+                    "openshift-kube-scheduler-operator",
+                    "openshift-kube-storage-version-migrator",
+                    "openshift-kube-storage-version-migrator-operator",
+                    "openshift-kubevirt-infra",
+                    "openshift-logging",
+                    "openshift-machine-api",
+                    "openshift-machine-config-operator",
+                    "openshift-managed-upgrade-operator",
+                    "openshift-marketplace",
+                    "openshift-monitoring",
+                    "openshift-multus",
+                    "openshift-must-gather-operator",
+                    "openshift-network-diagnostics",
+                    "openshift-network-operator",
+                    "openshift-node",
+                    "openshift-oauth-apiserver",
+                    "openshift-openstack-infra",
+                    "openshift-operator-lifecycle-manager",
+                    "openshift-operators",
+                    "openshift-operators-redhat",
+                    "openshift-osd-metrics",
+                    "openshift-ovirt-infra",
+                    "openshift-rbac-permissions",
+                    "openshift-route-monitor-operator",
+                    "openshift-sdn",
+                    "openshift-security",
+                    "openshift-service-ca",
+                    "openshift-service-ca-operator",
+                    "openshift-splunk-forwarder-operator",
+                    "openshift-sre-pruning",
+                    "openshift-sre-sshd",
+                    "openshift-strimzi",
+                    "openshift-user-workload-monitoring",
+                    "openshift-validation-webhook",
+                    "openshift-velero",
+                    "openshift-vsphere-infra",
+                    "openshift-addon-operator",
+                    "openshift-backplane-managed-scripts",
+                    "openshift-cloud-controller-manager-operator",
+                    "openshift-cloud-network-config-controller",
+                    "openshift-deployment-validation-operator",
+                    "openshift-managed-node-metadata-operator",
+                    "openshift-ocm-agent-operator",
+                    "openshift-ovn-kubernetes",
+                    "openshift-azure-operator",
+                    "openshift-azure-loggi",
+                    "openshift-cloud-controller-manager",
+                    "openshift-nutanix-infra",
+                    "openshift-route-controller-manager",
+                    "dedicated-admin",
+                    "default",
+                    "openshift-aws-vpce-operator",
+                    "openshift-backplane-csa",
+                    "openshift-backplane-cse",
+                    "openshift-backplane-csm",
+                    "openshift-backplane-mobb",
+                    "openshift-backplane-tam",
+                    "openshift-cluster-api",
+                    "openshift-compliance",
+                    "openshift-compliance-monkey",
+                    "openshift-container-security",
+                    "openshift-file-integrity",
+                    "openshift-observability-operator",
+                    "openshift-platform-operators",
+                    "openshift-scanning",
+                    "openshift-suricata"
+                  ]
+                },
+                "inventoryCollection": {
+                  "enabled": true
+                },
+                "malwareScanning": {
+                  "enabled": true
+                },
+                "runtimeSecurity": {
+                  "enabled": true
+                },
+                "secretScanning": {
+                  "enabled": true
+                },
+                "vulnerabilityScanning": {
+                  "enabled": true
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "container-security.trendmicro.com/v1alpha1",
+            "kind": "VisionOneContainerSecurity",
+            "metadata": {
+              "name": "visionone-containersecurity-sample",
+              "namespace": "trendmicro-system"
+            },
+            "spec": {
+              "visionOne": {
+                "bootstrapToken": "",
+                "clusterRegistrationKey": false,
+                "endpoint": "https://api.xdr.trendmicro.com/external/v2/direct/vcs/external/vcs",
+                "exclusion": {
+                  "namespaces": [
+                    "kube-system",
+                    "openshift",
+                    "openshift-apiserver",
+                    "openshift-apiserver-operator",
+                    "openshift-aqua",
+                    "openshift-authentication",
+                    "openshift-authentication-operator",
+                    "openshift-backplane",
+                    "openshift-backplane-cee",
+                    "openshift-backplane-srep",
+                    "openshift-build-test",
+                    "openshift-cloud-credential-operator",
+                    "openshift-cloud-ingress-operator",
+                    "openshift-cluster-csi-drivers",
+                    "openshift-cluster-machine-approver",
+                    "openshift-cluster-node-tuning-operator",
+                    "openshift-cluster-samples-operator",
+                    "openshift-cluster-storage-operator",
+                    "openshift-cluster-version",
+                    "openshift-codeready-workspaces",
+                    "openshift-config",
+                    "openshift-config-managed",
+                    "openshift-config-operator",
+                    "openshift-console",
+                    "openshift-console-operator",
+                    "openshift-console-user-settings",
+                    "openshift-controller-manager",
+                    "openshift-controller-manager-operator",
+                    "openshift-custom-domains-operator",
+                    "openshift-customer-monitoring",
+                    "openshift-dns",
+                    "openshift-dns-operator",
+                    "openshift-etcd",
+                    "openshift-etcd-operator",
+                    "openshift-host-network",
+                    "openshift-image-registry",
+                    "openshift-infra",
+                    "openshift-ingress",
+                    "openshift-ingress-canary",
+                    "openshift-ingress-operator",
+                    "openshift-insights",
+                    "openshift-kni-infra",
+                    "openshift-kube-apiserver",
+                    "openshift-kube-apiserver-operator",
+                    "openshift-kube-controller-manager",
+                    "openshift-kube-controller-manager-operator",
+                    "openshift-kube-scheduler",
+                    "openshift-kube-scheduler-operator",
+                    "openshift-kube-storage-version-migrator",
+                    "openshift-kube-storage-version-migrator-operator",
+                    "openshift-kubevirt-infra",
+                    "openshift-logging",
+                    "openshift-machine-api",
+                    "openshift-machine-config-operator",
+                    "openshift-managed-upgrade-operator",
+                    "openshift-marketplace",
+                    "openshift-monitoring",
+                    "openshift-multus",
+                    "openshift-must-gather-operator",
+                    "openshift-network-diagnostics",
+                    "openshift-network-operator",
+                    "openshift-node",
+                    "openshift-oauth-apiserver",
+                    "openshift-openstack-infra",
+                    "openshift-operator-lifecycle-manager",
+                    "openshift-operators",
+                    "openshift-operators-redhat",
+                    "openshift-osd-metrics",
+                    "openshift-ovirt-infra",
+                    "openshift-rbac-permissions",
+                    "openshift-route-monitor-operator",
+                    "openshift-sdn",
+                    "openshift-security",
+                    "openshift-service-ca",
+                    "openshift-service-ca-operator",
+                    "openshift-splunk-forwarder-operator",
+                    "openshift-sre-pruning",
+                    "openshift-sre-sshd",
+                    "openshift-strimzi",
+                    "openshift-user-workload-monitoring",
+                    "openshift-validation-webhook",
+                    "openshift-velero",
+                    "openshift-vsphere-infra",
+                    "openshift-addon-operator",
+                    "openshift-backplane-managed-scripts",
+                    "openshift-cloud-controller-manager-operator",
+                    "openshift-cloud-network-config-controller",
+                    "openshift-deployment-validation-operator",
+                    "openshift-managed-node-metadata-operator",
+                    "openshift-ocm-agent-operator",
+                    "openshift-ovn-kubernetes",
+                    "openshift-azure-operator",
+                    "openshift-azure-loggi",
+                    "openshift-cloud-controller-manager",
+                    "openshift-nutanix-infra",
+                    "openshift-route-controller-manager",
+                    "dedicated-admin",
+                    "default",
+                    "openshift-aws-vpce-operator",
+                    "openshift-backplane-csa",
+                    "openshift-backplane-cse",
+                    "openshift-backplane-csm",
+                    "openshift-backplane-mobb",
+                    "openshift-backplane-tam",
+                    "openshift-cluster-api",
+                    "openshift-compliance",
+                    "openshift-compliance-monkey",
+                    "openshift-container-security",
+                    "openshift-file-integrity",
+                    "openshift-observability-operator",
+                    "openshift-platform-operators",
+                    "openshift-scanning",
+                    "openshift-suricata"
+                  ]
+                },
+                "inventoryCollection": {
+                  "enabled": true
+                },
+                "malwareScanning": {
+                  "enabled": true
+                },
+                "runtimeSecurity": {
+                  "enabled": true
+                },
+                "secretScanning": {
+                  "enabled": true
+                },
+                "vulnerabilityScanning": {
+                  "enabled": true
+                }
+              }
+            }
+          }
+        ]
+      capabilities: Seamless Upgrades
+      categories: Security
+      certified: "false"
+      com.redhat.openshift.versions: v4.12-v4.20
+      containerImage: public.ecr.aws/trendmicro/container-security/visionone-containersecurity-operator:v0.0.4
+      createdAt: "2025-12-04T21:04:32Z"
+      description: Trend Vision One™ Container Security delivers full lifecycle protection
+        for containers with real-time threat detection, policy enforcement, compliance
+        assurance, and rapid incident response.
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "false"
+      features.operators.openshift.io/fips-compliant: "true"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: trendmicro-system
+      operatorhub.io/ui-metadata-max-k8s-version: "1.26"
+      operators.openshift.io/valid-subscription: VisionOneContainerSecurity Subscription
+      operators.operatorframework.io/builder: operator-sdk-v1.42.0
+      operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+      repository: https://github.com/trendmicro/visionone-container-security-helm
+      support: TrendMicro Inc
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Trend Vision One™ Container Security delivers full lifecycle
+          protection for containers with real-time threat detection, policy enforcement,
+          compliance assurance, and rapid incident response.
+        displayName: VisionOneContainerSecurity
+        kind: VisionOneContainerSecurity
+        name: visiononecontainersecurities.container-security.trendmicro.com
+        resources:
+        - kind: Deployment
+          name: controller-manager
+          version: v1
+        - kind: ServiceAccount
+          name: controller-manager
+          version: v1
+        - kind: Service
+          name: trend-service
+          version: v1
+        - kind: Secret
+          name: trend-secret
+          version: v1
+        - kind: ConfigMap
+          name: trend-config
+          version: v1
+        specDescriptors:
+        - description: Vision One Container Security cluster registration configuration
+          displayName: VisionOne
+          path: visionOne
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:object
+        version: v1alpha1
+    description: "[Trend Vision One™ Container Security](https://docs.trendmicro.com/en-us/documentation/article/trend-vision-one-container-security)
+      delivers comprehensive, end-to-end\n protection for containerized workloads
+      across OpenShift and Kubernetes environments.\n It continuously monitors for
+      threats, vulnerabilities, policy violations, and\n exposed secrets ensuring
+      compliance and enabling rapid, automated response. Purpose-built\n for hybrid
+      cloud, it instantly isolates compromised containers to prevent lateral\n movement
+      and minimize impact. Seamlessly integrating into OpenShift DevSecOps\n pipelines,
+      it empowers security teams to enforce policies while enabling developers\n to
+      innovate and deploy with confidence without disrupting workflows or compromising\n
+      agility.\n\n **Installation**\n \n - Use the recommended `trendmicro-system`
+      namespace.\n - Refer to the [Trend Vision One™ Documentation](https://docs.trendmicro.com/en-us/documentation/article/trend-vision-one-red-hat-openshift-operator)
+      for registration and installation steps.\n"
+    displayName: Trend Vision One™ Container Security
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+    keywords:
+    - trendmicro
+    - visionone
+    - container-security
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Documentation
+      url: https://docs.trendmicro.com/en-us/documentation/article/trend-vision-one-red-hat-openshift-operator
+    maintainers:
+    - email: support@trendmicro.com
+      name: TrendMicro VisionOne Support Team
+    maturity: alpha
+    minKubeVersion: 1.23.0
+    provider:
+      name: TrendMicro
+      url: trendmicro.com
+relatedImages:
+- image: public.ecr.aws/trendmicro/container-security/visionone-containersecurity-operator:v0.0.4
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/visionone-containersecurity:0.0.4
   name: ""
 schema: olm.bundle

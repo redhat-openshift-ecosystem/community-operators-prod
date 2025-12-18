@@ -1,0 +1,287 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.17.3
+  creationTimestamp: null
+  name: gatewayconfigs.services.platform.opendatahub.io
+spec:
+  group: services.platform.opendatahub.io
+  names:
+    kind: GatewayConfig
+    listKind: GatewayConfigList
+    plural: gatewayconfigs
+    singular: gatewayconfig
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - description: Ready
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    - description: Reason
+      jsonPath: .status.conditions[?(@.type=="Ready")].reason
+      name: Reason
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: GatewayConfig is the Schema for the gatewayconfigs API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: GatewayConfigSpec defines the desired state of GatewayConfig
+            properties:
+              authProxyTimeout:
+                description: |-
+                  AuthProxyTimeout defines the timeout for external authorization service calls (e.g., "5s", "10s")
+                  This controls how long Envoy waits for a response from the authentication proxy before timing out 403 response.
+                type: string
+              authTimeout:
+                description: |-
+                  AuthTimeout is the duration Envoy waits for auth proxy responses.
+                  Requests timeout with 403 if exceeded.
+                  Deprecated: Use AuthProxyTimeout instead.
+                pattern: ^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$
+                type: string
+              certificate:
+                description: Certificate specifies configuration of the TLS certificate
+                  securing communication for the gateway.
+                properties:
+                  secretName:
+                    description: |-
+                      SecretName specifies the name of the Kubernetes Secret resource that contains a
+                      TLS certificate secure HTTP communications for the KNative network.
+                    type: string
+                  type:
+                    default: OpenshiftDefaultIngress
+                    description: |-
+                      Type specifies if the TLS certificate should be generated automatically, or if the certificate
+                      is provided by the user. Allowed values are:
+                      * SelfSigned: A certificate is going to be generated using an own private key.
+                      * Provided: Pre-existence of the TLS Secret (see SecretName) with a valid certificate is assumed.
+                      * OpenshiftDefaultIngress: Default ingress certificate configured for OpenShift
+                    enum:
+                    - SelfSigned
+                    - Provided
+                    - OpenshiftDefaultIngress
+                    type: string
+                type: object
+              cookie:
+                description: Cookie configuration (applies to both OIDC and OpenShift
+                  OAuth)
+                properties:
+                  expire:
+                    default: 24h
+                    description: |-
+                      Expire duration for OAuth2 proxy session cookie (e.g., "24h", "8h")
+                      This controls how long the session cookie is valid before requiring re-authentication.
+                    type: string
+                  refresh:
+                    default: 1h
+                    description: |-
+                      Refresh duration for OAuth2 proxy to refresh access tokens (e.g., "2h", "1h", "30m")
+                      This must be LESS than the OIDC provider's Access Token Lifespan to avoid token expiration.
+                      For example, if Keycloak Access Token Lifespan is 1 hour, set this to "30m" or "45m".
+                    type: string
+                type: object
+              domain:
+                description: |-
+                  Domain specifies the host name for intercepting incoming requests.
+                  Most likely, you will want to use a wildcard name, like *.example.com.
+                  If not set, the domain of the OpenShift Ingress is used.
+                  If you choose to generate a certificate, this is the domain used for the certificate request.
+                  Example: *.example.com, example.com, apps.example.com
+                pattern: ^(\*\.)?([a-z0-9]([-a-z0-9]*[a-z0-9])?\.)*[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                type: string
+              ingressMode:
+                description: |-
+                  IngressMode specifies how the Gateway is exposed externally.
+                  "OcpRoute" uses ClusterIP with standard OpenShift Routes (default for new deployments).
+                  "LoadBalancer" uses a LoadBalancer service type (requires cloud or MetalLB).
+                enum:
+                - OcpRoute
+                - LoadBalancer
+                type: string
+              networkPolicy:
+                description: NetworkPolicy configuration for kube-auth-proxy
+                properties:
+                  ingress:
+                    description: |-
+                      Ingress defines ingress NetworkPolicy rules.
+                      When nil, ingress rules are applied by default (allows traffic from Gateway pods and monitoring namespaces).
+                      When specified, Enabled must be set to true to apply rules or false to skip NetworkPolicy creation.
+                      Set Enabled=false only in development environments or when using alternative network security controls.
+                    properties:
+                      enabled:
+                        description: |-
+                          Enabled determines whether ingress rules are applied.
+                          When true, creates NetworkPolicy allowing traffic only from Gateway pods and monitoring namespaces.
+                        type: boolean
+                    required:
+                    - enabled
+                    type: object
+                type: object
+              oidc:
+                description: OIDC configuration (used when cluster is in OIDC authentication
+                  mode)
+                properties:
+                  clientID:
+                    description: OIDC client ID
+                    type: string
+                  clientSecretRef:
+                    description: Reference to secret containing client secret
+                    properties:
+                      key:
+                        description: The key of the secret to select from.  Must be
+                          a valid secret key.
+                        type: string
+                      name:
+                        default: ""
+                        description: |-
+                          Name of the referent.
+                          This field is effectively required, but due to backwards compatibility is
+                          allowed to be empty. Instances of this type with an empty value here are
+                          almost certainly wrong.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        type: string
+                      optional:
+                        description: Specify whether the Secret or its key must be
+                          defined
+                        type: boolean
+                    required:
+                    - key
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  issuerURL:
+                    description: OIDC issuer URL
+                    type: string
+                  secretNamespace:
+                    description: |-
+                      Namespace where the client secret is located
+                      If not specified, defaults to openshift-ingress
+                    type: string
+                required:
+                - clientID
+                - clientSecretRef
+                - issuerURL
+                type: object
+              providerCASecretName:
+                description: |-
+                  ProviderCASecretName is the name of the secret containing the CA certificate for the authentication provider
+                  Used when the OAuth/OIDC provider uses a self-signed or custom CA certificate.
+                  Secret must exist in the openshift-ingress namespace and contain a 'ca.crt' key with the PEM-encoded CA certificate.
+                type: string
+              subdomain:
+                description: |-
+                  Subdomain configuration for the GatewayConfig
+                  Example: my-gateway, custom-gateway
+                maxLength: 63
+                pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?)$
+                type: string
+              verifyProviderCertificate:
+                default: true
+                description: |-
+                  VerifyProviderCertificate controls TLS certificate verification for the authentication provider.
+                  When true (default), certificates are verified against the system trust store and providerCASecretName.
+                  When false, certificate verification is disabled (development/testing only).
+                  WARNING: Setting this to false disables security and should only be used in non-production environments.
+                  For production use with self-signed certificates, use ProviderCASecretName instead.
+                type: boolean
+            type: object
+          status:
+            description: GatewayConfigStatus defines the observed state of GatewayConfig
+            properties:
+              conditions:
+                items:
+                  properties:
+                    lastHeartbeatTime:
+                      description: |-
+                        The last time we got an update on a given condition, this should not be set and is
+                        present only for backward compatibility reasons
+                      format: date-time
+                      type: string
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.
+                        If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human-readable message indicating
+                        details about the transition.
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        The value should be a CamelCase string.
+                      type: string
+                    severity:
+                      description: |-
+                        Severity with which to treat failures of this type of condition.
+                        When this is not specified, it defaults to Error.
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
+              observedGeneration:
+                description: The generation observed by the resource controller.
+                format: int64
+                type: integer
+              phase:
+                type: string
+            type: object
+        type: object
+        x-kubernetes-validations:
+        - message: GatewayConfig name must be default-gateway
+          rule: self.metadata.name == 'default-gateway'
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

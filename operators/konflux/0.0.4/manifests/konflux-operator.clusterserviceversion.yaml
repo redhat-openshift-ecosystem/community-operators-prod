@@ -1,0 +1,1646 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "Konflux",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux"
+          },
+          "spec": {
+            "buildService": {
+              "spec": {
+                "buildControllerManager": {
+                  "manager": {
+                    "resources": {
+                      "limits": {
+                        "cpu": "30m",
+                        "memory": "128Mi"
+                      },
+                      "requests": {
+                        "cpu": "30m",
+                        "memory": "128Mi"
+                      }
+                    }
+                  },
+                  "replicas": 1
+                }
+              }
+            },
+            "certManager": {
+              "createClusterIssuer": true
+            },
+            "info": {
+              "spec": {
+                "banner": {
+                  "items": [
+                    {
+                      "summary": "Welcome to Konflux-CI! This is a development environment for testing and development purposes.",
+                      "type": "info"
+                    }
+                  ]
+                },
+                "publicInfo": {
+                  "environment": "development",
+                  "integrations": {
+                    "image_controller": {
+                      "enabled": true,
+                      "notifications": [
+                        {
+                          "config": {
+                            "url": "https://webhook.example.com/build"
+                          },
+                          "event": "build_complete",
+                          "method": "webhook",
+                          "title": "Build Notification"
+                        },
+                        {
+                          "config": {
+                            "email": "team@example.com"
+                          },
+                          "event": "repo_push",
+                          "method": "email",
+                          "title": "Email Notification"
+                        }
+                      ]
+                    }
+                  },
+                  "visibility": "public"
+                }
+              }
+            },
+            "integrationService": {
+              "spec": {
+                "integrationControllerManager": {
+                  "manager": {
+                    "resources": {
+                      "limits": {
+                        "cpu": "30m",
+                        "memory": "128Mi"
+                      },
+                      "requests": {
+                        "cpu": "30m",
+                        "memory": "128Mi"
+                      }
+                    }
+                  },
+                  "replicas": 1
+                }
+              }
+            },
+            "internalRegistry": {
+              "enabled": true
+            },
+            "namespaceLister": {
+              "spec": {
+                "namespaceLister": {
+                  "namespaceLister": {
+                    "resources": {
+                      "limits": {
+                        "cpu": "500m",
+                        "memory": "256Mi"
+                      },
+                      "requests": {
+                        "cpu": "100m",
+                        "memory": "128Mi"
+                      }
+                    }
+                  },
+                  "replicas": 1
+                }
+              }
+            },
+            "releaseService": {
+              "spec": {
+                "releaseControllerManager": {
+                  "manager": {
+                    "resources": {
+                      "limits": {
+                        "cpu": "30m",
+                        "memory": "128Mi"
+                      },
+                      "requests": {
+                        "cpu": "30m",
+                        "memory": "128Mi"
+                      }
+                    }
+                  },
+                  "replicas": 1
+                }
+              }
+            },
+            "ui": {
+              "spec": {
+                "dex": {
+                  "config": {
+                    "enablePasswordDB": true,
+                    "passwordConnector": "local",
+                    "staticPasswords": [
+                      {
+                        "email": "user1@konflux.dev",
+                        "hash": "REDACTED",
+                        "userID": "7138d2fe-724e-4e86-af8a-db7c4b080e20",
+                        "username": "user1"
+                      },
+                      {
+                        "email": "user2@konflux.dev",
+                        "hash": "REDACTED",
+                        "userID": "ea8e8ee1-2283-4e03-83d4-b00f8b821b64",
+                        "username": "user2"
+                      }
+                    ]
+                  }
+                },
+                "ingress": {
+                  "nodePortService": {
+                    "httpsPort": 30011
+                  }
+                },
+                "proxy": {
+                  "nginx": {
+                    "resources": {
+                      "limits": {
+                        "cpu": "30m",
+                        "memory": "128Mi"
+                      },
+                      "requests": {
+                        "cpu": "30m",
+                        "memory": "128Mi"
+                      }
+                    }
+                  },
+                  "replicas": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxApplicationAPI",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-application-api"
+          },
+          "spec": {}
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxBuildService",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-build-service"
+          },
+          "spec": {
+            "buildControllerManager": {
+              "manager": {
+                "env": [
+                  {
+                    "name": "PAC_WEBHOOK_URL",
+                    "value": "http://pipelines-as-code-controller.pipelines-as-code.svc.cluster.local:8180"
+                  },
+                  {
+                    "name": "EXAMPLE_CUSTOM_CONFIG",
+                    "valueFrom": {
+                      "configMapKeyRef": {
+                        "key": "custom-config",
+                        "name": "build-service-config"
+                      }
+                    }
+                  },
+                  {
+                    "name": "EXAMPLE_SECRET_VALUE",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "key": "secret-key",
+                        "name": "build-service-secret"
+                      }
+                    }
+                  }
+                ],
+                "resources": {
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "512Mi"
+                  },
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  }
+                }
+              },
+              "replicas": 2
+            }
+          }
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxCertManager",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-cert-manager"
+          },
+          "spec": {
+            "createClusterIssuer": true
+          }
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxEnterpriseContract",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-enterprise-contract"
+          },
+          "spec": {}
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxImageController",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-image-controller"
+          },
+          "spec": {}
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxInfo",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-info"
+          },
+          "spec": {
+            "banner": {
+              "items": [
+                {
+                  "summary": "Welcome to Konflux-CI! This is a production environment.",
+                  "type": "info"
+                },
+                {
+                  "dayOfWeek": 1,
+                  "endTime": "17:00",
+                  "startTime": "09:00",
+                  "summary": "**Scheduled Maintenance**: System maintenance will occur on Friday, March 15th from 2:00 AM to 4:00 AM EST.",
+                  "timeZone": "America/New_York",
+                  "type": "warning"
+                },
+                {
+                  "dayOfMonth": 15,
+                  "endTime": "18:00",
+                  "month": 3,
+                  "startTime": "14:00",
+                  "summary": "**CRITICAL**: Security patch deployment in progress. Some services may be temporarily unavailable.",
+                  "timeZone": "UTC",
+                  "type": "danger",
+                  "year": 2025
+                },
+                {
+                  "dayOfWeek": 1,
+                  "endTime": "11:00",
+                  "startTime": "09:00",
+                  "summary": "Weekly team standup reminder: Every Monday at 10:00 AM.",
+                  "timeZone": "America/Los_Angeles",
+                  "type": "info"
+                },
+                {
+                  "dayOfMonth": 31,
+                  "endTime": "23:59",
+                  "month": 12,
+                  "startTime": "00:00",
+                  "summary": "**Annual Review Period**: Performance reviews are due by end of month.",
+                  "timeZone": "UTC",
+                  "type": "warning"
+                },
+                {
+                  "endTime": "20:00",
+                  "startTime": "08:00",
+                  "summary": "**New Feature Available**:\n\n- Enhanced build pipeline visualization\n- Improved security scanning\n- [View Documentation](https://docs.konflux.example.com)\n",
+                  "timeZone": "Europe/London",
+                  "type": "info"
+                }
+              ]
+            },
+            "publicInfo": {
+              "environment": "production",
+              "integrations": {
+                "github": {
+                  "application_url": "https://github.com/apps/my-konflux-app/installations/new"
+                },
+                "image_controller": {
+                  "enabled": true,
+                  "notifications": [
+                    {
+                      "config": {
+                        "url": "https://webhook.example.com/build/complete"
+                      },
+                      "event": "build_complete",
+                      "method": "webhook",
+                      "title": "Build Complete Notification"
+                    },
+                    {
+                      "config": {
+                        "email": "devops-team@example.com"
+                      },
+                      "event": "repo_push",
+                      "method": "email",
+                      "title": "Repository Push Notification"
+                    },
+                    {
+                      "config": {
+                        "timeout": "30s",
+                        "url": "https://webhook.example.com/scan"
+                      },
+                      "event": "image_scan_complete",
+                      "method": "webhook",
+                      "title": "Image Scan Complete"
+                    }
+                  ]
+                },
+                "sbom_server": {
+                  "sbom_sha": "https://sbom.example.com/sha",
+                  "url": "https://sbom.example.com/content"
+                }
+              },
+              "rbac": [
+                {
+                  "description": "Full access to Konflux resources including secrets and administrative operations",
+                  "displayName": "Administrator",
+                  "name": "konflux-admin-user-actions"
+                },
+                {
+                  "description": "Manage workspace resources without access to sensitive or destructive actions",
+                  "name": "konflux-maintainer-user-actions"
+                },
+                {
+                  "description": "Read-only access to view CI results and workspace information",
+                  "displayName": "Viewer Role",
+                  "name": "konflux-viewer-user-actions"
+                },
+                {
+                  "description": "Custom role for specific use case with limited permissions",
+                  "name": "konflux-custom-role"
+                }
+              ],
+              "statusPageUrl": "https://status.konflux.example.com",
+              "visibility": "public"
+            }
+          }
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxIntegrationService",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-integration-service"
+          },
+          "spec": {
+            "integrationControllerManager": {
+              "manager": {
+                "env": [
+                  {
+                    "name": "EXAMPLE_CUSTOM_CONFIG",
+                    "valueFrom": {
+                      "configMapKeyRef": {
+                        "key": "custom-config",
+                        "name": "integration-service-config"
+                      }
+                    }
+                  },
+                  {
+                    "name": "EXAMPLE_SECRET_VALUE",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "key": "secret-key",
+                        "name": "integration-service-secret"
+                      }
+                    }
+                  }
+                ],
+                "resources": {
+                  "limits": {
+                    "cpu": "512m",
+                    "memory": "1Gi"
+                  },
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  }
+                }
+              },
+              "replicas": 3
+            }
+          }
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxInternalRegistry",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-internal-registry"
+          },
+          "spec": null
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxNamespaceLister",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-namespace-lister"
+          },
+          "spec": {
+            "namespaceLister": {
+              "namespaceLister": {
+                "env": [
+                  {
+                    "name": "LOG_LEVEL",
+                    "value": "0"
+                  },
+                  {
+                    "name": "CACHE_RESYNC_PERIOD",
+                    "value": "10m"
+                  },
+                  {
+                    "name": "EXAMPLE_CUSTOM_CONFIG",
+                    "valueFrom": {
+                      "configMapKeyRef": {
+                        "key": "custom-config",
+                        "name": "namespace-lister-config"
+                      }
+                    }
+                  },
+                  {
+                    "name": "EXAMPLE_SECRET_VALUE",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "key": "secret-key",
+                        "name": "namespace-lister-secret"
+                      }
+                    }
+                  }
+                ],
+                "resources": {
+                  "limits": {
+                    "cpu": "512m",
+                    "memory": "1Gi"
+                  },
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  }
+                }
+              },
+              "replicas": 3
+            }
+          }
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxRBAC",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-rbac"
+          },
+          "spec": {}
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxReleaseService",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-release-service"
+          },
+          "spec": {
+            "releaseControllerManager": {
+              "manager": {
+                "env": [
+                  {
+                    "name": "DEFAULT_RELEASE_PVC",
+                    "valueFrom": {
+                      "configMapKeyRef": {
+                        "key": "DEFAULT_RELEASE_PVC",
+                        "name": "release-service-manager-properties"
+                      }
+                    }
+                  },
+                  {
+                    "name": "EXAMPLE_CUSTOM_CONFIG",
+                    "valueFrom": {
+                      "configMapKeyRef": {
+                        "key": "custom-config",
+                        "name": "release-service-config"
+                      }
+                    }
+                  },
+                  {
+                    "name": "EXAMPLE_SECRET_VALUE",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "key": "secret-key",
+                        "name": "release-service-secret"
+                      }
+                    }
+                  }
+                ],
+                "resources": {
+                  "limits": {
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  }
+                }
+              },
+              "replicas": 3
+            }
+          }
+        },
+        {
+          "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+          "kind": "KonfluxUI",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "konflux-operator"
+            },
+            "name": "konflux-ui"
+          },
+          "spec": {
+            "dex": {
+              "config": {
+                "configureLoginWithOpenShift": true,
+                "connectors": [
+                  {
+                    "config": {
+                      "clientID": "$GITHUB_CLIENT_ID",
+                      "clientSecret": "$GITHUB_CLIENT_SECRET",
+                      "orgs": [
+                        {
+                          "name": "my-org",
+                          "teams": [
+                            "developers",
+                            "admins"
+                          ]
+                        },
+                        {
+                          "name": "another-org",
+                          "teams": [
+                            "contributors"
+                          ]
+                        }
+                      ],
+                      "redirectURI": "https://dex.example.com/idp/callback"
+                    },
+                    "id": "github",
+                    "name": "GitHub",
+                    "type": "github"
+                  },
+                  {
+                    "config": {
+                      "clientID": "$GOOGLE_CLIENT_ID",
+                      "clientSecret": "$GOOGLE_CLIENT_SECRET",
+                      "groups": [
+                        "admin@example.com"
+                      ],
+                      "issuer": "https://accounts.google.com",
+                      "redirectURI": "https://dex.example.com/idp/callback"
+                    },
+                    "id": "google",
+                    "name": "Google",
+                    "type": "oidc"
+                  },
+                  {
+                    "config": {
+                      "bindDN": "cn=admin,dc=example,dc=com",
+                      "bindPW": "$LDAP_BIND_PASSWORD",
+                      "groupSearch": {
+                        "baseDN": "ou=Groups,dc=example,dc=com",
+                        "filter": "(objectClass=groupOfNames)",
+                        "nameAttr": "cn",
+                        "userMatchers": [
+                          {
+                            "groupAttr": "member",
+                            "userAttr": "DN"
+                          }
+                        ]
+                      },
+                      "host": "ldap.example.com:636",
+                      "userSearch": {
+                        "baseDN": "ou=Users,dc=example,dc=com",
+                        "emailAttr": "mail",
+                        "filter": "(objectClass=person)",
+                        "idAttr": "uid",
+                        "nameAttr": "cn",
+                        "username": "uid"
+                      }
+                    },
+                    "id": "ldap",
+                    "name": "LDAP",
+                    "type": "ldap"
+                  }
+                ],
+                "enablePasswordDB": true,
+                "hostname": "dex.example.com",
+                "passwordConnector": "local",
+                "port": "9443",
+                "staticPasswords": [
+                  {
+                    "email": "user1@konflux.dev",
+                    "hash": "REDACTED",
+                    "userID": "7138d2fe-724e-4e86-af8a-db7c4b080e20",
+                    "username": "user1"
+                  },
+                  {
+                    "email": "user2@konflux.dev",
+                    "hash": "REDACTED",
+                    "userID": "ea8e8ee1-2283-4e03-83d4-b00f8b821b64",
+                    "username": "user2"
+                  },
+                  {
+                    "email": "admin@konflux.dev",
+                    "hash": "REDACTED",
+                    "userID": "admin-12345-67890-abcdef",
+                    "username": "admin"
+                  }
+                ]
+              },
+              "dex": {
+                "env": [
+                  {
+                    "name": "DEX_LOG_LEVEL",
+                    "value": "debug"
+                  },
+                  {
+                    "name": "DEX_STORAGE_TYPE",
+                    "value": "kubernetes"
+                  }
+                ],
+                "resources": {
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "512Mi"
+                  },
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  }
+                }
+              },
+              "replicas": 2
+            },
+            "ingress": {
+              "annotations": {
+                "cert-manager.io/cluster-issuer": "letsencrypt-prod",
+                "nginx.ingress.kubernetes.io/force-ssl-redirect": "true",
+                "nginx.ingress.kubernetes.io/proxy-body-size": "10m",
+                "nginx.ingress.kubernetes.io/ssl-redirect": "true"
+              },
+              "enabled": true,
+              "host": "konflux-ui.example.com",
+              "ingressClassName": "nginx",
+              "tlsSecretName": "konflux-ui-tls"
+            },
+            "proxy": {
+              "nginx": {
+                "env": [
+                  {
+                    "name": "NGINX_WORKER_PROCESSES",
+                    "value": "4"
+                  },
+                  {
+                    "name": "NGINX_WORKER_CONNECTIONS",
+                    "value": "1024"
+                  },
+                  {
+                    "name": "NGINX_KEEPALIVE_TIMEOUT",
+                    "value": "65"
+                  }
+                ],
+                "resources": {
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "512Mi"
+                  },
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  }
+                }
+              },
+              "oauth2Proxy": {
+                "env": [
+                  {
+                    "name": "OAUTH2_PROXY_PROVIDER",
+                    "value": "oidc"
+                  },
+                  {
+                    "name": "OAUTH2_PROXY_OIDC_ISSUER_URL",
+                    "value": "https://dex.example.com/idp/"
+                  },
+                  {
+                    "name": "OAUTH2_PROXY_CLIENT_ID",
+                    "value": "oauth2-proxy"
+                  },
+                  {
+                    "name": "OAUTH2_PROXY_CLIENT_SECRET",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "key": "client-secret",
+                        "name": "oauth2-proxy-secret"
+                      }
+                    }
+                  }
+                ],
+                "resources": {
+                  "limits": {
+                    "cpu": "200m",
+                    "memory": "256Mi"
+                  },
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "128Mi"
+                  }
+                }
+              },
+              "replicas": 3
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2026-01-15T10:37:22Z"
+    operators.operatorframework.io/builder: operator-sdk-v1.42.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    support: Konflux community
+    description: Konflux is a Cloud native software factory focused on software supply chain security.
+    repository: https://github.com/konflux-ci/konflux-ci
+    containerImage: quay.io/konflux/konflux-operator:0.0.4
+    categories: Integration & Delivery, Security, Developer Tools
+  name: konflux-operator.v0.0.4
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: KonfluxApplicationAPI is the Schema for the konfluxapplicationapis
+        API.
+      displayName: Konflux Application API
+      kind: KonfluxApplicationAPI
+      name: konfluxapplicationapis.konflux.konflux-ci.dev
+      version: v1alpha1
+    - description: KonfluxBuildService is the Schema for the konfluxbuildservices
+        API
+      displayName: Konflux Build Service
+      kind: KonfluxBuildService
+      name: konfluxbuildservices.konflux.konflux-ci.dev
+      version: v1alpha1
+    - description: KonfluxCertManager is the Schema for the konfluxcertmanagers API.
+      displayName: Konflux Cert Manager
+      kind: KonfluxCertManager
+      name: konfluxcertmanagers.konflux.konflux-ci.dev
+      version: v1alpha1
+    - description: KonfluxEnterpriseContract is the Schema for the konfluxenterprisecontracts
+        API.
+      displayName: Konflux Enterprise Contract
+      kind: KonfluxEnterpriseContract
+      name: konfluxenterprisecontracts.konflux.konflux-ci.dev
+      version: v1alpha1
+    - description: Konflux is the Schema for the konfluxes API.
+      displayName: Konflux
+      kind: Konflux
+      name: konfluxes.konflux.konflux-ci.dev
+      version: v1alpha1
+    - description: KonfluxImageController is the Schema for the konfluximagecontrollers
+        API.
+      displayName: Konflux Image Controller
+      kind: KonfluxImageController
+      name: konfluximagecontrollers.konflux.konflux-ci.dev
+      version: v1alpha1
+    - kind: KonfluxInfo
+      name: konfluxinfoes.konflux.konflux-ci.dev
+      version: v1alpha1
+      description: Global public configurations for the Konflux deployment
+    - description: KonfluxIntegrationService is the Schema for the konfluxintegrationservices
+        API
+      displayName: Konflux Integration Service
+      kind: KonfluxIntegrationService
+      name: konfluxintegrationservices.konflux.konflux-ci.dev
+      version: v1alpha1
+    - description: |-
+        KonfluxInternalRegistry is the Schema for the konfluxinternalregistries API.
+        Enabling the internal registry requires trust-manager to be deployed for Certificate and Bundle resources.
+      displayName: Konflux Internal Registry
+      kind: KonfluxInternalRegistry
+      name: konfluxinternalregistries.konflux.konflux-ci.dev
+      version: v1alpha1
+    - description: KonfluxNamespaceLister is the Schema for the konfluxnamespacelisters
+        API.
+      displayName: Konflux Namespace Lister
+      kind: KonfluxNamespaceLister
+      name: konfluxnamespacelisters.konflux.konflux-ci.dev
+      version: v1alpha1
+    - description: KonfluxRBAC is the Schema for the konfluxrbacs API.
+      displayName: Konflux RBAC
+      kind: KonfluxRBAC
+      name: konfluxrbacs.konflux.konflux-ci.dev
+      version: v1alpha1
+    - description: KonfluxReleaseService is the Schema for the konfluxreleaseservices
+        API
+      displayName: Konflux Release Service
+      kind: KonfluxReleaseService
+      name: konfluxreleaseservices.konflux.konflux-ci.dev
+      version: v1alpha1
+    - description: KonfluxUI is the Schema for the konfluxuis API
+      displayName: Konflux UI
+      kind: KonfluxUI
+      name: konfluxuis.konflux.konflux-ci.dev
+      version: v1alpha1
+  description: Cloud native software factory focused on software supply chain security
+  displayName: Konflux
+  icon:
+  - base64data: PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcKICAgd2lkdGg9IjQyLjQ5Mzk5MiIKICAgaGVpZ2h0PSI0Mi40NTk5OTkiCiAgIHZpZXdCb3g9IjAgMCA0Mi40OTM5OTIgNDIuNDU5OTk5IgogICBmaWxsPSJub25lIgogICB2ZXJzaW9uPSIxLjEiCiAgIGlkPSJzdmcxMyIKICAgc29kaXBvZGk6ZG9jbmFtZT0ia29uZmx1eC5zdmciCiAgIGlua3NjYXBlOnZlcnNpb249IjEuNC4yIChlYmYwZTk0MGQwLCAyMDI1LTA1LTA4KSIKICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiCiAgIHhtbG5zOnNvZGlwb2RpPSJodHRwOi8vc29kaXBvZGkuc291cmNlZm9yZ2UubmV0L0RURC9zb2RpcG9kaS0wLmR0ZCIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8c29kaXBvZGk6bmFtZWR2aWV3CiAgICAgaWQ9Im5hbWVkdmlldzEzIgogICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIKICAgICBib3JkZXJjb2xvcj0iIzAwMDAwMCIKICAgICBib3JkZXJvcGFjaXR5PSIwLjI1IgogICAgIGlua3NjYXBlOnNob3dwYWdlc2hhZG93PSIyIgogICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwLjAiCiAgICAgaW5rc2NhcGU6cGFnZWNoZWNrZXJib2FyZD0iMCIKICAgICBpbmtzY2FwZTpkZXNrY29sb3I9IiNkMWQxZDEiCiAgICAgaW5rc2NhcGU6em9vbT0iNy4yMjQ1NTA5IgogICAgIGlua3NjYXBlOmN4PSI3OS44NjY1NTYiCiAgICAgaW5rc2NhcGU6Y3k9IjE5LjEwMTUzMyIKICAgICBpbmtzY2FwZTp3aW5kb3ctd2lkdGg9IjI1NjAiCiAgICAgaW5rc2NhcGU6d2luZG93LWhlaWdodD0iMTMzNSIKICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3cteT0iMCIKICAgICBpbmtzY2FwZTp3aW5kb3ctbWF4aW1pemVkPSIxIgogICAgIGlua3NjYXBlOmN1cnJlbnQtbGF5ZXI9InN2ZzEzIiAvPgogIDxnCiAgICAgY2xpcC1wYXRoPSJ1cmwoI2NsaXBQYXRoMTkpIgogICAgIGlkPSJnMTMiPgogICAgPHBhdGgKICAgICAgIGQ9Im0gNjQuMjEsMzEuNTggLTYuMzksLTcuODMgdiA3LjgzIEggNTQuMyBWIDE0IGggMy41MiB2IDcuODggTCA2NC4yMSwxNCBoIDQuMjUgbCAtNy4yNSw4LjcxIDcuNDUwMSw4Ljg2IEggNjQuMiBaIgogICAgICAgZmlsbD0iI2ZmZmZmZiIKICAgICAgIGlkPSJwYXRoMSIgLz4KICAgIDxwYXRoCiAgICAgICBkPSJtIDczLjM1MDEsMzAuNiBjIC0xLjM4LC0wLjc3IC0yLjQ3LC0xLjg0IC0zLjI3LC0zLjIxIC0wLjgxLC0xLjM3IC0xLjIxLC0yLjkyIC0xLjIxLC00LjY0IDAsLTEuNzIgMC40LC0zLjI1IDEuMjEsLTQuNjIgMC44MSwtMS4zNyAxLjksLTIuNDQgMy4yNywtMy4yMSAxLjM4LC0wLjc3IDIuODksLTEuMTYgNC41MywtMS4xNiAxLjY0LDAgMy4xOCwwLjM5IDQuNTQsMS4xNiAxLjM3LDAuNzcgMi40NSwxLjg0IDMuMjUsMy4yMSAwLjgsMS4zNyAxLjIsMi45MSAxLjIsNC42MiAwLDEuNzEgLTAuNCwzLjI4IC0xLjIsNC42NCAtMC44LDEuMzcgLTEuODgsMi40NCAtMy4yNiwzLjIxIC0xLjM4LDAuNzcgLTIuODksMS4xNiAtNC41MywxLjE2IC0xLjY0LDAgLTMuMTYsLTAuMzkgLTQuNTMsLTEuMTYgeiBtIDcuMzMsLTIuNzEgYyAwLjgxLC0wLjQ4IDEuNDMsLTEuMTYgMS44OSwtMi4wNSAwLjQ1LC0wLjg5IDAuNjgsLTEuOTIgMC42OCwtMy4xIDAsLTEuMTggLTAuMjMsLTIuMiAtMC42OCwtMy4wOCAtMC40NSwtMC44OCAtMS4wOCwtMS41NiAtMS44OSwtMi4wMyAtMC44MSwtMC40NyAtMS43NCwtMC43IC0yLjc5LC0wLjcgLTEuMDUsMCAtMS45OSwwLjI0IC0yLjgxLDAuNyAtMC44MSwwLjQ3IC0xLjQ1LDEuMTUgLTEuOSwyLjAzIC0wLjQ1LDAuODggLTAuNjgsMS45MSAtMC42OCwzLjA4IDAsMS4xNyAwLjIzLDIuMjEgMC42OCwzLjEgMC40NSwwLjg5IDEuMDksMS41NyAxLjksMi4wNSAwLjgxLDAuNDggMS43NSwwLjcyIDIuODEsMC43MiAxLjA2LDAgMS45OSwtMC4yNCAyLjc5LC0wLjcyIHoiCiAgICAgICBmaWxsPSIjZmZmZmZmIgogICAgICAgaWQ9InBhdGgyIiAvPgogICAgPHBhdGgKICAgICAgIGlkPSJwYXRoMyIKICAgICAgIGQ9Im0gOTAuMTMwODU5LDEzLjk4MDQ2OSB2IDE3LjU5OTYwOSBoIDAuNzA1MDc5IGMgLTAuMTc0OTUsLTAuNTAwNzQgLTAuMzM5NTU5LC0xLjAwNTA5NiAtMC40OTIxODgsLTEuNTEzNjcyIC0wLjM5Mzg3MywtMS4zMTI0MjkgMC45Mzk0MjUsLTEuNjc0OTE2IDEuMzM1OTM4LC0wLjM2MzI4MSAwLjE5MTAyOCwwLjYzMTkxMyAwLjQwMjEyOSwxLjI1NzA5OSAwLjYyNjk1MywxLjg3Njk1MyBoIDEuMzQzNzUgViAxOS41MTk1MzEgbCA2Ljk2MDkzOSwxMC41MTk1MzEgYyAwLjAyOTksLTAuMDk5MjYgMC4wNjAxLC0wLjIwMDk4NiAwLjA5MTgsLTAuMzA2NjQgMS4wNDQzNSwtMy4zOTIwNzMgMi4xMjU4MywtNi43NzUxMDUgMy40Mzk0NiwtMTAuMDc0MjE5IDAuNDI3NTgsLTEuMDczODU5IDAuNjgwOCwtMS42NjMyMTcgMS4wMDc4MSwtMi40MDAzOTEgdiAtMy4yNzczNDMgaCAtMy41MTk1MyBWIDI2LjA2MDU0NyBMIDkzLjY1MDM5MSwxMy45ODA0NjkgWiBtIDE1LjAxOTUzMSw2Ljg5ODQzNyBjIC0xLjE3NDUxLDMuMDM2MzA0IC0yLjE2MzA1LDYuMTQxNTY3IC0zLjEyMTA5LDkuMjUxOTUzIC0wLjE0MTY0LDAuNDcxMzY1IC0wLjI4MjA5LDAuOTQyMzUyIC0wLjQyMTg4LDEuNDE0MDYzIGwgMC4wMjM0LDAuMDM1MTYgaCAyLjYwNzQyIGMgMC4zMDQzNiwtMC4yNjE5ODYgMC42MDgxOCwtMC41MjQ2MjIgMC45MTIxMSwtMC43ODcxMDkgeiIgLz4KICAgIDxwYXRoCiAgICAgICBpZD0icGF0aDQiCiAgICAgICBkPSJtIDEwOC45Mjk2OSwxNCB2IDEzLjUwOTc2NiBjIDEuMTc0OTIsLTEuMDI1NzgyIDIuMzQ3NDMsLTIuMDUyNzcgMy41MTk1MywtMy4wODIwMzIgdiAtMC4yODcxMDkgaCAwLjMyODEyIGMgMC4xNzUzOSwtMC4xNTQwNjcgMC4zNTAwNCwtMC4zMDg3ODIgMC41MjUzOSwtMC40NjI4OTEgMC44OTM5NCwtMC43NzY0ODggMS43ODgzNSwtMS41NTI5OTcgMi42ODM2LC0yLjMyODEyNSBoIC0zLjUzNzExIHYgLTQuNTA5NzY1IGggNy4zMzAwOCBWIDE0IFogbSA5LjEzMDg2LDcuMzg2NzE5IGMgLTEuMDYwNjUsMC45MTYxOTkgLTIuMTE5MzgsMS44MzUxMjMgLTMuMTc3NzQsMi43NTM5MDYgaCAzLjE3Nzc0IHogbSAtNS42MTEzMyw0Ljg4MjgxMiBjIC0xLjE3MTc4LDEuMDI3ODc3IC0yLjM0NDMsMi4wNTQzMzMgLTMuNTE5NTMsMy4wNzgxMjUgdiAyLjIyMjY1NiBoIDMuNTE5NTMgeiIgLz4KICAgIDxwYXRoCiAgICAgICBpZD0icGF0aDUiCiAgICAgICBkPSJtIDEyMi45MDAzOSwxNCB2IDEuNDE2MDE2IGMgMC41NTc5NCwtMC40NzMyMSAxLjExNjA3LC0wLjk0NDkyMSAxLjY3NTc4LC0xLjQxNjAxNiB6IG0gMy41MTk1MywwLjI1OTc2NiBjIC0xLjE3NzQxLDAuOTg2MjQgLTIuMzQ5OTIsMS45NzkwNTcgLTMuNTE5NTMsMi45NzQ2MDkgdiAxNC4zMzU5MzcgaCAxMC44MzAwOCB2IC0yLjc5MTAxNSBoIC03LjMwMDc4IC0wLjAxIHoiIC8+CiAgICA8cGF0aAogICAgICAgZD0ibSAxMzkuMTksMTQgdiAxMC44OCBjIDAsMS4xOSAwLjMxLDIuMSAwLjkzLDIuNzMgMC42MiwwLjYzIDEuNDksMC45NCAyLjYyLDAuOTQgMS4xMywwIDIuMDIsLTAuMzEgMi42NCwtMC45NCAwLjYyLC0wLjYzIDAuOTMsLTEuNTQgMC45MywtMi43MyBWIDE0IGggMy41NSB2IDEwLjg1IGMgMCwxLjQ5IC0wLjMyLDIuNzYgLTAuOTcsMy43OSAtMC42NSwxLjAzIC0xLjUxLDEuODEgLTIuNTksMi4zMyAtMS4wOCwwLjUyIC0yLjI5LDAuNzggLTMuNjEsMC43OCAtMS4zMiwwIC0yLjUsLTAuMjYgLTMuNTYsLTAuNzggLTEuMDcsLTAuNTIgLTEuOTEsLTEuMyAtMi41MywtMi4zMyAtMC42MiwtMS4wMyAtMC45MywtMi4yOSAtMC45MywtMy43OSBWIDE0IFoiCiAgICAgICBmaWxsPSIjZmZmZmZmIgogICAgICAgaWQ9InBhdGg2IiAvPgogICAgPHBhdGgKICAgICAgIGQ9Im0gMTYyLjg0LDMxLjU4IC0zLjgsLTUuOTIgLTMuNDUsNS45MiBoIC0zLjk4IGwgNS41NCwtOC44NiAtNS42MSwtOC43MSBoIDQuMDUgbCAzLjgsNS44OSAzLjQyLC01Ljg5IGggMy45OCBsIC01LjUxLDguODQgNS42MSw4Ljc0IGggLTQuMDUgeiIKICAgICAgIGZpbGw9IiNmZmZmZmYiCiAgICAgICBpZD0icGF0aDciIC8+CiAgICA8cGF0aAogICAgICAgZD0ibSAyMS4yMSw0MC41MiBjIDEwLjc2OTUsMCAxOS41LC04LjczMDQgMTkuNSwtMTkuNSAwLC0xMC43Njk1IC04LjczMDUsLTE5LjUgLTE5LjUsLTE5LjUgLTEwLjc2OTYsMCAtMTkuNTAwMDQsOC43MzA1IC0xOS41MDAwNCwxOS41IDAsMTAuNzY5NiA4LjczMDQ0LDE5LjUgMTkuNTAwMDQsMTkuNSB6IgogICAgICAgZmlsbD0iI2ZmZmZmZiIKICAgICAgIGlkPSJwYXRoOCIgLz4KICAgIDxwYXRoCiAgICAgICBkPSJtIDI2LjA4MDEsMjIuMDQgYyAtMy40MywwIC02LjIyLDIuNzggLTYuMjIsNi4yMiAwLDAuMjMgMC4wMSwwLjQ1IDAuMDQsMC42NyAtNS4zOCwtMS43NCAtMTEuMjYsLTguNjIgLTE3Ljc2LC04LjY4IC0wLjQ5LDAgLTEuMDIsMC4wNCAtMS41NDAwMDIsMC4xMyB2IDEuMjkgYyAwLjM5LC0wLjA0IDAuODAwMDAyLC0wLjA0IDEuMjAwMDAyLDAuMDIgOC42NiwxLjM3IDEwLjMyLDExLjY2IDE3LjQ1LDE0LjQzIDQuOTUsMS45MiAxMC4xNywtMC4xNCAxMi4yMywtNC4yNiAwLjUsLTAuOTkgMC44MiwtMi40NyAwLjgyLC0zLjYxIDAsLTMuNDMgLTIuNzgsLTYuMjIgLTYuMjIsLTYuMjIgeiIKICAgICAgIGZpbGw9IiMwMDQ4ODQiCiAgICAgICBpZD0icGF0aDkiIC8+CiAgICA8cGF0aAogICAgICAgZD0ibSAxOC45OTAxLDYuOTM5OTkgYyAtMi44OCwwIC01LjIyLDIuMzQgLTUuMjIsNS4yMjAwMSAwLDEuMTQgMC4zNywyLjIgMC45OSwzLjA2IC0wLjE5LDAuMTggLTAuNDMsMC4zNSAtMC43MiwwLjUxIC0yLjEzLDEuMTkgLTMuMjMsMC40OCAtNy42OTk5OSwwLjk2IC0xLjcyLDAuMTggLTMuODMsMC43NyAtNS4zODAwMDMsMi4wOCAtMC4yNCwwLjc0IC0wLjQ1LDEuNSAtMC42LDIuMjggMC42NjAwMDMsLTAuNzUgMS42ODAwMDMsLTEuNjIgMy4zMDAwMDMsLTIuMDkgNC4wOSwtMS4xOSA3Ljg2OTk5LDAuOTkgMTIuNDk5OTksMC41NSAyLjg5LC0wLjI3IDUuMDgsLTAuODggNi44NywtMy40NCAwLjk2LC0xLjM3IDEuMTcsLTIuNTMgMS4xNywtMy45MiAwLC0yLjg4MDAxIC0yLjM0LC01LjIyMDAxIC01LjIyLC01LjIyMDAxIHoiCiAgICAgICBmaWxsPSIjMDA0ODg0IgogICAgICAgaWQ9InBhdGgxMCIgLz4KICAgIDxwYXRoCiAgICAgICBkPSJtIDI1LjQ1OTksMjAuNTUgYyAtMy4yNCwwIC01Ljg3LDIuNjMgLTUuODcsNS44NyAwLDAuMjEgMC4wMSwwLjQzIDAuMDMsMC42MyAtNS4wOCwtMS42NSAtMTAuNjM5OTcsLTguMTQgLTE2Ljc3OTk3LC04LjIgLTAuOTcsMCAtMC42OSwtMC4zOSAtMS42NiwtMC4wNiB2IDEuMTcgYyAwLjg1LC0wLjI2IDAuMzksMC4xIDEuMzQsMC4yNSA4LjE3OTk3LDEuMyA5Ljc1OTk3LDExLjAxIDE2LjQ4OTk3LDEzLjYzIDQuNjcsMS44MiA5LjYxLC0wLjEzIDExLjU1LC00LjAyIDAuNDcsLTAuOTQgMC43OCwtMi4zNCAwLjc4LC0zLjQxIDAsLTMuMjQgLTIuNjMsLTUuODcgLTUuODcsLTUuODcgeiIKICAgICAgIGZpbGw9IiM0OGI1ZmYiCiAgICAgICBpZD0icGF0aDExIiAvPgogICAgPHBhdGgKICAgICAgIGQ9Im0gMTguMDE5OSw2LjE0IGMgLTIuNzIsMCAtNC45MywyLjIxIC00LjkzLDQuOTMgMCwxLjA4IDAuMzUsMi4wOCAwLjk0LDIuODkgLTAuMTgsMC4xNyAtMC40LDAuMzMgLTAuNjgsMC40OCAtMi4wMiwxLjEyIC0zLjA1LDAuNDUgLTcuMjY5OTcsMC45MSAtMS42MiwwLjE3IC0zLjYyLDAuNzIgLTUuMDc5OTk4LDEuOTYgLTAuMjMsMC43IC0wLjQyLDEuNDIgLTAuNTcsMi4xNiAwLjYyOTk5OCwtMC43MSAxLjU4OTk5OCwtMS41MyAzLjExOTk5OCwtMS45OCAzLjg3LC0xLjEzIDcuNDM5OTcsMC45NCAxMS44MDk5NywwLjUyIDIuNzMsLTAuMjYgNC44LC0wLjgzIDYuNDksLTMuMjUgMC45MSwtMS4zIDEuMSwtMi4zOSAxLjEsLTMuNyAwLC0yLjcxOTk5IC0yLjIxLC00LjkzIC00LjkzLC00LjkzIHoiCiAgICAgICBmaWxsPSIjNDhiNWZmIgogICAgICAgaWQ9InBhdGgxMiIgLz4KICAgIDxwYXRoCiAgICAgICBkPSJNIDIxLjIzLDQyLjQ1IEMgOS41Miw0Mi40NSAwLDMyLjkzIDAsMjEuMjMgMCw5LjUzIDkuNTIsMCAyMS4yMywwIGMgMTEuNzEsMCAyMS4yMyw5LjUyIDIxLjIzLDIxLjIzIDAsMTEuNzEgLTkuNTIsMjEuMjMgLTIxLjIzLDIxLjIzIHogbSAwLC00MC4xMSBjIC0xMC40MiwwIC0xOC44OSw4LjQ3IC0xOC44OSwxOC44OSAwLDEwLjQyIDguNDcsMTguODkgMTguODksMTguODkgMTAuNDIsMCAxOC44OSwtOC40NyAxOC44OSwtMTguODkgMCwtMTAuNDIgLTguNDgsLTE4Ljg5IC0xOC44OSwtMTguODkgeiIKICAgICAgIGZpbGw9IiM0OGI1ZmYiCiAgICAgICBpZD0icGF0aDEzIiAvPgogIDwvZz4KICA8ZGVmcwogICAgIGlkPSJkZWZzMTMiPgogICAgPGxpbmVhckdyYWRpZW50CiAgICAgICBpZD0ic3dhdGNoMTkiCiAgICAgICBpbmtzY2FwZTpzd2F0Y2g9InNvbGlkIj4KICAgICAgPHN0b3AKICAgICAgICAgc3R5bGU9InN0b3AtY29sb3I6IzAwMDAwMDtzdG9wLW9wYWNpdHk6MTsiCiAgICAgICAgIG9mZnNldD0iMCIKICAgICAgICAgaWQ9InN0b3AxOSIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8Y2xpcFBhdGgKICAgICAgIGlkPSJjbGlwMF80MV8xNzQzIj4KICAgICAgPHJlY3QKICAgICAgICAgd2lkdGg9IjE2Ni44OTk5OSIKICAgICAgICAgaGVpZ2h0PSI0Mi40NTAwMDEiCiAgICAgICAgIGZpbGw9IiNmZmZmZmYiCiAgICAgICAgIGlkPSJyZWN0MTMiCiAgICAgICAgIHg9IjAiCiAgICAgICAgIHk9IjAiIC8+CiAgICA8L2NsaXBQYXRoPgogICAgPGNsaXBQYXRoCiAgICAgICBjbGlwUGF0aFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIKICAgICAgIGlkPSJjbGlwUGF0aDE5Ij4KICAgICAgPHJlY3QKICAgICAgICAgc3R5bGU9ImZpbGw6bm9uZTtmaWxsLW9wYWNpdHk6MSIKICAgICAgICAgaWQ9InJlY3QxOSIKICAgICAgICAgd2lkdGg9IjQyLjQ5Mzk5MiIKICAgICAgICAgaGVpZ2h0PSI0My43Mzk3NDIiCiAgICAgICAgIHg9IjAiCiAgICAgICAgIHk9Ii0wLjI3NjgzMzgiIC8+CiAgICA8L2NsaXBQYXRoPgogIDwvZGVmcz4KPC9zdmc+Cg==
+    mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - ""
+          resources:
+          - groups
+          - users
+          verbs:
+          - impersonate
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - serviceaccounts
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - mutatingwebhookconfigurations
+          - validatingwebhookconfigurations
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - apiextensions.k8s.io
+          resources:
+          - customresourcedefinitions
+          verbs:
+          - create
+          - get
+          - patch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - appstudio.redhat.com
+          resources:
+          - enterprisecontractpolicies
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - appstudio.redhat.com
+          resources:
+          - releaseserviceconfigs
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - localsubjectaccessreviews
+          verbs:
+          - create
+        - apiGroups:
+          - batch
+          resources:
+          - cronjobs
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - cert-manager.io
+          resources:
+          - certificates
+          - clusterissuers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - cert-manager.io
+          resources:
+          - issuers
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - ingresses
+          verbs:
+          - get
+        - apiGroups:
+          - console.openshift.io
+          resources:
+          - consolelinks
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - console.openshift.io
+          resources:
+          - consoleyamlsamples
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - dex.coreos.com
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - konflux.konflux-ci.dev
+          resources:
+          - konfluxapplicationapis
+          - konfluxbuildservices
+          - konfluxcertmanagers
+          - konfluxenterprisecontracts
+          - konfluxes
+          - konfluximagecontrollers
+          - konfluxinfoes
+          - konfluxintegrationservices
+          - konfluxinternalregistries
+          - konfluxnamespacelisters
+          - konfluxrbacs
+          - konfluxreleaseservices
+          - konfluxuis
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - konflux.konflux-ci.dev
+          resources:
+          - konfluxapplicationapis/finalizers
+          - konfluxbuildservices/finalizers
+          - konfluxcertmanagers/finalizers
+          - konfluxenterprisecontracts/finalizers
+          - konfluxes/finalizers
+          - konfluximagecontrollers/finalizers
+          - konfluxinfoes/finalizers
+          - konfluxintegrationservices/finalizers
+          - konfluxinternalregistries/finalizers
+          - konfluxnamespacelisters/finalizers
+          - konfluxrbacs/finalizers
+          - konfluxreleaseservices/finalizers
+          - konfluxuis/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - konflux.konflux-ci.dev
+          resources:
+          - konfluxapplicationapis/status
+          - konfluxbuildservices/status
+          - konfluxcertmanagers/status
+          - konfluxenterprisecontracts/status
+          - konfluxes/status
+          - konfluximagecontrollers/status
+          - konfluxinfoes/status
+          - konfluxintegrationservices/status
+          - konfluxinternalregistries/status
+          - konfluxnamespacelisters/status
+          - konfluxrbacs/status
+          - konfluxreleaseservices/status
+          - konfluxuis/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - kyverno.io
+          resources:
+          - clusterpolicies
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingresses
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - networkpolicies
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          verbs:
+          - bind
+          - create
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - build-pipeline-runner-rolebinding
+          - build-service-manager-rolebinding
+          - build-service-metrics-auth-rolebinding
+          resources:
+          - clusterrolebindings
+          verbs:
+          - bind
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - dex
+          - konflux-proxy
+          - konflux-proxy-namespace-lister
+          resources:
+          - clusterrolebindings
+          verbs:
+          - bind
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - image-controller-manager-rolebinding
+          - image-controller-metrics-auth-rolebinding
+          resources:
+          - clusterrolebindings
+          verbs:
+          - bind
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - integration-service-manager-rolebinding
+          - integration-service-metrics-auth-rolebinding
+          - integration-service-snapshot-garbage-collector
+          - integration-service-tekton-role-binding
+          - kyverno-background-controller-konflux-integration-runner
+          resources:
+          - clusterrolebindings
+          verbs:
+          - bind
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - namespace-lister-authorizer
+          resources:
+          - clusterrolebindings
+          verbs:
+          - bind
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - release-service-application-role-binding
+          - release-service-component-role-binding
+          - release-service-environment-role-binding
+          - release-service-manager-rolebinding
+          - release-service-metrics-auth-rolebinding
+          - release-service-release-role-binding
+          - release-service-releaseplan-role-binding
+          - release-service-releaseplanadmission-role-binding
+          - release-service-snapshot-role-binding
+          - release-service-snapshotenvironmentbinding-role-binding
+          - release-service-tekton-role-binding
+          resources:
+          - clusterrolebindings
+          verbs:
+          - bind
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterroles
+          verbs:
+          - create
+          - escalate
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - appstudio-pipelines-runner
+          - build-service-manager-role
+          - build-service-metrics-auth-role
+          resources:
+          - clusterroles
+          verbs:
+          - bind
+          - escalate
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - dex
+          - konflux-proxy
+          - konflux-proxy-namespace-lister
+          resources:
+          - clusterroles
+          verbs:
+          - bind
+          - escalate
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - enterprisecontract-configmap-viewer-role
+          - enterprisecontractpolicy-viewer-role
+          resources:
+          - clusterroles
+          verbs:
+          - bind
+          - escalate
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - image-controller-imagerepository-editor-role
+          - image-controller-imagerepository-viewer-role
+          - image-controller-manager-role
+          - image-controller-metrics-auth-role
+          resources:
+          - clusterroles
+          verbs:
+          - bind
+          - escalate
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - integration-service-integrationtestscenario-admin-role
+          - integration-service-integrationtestscenario-editor-role
+          - integration-service-integrationtestscenario-viewer-role
+          - integration-service-manager-role
+          - integration-service-metrics-auth-role
+          - integration-service-snapshot-garbage-collector
+          - integration-service-tekton-editor-role
+          - konflux-integration-runner
+          resources:
+          - clusterroles
+          verbs:
+          - bind
+          - escalate
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - namespace-lister-authorizer
+          resources:
+          - clusterroles
+          verbs:
+          - bind
+          - escalate
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - release-pipeline-resource-role
+          - release-service-application-role
+          - release-service-component-role
+          - release-service-environment-viewer-role
+          - release-service-manager-role
+          - release-service-metrics-auth-role
+          - release-service-release-editor-role
+          - release-service-release-viewer-role
+          - release-service-releaseplan-editor-role
+          - release-service-releaseplan-viewer-role
+          - release-service-releaseplanadmission-editor-role
+          - release-service-releaseplanadmission-viewer-role
+          - release-service-snapshot-editor-role
+          - release-service-snapshot-viewer-role
+          - release-service-snapshotenvironmentbinding-editor-role
+          - release-service-tekton-role
+          - releaseserviceconfig-role
+          resources:
+          - clusterroles
+          verbs:
+          - bind
+          - escalate
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - build-pipeline-config-read-only-binding
+          - build-service-leader-election-rolebinding
+          resources:
+          - rolebindings
+          verbs:
+          - bind
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - image-controller-leader-election-rolebinding
+          resources:
+          - rolebindings
+          verbs:
+          - bind
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - integration-service-leader-election-rolebinding
+          resources:
+          - rolebindings
+          verbs:
+          - bind
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - public-ec-cm
+          - public-ecp
+          resources:
+          - rolebindings
+          verbs:
+          - bind
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - release-service-leader-election-rolebinding
+          - releaseserviceconfigs-rolebinding
+          resources:
+          - rolebindings
+          verbs:
+          - bind
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - rolebindings
+          - roles
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - build-service-leader-election-role
+          resources:
+          - roles
+          verbs:
+          - bind
+          - escalate
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - image-controller-leader-election-role
+          resources:
+          - roles
+          verbs:
+          - bind
+          - escalate
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - integration-service-leader-election-role
+          resources:
+          - roles
+          verbs:
+          - bind
+          - escalate
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resourceNames:
+          - release-service-leader-election-role
+          resources:
+          - roles
+          verbs:
+          - bind
+          - escalate
+        - apiGroups:
+          - security.openshift.io
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - trust.cert-manager.io
+          resources:
+          - bundles
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: konflux-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: konflux-operator
+          control-plane: controller-manager
+        name: konflux-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: konflux-operator
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                app.kubernetes.io/name: konflux-operator
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --metrics-bind-address=:8443
+                - --leader-elect
+                - --health-probe-bind-address=:8081
+                command:
+                - /manager
+                image: quay.io/konflux-ci/konflux-operator:release-sha-1893442
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                ports:
+                - containerPort: 8081
+                  name: probes
+                  protocol: TCP
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  readOnlyRootFilesystem: true
+              securityContext:
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+              serviceAccountName: konflux-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: konflux-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - build
+  - release
+  - secure-supply-chain
+  - pipeline
+  - scc
+  - factory
+  links:
+  - name: Konflux Operator Repository
+    url: https://github.com/konflux-ci/konflux-ci
+  - name: Konflux Operator Documentation
+    url: https://konflux-ci.dev/konflux-ci
+  - name: Report Issues
+    url: https://github.com/konflux-ci/konflux-ci/issues/new
+  maturity: alpha
+  minKubeVersion: 1.33.5
+  provider:
+    name: Konflux community
+    url: https://konflux-ci.dev/
+  maintainers:
+  - email: konflux@googlegroups.com
+    name: Konflux community
+  version: 0.0.4

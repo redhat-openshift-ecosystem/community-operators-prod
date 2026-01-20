@@ -20,6 +20,8 @@ entries:
 - name: slurm-operator.v1.0.0
 - name: slurm-operator.v1.0.1
   replaces: slurm-operator.v1.0.0
+- name: slurm-operator.v1.0.1-1
+  replaces: slurm-operator.v1.0.1
 name: release-1.0
 package: slurm-operator
 schema: olm.channel
@@ -3032,5 +3034,652 @@ relatedImages:
 - image: ghcr.io/slinkyproject/slurm-operator:1.0.1
   name: ""
 - image: quay.io/community-operator-pipeline-prod/slurm-operator:1.0.1
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/slurm-operator:1.0.1-1
+name: slurm-operator.v1.0.1-1
+package: slurm-operator
+properties:
+- type: olm.gvk
+  value:
+    group: slinky.slurm.net
+    kind: Accounting
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: slinky.slurm.net
+    kind: Controller
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: slinky.slurm.net
+    kind: LoginSet
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: slinky.slurm.net
+    kind: NodeSet
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: slinky.slurm.net
+    kind: RestApi
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: slinky.slurm.net
+    kind: Token
+    version: v1beta1
+- type: olm.package
+  value:
+    packageName: slurm-operator
+    version: 1.0.1-1
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "slinky.slurm.net/v1beta1",
+            "kind": "Accounting",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "Helm",
+                "app.kubernetes.io/part-of": "slurm",
+                "app.kubernetes.io/version": "25.11",
+                "helm.sh/chart": "slurm-1.0.1"
+              },
+              "name": "slurm",
+              "namespace": "slurm"
+            },
+            "spec": {
+              "jwtHs256KeyRef": {
+                "key": "jwt_hs256.key",
+                "name": "slurm-auth-jwths256"
+              },
+              "service": {
+                "metadata": {},
+                "spec": {}
+              },
+              "slurmKeyRef": {
+                "key": "slurm.key",
+                "name": "slurm-auth-slurm"
+              },
+              "slurmdbd": {
+                "args": [],
+                "image": "quay.io/slinky-on-openshift/slurmdbd:25.05.4-centos9-ohpc",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {}
+              },
+              "storageConfig": {
+                "database": "slurm_acct_db",
+                "host": "mariadb",
+                "passwordKeyRef": {
+                  "key": "password",
+                  "name": "mariadb-password"
+                },
+                "port": 3306,
+                "username": "slurm"
+              },
+              "template": {
+                "spec": {
+                  "affinity": {},
+                  "imagePullSecrets": null,
+                  "initContainers": [],
+                  "nodeSelector": {
+                    "kubernetes.io/os": "linux"
+                  },
+                  "priorityClassName": null,
+                  "resources": {},
+                  "tolerations": []
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "slinky.slurm.net/v1beta1",
+            "kind": "Controller",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "Helm",
+                "app.kubernetes.io/part-of": "slurm",
+                "app.kubernetes.io/version": "25.11",
+                "helm.sh/chart": "slurm-1.0.1"
+              },
+              "name": "slurm",
+              "namespace": "slurm"
+            },
+            "spec": {
+              "accountingRef": {
+                "name": "slurm",
+                "namespace": "slurm"
+              },
+              "epilogScriptRefs": null,
+              "epilogSlurmctldScriptRefs": null,
+              "extraConf": "PartitionName=all Nodes=ALL Default=YES MaxTime=UNLIMITED State=UP\n",
+              "jwtHs256KeyRef": {
+                "key": "jwt_hs256.key",
+                "name": "slurm-auth-jwths256"
+              },
+              "logfile": {
+                "image": "registry.redhat.io/ubi9/ubi:latest",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {}
+              },
+              "metrics": {
+                "enabled": false,
+                "serviceMonitor": {
+                  "annotations": {},
+                  "enabled": false,
+                  "endpoints": [
+                    {
+                      "path": "/metrics/jobs"
+                    },
+                    {
+                      "path": "/metrics/nodes"
+                    },
+                    {
+                      "path": "/metrics/partitions"
+                    },
+                    {
+                      "path": "/metrics/scheduler"
+                    }
+                  ],
+                  "interval": "30s",
+                  "labels": {},
+                  "scrapeTimeout": "25s"
+                }
+              },
+              "persistence": {
+                "accessModes": [
+                  "ReadWriteOnce"
+                ],
+                "enabled": true,
+                "existingClaim": "",
+                "resources": {
+                  "requests": {
+                    "storage": "4Gi"
+                  }
+                }
+              },
+              "prologScriptRefs": null,
+              "prologSlurmctldScriptRefs": null,
+              "reconfigure": {
+                "image": "quay.io/slinky-on-openshift/slurmctld:25.05.4-centos9-ohpc",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {}
+              },
+              "service": {
+                "metadata": {},
+                "spec": {}
+              },
+              "slurmKeyRef": {
+                "key": "slurm.key",
+                "name": "slurm-auth-slurm"
+              },
+              "slurmctld": {
+                "args": [],
+                "image": "quay.io/slinky-on-openshift/slurmctld:25.11-ubuntu24.04",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {}
+              },
+              "template": {
+                "spec": {
+                  "affinity": {},
+                  "imagePullSecrets": null,
+                  "initContainers": [],
+                  "nodeSelector": {
+                    "kubernetes.io/os": "linux"
+                  },
+                  "priorityClassName": null,
+                  "resources": {},
+                  "tolerations": []
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "slinky.slurm.net/v1beta1",
+            "kind": "LoginSet",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "Helm",
+                "app.kubernetes.io/part-of": "slurm",
+                "app.kubernetes.io/version": "25.11",
+                "helm.sh/chart": "slurm-1.0.1"
+              },
+              "name": "slurm-login-slinky",
+              "namespace": "slurm"
+            },
+            "spec": {
+              "controllerRef": {
+                "name": "slurm",
+                "namespace": "slurm"
+              },
+              "initconf": {
+                "image": "docker.io/library/alpine:latest",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {}
+              },
+              "login": {
+                "env": [],
+                "image": "quay.io/slinky-on-openshift/login:25.05.4-centos9-ohpc",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {},
+                "securityContext": {
+                  "privileged": true
+                },
+                "volumeMounts": []
+              },
+              "replicas": 1,
+              "service": {
+                "metadata": {},
+                "spec": {
+                  "type": "LoadBalancer"
+                }
+              },
+              "sssdConfRef": {
+                "key": "sssd.conf",
+                "name": "slurm-login-slinky-sssd-conf"
+              },
+              "template": {
+                "spec": {
+                  "affinity": {},
+                  "imagePullSecrets": null,
+                  "initContainers": [],
+                  "nodeSelector": {
+                    "kubernetes.io/os": "linux"
+                  },
+                  "priorityClassName": null,
+                  "resources": {},
+                  "tolerations": [],
+                  "volumes": []
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "slinky.slurm.net/v1beta1",
+            "kind": "NodeSet",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "Helm",
+                "app.kubernetes.io/part-of": "slurm",
+                "app.kubernetes.io/version": "25.11",
+                "helm.sh/chart": "slurm-1.0.1"
+              },
+              "name": "slurm-worker-slinky",
+              "namespace": "slurm"
+            },
+            "spec": {
+              "controllerRef": {
+                "name": "slurm",
+                "namespace": "slurm"
+              },
+              "logfile": {
+                "image": "registry.redhat.io/ubi9/ubi:latest",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {}
+              },
+              "partition": {
+                "enabled": true
+              },
+              "replicas": 1,
+              "slurmd": {
+                "args": [],
+                "env": [
+                  {
+                    "name": "POD_CPUS",
+                    "value": "0"
+                  },
+                  {
+                    "name": "POD_MEMORY",
+                    "value": "0"
+                  }
+                ],
+                "image": "quay.io/slinky-on-openshift/slurmd:25.05.4-centos9-ohpc",
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {},
+                "volumeMounts": []
+              },
+              "taintKubeNodes": false,
+              "template": {
+                "spec": {
+                  "affinity": {},
+                  "hostname": "slinky-",
+                  "imagePullSecrets": null,
+                  "initContainers": [],
+                  "nodeSelector": {
+                    "kubernetes.io/os": "linux"
+                  },
+                  "priorityClassName": null,
+                  "resources": {},
+                  "tolerations": [],
+                  "volumes": []
+                }
+              },
+              "updateStrategy": {
+                "rollingUpdate": {
+                  "maxUnavailable": "25%"
+                },
+                "type": "RollingUpdate"
+              }
+            }
+          },
+          {
+            "apiVersion": "slinky.slurm.net/v1beta1",
+            "kind": "RestApi",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "Helm",
+                "app.kubernetes.io/part-of": "slurm",
+                "app.kubernetes.io/version": "25.11",
+                "helm.sh/chart": "slurm-1.0.1"
+              },
+              "name": "slurm",
+              "namespace": "slurm"
+            },
+            "spec": {
+              "controllerRef": {
+                "name": "slurm",
+                "namespace": "slurm"
+              },
+              "replicas": 1,
+              "service": {
+                "metadata": {},
+                "spec": {}
+              },
+              "slurmrestd": {
+                "args": [],
+                "env": [],
+                "image": "quay.io/slinky-on-openshift/slurmrestd:25.05.4-centos9-ohpc",
+                "resources": {}
+              },
+              "template": {
+                "spec": {
+                  "affinity": {},
+                  "imagePullSecrets": null,
+                  "initContainers": [],
+                  "nodeSelector": {
+                    "kubernetes.io/os": "linux"
+                  },
+                  "priorityClassName": null,
+                  "resources": {},
+                  "tolerations": []
+                }
+              }
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: AI/Machine Learning, Big Data
+      certified: "false"
+      containerImage: ghcr.io/slinkyproject/slurm-operator:1.0.1
+      createdAt: "2026-01-19T19:52:14Z"
+      description: Run Slurm on Kubernetes, by SchedMD. A Slinky project.
+      features.operators.openshift.io/disconnected: "false"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: slinky
+      operatorframework.io/suggested-namespace-template: |-
+        {
+          "apiVersion": "v1",
+          "kind": "Namespace",
+          "metadata": {
+            "name": "slinky",
+            "labels": {
+              "pod-security.kubernetes.io/enforce": "privileged",
+              "pod-security.kubernetes.io/audit": "privileged",
+              "pod-security.kubernetes.io/warn": "privileged",
+            },
+            "annotations": {
+              "openshift.io/node-selector": ""
+            },
+          }
+        }
+      operators.operatorframework.io/builder: operator-sdk-v1.39.2
+      operators.operatorframework.io/project_layout: unknown
+      repository: https://github.com/redhat-hpc/slinky-on-openshift
+      support: SchedMD
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - kind: Accounting
+        name: accountings.slinky.slurm.net
+        version: v1beta1
+      - kind: Controller
+        name: controllers.slinky.slurm.net
+        version: v1beta1
+      - kind: LoginSet
+        name: loginsets.slinky.slurm.net
+        version: v1beta1
+      - kind: NodeSet
+        name: nodesets.slinky.slurm.net
+        version: v1beta1
+      - kind: RestApi
+        name: restapis.slinky.slurm.net
+        version: v1beta1
+      - kind: Token
+        name: tokens.slinky.slurm.net
+        version: v1beta1
+    description: |
+      # Kubernetes Operator for Slurm Clusters
+
+      Run [Slurm] on [Kubernetes], by [SchedMD]. A [Slinky] project.
+
+      ## Documentation
+
+      Project documentation is located in the docs directory of [this repository](https://github.com/SlinkyProject/slurm-operator)
+
+      There is also supplemental work in the community for enabling [Slinky On OpenShift](https://github.com/redhat-hpc/slinky-on-openshift)
+
+      ## Quickstart with Slinky on OpenShift
+
+      Create the namespace with privileged SecurityContextConstraint. This makes it easier to deploy Slurm in
+      containers today but in the future we plan to provide a more restrictive SCC that fits what Slurm requires.
+
+      ```
+      oc adm new-project slurm
+      oc adm policy add-scc-to-user privileged -n slurm -z default
+      ```
+
+      This `helm` command deploys the Slurm operator on OpenShift with the upstream chart and uses a SSH key
+      for the root user of the LoginSet:
+
+      ```
+      helm install slurm oci://ghcr.io/slinkyproject/charts/slurm --namespace=slurm \
+        --version 1.0.1 \
+        --set loginsets.slinky.enabled=true \
+        --set loginsets.slinky.login.securityContext.privileged=true \
+        --set-literal loginsets.slinky.rootSshAuthorizedKeys="$(cat $HOME/.ssh/id_rsa.pub)"
+      ```
+
+      Then SSH to the login pod:
+
+      ```
+      ssh -o ProxyCommand='oc exec -i -n slurm svc/%h -- socat STDIO TCP:localhost:22' root@slurm-login-slinky
+      ```
+
+      ## Overview
+
+      [Slurm] and [Kubernetes] are workload managers originally designed for different
+      kinds of workloads. In broad strokes: Kubernetes excels at scheduling workloads
+      that typically run for an indefinite amount of time, with potentially vague
+      resource requirements, on a single node, with loose policy, but can scale its
+      resource pool infinitely to meet demand; Slurm excels at quickly scheduling
+      workloads that run for a finite amount of time, with well defined resource
+      requirements and topology, on multiple nodes, with strict policy, but its
+      resource pool is known.
+
+      This project enables the best of both workload managers, unified on Kubernetes.
+      It contains a [Kubernetes] operator to deploy and manage certain components of
+      [Slurm] clusters. This repository implements [custom-controllers] and
+      [custom resource definitions (CRDs)][crds] designed for the lifecycle (creation,
+      upgrade, graceful shutdown) of Slurm clusters.
+
+      ### Slurm Cluster
+
+      Slurm clusters are very flexible and can be configured in various ways. Our
+      Slurm helm chart provides a reference implementation that is highly customizable
+      and tries to expose everything Slurm has to offer.
+
+      ## Features
+
+      ### NodeSets
+
+      A set of homogeneous Slurm workers (compute nodes), which are delegated to
+      execute the Slurm workload.
+
+      The operator will take into consideration the running workload among Slurm nodes
+      as it needs to scale-in, upgrade, or otherwise handle node failures. Slurm nodes
+      will be marked as [drain][slurm-drain] before their eventual termination pending
+      scale-in or upgrade.
+
+      Slurm node states (e.g. Idle, Allocated, Mixed, Down, Drain, Not Responding,
+      etc...) are applied to each NodeSet pod via their pod conditions; each NodeSet
+      pod contains a pod status that reflects their own Slurm node state.
+
+      The operator supports NodeSet scale to zero, scaling the resource down to zero
+      replicas. Hence, any Horizontal Pod Autoscaler (HPA) that also support scale to
+      zero can be best paired with NodeSets.
+
+      ### LoginSets
+
+      A set of homogeneous login nodes (submit node, jump host) for Slurm, which
+      manage user identity via SSSD.
+
+      The operator supports LoginSet scale to zero, scaling the resource down to zero
+      replicas. Hence, any Horizontal Pod Autoscaler (HPA) that also support scale to
+      zero can be best paired with LoginSets.
+
+      ### Hybrid Support
+
+      Sometimes a Slurm cluster has some, but not all, of its components in
+      Kubernetes. The operator and its CRD are designed support these use cases.
+
+      ### Slurm
+
+      Slurm is a full featured HPC workload manager. To highlight a few features:
+
+      - [**Accounting**][slurm-accounting]: collect accounting information for every
+        job and job step executed.
+      - [**Partitions**][slurm-arch]: job queues with sets of resources and
+        constraints (e.g. job size limit, job time limit, users permitted).
+      - [**Reservations**][slurm-reservations]: reserve resources for jobs being
+        executed by select users and/or select accounts.
+      - [**Job Dependencies**][slurm-dependency]: defer the start of jobs until the
+        specified dependencies have been satisfied.
+      - [**Job Containers**][slurm-containers]: jobs which run an unprivileged OCI
+        container bundle.
+      - [**MPI**][slurm-mpi]: launch parallel MPI jobs, supports various MPI
+        implementations.
+      - [**Priority**][slurm-priority]: assigns priorities to jobs upon submission and
+        on an ongoing basis (e.g. as they age).
+      - [**Preemption**][slurm-preempt]: stop one or more low-priority jobs to let a
+        high-priority job run.
+      - [**QoS**][slurm-qos]: sets of policies affecting scheduling priority,
+        preemption, and resource limits.
+      - [**Fairshare**][slurm-fairshare]: distribute resources equitably among users
+        and accounts based on historical usage.
+      - [**Node Health Check**][slurm-healthcheck]: periodically check node health via
+        script.
+
+      ## Compatibility
+
+      | Software   |                             Minimum Version                              |
+      | :--------- | :----------------------------------------------------------------------: |
+      | Kubernetes | [v1.29](https://kubernetes.io/blog/2023/12/13/kubernetes-v1-29-release/) |
+      | Slurm      | [25.05](https://www.schedmd.com/slurm-version-25-05-0-is-now-available/) |
+
+      ## Support and Development
+
+      Feature requests, code contributions, and bug reports are welcome!
+
+      Github/Gitlab submitted issues and PRs/MRs are handled on a best effort basis.
+
+      The SchedMD official issue tracker is at <https://support.schedmd.com/>.
+
+      To schedule a demo or simply to reach out, please
+      [contact SchedMD][contact-schedmd].
+
+      ## License
+
+      Copyright (C) SchedMD LLC.
+
+      Licensed under the
+      [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) you
+      may not use project except in compliance with the license.
+
+      Unless required by applicable law or agreed to in writing, software distributed
+      under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+      CONDITIONS OF ANY KIND, either express or implied. See the License for the
+      specific language governing permissions and limitations under the License.
+
+      <!-- links -->
+
+
+      [cert-manager]: https://cert-manager.io/docs/installation/helm/
+      [contact-schedmd]: https://www.schedmd.com/slurm-resources/contact-schedmd/
+      [crds]: https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#customresourcedefinitions
+      [custom-controllers]: https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#custom-controllers
+
+      [kubernetes]: https://kubernetes.io/
+      [schedmd]: https://schedmd.com/
+      [slinky]: https://slinky.ai/
+      [slinky-docs]: https://slinky.schedmd.com/
+      [slurm]: https://slurm.schedmd.com/overview.html
+      [slurm-accounting]: https://slurm.schedmd.com/accounting.html
+      [slurm-arch]: https://slurm.schedmd.com/quickstart.html#arch
+      [slurm-containers]: https://slurm.schedmd.com/containers.html
+      [slurm-dependency]: https://slurm.schedmd.com/sbatch.html#OPT_dependency
+
+      [slurm-drain]: https://slurm.schedmd.com/scontrol.html#OPT_DRAIN
+      [slurm-fairshare]: https://slurm.schedmd.com/fair_tree.html
+      [slurm-healthcheck]: https://slurm.schedmd.com/slurm.conf.html#OPT_HealthCheckProgram
+      [slurm-mpi]: https://slurm.schedmd.com/mpi_guide.html
+      [slurm-preempt]: https://slurm.schedmd.com/preempt.html
+      [slurm-priority]: https://slurm.schedmd.com/priority_multifactor.html
+      [slurm-qos]: https://slurm.schedmd.com/qos.html
+      [slurm-reservations]: https://slurm.schedmd.com/reservations.html
+    displayName: Slurm Operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - slurm-operator
+    - slurm
+    - slinky
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Slinky on OpenShift
+      url: https://github.com/redhat-hpc/slinky-on-openshift/tree/v1.0.1
+    - name: Slurm Operator
+      url: https://github.com/SlinkyProject/slurm-operator/tree/v1.0.1
+    maintainers:
+    - email: jkincl@redhat.com
+      name: Jason Kincl
+    maturity: alpha
+    minKubeVersion: 1.29.0
+    provider:
+      name: Red Hat HPC Community
+relatedImages:
+- image: ghcr.io/slinkyproject/slurm-operator-webhook:1.0.1
+  name: ""
+- image: ghcr.io/slinkyproject/slurm-operator:1.0.1
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/slurm-operator:1.0.1-1
   name: ""
 schema: olm.bundle

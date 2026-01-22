@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: aws-neuron
+    app.kubernetes.io/name: aws-neuron
+    app.kubernetes.io/part-of: aws-neuron
+    app.kubernetes.io/role: aws-neuron-gpu-metrics
+  name: awslabs-gpu-operator-node-metrics-service
+spec:
+  clusterIP: None
+  ports:
+  - name: metrics
+    port: 8000
+    targetPort: metrics
+  selector:
+    app.kubernetes.io/component: aws-neuron
+    app.kubernetes.io/name: aws-neuron
+    app.kubernetes.io/part-of: aws-neuron
+    app.kubernetes.io/role: aws-neuron-gpu-metrics
+status:
+  loadBalancer: {}

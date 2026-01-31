@@ -62,8 +62,8 @@ metadata:
       ]
     capabilities: Seamless Upgrades
     categories: Networking, Security, Monitoring
-    containerImage: quay.io/ecosystem2022/fqdn-egress-controller:v1.0.0
-    createdAt: "2026-01-31T06:23:36Z"
+    containerImage: quay.io/ecosystem2022/fqdn-egress-operator:v1.0.0
+    createdAt: "2026-02-01T07:46:16Z"
     operators.operatorframework.io/builder: operator-sdk-v1.42.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
   name: fqdn-egress-operator.v1.0.0
@@ -135,7 +135,7 @@ spec:
     ### &#128640; Why FQDN Egress Operator?
     Traditional OpenShift MultiNetworkPolicy objects do not support rules based on Fully Qualified Domain Names (FQDNs). However, in many VMware replacement scenarios, customers need to use MultiNetworkPolicy to support east-west network traffic control and want to implement outbound rule control based on FQDNs.
 
-    The FQDN Egress Operator addresses this gap by rewriting an upstream community [fqdn-controller](https://github.com/konsole-is/fqdn-controller) project, can dynamically resolve FQDNs to IP addresses and maintain them as standard MultiNetworkPolicy objects. As operator release style, it can be easily installed and running on the OpenShift platform. FQDN Operator avoids intrusive changes to the network and works with the default CNI, it's a powerful complement to most VMware replacement scenarios.
+    The FQDN Egress Operator addresses this gap by rewriting a community [fqdn-controller](https://github.com/konsole-is/fqdn-controller) project, can dynamically resolve FQDNs to IP addresses and maintain them as standard MultiNetworkPolicy objects. As operator release style, it can be easily installed and running on the OpenShift platform. FQDN Operator avoids intrusive changes to the network and works with the default CNI, it's a powerful complement to most VMware replacement scenarios.
 
     ### &#128736; Key Capabilities
     * **Dynamic Resolving**: Periodically refreshes DNS records to ensure policies stay up-to-date.
@@ -271,7 +271,7 @@ spec:
                 - --health-probe-bind-address=:8081
                 command:
                 - /manager
-                image: quay.io/ecosystem2022/fqdn-egress-controller:v1.0.0
+                image: quay.io/ecosystem2022/fqdn-egress-operator:v1.0.0
                 imagePullPolicy: Always
                 livenessProbe:
                   httpGet:
@@ -354,15 +354,12 @@ spec:
   - fqdn
   - egress
   links:
-  - name: fqdn-controller
-    url: https://github.com/konsole-is/fqdn-controller
-  - name: FQDNNetworkPolicies
-    url: https://github.com/GoogleCloudPlatform/gke-fqdnnetworkpolicies-golang
+  - name: FQDN Egress Operator
+    url: https://github.com/mransonwang/fqdn-egress-operator
   maintainers:
   - email: fewang@redhat.com
     name: Feng Wang
   maturity: alpha
-  minKubeVersion: 1.25.0
   provider:
     name: Feng Wang
   version: 1.0.0

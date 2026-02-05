@@ -1,0 +1,137 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.0
+  creationTimestamp: null
+  name: clusterconnections.clusterpulse.io
+spec:
+  group: clusterpulse.io
+  names:
+    kind: ClusterConnection
+    listKind: ClusterConnectionList
+    plural: clusterconnections
+    shortNames:
+    - cc
+    singular: clusterconnection
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.displayName
+      name: Display Name
+      type: string
+    - jsonPath: .spec.endpoint
+      name: Endpoint
+      type: string
+    - jsonPath: .status.phase
+      name: Status
+      type: string
+    - jsonPath: .status.health
+      name: Health
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ClusterConnection is the Schema for the clusterconnections API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ClusterConnectionSpec defines the desired state of ClusterConnection
+            properties:
+              credentialsRef:
+                description: CredentialsRef references the secret containing cluster
+                  credentials
+                properties:
+                  name:
+                    description: Name of the secret
+                    type: string
+                  namespace:
+                    description: Namespace of the secret (defaults to same namespace
+                      as ClusterConnection)
+                    type: string
+                required:
+                - name
+                type: object
+              displayName:
+                description: DisplayName is a human-friendly name for the cluster
+                type: string
+              endpoint:
+                description: Endpoint is the API server endpoint of the target cluster
+                type: string
+              labels:
+                additionalProperties:
+                  type: string
+                description: Labels for cluster categorization
+                type: object
+              monitoring:
+                description: Monitoring configuration
+                properties:
+                  interval:
+                    description: Reconciliation interval in seconds (minimum 30, default
+                      30)
+                    format: int32
+                    type: integer
+                  timeout:
+                    description: Connection timeout in seconds (minimum 5, default
+                      10)
+                    format: int32
+                    type: integer
+                type: object
+            required:
+            - credentialsRef
+            - endpoint
+            type: object
+          status:
+            description: ClusterConnectionStatus defines the observed state of ClusterConnection
+            properties:
+              health:
+                description: Health indicates the cluster health
+                type: string
+              lastSyncTime:
+                description: LastSyncTime is the timestamp of the last successful
+                  sync
+                format: date-time
+                type: string
+              message:
+                description: Message provides additional information about the status
+                type: string
+              namespaces:
+                description: Namespaces is the number of namespaces in the cluster
+                type: integer
+              nodes:
+                description: Nodes is the number of nodes in the cluster
+                type: integer
+              phase:
+                description: Phase indicates the connection status
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

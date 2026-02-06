@@ -15,6 +15,10 @@ entries:
   - clusterpulse.v0.2.0
   - clusterpulse.v0.2.1
   - clusterpulse.v0.2.2
+- name: clusterpulse.v0.3.0
+  replaces: clusterpulse.v0.2.3
+  skips:
+  - clusterpulse.v0.2.3
 name: fast-v0
 package: clusterpulse
 schema: olm.channel
@@ -3286,5 +3290,659 @@ relatedImages:
 - image: quay.io/clusterpulse/operator:0.2.3
   name: ""
 - image: quay.io/community-operator-pipeline-prod/clusterpulse:0.2.3
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/clusterpulse:0.3.0
+name: clusterpulse.v0.3.0
+package: clusterpulse
+properties:
+- type: olm.gvk
+  value:
+    group: charts.clusterpulse.io
+    kind: ClusterPulse
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: clusterpulse.io
+    kind: ClusterConnection
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: clusterpulse.io
+    kind: MonitorAccessPolicy
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: clusterpulse.io
+    kind: RegistryConnection
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: clusterpulse
+    version: 0.3.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "charts.clusterpulse.io/v1alpha1",
+            "kind": "ClusterPulse",
+            "metadata": {
+              "name": "clusterpulse-prod"
+            },
+            "spec": {
+              "api": {
+                "enabled": true,
+                "imagePullPolicy": "Always",
+                "logging": {
+                  "json": true,
+                  "level": "INFO"
+                },
+                "oauth": {
+                  "enabled": true,
+                  "headerEmail": "X-Forwarded-Email",
+                  "headerUser": "X-Forwarded-User"
+                },
+                "rbac": {
+                  "auditEnabled": true,
+                  "cacheTTL": 0,
+                  "defaultDeny": true,
+                  "enabled": true,
+                  "groupSyncInterval": 300
+                },
+                "replicas": 3,
+                "resources": {
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "512Mi"
+                  },
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  }
+                },
+                "security": {
+                  "allowedOrigins": [
+                    "*"
+                  ],
+                  "sessionExpireMinutes": 1440,
+                  "trustedHosts": [
+                    "*"
+                  ]
+                },
+                "server": {
+                  "host": "0.0.0.0",
+                  "port": 8080,
+                  "reload": false,
+                  "workers": 1
+                }
+              },
+              "clusterEngine": {
+                "replicas": 1,
+                "resources": {
+                  "limits": {
+                    "cpu": "1000m",
+                    "memory": "1Gi"
+                  },
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "256Mi"
+                  }
+                },
+                "timing": {
+                  "cacheTTL": "600",
+                  "fullScanInterval": "300",
+                  "reconciliationInterval": "30"
+                }
+              },
+              "frontend": {
+                "config": {
+                  "enableAnonymousAccess": false,
+                  "features": {
+                    "devTools": false,
+                    "mockData": false,
+                    "nodeDetails": true,
+                    "operatorDetails": true,
+                    "registryStatus": true
+                  },
+                  "refreshInterval": 30000,
+                  "theme": {
+                    "defaultTheme": "auto"
+                  }
+                },
+                "enabled": true,
+                "oauth": {
+                  "enabled": true,
+                  "image": "quay.io/openshift/origin-oauth-proxy:4.17"
+                },
+                "replicas": 3,
+                "route": {
+                  "enabled": true,
+                  "tls": {
+                    "termination": "reencrypt"
+                  }
+                }
+              },
+              "policyEngine": {
+                "batch": {
+                  "cacheClearBatchSize": 500,
+                  "redisPipelineBatchSize": 1000,
+                  "redisScanBatchSize": 100
+                },
+                "cache": {
+                  "groupCacheTTL": 300,
+                  "policyCacheTTL": 300
+                },
+                "enabled": true,
+                "limits": {
+                  "maxPoliciesPerUser": 100,
+                  "policyValidationInterval": 300
+                },
+                "logging": {
+                  "level": "INFO"
+                },
+                "replicas": 1,
+                "resources": {
+                  "limits": {
+                    "cpu": "500m",
+                    "memory": "512Mi"
+                  },
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "128Mi"
+                  }
+                }
+              },
+              "redis": {
+                "enabled": true,
+                "global": {
+                  "compatibility": {
+                    "openshift": {
+                      "adaptSecurityContext": "force"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "clusterpulse.io/v1alpha1",
+            "kind": "ClusterConnection",
+            "metadata": {
+              "name": "example-cluster"
+            },
+            "spec": {
+              "credentialsRef": {
+                "name": "cluster-credentials"
+              },
+              "displayName": "Example Production Cluster",
+              "endpoint": "https://api.example.openshift.com:6443",
+              "monitoring": {
+                "interval": 30,
+                "timeout": 10
+              }
+            }
+          },
+          {
+            "apiVersion": "clusterpulse.io/v1alpha1",
+            "kind": "MonitorAccessPolicy",
+            "metadata": {
+              "name": "example"
+            },
+            "spec": {
+              "access": {
+                "effect": "Allow",
+                "enabled": true
+              },
+              "identity": {
+                "priority": 100,
+                "subjects": {
+                  "groups": [
+                    "default-group"
+                  ],
+                  "users": [
+                    "default-user"
+                  ]
+                }
+              },
+              "operations": {
+                "audit": {
+                  "logAccess": false,
+                  "requireReason": false
+                }
+              },
+              "scope": {
+                "clusters": {
+                  "default": "none",
+                  "rules": [
+                    {
+                      "permissions": {
+                        "view": true,
+                        "viewAuditInfo": true,
+                        "viewCosts": true,
+                        "viewMetadata": true,
+                        "viewMetrics": true,
+                        "viewSecrets": true,
+                        "viewSensitive": true
+                      },
+                      "resources": {
+                        "namespaces": {
+                          "visibility": "all"
+                        },
+                        "nodes": {
+                          "filters": {
+                            "hideMasters": false
+                          },
+                          "visibility": "all"
+                        },
+                        "operators": {
+                          "visibility": "none"
+                        },
+                        "pods": {
+                          "visibility": "all"
+                        }
+                      },
+                      "selector": {
+                        "matchPattern": ".*"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "clusterpulse.io/v1alpha1",
+            "kind": "RegistryConnection",
+            "metadata": {
+              "name": "dockerhub",
+              "namespace": "clusterpulse"
+            },
+            "spec": {
+              "displayName": "Docker Hub",
+              "endpoint": "https://registry-1.docker.io",
+              "healthCheckPaths": [
+                "/v2/"
+              ],
+              "insecure": false,
+              "labels": {
+                "environment": "production",
+                "provider": "dockerhub"
+              },
+              "monitoring": {
+                "checkCatalog": false,
+                "interval": 60,
+                "maxCatalogEntries": 100,
+                "timeout": 10
+              },
+              "skipTLSVerify": false
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: Monitoring
+      containerImage: quay.io/clusterpulse/operator
+      createdAt: "2026-02-05T22:53:21Z"
+      description: Provides OpenShift cluster health monitoring
+      operators.operatorframework.io/builder: operator-sdk-v1.41.1
+      operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+      repository: https://github.com/ClusterPulse/operator
+      support: None
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Defines a connection to a monitored Kubernetes/OpenShift cluster
+        displayName: Cluster Connection
+        kind: ClusterConnection
+        name: clusterconnections.clusterpulse.io
+        resources:
+        - kind: Secret
+          name: ""
+          version: v1
+        specDescriptors:
+        - description: Reference to secret containing cluster credentials
+          displayName: Credentials Configuration
+          path: credentialsRef
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Monitoring and health check configuration
+          displayName: Monitoring Configuration
+          path: monitoring
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Human-friendly name for the cluster
+          displayName: Display Name
+          path: displayName
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - description: Cluster API endpoint URL
+          displayName: API Endpoint
+          path: endpoint
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - description: Name of the secret containing credentials
+          displayName: Credentials Secret
+          path: credentialsRef.name
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Reconciliation interval in seconds
+          displayName: Check Interval
+          path: monitoring.interval
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Connection timeout in seconds
+          displayName: Connection Timeout
+          path: monitoring.timeout
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        statusDescriptors:
+        - description: Current connection status
+          displayName: Connection Status
+          path: phase
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes.phase
+        - description: Cluster health status
+          displayName: Health
+          path: health
+          x-descriptors:
+          - urn:alm:descriptor:text
+        version: v1alpha1
+      - description: Manages the deployment and configuration of ClusterPulse monitoring
+          platform
+        displayName: ClusterPulse Instance
+        kind: ClusterPulse
+        name: clusterpulses.charts.clusterpulse.io
+        resources:
+        - kind: Deployment
+          name: ""
+          version: v1
+        - kind: Service
+          name: ""
+          version: v1
+        - kind: ConfigMap
+          name: ""
+          version: v1
+        - kind: Secret
+          name: ""
+          version: v1
+        - kind: ServiceAccount
+          name: ""
+          version: v1
+        - kind: Role
+          name: ""
+          version: v1
+        - kind: RoleBinding
+          name: ""
+          version: v1
+        - kind: Route
+          name: ""
+          version: v1
+        specDescriptors:
+        - description: Redis configuration for data storage
+          displayName: Redis Configuration
+          path: redis
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: API service configuration
+          displayName: API Configuration
+          path: api
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Cluster controller engine configuration
+          displayName: Cluster Engine Configuration
+          path: clusterEngine
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Frontend UI configuration
+          displayName: Frontend Configuration
+          path: frontend
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Policy engine configuration for access control
+          displayName: Policy Engine Configuration
+          path: policyEngine
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Enable Redis deployment for data storage
+          displayName: Enable Redis
+          path: redis.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Enable API service deployment
+          displayName: Enable API
+          path: api.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Number of API server replicas
+          displayName: API Replicas
+          path: api.replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: Docker image for API service
+          displayName: API Image
+          path: api.image
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - description: Enable frontend UI deployment
+          displayName: Enable Frontend
+          path: frontend.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Number of frontend replicas
+          displayName: Frontend Replicas
+          path: frontend.replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: Docker image for frontend UI
+          displayName: Frontend Image
+          path: frontend.image
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - description: Number of cluster controller replicas
+          displayName: Cluster Controller Replicas
+          path: clusterEngine.replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: Docker image for cluster controller
+          displayName: Cluster Controller Image
+          path: clusterEngine.image
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - description: Enable policy engine deployment
+          displayName: Enable Policy Engine
+          path: policyEngine.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Number of policy engine replicas
+          displayName: Policy Engine Replicas
+          path: policyEngine.replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: Docker image for policy engine
+          displayName: Policy Engine Image
+          path: policyEngine.image
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        statusDescriptors:
+        - description: Current deployment phase
+          displayName: Phase
+          path: phase
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes.phase
+        version: v1alpha1
+      - description: Defines fine-grained access control policies for cluster monitoring
+        displayName: Monitor Access Policy
+        kind: MonitorAccessPolicy
+        name: monitoraccesspolicies.clusterpulse.io
+        resources:
+        - kind: ConfigMap
+          name: ""
+          version: v1
+        specDescriptors:
+        - description: Access control configuration
+          displayName: Access Configuration
+          path: access
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Identity and priority configuration
+          displayName: Identity Configuration
+          path: identity
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Operational aspects configuration
+          displayName: Operations Configuration
+          path: operations
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Scope and cluster rules configuration
+          displayName: Scope Configuration
+          path: scope
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Policy priority (higher values take precedence)
+          displayName: Priority
+          path: identity.priority
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: List of users this policy applies to
+          displayName: Users
+          path: identity.subjects.users
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: List of groups this policy applies to
+          displayName: Groups
+          path: identity.subjects.groups
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Allow or Deny access
+          displayName: Effect
+          path: access.effect
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Allow
+          - urn:alm:descriptor:com.tectonic.ui:select:Deny
+        - description: Whether this policy is active
+          displayName: Enabled
+          path: access.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Default access for clusters not matching any rule
+          displayName: Default Cluster Access
+          path: scope.clusters.default
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:allow
+          - urn:alm:descriptor:com.tectonic.ui:select:deny
+          - urn:alm:descriptor:com.tectonic.ui:select:none
+        - description: Log all access attempts using this policy
+          displayName: Log Access
+          path: operations.audit.logAccess
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        statusDescriptors:
+        - description: Current policy state
+          displayName: State
+          path: state
+          x-descriptors:
+          - urn:alm:descriptor:text
+        version: v1alpha1
+      - description: Defines a connection to a container registry for monitoring
+        displayName: Registry Connection
+        kind: RegistryConnection
+        name: registryconnections.clusterpulse.io
+        resources:
+        - kind: Secret
+          name: ""
+          version: v1
+        specDescriptors:
+        - description: Human-friendly name for the registry
+          displayName: Display Name
+          path: displayName
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - description: Registry endpoint URL
+          displayName: Registry Endpoint
+          path: endpoint
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - description: Allow insecure HTTP connections
+          displayName: Allow Insecure
+          path: insecure
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Skip TLS certificate verification
+          displayName: Skip TLS Verify
+          path: skipTLSVerify
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Health check interval in seconds
+          displayName: Check Interval
+          path: monitoring.interval
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Paths to check for registry health
+          displayName: Health Check Paths
+          path: healthCheckPaths
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Labels for registry categorization
+          displayName: Labels
+          path: labels
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Registry monitoring configuration
+          displayName: Monitoring Configuration
+          path: monitoring
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        statusDescriptors:
+        - description: Whether registry is reachable
+          displayName: Available
+          path: available
+          x-descriptors:
+          - urn:alm:descriptor:text
+        - description: Registry health status
+          displayName: Health
+          path: health
+          x-descriptors:
+          - urn:alm:descriptor:text
+        version: v1alpha1
+    description: |
+      ## About ClusterPulse
+      ClusterPulse is a comprehensive multi-cluster monitoring and management platform designed for OpenShift environments. It provides centralized visibility, policy-based access control, and real-time monitoring across multiple clusters through a unified dashboard. For more information, visit [https://github.com/ClusterPulse/operator](https://github.com/ClusterPulse/operator).
+
+      ## Features and Capabilities
+      - **Multi-Cluster Monitoring**: Connect and monitor multiple OpenShift/Kubernetes clusters from a single interface
+      - **Policy-Based Access Control**: Fine-grained access policies using MonitorAccessPolicy CRDs
+      - **Real-Time Metrics**: Live cluster health, node status, and resource utilization tracking
+      - **Registry Monitoring**: Monitor connected container registries
+      - **OAuth Integration**: Seamless OpenShift OAuth integration for authentication
+      - **Redis-Backed Storage**: Scalable data storage using Redis for metrics and state
+    displayName: ClusterPulse
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - clusterpulse
+    links:
+    - name: ClusterPulse
+      url: https://github.com/ClusterPulse/operator
+    maintainers:
+    - email: asmoore@redhat.com
+      name: Asa Moore
+    maturity: alpha
+    minKubeVersion: 1.23.0
+    provider:
+      name: ClusterPulse
+relatedImages:
+- image: quay.io/clusterpulse/operator:0.3.0
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/clusterpulse:0.3.0
   name: ""
 schema: olm.bundle

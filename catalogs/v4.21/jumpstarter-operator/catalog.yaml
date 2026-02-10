@@ -5,6 +5,9 @@ schema: olm.package
 ---
 entries:
 - name: jumpstarter-operator.v0.8.0
+- name: jumpstarter-operator.v0.8.1-rc.1
+  replaces: jumpstarter-operator.v0.8.0
+  skipRange: '>=0.8.0 <0.8.1-rc.1'
 name: alpha
 package: jumpstarter-operator
 schema: olm.channel
@@ -218,6 +221,217 @@ properties:
       url: https://jumpstarter.dev
 relatedImages:
 - image: quay.io/community-operator-pipeline-prod/jumpstarter-operator:0.8.0
+  name: ""
+- image: quay.io/jumpstarter-dev/jumpstarter-operator:latest
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/jumpstarter-operator:0.8.1-rc.1
+name: jumpstarter-operator.v0.8.1-rc.1
+package: jumpstarter-operator
+properties:
+- type: olm.gvk
+  value:
+    group: jumpstarter.dev
+    kind: Client
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: jumpstarter.dev
+    kind: Exporter
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: jumpstarter.dev
+    kind: ExporterAccessPolicy
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: jumpstarter.dev
+    kind: Lease
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: operator.jumpstarter.dev
+    kind: Jumpstarter
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: jumpstarter-operator
+    version: 0.8.1-rc.1
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "jumpstarter.dev/v1alpha1",
+            "kind": "Client",
+            "metadata": {
+              "labels": {
+                "type": "developer"
+              },
+              "name": "client-sample"
+            },
+            "spec": {
+              "username": "kc:user-name-in-keycloak"
+            }
+          },
+          {
+            "apiVersion": "jumpstarter.dev/v1alpha1",
+            "kind": "Exporter",
+            "metadata": {
+              "labels": {
+                "type": "nxp-imx8mm-evk"
+              },
+              "name": "exporter-sample"
+            },
+            "spec": {}
+          },
+          {
+            "apiVersion": "jumpstarter.dev/v1alpha1",
+            "kind": "ExporterAccessPolicy",
+            "metadata": {
+              "name": "exporteraccesspolicy-sample"
+            },
+            "spec": {
+              "exporterSelector": {
+                "matchLabels": {
+                  "lab": "jumpstarter"
+                }
+              },
+              "policies": [
+                {
+                  "from": [
+                    {
+                      "clientSelector": {
+                        "matchLabels": {
+                          "team": "platform"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "jumpstarter.dev/v1alpha1",
+            "kind": "Lease",
+            "metadata": {
+              "name": "lease-sample"
+            },
+            "spec": {
+              "clientRef": {
+                "name": "client-sample"
+              },
+              "duration": "1h",
+              "selector": {
+                "matchLabels": {
+                  "board": "rcar-s4"
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "operator.jumpstarter.dev/v1alpha1",
+            "kind": "Jumpstarter",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "jumpstarter-operator"
+              },
+              "name": "jumpstarter-sample"
+            },
+            "spec": null
+          }
+        ]
+      capabilities: Basic Install
+      categories: Developer Tools, Integration & Delivery
+      com.redhat.openshift.versions: v4.18-v4.21
+      containerImage: quay.io/jumpstarter-dev/jumpstarter-operator:latest
+      createdAt: "2026-02-09T17:32:43Z"
+      description: Jumpstarter is a cloud-native framework for Hardware-in-the-Loop
+        (HIL) testing and development
+      operators.operatorframework.io/builder: operator-sdk-v1.41.1
+      operators.operatorframework.io/internal-objects: '["clients.jumpstarter.dev","exporters.jumpstarter.dev","leases.jumpstarter.dev","exporteraccesspolicies.jumpstarter.dev"]'
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/jumpstarter-dev/jumpstarter-controller
+      support: The Jumpstarter Community
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Client represents a user identity for accessing the Jumpstarter
+          controller.
+        displayName: Client
+        kind: Client
+        name: clients.jumpstarter.dev
+        version: v1alpha1
+      - description: ExporterAccessPolicy defines access rules for exporters.
+        displayName: ExporterAccessPolicy
+        kind: ExporterAccessPolicy
+        name: exporteraccesspolicies.jumpstarter.dev
+        version: v1alpha1
+      - description: Exporter represents a device exporter registered with the Jumpstarter
+          controller.
+        displayName: Exporter
+        kind: Exporter
+        name: exporters.jumpstarter.dev
+        version: v1alpha1
+      - description: Jumpstarter is the Schema for the jumpstarters API.
+        displayName: Jumpstarter
+        kind: Jumpstarter
+        name: jumpstarters.operator.jumpstarter.dev
+        version: v1alpha1
+      - description: Lease represents a client's request to use an exporter.
+        displayName: Lease
+        kind: Lease
+        name: leases.jumpstarter.dev
+        version: v1alpha1
+    description: Jumpstarter is a cloud-native framework for Hardware-in-the-Loop
+      (HIL) automation that bridges the gap between embedded development workflows
+      and real-world deployment environments. This operator installs and manages the
+      Jumpstarter Controller, which acts as the central brain for your testing infrastructure.
+      It orchestrates secure, shared access to physical hardware and virtual devices
+      (represented as "exporters") directly from your Kubernetes or OpenShift cluster.
+    displayName: Jumpstarter Operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - hil
+    - hardware-in-the-loop
+    - hardware
+    - device
+    - embedded
+    - testing
+    - framework
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Jumpstarter Operator
+      url: https://jumpstarter.dev/main/getting-started/installation/service/index.html
+    maintainers:
+    - email: majopela@redhat.com
+      name: Miguel Angel Ajo
+    - email: bzlotnik@redhat.com
+      name: Benny Zlotnik
+    - email: bkhizgiy@redhat.com
+      name: Bella Khizgiyaev
+    maturity: alpha
+    minKubeVersion: 1.28.0
+    provider:
+      name: The Jumpstarter Community
+      url: https://jumpstarter.dev
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/jumpstarter-operator:0.8.1-rc.1
   name: ""
 - image: quay.io/jumpstarter-dev/jumpstarter-operator:latest
   name: ""

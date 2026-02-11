@@ -7,6 +7,8 @@ name: rsct-operator
 schema: olm.package
 ---
 entries:
+- name: rsct-operator.v0.0.1-alpha3
+  replaces: rsct-operator.v0.0.1-alpha2
 - name: rsct-operator.v0.0.1-alpha2
 name: alpha
 package: rsct-operator
@@ -111,5 +113,106 @@ relatedImages:
 - image: ghcr.io/ocp-power-automation/rsct-operator:0.0.1-alpha2
   name: ""
 - image: quay.io/community-operator-pipeline-prod/rsct-operator:0.0.1-alpha2
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/rsct-operator:0.0.1-alpha3
+name: rsct-operator.v0.0.1-alpha3
+package: rsct-operator
+properties:
+- type: olm.gvk
+  value:
+    group: rsct.ibm.com
+    kind: RSCT
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: rsct-operator
+    version: 0.0.1-alpha3
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "rsct.ibm.com/v1alpha1",
+            "kind": "RSCT",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/created-by": "rsct-operator",
+                "app.kubernetes.io/instance": "rsct",
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "rsct",
+                "app.kubernetes.io/part-of": "rsct-operator"
+              },
+              "name": "rsct"
+            },
+            "spec": {}
+          }
+        ]
+      capabilities: Basic Install
+      categories: Monitoring
+      containerImage: ghcr.io/ocp-power-automation/rsct-operator:0.0.1-alpha3
+      createdAt: "2026-02-04T04:23:54Z"
+      description: Deploys the RSCT DaemonSet on all ppc64le architecture nodes of
+        Kubernetes and OpenShift clusters.
+      operators.operatorframework.io/builder: operator-sdk-v1.41.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/ocp-power-automation/rsct-operator
+      support: IBM
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: RSCT is the Schema for the rscts API
+        displayName: RSCT
+        kind: RSCT
+        name: rscts.rsct.ibm.com
+        version: v1alpha1
+    description: "Deploys RSCT daemonset on all ppc64le architecture nodes of an Kubernetes
+      and OpenShift cluster.\n\n### Prerequisite for OpenShift cluster\n- Create a
+      catalog source using `quay.io/operatorhubio/catalog:latest` in `openshift-marketplace`
+      namespace. \n- Use `rsct-operator-system` namespace for RSCT deployment.\n\n###
+      Follow this document to deploy the RSCT operator on OpenShift cluster \n- [RSCT
+      Deployment on OpenShift Clusters](https://github.com/ocp-power-automation/rsct-operator/blob/main/docs/Install.md)\n\n###
+      In the Custom Resource Definition,\n- The RSCT image can be configured in the
+      spec:\n```\nspec:\n  image: quay.io/powercloud/rsct-ppc64le:latest\n```\nDefault
+      image is `quay.io/powercloud/rsct-ppc64le:latest`"
+    displayName: RSCT Operator for IBM Power Systems
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - rsct
+    - powervs
+    - ibm
+    - rmc
+    - power
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.ppc64le: supported
+    links:
+    - name: RSCT Operator
+      url: https://github.com/ocp-power-automation/rsct-operator
+    maintainers:
+    - email: mjturek@us.ibm.com
+      name: Michael Turek
+    - email: varad.ahirwadkar1@ibm.com
+      name: Varad Ahirwadkar
+    - email: mkumatag@in.ibm.com
+      name: Manjunath Kumatagi
+    maturity: alpha
+    minKubeVersion: 1.29.0
+    provider:
+      name: IBM
+relatedImages:
+- image: ghcr.io/ocp-power-automation/rsct-operator:0.0.1-alpha3
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/rsct-operator:0.0.1-alpha3
   name: ""
 schema: olm.bundle

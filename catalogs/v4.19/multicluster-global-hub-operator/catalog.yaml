@@ -19,6 +19,12 @@ name: release-1.6
 package: multicluster-global-hub-operator
 schema: olm.channel
 ---
+entries:
+- name: multicluster-global-hub-operator.v1.7.0-alpha
+name: release-1.7
+package: multicluster-global-hub-operator
+schema: olm.channel
+---
 image: quay.io/community-operator-pipeline-prod/multicluster-global-hub-operator@sha256:d101e2b9ab4d8ca7c87c86ea4e3630dcc82a9c5a78885179c8b16773c8aac587
 name: multicluster-global-hub-operator.v1.5.0
 package: multicluster-global-hub-operator
@@ -647,5 +653,329 @@ relatedImages:
 - image: quay.io/redhat-user-workloads/acm-multicluster-glo-tenant/postgres-exporter-globalhub-1-6@sha256:2a68afbc8b4208e8aa16e7f0a8266246a16a2e97d4d6f930318888fc1e0c7306
   name: postgres-exporter
 - image: quay.io/stolostron/postgresql-16@sha256:db2f73275f9cc0f2d262fadb8e8a5da72b089f9d22f7c859bb1364d9f9a8b622
+  name: postgresql
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/multicluster-global-hub-operator:1.7.0-alpha
+name: multicluster-global-hub-operator.v1.7.0-alpha
+package: multicluster-global-hub-operator
+properties:
+- type: olm.gvk
+  value:
+    group: global-hub.open-cluster-management.io
+    kind: ManagedClusterMigration
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: operator.open-cluster-management.io
+    kind: MulticlusterGlobalHub
+    version: v1alpha4
+- type: olm.gvk
+  value:
+    group: operator.open-cluster-management.io
+    kind: MulticlusterGlobalHubAgent
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: multicluster-global-hub-operator
+    version: 1.7.0-alpha
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "global-hub.open-cluster-management.io/v1alpha1",
+            "kind": "ManagedClusterMigration",
+            "metadata": {
+              "name": "migration-sample"
+            },
+            "spec": {}
+          },
+          {
+            "apiVersion": "operator.open-cluster-management.io/v1alpha1",
+            "kind": "MulticlusterGlobalHubAgent",
+            "metadata": {
+              "name": "multiclusterglobalhubagent"
+            },
+            "spec": {
+              "transportConfigSecretName": "transport-config"
+            }
+          },
+          {
+            "apiVersion": "operator.open-cluster-management.io/v1alpha4",
+            "kind": "MulticlusterGlobalHub",
+            "metadata": {
+              "name": "multiclusterglobalhub"
+            },
+            "spec": {
+              "dataLayer": {
+                "postgres": {
+                  "retention": "18m"
+                }
+              }
+            }
+          }
+        ]
+      capabilities: Seamless Upgrades
+      categories: Integration & Delivery,OpenShift Optional
+      certified: "false"
+      containerImage: quay.io/redhat-user-workloads/acm-multicluster-glo-tenant/multicluster-global-hub-operator-globalhub-1-7@sha256:f98bc5607af9432831095a83a7dd7771471059edd458065602d7c1b675e688ee
+      createdAt: "2026-01-21T06:18:42Z"
+      description: Manages the installation and upgrade of the Multicluster Global
+        Hub.
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "true"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/initialization-resource: '{"apiVersion":"operator.open-cluster-management.io/v1alpha4",
+        "kind":"MulticlusterGlobalHub","metadata":{"name":"multiclusterglobalhub","namespace":"multicluster-global-hub"},
+        "spec": {}}'
+      operatorframework.io/suggested-namespace: multicluster-global-hub
+      operators.openshift.io/infrastructure-features: '["disconnected", "fips"]'
+      operators.openshift.io/valid-subscription: '["OpenShift Platform Plus", "Red
+        Hat Advanced Cluster Management for Kubernetes"]'
+      operators.operatorframework.io/builder: operator-sdk-v1.34.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/stolostron/multicluster-global-hub
+      support: Red Hat
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: ManagedClusterMigration is a global hub resource that allows
+          you to migrate managed clusters from one hub to another
+        displayName: Managed Cluster Migration
+        kind: ManagedClusterMigration
+        name: managedclustermigrations.global-hub.open-cluster-management.io
+        resources:
+        - kind: Deployment
+          name: multicluster-global-hub-manager
+          version: v1
+        specDescriptors:
+        - description: From specifies the source hub cluster from which the managed
+            clusters originate.
+          displayName: From
+          path: from
+        - description: IncludedManagedClusters is an explicit list of managed clusters
+            to include in the migration operation. This field is mutually exclusive
+            with IncludedManagedClustersPlacementRef.
+          displayName: Included Managed Clusters
+          path: includedManagedClusters
+        - description: IncludedManagedClustersPlacementRef specifies the name of a
+            Placement resource that determines which managed clusters are included
+            in the migration operation. The referenced Placement must be defined in
+            the global hub agent namespace of the source hub cluster, such as "multicluster-global-hub"
+            or "multicluster-global-hub-agent". This field is mutually exclusive with
+            IncludedManagedClusters.
+          displayName: Included Managed Clusters Placement
+          path: includedManagedClustersPlacementRef
+        - description: SupportedConfigs defines additional configuration options for
+            the migration
+          displayName: Supported Configs
+          path: supportedConfigs
+        - description: StageTimeout defines the timeout duration for each migration
+            stage
+          displayName: Stage Timeout
+          path: supportedConfigs.stageTimeout
+        - description: To specifies the target hub cluster to which the managed clusters
+            will be migrated.
+          displayName: To
+          path: to
+        statusDescriptors:
+        - description: Conditions represents the latest available observations of
+            the current state
+          displayName: Conditions
+          path: conditions
+        - description: Phase represents the current phase of the migration
+          displayName: Phase
+          path: phase
+        version: v1alpha1
+      - description: MulticlusterGlobalHubAgent is the Schema for the multiclusterglobalhubagents
+          API
+        displayName: Multicluster Global Hub Agent
+        kind: MulticlusterGlobalHubAgent
+        name: multiclusterglobalhubagents.operator.open-cluster-management.io
+        resources:
+        - kind: Deployment
+          name: multicluster-global-hub-operator
+          version: v1
+        specDescriptors:
+        - description: ImagePullPolicy specifies the pull policy of the multicluster
+            global hub agent image
+          displayName: Image Pull Policy
+          path: imagePullPolicy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:imagePullPolicy
+        - description: ImagePullSecret specifies the pull secret of the multicluster
+            global hub agent image
+          displayName: Image Pull Secret
+          path: imagePullSecret
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Tolerations causes all components to tolerate any taints
+          displayName: Tolerations
+          path: tolerations
+        - description: TransportConfigSecretName specifies the secret which is used
+            to connect to the global hub Kafka. You can get kafka.yaml content using
+            `tools/generate-kafka-config.sh` from the global hub environment. Then
+            you can create the secret in the current environment by running `kubectl
+            create secret generic transport-config -n "multicluster-global-hub" --from-file=kafka.yaml="./kafka.yaml"`
+          displayName: Transport Config Secret Name
+          path: transportConfigSecretName
+        statusDescriptors:
+        - description: Conditions represents the latest available observations of
+            the current state
+          displayName: Conditions
+          path: conditions
+        version: v1alpha1
+      - description: MulticlusterGlobalHub defines the configuration for an instance
+          of the multiCluster global hub
+        displayName: Multicluster Global Hub
+        kind: MulticlusterGlobalHub
+        name: multiclusterglobalhubs.operator.open-cluster-management.io
+        resources:
+        - kind: Deployment
+          name: multicluster-global-hub-operator
+          version: v1
+        specDescriptors:
+        - description: 'AvailabilityType specifies deployment replication for improved
+            availability. Options are: Basic and High (default)'
+          displayName: Availability Configuration
+          path: availabilityConfig
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:High
+          - urn:alm:descriptor:com.tectonic.ui:select:Basic
+        - description: DataLayerSpec can be configured to use a different data layer
+          displayName: Data Layer Spec
+          path: dataLayer
+        - description: EnableMetrics enables the metrics for the global hub created
+            kafka and postgres components. If the user provides the kafka and postgres,
+            then the enablemetrics variable is useless.
+          displayName: Enable Metrics
+          path: enableMetrics
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: ImagePullPolicy specifies the pull policy of the multicluster
+            global hub images
+          displayName: Image Pull Policy
+          path: imagePullPolicy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:imagePullPolicy
+        - description: ImagePullSecret specifies the pull secret of the multicluster
+            global hub images
+          displayName: Image Pull Secret
+          path: imagePullSecret
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: InstallAgentOnLocal determines whether deploy the Global Hub
+            Agent on the local hub cluster or not. If set to true, the Global Hub
+            Agent will be installed on the local hub cluster only. If set to false,
+            the Global Hub Agent will not be installed on the local hub cluster.
+          displayName: Install Agent On Local
+          path: installAgentOnLocal
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Tolerations causes all components to tolerate any taints
+          displayName: Tolerations
+          path: tolerations
+        statusDescriptors:
+        - description: Conditions represents the latest available observations of
+            the current state
+          displayName: Conditions
+          path: conditions
+        version: v1alpha4
+    description: |
+      The Multicluster Global Hub Operator contains the components of multicluster global hub. The Operator deploys all of the required components for global multicluster management. The components include `multicluster-global-hub-manager` and `multicluster-global-hub-grafana` in the global hub cluster and `multicluster-global-hub-agent` in the managed hub clusters.
+      The Operator also deploys the strimzi kafka and crunchy postgres if you do not bring your own kafka and postgres.
+
+      ## Prerequisites
+      - Red Hat Advanced Cluster Management for Kubernetes needs to be installed. You can find the support matrix in the official document.
+
+      ## How to Install
+      Install the Multicluster Global Hub Operator by following the instructions that are displayed after you select the Install button.
+      A pod will be created in `multicluster-global-hub` namespace:
+      ```
+      $ kubectl get pods -n multicluster-global-hub
+      NAME                                                             READY   STATUS    RESTARTS   AGE
+      multicluster-global-hub-operator-5ccbbc878d-98fdp                1/1     Running   0          19s
+      ```
+      The operator is now providing new Custom Resources Definitions: `multiclusterglobalhubs.operator.open-cluster-management.io`
+
+      ## Using the Multicluster Global Hub Operator
+      After installed the operator, create an instance of the MulticlusterGlobalHub resource to instantiate the Multicluster Global Hub.
+      Once an instance of the MulticlusterGlobalHub is created, the following pods are created in the `multicluster-global-hub` namespace:
+      ```
+      $ kubectl get pods -n multicluster-global-hub
+      NAME                                                    READY   STATUS    RESTARTS   AGE
+      amq-streams-cluster-operator-v2.6.0-2-f49bf7559-569mw   1/1     Running   0          22m
+      kafka-entity-operator-68dcd446f4-pg257                  3/3     Running   0          19m
+      kafka-kafka-0                                           1/1     Running   0          20m
+      kafka-kafka-1                                           1/1     Running   0          20m
+      kafka-kafka-2                                           1/1     Running   0          20m
+      multicluster-global-hub-grafana-5b7cfb6876-5rcnn        2/2     Running   0          19m
+      multicluster-global-hub-grafana-5b7cfb6876-wq99v        2/2     Running   0          19m
+      multicluster-global-hub-manager-7f56d78c49-hzfvw        1/1     Running   0          19m
+      multicluster-global-hub-manager-7f56d78c49-wbkzl        1/1     Running   0          19m
+      multicluster-global-hub-operator-768bd5bd4f-59xjd       1/1     Running   0          22m
+      multicluster-global-hub-postgresql-0                    2/2     Running   0          22m
+      ```
+      ## Documentation
+      For documentation about installing and using the Multicluster GlobalHub Operator with Red Hat Advanced Cluster Management for
+      Kubernetes, see [Multicluser GlobalHub Documentation](https://access.redhat.com/documentation/en-us/red_hat_advanced_cluster_management_for_kubernetes/2.16/html-single/multicluster_global_hub/index#doc-wrapper) in the Red Hat Advanced Cluster Management
+      documentation.
+
+      ## Support & Troubleshooting
+      Product support, which includes Support Cases, Product Pages, and Knowledgebase articles, is available when you have
+      a [Red Hat Advanced Cluster Management](https://www.redhat.com/en/technologies/management/advanced-cluster-management)
+      subscription.
+    displayName: Multicluster Global Hub Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+    keywords:
+    - multicluster-global-hub
+    - multiple-hubs
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/arch.ppc64le: supported
+      operatorframework.io/arch.s390x: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Multicluster Global Hub Operator
+      url: https://github.com/stolostron/multicluster-global-hub
+    maintainers:
+    - email: acm-contact@redhat.com
+      name: acm-contact
+    maturity: release-1.7
+    provider:
+      name: Red Hat, Inc
+      url: https://github.com/stolostron/multicluster-global-hub
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/multicluster-global-hub-operator:1.7.0-alpha
+  name: ""
+- image: quay.io/redhat-user-workloads/acm-multicluster-glo-tenant/glo-grafana-globalhub-1-7@sha256:fdccef592e482dcf016de92661b9dafabf27884460eb868a6e4075910a4e2130
+  name: grafana
+- image: quay.io/redhat-user-workloads/acm-multicluster-glo-tenant/multicluster-global-hub-agent-globalhub-1-7@sha256:d2c9b3ba0159c609cec685ee193c70802ff88145c2d12326fe02d999d484f765
+  name: multicluster-global-hub-agent
+- image: quay.io/redhat-user-workloads/acm-multicluster-glo-tenant/multicluster-global-hub-manager-globalhub-1-7@sha256:234e9e48fa2668fc9b383931ab8aa277aa9c23109f0e3af8b029621ddbd119ba
+  name: multicluster-global-hub-manager
+- image: quay.io/redhat-user-workloads/acm-multicluster-glo-tenant/multicluster-global-hub-operator-globalhub-1-7@sha256:f98bc5607af9432831095a83a7dd7771471059edd458065602d7c1b675e688ee
+  name: multicluster-global-hub-operator
+- image: quay.io/redhat-user-workloads/acm-multicluster-glo-tenant/postgres-exporter-globalhub-1-7@sha256:d9b5d09cf1a1a4da51af11b070ba17996b073a7c0111e5fa04aca4deb7758c3c
+  name: postgres-exporter
+- image: registry.redhat.io/rhel9/postgresql-16@sha256:dc79eeb04f5ee2d396dc6c0d85ac7db45c0cb9cf1a8daba2b8226ae20aaab370
   name: postgresql
 schema: olm.bundle

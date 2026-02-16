@@ -1,5 +1,5 @@
 ---
-defaultChannel: stable-v0
+defaultChannel: stable-v0.0
 name: konflux-operator
 schema: olm.package
 ---
@@ -10,13 +10,34 @@ entries:
 - name: konflux-operator.v0.0.8
 - name: konflux-operator.v0.0.9
 - name: konflux-operator.v0.0.11
+- name: konflux-operator.v0.0.12
   skips:
   - konflux-operator.v0.0.4
   - konflux-operator.v0.0.5
   - konflux-operator.v0.0.6
   - konflux-operator.v0.0.8
   - konflux-operator.v0.0.9
+  - konflux-operator.v0.0.11
 name: stable-v0
+package: konflux-operator
+schema: olm.channel
+---
+entries:
+- name: konflux-operator.v0.0.4
+- name: konflux-operator.v0.0.5
+- name: konflux-operator.v0.0.6
+- name: konflux-operator.v0.0.8
+- name: konflux-operator.v0.0.9
+- name: konflux-operator.v0.0.11
+- name: konflux-operator.v0.0.12
+  skips:
+  - konflux-operator.v0.0.4
+  - konflux-operator.v0.0.5
+  - konflux-operator.v0.0.6
+  - konflux-operator.v0.0.8
+  - konflux-operator.v0.0.9
+  - konflux-operator.v0.0.11
+name: stable-v0.0
 package: konflux-operator
 schema: olm.channel
 ---
@@ -923,6 +944,912 @@ relatedImages:
 - image: quay.io/community-operator-pipeline-prod/konflux:0.0.11
   name: ""
 - image: quay.io/konflux-ci/konflux-operator:release-sha-1313a9b
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/konflux:0.0.12
+name: konflux-operator.v0.0.12
+package: konflux-operator
+properties:
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: Konflux
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxApplicationAPI
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxBuildService
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxCertManager
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxDefaultTenant
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxEnterpriseContract
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxImageController
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxInfo
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxIntegrationService
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxInternalRegistry
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxNamespaceLister
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxRBAC
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxReleaseService
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: konflux.konflux-ci.dev
+    kind: KonfluxUI
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: konflux-operator
+    version: 0.0.12
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "Konflux",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux"
+            },
+            "spec": {}
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxApplicationAPI",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-application-api"
+            },
+            "spec": {}
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxBuildService",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-build-service"
+            },
+            "spec": {
+              "buildControllerManager": {
+                "manager": {
+                  "env": [
+                    {
+                      "name": "PAC_WEBHOOK_URL",
+                      "value": "http://pipelines-as-code-controller.pipelines-as-code.svc.cluster.local:8180"
+                    },
+                    {
+                      "name": "EXAMPLE_CUSTOM_CONFIG",
+                      "valueFrom": {
+                        "configMapKeyRef": {
+                          "key": "custom-config",
+                          "name": "build-service-config"
+                        }
+                      }
+                    },
+                    {
+                      "name": "EXAMPLE_SECRET_VALUE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "secret-key",
+                          "name": "build-service-secret"
+                        }
+                      }
+                    }
+                  ],
+                  "resources": {
+                    "limits": {
+                      "cpu": "500m",
+                      "memory": "512Mi"
+                    },
+                    "requests": {
+                      "cpu": "100m",
+                      "memory": "256Mi"
+                    }
+                  }
+                },
+                "replicas": 2
+              }
+            }
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxCertManager",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-cert-manager"
+            },
+            "spec": {
+              "createClusterIssuer": true
+            }
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxDefaultTenant",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konfluxdefaulttenant-sample"
+            },
+            "spec": null
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxEnterpriseContract",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-enterprise-contract"
+            },
+            "spec": {}
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxImageController",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-image-controller"
+            },
+            "spec": {}
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxInfo",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-info"
+            },
+            "spec": {
+              "banner": {
+                "items": [
+                  {
+                    "summary": "Welcome to Konflux-CI! This is a production environment.",
+                    "type": "info"
+                  },
+                  {
+                    "dayOfWeek": 1,
+                    "endTime": "17:00",
+                    "startTime": "09:00",
+                    "summary": "**Scheduled Maintenance**: System maintenance will occur on Friday, March 15th from 2:00 AM to 4:00 AM EST.",
+                    "timeZone": "America/New_York",
+                    "type": "warning"
+                  },
+                  {
+                    "dayOfMonth": 15,
+                    "endTime": "18:00",
+                    "month": 3,
+                    "startTime": "14:00",
+                    "summary": "**CRITICAL**: Security patch deployment in progress. Some services may be temporarily unavailable.",
+                    "timeZone": "UTC",
+                    "type": "danger",
+                    "year": 2025
+                  },
+                  {
+                    "dayOfWeek": 1,
+                    "endTime": "11:00",
+                    "startTime": "09:00",
+                    "summary": "Weekly team standup reminder: Every Monday at 10:00 AM.",
+                    "timeZone": "America/Los_Angeles",
+                    "type": "info"
+                  },
+                  {
+                    "dayOfMonth": 31,
+                    "endTime": "23:59",
+                    "month": 12,
+                    "startTime": "00:00",
+                    "summary": "**Annual Review Period**: Performance reviews are due by end of month.",
+                    "timeZone": "UTC",
+                    "type": "warning"
+                  },
+                  {
+                    "endTime": "20:00",
+                    "startTime": "08:00",
+                    "summary": "**New Feature Available**:\n\n- Enhanced build pipeline visualization\n- Improved security scanning\n- [View Documentation](https://docs.konflux.example.com)\n",
+                    "timeZone": "Europe/London",
+                    "type": "info"
+                  }
+                ]
+              },
+              "publicInfo": {
+                "environment": "production",
+                "integrations": {
+                  "github": {
+                    "application_url": "https://github.com/apps/my-konflux-app/installations/new"
+                  },
+                  "image_controller": {
+                    "enabled": true,
+                    "notifications": [
+                      {
+                        "config": {
+                          "url": "https://webhook.example.com/build/complete"
+                        },
+                        "event": "build_complete",
+                        "method": "webhook",
+                        "title": "Build Complete Notification"
+                      },
+                      {
+                        "config": {
+                          "email": "devops-team@example.com"
+                        },
+                        "event": "repo_push",
+                        "method": "email",
+                        "title": "Repository Push Notification"
+                      },
+                      {
+                        "config": {
+                          "timeout": "30s",
+                          "url": "https://webhook.example.com/scan"
+                        },
+                        "event": "image_scan_complete",
+                        "method": "webhook",
+                        "title": "Image Scan Complete"
+                      }
+                    ]
+                  },
+                  "sbom_server": {
+                    "sbom_sha": "https://sbom.example.com/sha",
+                    "url": "https://sbom.example.com/content"
+                  }
+                },
+                "rbac": [
+                  {
+                    "description": "Full access to Konflux resources including secrets and administrative operations",
+                    "displayName": "Administrator",
+                    "name": "konflux-admin-user-actions"
+                  },
+                  {
+                    "description": "Manage workspace resources without access to sensitive or destructive actions",
+                    "name": "konflux-maintainer-user-actions"
+                  },
+                  {
+                    "description": "Read-only access to view CI results and workspace information",
+                    "displayName": "Viewer Role",
+                    "name": "konflux-viewer-user-actions"
+                  },
+                  {
+                    "description": "Custom role for specific use case with limited permissions",
+                    "name": "konflux-custom-role"
+                  }
+                ],
+                "statusPageUrl": "https://status.konflux.example.com",
+                "visibility": "public"
+              }
+            }
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxIntegrationService",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-integration-service"
+            },
+            "spec": {
+              "integrationControllerManager": {
+                "manager": {
+                  "env": [
+                    {
+                      "name": "EXAMPLE_CUSTOM_CONFIG",
+                      "valueFrom": {
+                        "configMapKeyRef": {
+                          "key": "custom-config",
+                          "name": "integration-service-config"
+                        }
+                      }
+                    },
+                    {
+                      "name": "EXAMPLE_SECRET_VALUE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "secret-key",
+                          "name": "integration-service-secret"
+                        }
+                      }
+                    }
+                  ],
+                  "resources": {
+                    "limits": {
+                      "cpu": "512m",
+                      "memory": "1Gi"
+                    },
+                    "requests": {
+                      "cpu": "100m",
+                      "memory": "256Mi"
+                    }
+                  }
+                },
+                "replicas": 3
+              }
+            }
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxInternalRegistry",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-internal-registry"
+            },
+            "spec": null
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxNamespaceLister",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-namespace-lister"
+            },
+            "spec": {
+              "namespaceLister": {
+                "namespaceLister": {
+                  "env": [
+                    {
+                      "name": "LOG_LEVEL",
+                      "value": "0"
+                    },
+                    {
+                      "name": "CACHE_RESYNC_PERIOD",
+                      "value": "10m"
+                    },
+                    {
+                      "name": "EXAMPLE_CUSTOM_CONFIG",
+                      "valueFrom": {
+                        "configMapKeyRef": {
+                          "key": "custom-config",
+                          "name": "namespace-lister-config"
+                        }
+                      }
+                    },
+                    {
+                      "name": "EXAMPLE_SECRET_VALUE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "secret-key",
+                          "name": "namespace-lister-secret"
+                        }
+                      }
+                    }
+                  ],
+                  "resources": {
+                    "limits": {
+                      "cpu": "512m",
+                      "memory": "1Gi"
+                    },
+                    "requests": {
+                      "cpu": "100m",
+                      "memory": "256Mi"
+                    }
+                  }
+                },
+                "replicas": 3
+              }
+            }
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxRBAC",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-rbac"
+            },
+            "spec": {}
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxReleaseService",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-release-service"
+            },
+            "spec": {
+              "releaseControllerManager": {
+                "manager": {
+                  "env": [
+                    {
+                      "name": "DEFAULT_RELEASE_PVC",
+                      "valueFrom": {
+                        "configMapKeyRef": {
+                          "key": "DEFAULT_RELEASE_PVC",
+                          "name": "release-service-manager-properties"
+                        }
+                      }
+                    },
+                    {
+                      "name": "EXAMPLE_CUSTOM_CONFIG",
+                      "valueFrom": {
+                        "configMapKeyRef": {
+                          "key": "custom-config",
+                          "name": "release-service-config"
+                        }
+                      }
+                    },
+                    {
+                      "name": "EXAMPLE_SECRET_VALUE",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "secret-key",
+                          "name": "release-service-secret"
+                        }
+                      }
+                    }
+                  ],
+                  "resources": {
+                    "limits": {
+                      "cpu": "100m",
+                      "memory": "256Mi"
+                    },
+                    "requests": {
+                      "cpu": "100m",
+                      "memory": "256Mi"
+                    }
+                  }
+                },
+                "replicas": 3
+              }
+            }
+          },
+          {
+            "apiVersion": "konflux.konflux-ci.dev/v1alpha1",
+            "kind": "KonfluxUI",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "konflux-operator"
+              },
+              "name": "konflux-ui"
+            },
+            "spec": {
+              "dex": {
+                "config": {
+                  "configureLoginWithOpenShift": true,
+                  "connectors": [
+                    {
+                      "config": {
+                        "clientID": "$GITHUB_CLIENT_ID",
+                        "clientSecret": "$GITHUB_CLIENT_SECRET",
+                        "orgs": [
+                          {
+                            "name": "my-org",
+                            "teams": [
+                              "developers",
+                              "admins"
+                            ]
+                          },
+                          {
+                            "name": "another-org",
+                            "teams": [
+                              "contributors"
+                            ]
+                          }
+                        ],
+                        "redirectURI": "https://dex.example.com/idp/callback"
+                      },
+                      "id": "github",
+                      "name": "GitHub",
+                      "type": "github"
+                    },
+                    {
+                      "config": {
+                        "clientID": "$GOOGLE_CLIENT_ID",
+                        "clientSecret": "$GOOGLE_CLIENT_SECRET",
+                        "groups": [
+                          "admin@example.com"
+                        ],
+                        "issuer": "https://accounts.google.com",
+                        "redirectURI": "https://dex.example.com/idp/callback"
+                      },
+                      "id": "google",
+                      "name": "Google",
+                      "type": "oidc"
+                    },
+                    {
+                      "config": {
+                        "bindDN": "cn=admin,dc=example,dc=com",
+                        "bindPW": "$LDAP_BIND_PASSWORD",
+                        "groupSearch": {
+                          "baseDN": "ou=Groups,dc=example,dc=com",
+                          "filter": "(objectClass=groupOfNames)",
+                          "nameAttr": "cn",
+                          "userMatchers": [
+                            {
+                              "groupAttr": "member",
+                              "userAttr": "DN"
+                            }
+                          ]
+                        },
+                        "host": "ldap.example.com:636",
+                        "userSearch": {
+                          "baseDN": "ou=Users,dc=example,dc=com",
+                          "emailAttr": "mail",
+                          "filter": "(objectClass=person)",
+                          "idAttr": "uid",
+                          "nameAttr": "cn",
+                          "username": "uid"
+                        }
+                      },
+                      "id": "ldap",
+                      "name": "LDAP",
+                      "type": "ldap"
+                    }
+                  ],
+                  "enablePasswordDB": true,
+                  "hostname": "dex.example.com",
+                  "passwordConnector": "local",
+                  "port": "9443",
+                  "staticPasswords": [
+                    {
+                      "email": "user1@konflux.dev",
+                      "hash": "REDACTED",
+                      "userID": "7138d2fe-724e-4e86-af8a-db7c4b080e20",
+                      "username": "user1"
+                    },
+                    {
+                      "email": "user2@konflux.dev",
+                      "hash": "REDACTED",
+                      "userID": "ea8e8ee1-2283-4e03-83d4-b00f8b821b64",
+                      "username": "user2"
+                    },
+                    {
+                      "email": "admin@konflux.dev",
+                      "hash": "REDACTED",
+                      "userID": "admin-12345-67890-abcdef",
+                      "username": "admin"
+                    }
+                  ]
+                },
+                "dex": {
+                  "env": [
+                    {
+                      "name": "DEX_LOG_LEVEL",
+                      "value": "debug"
+                    },
+                    {
+                      "name": "DEX_STORAGE_TYPE",
+                      "value": "kubernetes"
+                    }
+                  ],
+                  "resources": {
+                    "limits": {
+                      "cpu": "500m",
+                      "memory": "512Mi"
+                    },
+                    "requests": {
+                      "cpu": "100m",
+                      "memory": "256Mi"
+                    }
+                  }
+                },
+                "replicas": 2
+              },
+              "ingress": {
+                "annotations": {
+                  "cert-manager.io/cluster-issuer": "letsencrypt-prod",
+                  "nginx.ingress.kubernetes.io/force-ssl-redirect": "true",
+                  "nginx.ingress.kubernetes.io/proxy-body-size": "10m",
+                  "nginx.ingress.kubernetes.io/ssl-redirect": "true"
+                },
+                "enabled": true,
+                "host": "konflux-ui.example.com",
+                "ingressClassName": "nginx",
+                "tlsSecretName": "konflux-ui-tls"
+              },
+              "proxy": {
+                "nginx": {
+                  "env": [
+                    {
+                      "name": "NGINX_WORKER_PROCESSES",
+                      "value": "4"
+                    },
+                    {
+                      "name": "NGINX_WORKER_CONNECTIONS",
+                      "value": "1024"
+                    },
+                    {
+                      "name": "NGINX_KEEPALIVE_TIMEOUT",
+                      "value": "65"
+                    }
+                  ],
+                  "resources": {
+                    "limits": {
+                      "cpu": "500m",
+                      "memory": "512Mi"
+                    },
+                    "requests": {
+                      "cpu": "100m",
+                      "memory": "256Mi"
+                    }
+                  }
+                },
+                "oauth2Proxy": {
+                  "env": [
+                    {
+                      "name": "OAUTH2_PROXY_PROVIDER",
+                      "value": "oidc"
+                    },
+                    {
+                      "name": "OAUTH2_PROXY_OIDC_ISSUER_URL",
+                      "value": "https://dex.example.com/idp/"
+                    },
+                    {
+                      "name": "OAUTH2_PROXY_CLIENT_ID",
+                      "value": "oauth2-proxy"
+                    },
+                    {
+                      "name": "OAUTH2_PROXY_CLIENT_SECRET",
+                      "valueFrom": {
+                        "secretKeyRef": {
+                          "key": "client-secret",
+                          "name": "oauth2-proxy-secret"
+                        }
+                      }
+                    }
+                  ],
+                  "resources": {
+                    "limits": {
+                      "cpu": "200m",
+                      "memory": "256Mi"
+                    },
+                    "requests": {
+                      "cpu": "50m",
+                      "memory": "128Mi"
+                    }
+                  }
+                },
+                "replicas": 3
+              }
+            }
+          }
+        ]
+      capabilities: Full Lifecycle
+      categories: Integration & Delivery, Security, Developer Tools
+      containerImage: quay.io/konflux-ci/konflux-operator:release-sha-81f479a
+      createdAt: "2026-02-16T03:24:04Z"
+      description: Cloud native software factory focused on software supply chain
+        security
+      olm.operatorNamespace: konflux-operator
+      olm.suggested-namespace: konflux-operator
+      operators.operatorframework.io/builder: operator-sdk-v1.42.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/konflux-ci/konflux-ci
+      support: Konflux Community
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: KonfluxApplicationAPI is the Schema for the konfluxapplicationapis
+          API.
+        displayName: Konflux Application API
+        kind: KonfluxApplicationAPI
+        name: konfluxapplicationapis.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: KonfluxBuildService is the Schema for the konfluxbuildservices
+          API
+        displayName: Konflux Build Service
+        kind: KonfluxBuildService
+        name: konfluxbuildservices.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: KonfluxCertManager is the Schema for the konfluxcertmanagers
+          API.
+        displayName: Konflux Cert Manager
+        kind: KonfluxCertManager
+        name: konfluxcertmanagers.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: KonfluxDefaultTenant is the Schema for the konfluxdefaulttenants
+          API.
+        displayName: Konflux Default Tenant
+        kind: KonfluxDefaultTenant
+        name: konfluxdefaulttenants.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: KonfluxEnterpriseContract is the Schema for the konfluxenterprisecontracts
+          API.
+        displayName: Konflux Enterprise Contract
+        kind: KonfluxEnterpriseContract
+        name: konfluxenterprisecontracts.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: Konflux is the Schema for the konfluxes API.
+        displayName: Konflux
+        kind: Konflux
+        name: konfluxes.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: KonfluxImageController is the Schema for the konfluximagecontrollers
+          API.
+        displayName: Konflux Image Controller
+        kind: KonfluxImageController
+        name: konfluximagecontrollers.konflux.konflux-ci.dev
+        version: v1alpha1
+      - kind: KonfluxInfo
+        name: konfluxinfoes.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: KonfluxIntegrationService is the Schema for the konfluxintegrationservices
+          API
+        displayName: Konflux Integration Service
+        kind: KonfluxIntegrationService
+        name: konfluxintegrationservices.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: |-
+          KonfluxInternalRegistry is the Schema for the konfluxinternalregistries API.
+          Enabling the internal registry requires trust-manager to be deployed for Certificate and Bundle resources.
+        displayName: Konflux Internal Registry
+        kind: KonfluxInternalRegistry
+        name: konfluxinternalregistries.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: KonfluxNamespaceLister is the Schema for the konfluxnamespacelisters
+          API.
+        displayName: Konflux Namespace Lister
+        kind: KonfluxNamespaceLister
+        name: konfluxnamespacelisters.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: KonfluxRBAC is the Schema for the konfluxrbacs API.
+        displayName: Konflux RBAC
+        kind: KonfluxRBAC
+        name: konfluxrbacs.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: KonfluxReleaseService is the Schema for the konfluxreleaseservices
+          API
+        displayName: Konflux Release Service
+        kind: KonfluxReleaseService
+        name: konfluxreleaseservices.konflux.konflux-ci.dev
+        version: v1alpha1
+      - description: KonfluxUI is the Schema for the konfluxuis API
+        displayName: Konflux UI
+        kind: KonfluxUI
+        name: konfluxuis.konflux.konflux-ci.dev
+        version: v1alpha1
+    description: |
+      ## Welcome to Konflux
+
+      Konflux is a **cloud-native software factory** focused on software supply chain security. It provides an enterprise-grade platform for building, testing, and releasing software with built-in security and compliance features.
+
+      ## Key Features
+
+      - **Automated Container Builds**: Build container images from source code using Tekton pipelines with minimal configuration
+      - **Integration Testing**: Run comprehensive tests and validations before releasing your software
+      - **Managed Releases**: Streamlined release workflows with approval gates and automated promotions
+      - **Supply Chain Security**: Built-in SLSA compliance, artifact signing, and attestation generation
+      - **Policy Enforcement**: Conforma policies ensure your software meets security and compliance requirements
+      - **Web UI**: Intuitive interface for managing applications, viewing pipelines, and monitoring builds
+
+      ## Installation
+
+      After installing the Konflux Operator, create a `Konflux` custom resource to deploy the platform.
+
+      ### Example: Minimal Konflux CR
+
+      ```yaml
+      apiVersion: konflux.konflux-ci.dev/v1alpha1
+      kind: Konflux
+      metadata:
+        name: konflux
+        namespace: konflux
+      spec: {}
+      ```
+
+      ## Default Configuration
+
+      When deployed with an empty spec:
+
+      - **Ingress**: Automatically configured using the cluster's default ingress domain
+      - **Authentication**: OpenShift OAuth login is enabled by default on OpenShift clusters
+
+      For detailed configuration options, refer to the [documentation](https://konflux-ci.dev/konflux-ci).
+    displayName: Konflux
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - build
+    - release
+    - secure-supply-chain
+    - pipeline
+    - scc
+    - factory
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Konflux Operator Repository
+      url: https://github.com/konflux-ci/konflux-ci
+    - name: Konflux Operator Documentation
+      url: https://konflux-ci.dev/konflux-ci
+    - name: Report Issues
+      url: https://github.com/konflux-ci/konflux-ci/issues/new
+    maintainers:
+    - email: konflux@googlegroups.com
+      name: Konflux Community
+    maturity: alpha
+    minKubeVersion: 1.33.5
+    provider:
+      name: Konflux Community
+      url: https://konflux-ci.dev/
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/konflux:0.0.12
+  name: ""
+- image: quay.io/konflux-ci/konflux-operator:release-sha-81f479a
   name: ""
 schema: olm.bundle
 ---

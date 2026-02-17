@@ -42,6 +42,8 @@ entries:
   replaces: rabbitmq-cluster-operator.v2.8.0
 - name: rabbitmq-cluster-operator.v2.18.0
   replaces: rabbitmq-cluster-operator.v2.16.0
+- name: rabbitmq-cluster-operator.v2.19.1
+  replaces: rabbitmq-cluster-operator.v2.18.0
 name: stable
 package: rabbitmq-cluster-operator
 schema: olm.channel
@@ -1174,6 +1176,136 @@ relatedImages:
 - image: quay.io/community-operator-pipeline-prod/rabbitmq-cluster-operator:2.18.0
   name: ""
 - image: quay.io/rabbitmqoperator/cluster-operator:2.18.0
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/rabbitmq-cluster-operator:2.19.1
+name: rabbitmq-cluster-operator.v2.19.1
+package: rabbitmq-cluster-operator
+properties:
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: RabbitmqCluster
+    version: v1beta1
+- type: olm.package
+  value:
+    packageName: rabbitmq-cluster-operator
+    version: 2.19.1
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |
+        [
+          {
+            "apiVersion": "rabbitmq.com/v1beta1",
+            "kind": "RabbitmqCluster",
+            "metadata": {
+              "name": "hello-world"
+            },
+            "spec": {
+              "override": {
+                "statefulset": {
+                  "spec": {
+                    "template": {
+                      "spec": {
+                        "containers": [],
+                        "securityContext": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      capabilities: Full Lifecycle
+      categories: Streaming & Messaging
+      certified: "false"
+      containerImage: quay.io/rabbitmqoperator/cluster-operator:2.19.1
+      createdAt: 2026-02-06T14:45:52
+      repository: https://github.com/rabbitmq/cluster-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Rabbitmq Cluster
+        displayName: RabbitmqCluster
+        kind: RabbitmqCluster
+        name: rabbitmqclusters.rabbitmq.com
+        version: v1beta1
+    description: "## About the managed application\nRabbitMQ is an open-source message
+      broker that originally implemented the\nAdvanced Message Queuing Protocol (AMQP).
+      Nowadays features a plug-in\narchitecture supporting protocols such as Streaming
+      Text Oriented Messaging\nProtocol (STOMP), MQ Telemetry Transport (MQTT), and
+      others. RabbitMQ\nsupports native streaming and AMQP 1.0.\n\nVisit [rabbitmq.com](rabbitmq.com)
+      for more information.\n\n## About this Operator\nRabbitMQ Cluster Kubernetes
+      Operator is developed and maintened by the VMware \nRabbitMQ team and provides
+      a consistent and easy way to deploy RabbitMQ\nclusters to Kubernetes and run
+      them, including \"day two\" (continuous)\noperations. RabbitMQ clusters deployed
+      using the Operator can be used by\napplications running on Kubernetes or outside
+      of Kubernetes.\n\nRead [RabbitMQ operator docs](https://www.rabbitmq.com/kubernetes/operator/operator-overview)\nfor
+      more information.\n"
+    displayName: RabbitMQ-cluster-operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - rabbitmq
+    - messaging
+    - amqp
+    - amqp10
+    - stomp
+    - mqtt
+    - mqtt5
+    - queues
+    - streaming
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/arch.ppc64le: supported
+      operatorframework.io/arch.s390x: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Documentation
+      url: https://www.rabbitmq.com/kubernetes/operator/operator-overview.html
+    - name: GitHub
+      url: https://github.com/rabbitmq/cluster-operator
+    maintainers:
+    - email: rabbitmq-users@googlegroups.com
+      name: VMware Tanzu
+    maturity: stable
+    minKubeVersion: 1.26.0
+    nativeAPIs:
+    - group: apps
+      kind: Deployment
+      version: v1
+    - group: ""
+      kind: Service
+      version: v1
+    - group: apps
+      kind: ReplicaSet
+      version: v1
+    - group: ""
+      kind: Pod
+      version: v1
+    - group: ""
+      kind: Secret
+      version: v1
+    - group: ""
+      kind: ConfigMap
+      version: v1
+    provider:
+      name: VMware Tanzu
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/rabbitmq-cluster-operator:2.19.1
+  name: ""
+- image: quay.io/rabbitmqoperator/cluster-operator:2.19.1
   name: ""
 schema: olm.bundle
 ---

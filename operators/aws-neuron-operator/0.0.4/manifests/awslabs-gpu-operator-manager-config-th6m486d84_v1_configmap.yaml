@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  controller_manager_config.yaml: |
+    healthProbeBindAddress: :8081
+    metricsBindAddress: 127.0.0.1:8080
+    leaderElection:
+      enabled: true
+      resourceID: gpue.openshift.io
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: aws-neuron
+    app.kubernetes.io/name: aws-neuron
+    app.kubernetes.io/part-of: aws-neuron
+  name: awslabs-gpu-operator-manager-config-th6m486d84

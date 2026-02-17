@@ -9,6 +9,10 @@ entries:
   replaces: aws-neuron-operator.v0.0.1
 - name: aws-neuron-operator.v0.0.3
   replaces: aws-neuron-operator.v0.0.2
+- name: aws-neuron-operator.v0.1.2
+  replaces: aws-neuron-operator.v0.0.3
+- name: aws-neuron-operator.v0.0.5
+  replaces: aws-neuron-operator.v0.1.2
 name: Fast
 package: aws-neuron-operator
 schema: olm.channel
@@ -19,6 +23,10 @@ entries:
   replaces: aws-neuron-operator.v0.0.1
 - name: aws-neuron-operator.v0.0.3
   replaces: aws-neuron-operator.v0.0.2
+- name: aws-neuron-operator.v0.1.2
+  replaces: aws-neuron-operator.v0.0.3
+- name: aws-neuron-operator.v0.0.5
+  replaces: aws-neuron-operator.v0.1.2
 name: Stable
 package: aws-neuron-operator
 schema: olm.channel
@@ -265,5 +273,163 @@ relatedImages:
 - image: public.ecr.aws/q5p6u7h8/neuron-openshift/operator:v0.1.1
   name: ""
 - image: quay.io/community-operator-pipeline-prod/aws-neuron-operator:0.0.3
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/aws-neuron-operator:0.0.5
+name: aws-neuron-operator.v0.0.5
+package: aws-neuron-operator
+properties:
+- type: olm.gvk
+  value:
+    group: k8s.aws
+    kind: DeviceConfig
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: aws-neuron-operator
+    version: 0.0.5
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "k8s.aws/v1alpha1",
+            "kind": "DeviceConfig",
+            "metadata": {
+              "name": "device-config",
+              "namespace": "ai-operator-on-aws"
+            },
+            "spec": {
+              "customSchedulerImage": "public.ecr.aws/eks-distro/kubernetes/kube-scheduler:v1.32.9-eks-1-32-24",
+              "devicePluginImage": "public.ecr.aws/neuron/neuron-device-plugin:2.24.23.0",
+              "driversImage": "public.ecr.aws/os-partners/neuron-openshift/neuron-kernel-module:2.24.7.0",
+              "nodeMetricsImage": "public.ecr.aws/neuron/neuron-monitor:1.3.0",
+              "schedulerExtensionImage": "public.ecr.aws/neuron/neuron-scheduler:2.24.23.0",
+              "selector": {
+                "feature.node.kubernetes.io/aws-neuron": "true"
+              },
+              "useInTreeDrivers": false
+            }
+          }
+        ]
+      capabilities: Basic Install
+      createdAt: "2026-01-21T10:51:47Z"
+      operatorframework.io/suggested-namespace: ai-operator-on-aws
+      operators.operatorframework.io/builder: operator-sdk-v1.32.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - kind: DeviceConfig
+        name: deviceconfigs.k8s.aws
+        version: v1alpha1
+    description: Aws Neuron Operator description. TODO.
+    displayName: Aws Neuron Operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - aws-neuron-operator
+    links:
+    - name: Aws Neuron Operator
+      url: https://aws-neuron-operator.domain
+    maintainers:
+    - email: your@email.com
+      name: Maintainer Name
+    maturity: alpha
+    provider:
+      name: Provider Name
+      url: https://your.domain
+relatedImages:
+- image: public.ecr.aws/os-partners/neuron-openshift/operator:v0.1.3
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/aws-neuron-operator:0.0.5
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/aws-neuron-operator:0.0.4
+name: aws-neuron-operator.v0.1.2
+package: aws-neuron-operator
+properties:
+- type: olm.gvk
+  value:
+    group: k8s.aws
+    kind: DeviceConfig
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: aws-neuron-operator
+    version: 0.1.2
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "k8s.aws/v1alpha1",
+            "kind": "DeviceConfig",
+            "metadata": {
+              "name": "device-config",
+              "namespace": "ai-operator-on-aws"
+            },
+            "spec": {
+              "customSchedulerImage": "public.ecr.aws/eks-distro/kubernetes/kube-scheduler:v1.32.9-eks-1-32-24",
+              "devicePluginImage": "public.ecr.aws/neuron/neuron-device-plugin:2.24.23.0",
+              "driversImage": "public.ecr.aws/os-partners/neuron-openshift/neuron-kernel-module:2.24.7.0",
+              "nodeMetricsImage": "public.ecr.aws/neuron/neuron-monitor:1.3.0",
+              "schedulerExtensionImage": "public.ecr.aws/neuron/neuron-scheduler:2.24.23.0",
+              "selector": {
+                "feature.node.kubernetes.io/aws-neuron": "true"
+              },
+              "useInTreeDrivers": false
+            }
+          }
+        ]
+      capabilities: Basic Install
+      createdAt: "2026-01-21T10:51:47Z"
+      operatorframework.io/suggested-namespace: ai-operator-on-aws
+      operators.operatorframework.io/builder: operator-sdk-v1.32.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - kind: DeviceConfig
+        name: deviceconfigs.k8s.aws
+        version: v1alpha1
+    description: Aws Neuron Operator description. TODO.
+    displayName: Aws Neuron Operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - aws-neuron-operator
+    links:
+    - name: Aws Neuron Operator
+      url: https://aws-neuron-operator.domain
+    maintainers:
+    - email: your@email.com
+      name: Maintainer Name
+    maturity: alpha
+    provider:
+      name: Provider Name
+      url: https://your.domain
+relatedImages:
+- image: public.ecr.aws/os-partners/neuron-openshift/operator:v0.1.3
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/aws-neuron-operator:0.0.4
   name: ""
 schema: olm.bundle

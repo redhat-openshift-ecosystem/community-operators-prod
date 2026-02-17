@@ -14,6 +14,8 @@ entries:
   replaces: alloydb-omni-operator.v1.4.0
 - name: alloydb-omni-operator.v1.5.0
   replaces: alloydb-omni-operator.v1.4.1
+- name: alloydb-omni-operator.v1.6.0
+  replaces: alloydb-omni-operator.v1.5.0
 name: stable
 package: alloydb-omni-operator
 schema: olm.channel
@@ -2843,5 +2845,733 @@ relatedImages:
 - image: gcr.io/kubebuilder/kube-rbac-proxy:v0.14.1
   name: ""
 - image: quay.io/community-operator-pipeline-prod/alloydb-omni-operator@sha256:08fafb811f709780c0ccb3c22e3c6417cb14a70a9305e46a7b50457647a82102
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/alloydb-omni-operator@sha256:fa962452707fe06a2323b08cd72b54082cd813ff569357e6f23118b37121f059
+name: alloydb-omni-operator.v1.6.0
+package: alloydb-omni-operator
+properties:
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: Backup
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: BackupPlan
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: DBCluster
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: DBInstance
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: Failover
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: PgBouncer
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: Replication
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: Restore
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: Sidecar
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: Switchover
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: TdeConfig
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.dbadmin.goog
+    kind: UserDefinedAuthentication
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: BackupRepository
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: CreateStandbyJob
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: DeleteStandbyJob
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: Failover
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: Instance
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: InstanceBackup
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: InstanceBackupPlan
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: InstanceRestore
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: InstanceSwitchover
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: InstanceUserDefinedAuthentication
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: LROJob
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: ReplicationConfig
+    version: v1
+- type: olm.gvk
+  value:
+    group: alloydbomni.internal.dbadmin.goog
+    kind: Sidecar
+    version: v1
+- type: olm.gvk.required
+  value:
+    group: cert-manager.io
+    kind: Certificate
+    version: v1
+- type: olm.gvk.required
+  value:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    version: v1
+- type: olm.gvk.required
+  value:
+    group: cert-manager.io
+    kind: Issuer
+    version: v1
+- type: olm.package
+  value:
+    packageName: alloydb-omni-operator
+    version: 1.6.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "Backup",
+            "metadata": {
+              "name": "backup1"
+            },
+            "spec": {
+              "backupPlanRef": "backupplan1",
+              "dbclusterRef": "dbcluster-sample",
+              "manual": true,
+              "physicalBackupSpec": {
+                "backupType": "full"
+              }
+            }
+          },
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "BackupPlan",
+            "metadata": {
+              "name": "backupplan1"
+            },
+            "spec": {
+              "backupRetainDays": 14,
+              "backupSchedules": {
+                "full": "0 0 * * 0",
+                "incremental": "0 21 * * *"
+              },
+              "dbclusterRef": "dbcluster-sample",
+              "paused": false
+            }
+          },
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "Restore",
+            "metadata": {
+              "name": "clone1"
+            },
+            "spec": {
+              "clonedDBClusterConfig": {
+                "dbclusterName": "new-dbcluster-sample"
+              },
+              "pointInTime": "2024-02-23T19:59:43Z",
+              "sourceDBCluster": "dbcluster-sample"
+            }
+          },
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "DBCluster",
+            "metadata": {
+              "name": "dbcluster-sample"
+            },
+            "spec": {
+              "databaseVersion": "17.5.0",
+              "primarySpec": {
+                "adminUser": {
+                  "passwordRef": {
+                    "name": "db-pw-dbcluster-sample"
+                  }
+                },
+                "resources": {
+                  "cpu": 1,
+                  "disks": [
+                    {
+                      "name": "DataDisk",
+                      "size": "10Gi"
+                    }
+                  ],
+                  "memory": "5Gi"
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "DBInstance",
+            "metadata": {
+              "name": "dbcluster-sample-rp-1"
+            },
+            "spec": {
+              "dbcParent": {
+                "name": "dbcluster-sample"
+              },
+              "instanceType": "ReadPool",
+              "nodeCount": 2,
+              "resources": {
+                "cpu": 2,
+                "disks": [
+                  {
+                    "name": "DataDisk",
+                    "size": "15Gi"
+                  }
+                ],
+                "memory": "6Gi"
+              },
+              "schedulingconfig": {
+                "nodeaffinity": {
+                  "preferredDuringSchedulingIgnoredDuringExecution": [
+                    {
+                      "preference": {
+                        "matchExpressions": [
+                          {
+                            "key": "another-node-label-key",
+                            "operator": "In",
+                            "values": [
+                              "another-node-label-value"
+                            ]
+                          }
+                        ]
+                      },
+                      "weight": 1
+                    }
+                  ]
+                },
+                "podAffinity": {
+                  "preferredDuringSchedulingIgnoredDuringExecution": [
+                    {
+                      "podAffinityTerm": {
+                        "labelSelector": {
+                          "matchExpressions": [
+                            {
+                              "key": "app",
+                              "operator": "In",
+                              "values": [
+                                "store"
+                              ]
+                            }
+                          ]
+                        },
+                        "topologyKey": "kubernetes.io/hostname"
+                      },
+                      "weight": 1
+                    }
+                  ]
+                },
+                "podAntiAffinity": {
+                  "preferredDuringSchedulingIgnoredDuringExecution": [
+                    {
+                      "podAffinityTerm": {
+                        "labelSelector": {
+                          "matchExpressions": [
+                            {
+                              "key": "security",
+                              "operator": "In",
+                              "values": [
+                                "S1"
+                              ]
+                            }
+                          ]
+                        },
+                        "topologyKey": "topology.kubernetes.io/zone"
+                      },
+                      "weight": 1
+                    }
+                  ]
+                },
+                "tolerations": [
+                  {
+                    "effect": "NoSchedule",
+                    "key": "node-role.kubernetes.io/control-plane",
+                    "operator": "Exists"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "Failover",
+            "metadata": {
+              "name": "failover-sample"
+            },
+            "spec": {
+              "dbclusterRef": "dbcluster-sample"
+            }
+          },
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "PgBouncer",
+            "metadata": {
+              "name": "mypgbouncer"
+            },
+            "spec": {
+              "allowSuperUserAccess": true,
+              "dbclusterRef": "dbcluster-sample",
+              "parameters": {
+                "default_pool_size": "15",
+                "ignore_startup_parameters": "extra_float_digits",
+                "max_client_conn": "800",
+                "max_db_connections": "160",
+                "pool_mode": "transaction"
+              },
+              "podSpec": {
+                "image": "gcr.io/alloydb-omni/operator/g-pgbouncer:1.6.0",
+                "resources": {
+                  "cpu": 1,
+                  "memory": "1Gi"
+                }
+              },
+              "replicaCount": 1,
+              "serviceOptions": {
+                "type": "ClusterIP"
+              }
+            }
+          },
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "Replication",
+            "metadata": {
+              "name": "replication-downstream-sample"
+            },
+            "spec": {
+              "dbcluster": {
+                "name": "dbcluster-sample"
+              },
+              "downstream": {
+                "control": "setup",
+                "host": "10.10.10.10",
+                "password": {
+                  "name": "ha-rep-pw-dbcluster-sample"
+                },
+                "port": 5432,
+                "replicationSlotName": "dbcluster_sample_replication_upstream_sample",
+                "username": "alloydbreplica"
+              }
+            }
+          },
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "Replication",
+            "metadata": {
+              "name": "replication-upstream-sample"
+            },
+            "spec": {
+              "dbcluster": {
+                "name": "dbcluster-sample"
+              },
+              "upstream": {}
+            }
+          },
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "Restore",
+            "metadata": {
+              "name": "restore1"
+            },
+            "spec": {
+              "backup": "backup1",
+              "sourceDBCluster": "dbcluster-sample"
+            }
+          },
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "Sidecar",
+            "metadata": {
+              "name": "sidecar-sample"
+            },
+            "spec": {
+              "sidecars": [
+                {
+                  "args": [
+                    "-c",
+                    "while [ true ]\ndo\ndate\nset -x\nls -lh /logs/diagnostic\nset +x\ndone\n"
+                  ],
+                  "command": [
+                    "/bin/sh"
+                  ],
+                  "image": "busybox",
+                  "name": "sidecar-sample",
+                  "volumeMounts": [
+                    {
+                      "mountPath": "/logs",
+                      "name": "obsdisk"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "apiVersion": "alloydbomni.dbadmin.goog/v1",
+            "kind": "Switchover",
+            "metadata": {
+              "name": "switchover-sample"
+            },
+            "spec": {
+              "dbclusterRef": "dbcluster-sample",
+              "newPrimary": "aaaa-dbcluster-sample"
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Database
+      containerImage: gcr.io/alloydb-omni/operator/fleet-operator:1.6.0
+      createdAt: "2025-11-05T21:02:09Z"
+      operatorframework.io/suggested-namespace: alloydb-omni-system
+      operators.operatorframework.io/builder: operator-sdk-v1.37.0
+      operators.operatorframework.io/internal-objects: '["backuprepositories.alloydbomni.internal.dbadmin.goog",
+        "failovers.alloydbomni.internal.dbadmin.goog", "instancebackupplans.alloydbomni.internal.dbadmin.goog","instancebackups.alloydbomni.internal.dbadmin.goog","instancerestores.alloydbomni.internal.dbadmin.goog","instances.alloydbomni.internal.dbadmin.goog","instanceswitchovers.alloydbomni.internal.dbadmin.goog","instanceuserdefinedauthentications.alloydbomni.internal.dbadmin.goog","lrojobs.alloydbomni.internal.dbadmin.goog","replicationconfigs.alloydbomni.internal.dbadmin.goog","sidecars.alloydbomni.internal.dbadmin.goog","createstandbyjobs.alloydbomni.internal.dbadmin.goog","deletestandbyjobs.alloydbomni.internal.dbadmin.goog"]'
+      operators.operatorframework.io/project_layout: unknown
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: BackupPlan is the Schema for the backupplans API.
+        displayName: Backup Plan
+        kind: BackupPlan
+        name: backupplans.alloydbomni.dbadmin.goog
+        version: v1
+      - description: Backup is the Schema for the backups API.
+        displayName: Backup
+        kind: Backup
+        name: backups.alloydbomni.dbadmin.goog
+        version: v1
+      - description: CreateStandbyJob is an internal workflow tracking object. Users
+          should not directly interact with this.
+        displayName: (Internal) Create Standby Job
+        kind: CreateStandbyJob
+        name: createstandbyjobs.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: DBCluster is the Schema for the DBClusters API.
+        displayName: DB Cluster
+        kind: DBCluster
+        name: dbclusters.alloydbomni.dbadmin.goog
+        version: v1
+      - description: DBInstance is the Schema for the DBInstances API.
+        displayName: DB Instance
+        kind: DBInstance
+        name: dbinstances.alloydbomni.dbadmin.goog
+        version: v1
+      - description: DeleteStandbyJob is an internal workflow tracking object. Users
+          should not directly interact with this.
+        displayName: (Internal) Delete Standby Job
+        kind: DeleteStandbyJob
+        name: deletestandbyjobs.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: Failover represents the parameters and status of a single failover
+          operation.
+        displayName: Failover
+        kind: Failover
+        name: failovers.alloydbomni.dbadmin.goog
+        version: v1
+      - description: PgBouncer is the Schema for the PgBouncer API.
+        displayName: PgBouncer
+        kind: PgBouncer
+        name: pgbouncers.alloydbomni.dbadmin.goog
+        version: v1
+      - description: Replication is the Schema for the Replications API.
+        displayName: Replication
+        kind: Replication
+        name: replications.alloydbomni.dbadmin.goog
+        version: v1
+      - description: Restore is the Schema for the Restores API.
+        displayName: Restore
+        kind: Restore
+        name: restores.alloydbomni.dbadmin.goog
+        version: v1
+      - description: Sidecar is the Schema for the Sidecar API.
+        displayName: Sidecar
+        kind: Sidecar
+        name: sidecars.alloydbomni.dbadmin.goog
+        version: v1
+      - description: Switchover represents the parameters and status of a single switchover.
+        displayName: Switchover
+        kind: Switchover
+        name: switchovers.alloydbomni.dbadmin.goog
+        version: v1
+      - description: TdeConfig is the Schema for the TdeConfigs API.
+        displayName: TDE Config
+        kind: TdeConfig
+        name: tdeconfigs.alloydbomni.dbadmin.goog
+        version: v1
+      - description: UserDefinedAuthentication is the Schema for the UserDefinedAuthentications
+          API.
+        displayName: User Defined Authentication
+        kind: UserDefinedAuthentication
+        name: userdefinedauthentications.alloydbomni.dbadmin.goog
+        version: v1
+      - description: BackupRepository is the Schema for the backuprepositories API.
+        displayName: (Internal) Backup Repository
+        kind: BackupRepository
+        name: backuprepositories.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: Failover is the Schema for the failover API.
+        displayName: (Internal) Failover
+        kind: Failover
+        name: failovers.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: InstanceBackupPlan is the Schema for the InstanceBackupPlan API.
+        displayName: (Internal) Instance Backup Plan
+        kind: InstanceBackupPlan
+        name: instancebackupplans.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: InstanceBackup is the Schema for the InstanceBackup API.
+        displayName: (Internal) Instance Backup
+        kind: InstanceBackup
+        name: instancebackups.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: InstanceRestore is the Schema for the InstanceRestore API.
+        displayName: (Internal) Instance Restore
+        kind: InstanceRestore
+        name: instancerestores.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: Instance is the Schema for the Instance API.
+        displayName: (Internal) Instance
+        kind: Instance
+        name: instances.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: InstanceSwitchover is the Schema for the InstanceSwitchover API.
+        displayName: (Internal) Instance Switchover
+        kind: InstanceSwitchover
+        name: instanceswitchovers.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: InstanceUserDefinedAuthentication is the Schema for the InstanceUserDefinedAuthentication
+          API.
+        displayName: (Internal) Instance User Defined Authentication
+        kind: InstanceUserDefinedAuthentication
+        name: instanceuserdefinedauthentications.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: LROJob is the Schema for the LROJob API.
+        displayName: (Internal) LRO Job
+        kind: LROJob
+        name: lrojobs.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: ReplicationConfig is the Schema for the ReplicationConfig API.
+        displayName: (Internal) Replication Config
+        kind: ReplicationConfig
+        name: replicationconfigs.alloydbomni.internal.dbadmin.goog
+        version: v1
+      - description: Sidecar is the Schema for the Sidecar API.
+        displayName: (Internal) Sidecar
+        kind: Sidecar
+        name: sidecars.alloydbomni.internal.dbadmin.goog
+        version: v1
+    description: |-
+      AlloyDB Omni is a database that lets you deploy a streamlined edition of AlloyDB for PostgreSQL in your own computing environment. While being 100% compatible with PostgreSQL applications and tools, AlloyDB Omni delivers higher performance for both OLTP and OLAP workloads and makes administration easy with a number of autopilots. AlloyDB AI provides powerful tools to build generative AI applications with the ability to create, store, and index vector embeddings right in your database.
+
+      ## Post-installation
+
+      The operator requires cert-manager issuers to provision certificates for secure connections. After installing the operator, you have the option to configure [custom certificate issuers][manage-certs].
+
+      If you're not using a custom certificate issuer, you will need to create the default certificate issuer resources:
+
+      ```
+      kubectl create ns ${NAMESPACE:?}
+      ```
+
+      ```
+      kubectl apply -f - <<EOF
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: alloydbomni-selfsigned-cluster-issuer
+      spec:
+        selfSigned: {}
+      ---
+      apiVersion: cert-manager.io/v1
+      kind: Issuer
+      metadata:
+        name: fleet-selfsigned-issuer
+        namespace: ${NAMESPACE:?}
+      spec:
+        selfSigned: {}
+      ---
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: fleet-serving-cert
+        namespace: ${NAMESPACE:?}
+      spec:
+        dnsNames:
+        - fleet-webhook-service.alloydb-omni-system.svc
+        - fleet-webhook-service.alloydb-omni-system.svc.cluster.local
+        issuerRef:
+          kind: Issuer
+          name: fleet-selfsigned-issuer
+        secretName: fleet-webhook-server-cert
+      ---
+      apiVersion: cert-manager.io/v1
+      kind: Issuer
+      metadata:
+        name: local-selfsigned-issuer
+        namespace: ${NAMESPACE:?}
+      spec:
+        selfSigned: {}
+      ---
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: local-serving-cert
+        namespace: ${NAMESPACE:?}
+      spec:
+        dnsNames:
+        - local-webhook-service.alloydb-omni-system.svc
+        - local-webhook-service.alloydb-omni-system.svc.cluster.local
+        issuerRef:
+          kind: Issuer
+          name: local-selfsigned-issuer
+        secretName: local-webhook-server-cert
+      EOF
+      ```
+
+      Replace the following:
+      * `NAMESPACE` : the namespace where you have installed your operator. Suggested namespace: `alloydb-omni-system`.
+
+      ## Creating a database cluster
+
+      After you install the AlloyDB Omni operator on your Kubernetes cluster, you can create an AlloyDB Omni database cluster. For each database cluster you create, you must first create a password secret using the following format:
+
+      ```
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: db-pw-${DB_CLUSTER_NAME:s?}
+        namespace: ${DB_CLUSTER_NAMESPACE:?}
+      type: Opaque
+      data:
+        ${DB_CLUSTER_NAME:?}: "ENCODED_PASSWORD"
+      ```
+
+      Replace the following:
+      * `DB_CLUSTER_NAME`: the name of this database cluster. For example, `my-db-cluster`.
+      * `DB_CLUSTER_NAMESPACE` (Optional): the namespace where you want to create the database cluster. For example, `my-db-cluster-namespace`.
+      * `ENCODED_PASSWORD`: the database login password for the default postgres user role, encoded as a base64 string. For example, `Q2hhbmdlTWUxMjM=` for password `ChangeMe123`.
+
+      Follow [these][database-cluster] steps for creating a database cluster.
+
+      ## Connect to AlloyDB Omni running on Kubernetes
+      Follow [these][connect] steps to connect to AlloyDB Omni.
+
+      [manage-certs]: https://docs.cloud.google.com/alloydb/omni/kubernetes/current/docs/manage-certificates-kubernetes-operator
+      [database-cluster]: https://docs.cloud.google.com/alloydb/omni/kubernetes/current/docs/deploy-kubernetes#create
+      [connect]: https://docs.cloud.google.com/alloydb/omni/kubernetes/current/docs/run-connect#connect-kubernetes
+    displayName: AlloyDB Omni Operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - database
+    - sql
+    - postgres
+    - vector
+    - ai
+    - analytics
+    - postgresql
+    - alloydb
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Documentation
+      url: https://cloud.google.com/alloydb/omni/docs
+    - name: Release Notes
+      url: https://cloud.google.com/alloydb/docs/release-notes
+    maintainers:
+    - email: alloydb-omni-ext@google.com
+      name: Google Cloud
+    maturity: stable
+    minKubeVersion: 1.21.0
+    provider:
+      name: Google
+      url: https://cloud.google.com/alloydb/omni
+relatedImages:
+- image: gcr.io/alloydb-omni/operator/fleet-operator:1.6.0
+  name: ""
+- image: gcr.io/alloydb-omni/operator/local-operator:1.6.0
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/alloydb-omni-operator@sha256:fa962452707fe06a2323b08cd72b54082cd813ff569357e6f23118b37121f059
   name: ""
 schema: olm.bundle

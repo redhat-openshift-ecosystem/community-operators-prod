@@ -15,6 +15,8 @@ entries:
   replaces: kepler-operator.v0.21.0
 - name: kepler-operator.v0.23.0
   replaces: kepler-operator.v0.22.0
+- name: kepler-operator.v0.24.0
+  replaces: kepler-operator.v0.23.0
 name: alpha
 package: kepler-operator
 schema: olm.channel
@@ -679,5 +681,151 @@ relatedImages:
 - image: quay.io/sustainable_computing_io/kepler-operator:0.23.0
   name: ""
 - image: quay.io/sustainable_computing_io/kepler:v0.11.3
+  name: kepler
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/kepler-operator:0.24.0
+name: kepler-operator.v0.24.0
+package: kepler-operator
+properties:
+- type: olm.gvk
+  value:
+    group: kepler.system.sustainable.computing.io
+    kind: PowerMonitor
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: kepler.system.sustainable.computing.io
+    kind: PowerMonitorInternal
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: kepler-operator
+    version: 0.24.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "kepler.system.sustainable.computing.io/v1alpha1",
+            "kind": "PowerMonitor",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/instance": "powermonitor",
+                "app.kubernetes.io/name": "powermonitor",
+                "app.kubernetes.io/part-of": "kepler-operator"
+              },
+              "name": "power-monitor"
+            },
+            "spec": {
+              "kepler": {
+                "config": {
+                  "logLevel": "info"
+                }
+              }
+            }
+          }
+        ]
+      capabilities: Seamless Upgrades
+      categories: Monitoring, Observability
+      containerImage: quay.io/sustainable_computing_io/kepler-operator:0.24.0
+      createdAt: "2026-02-16T07:40:57Z"
+      description: Deploys and Manages Kepler on Kubernetes
+      operators.operatorframework.io/builder: operator-sdk-v1.41.1
+      operators.operatorframework.io/internal-objects: |-
+        [
+          "powermonitorinternals.kepler.system.sustainable.computing.io"
+        ]
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/sustainable-computing-io/kepler-operator
+      support: https://github.com/sustainable-computing-io/kepler-operator/issues
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: PowerMonitorInternal is the Schema for internal/unsupported API
+        displayName: PowerMonitorInternal
+        kind: PowerMonitorInternal
+        name: powermonitorinternals.kepler.system.sustainable.computing.io
+        statusDescriptors:
+        - description: conditions represent the latest available observations of the
+            power-monitor
+          displayName: Conditions
+          path: conditions
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:conditions
+        version: v1alpha1
+      - description: PowerMonitor is the Schema for the powermonitors API
+        displayName: PowerMonitor
+        kind: PowerMonitor
+        name: powermonitors.kepler.system.sustainable.computing.io
+        statusDescriptors:
+        - description: conditions represent the latest available observations of the
+            power-monitor
+          displayName: Conditions
+          path: conditions
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:conditions
+        version: v1alpha1
+    description: |-
+      Kepler (Kubernetes-based Efficient Power Level Exporter) is a Prometheus exporter that
+      measures energy consumption metrics at the container, pod, and node level in Kubernetes clusters.
+
+      ### Prerequisites
+      To view the metrics exposed by Kepler, **[User Workload Monitoring](https://docs.redhat.com/documentation/openshift_container_platform/latest/html/monitoring/configuring-user-workload-monitoring)**
+      MUST be enabled in your cluster.
+
+      ### Documentation
+      * [User Documentation](https://github.com/sustainable-computing-io/kepler-operator/blob/main/README.md)
+      * [Developer Guide](https://github.com/sustainable-computing-io/kepler-operator/tree/main/docs/developer)
+
+      ### Contributing
+      * [Report Bugs](https://github.com/sustainable-computing-io/kepler-operator/issues/new?template=bug_report.md) - Found a bug? Let us know!
+      * [Browse Issues](https://github.com/sustainable-computing-io/kepler-operator/issues) - See what we're working on
+
+      ### License
+      Licensed under [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+    displayName: Kepler
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - Kepler
+    - power
+    - energy
+    - monitoring
+    links:
+    - name: Installation Guide
+      url: https://sustainable-computing.io/installation/community-operator/
+    - name: Kepler Project
+      url: https://sustainable-computing.io/
+    maintainers:
+    - email: sthaha@redhat.com
+      name: Sunil Thaha
+    - email: vprashar@redhat.com
+      name: Vibhu Prashar
+    - email: vimalkum@redhat.com
+      name: Vimal Kumar
+    - email: kaliu@redhat.com
+      name: Kaiyi Liu
+    maturity: alpha
+    minKubeVersion: 1.24.0
+    provider:
+      name: Kepler Operator Contributors
+      url: https://sustainable-computing.io/
+relatedImages:
+- image: quay.io/brancz/kube-rbac-proxy:v0.19.0
+  name: kube-rbac-proxy
+- image: quay.io/community-operator-pipeline-prod/kepler-operator:0.24.0
+  name: ""
+- image: quay.io/sustainable_computing_io/kepler-operator:0.24.0
+  name: ""
+- image: quay.io/sustainable_computing_io/kepler:v0.11.4
   name: kepler
 schema: olm.bundle

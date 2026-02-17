@@ -1,0 +1,365 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "networking.turbosimone.com/v1alpha1",
+          "kind": "NetworkPolicy",
+          "metadata": {
+            "name": "allow-rhel9-egress-redhat"
+          },
+          "spec": {
+            "egress": [
+              {
+                "ports": [
+                  {
+                    "port": 53,
+                    "protocol": "UDP"
+                  }
+                ],
+                "toFQDNs": [
+                  "dns.example.com"
+                ]
+              },
+              {
+                "ports": [
+                  {
+                    "port": 443,
+                    "protocol": "TCP"
+                  },
+                  {
+                    "port": 80,
+                    "protocol": "TCP"
+                  }
+                ],
+                "toFQDNs": [
+                  "www.redhat.com",
+                  "consent-pref.trustarc.com",
+                  "consent.trustarc.com",
+                  "static.redhat.com",
+                  "sso.redhat.com",
+                  "assets.adobedtm.com",
+                  "consent-st.trustarc.com",
+                  "adobedc.demdex.net"
+                ]
+              }
+            ],
+            "matchExpressions": [
+              {
+                "key": "vm.kubevirt.io/name",
+                "operator": "In",
+                "values": [
+                  "rhel9-minimum",
+                  "rhel9-gui-server"
+                ]
+              }
+            ],
+            "targetNetwork": "cudn-localnet2"
+          }
+        }
+      ]
+    capabilities: Seamless Upgrades
+    categories: Networking, Security, Monitoring
+    containerImage: quay.io/ecosystem2022/fqdn-egress-operator:v1.0.0
+    createdAt: "2026-02-01T07:46:16Z"
+    operators.operatorframework.io/builder: operator-sdk-v1.42.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+  name: fqdn-egress-operator.v1.0.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: |-
+        NetworkPolicy is the Schema for the networkpolicies API.
+
+          - Please ensure the pods you apply this network policy to have a separate policy allowing access to CoreDNS / KubeDNS pods in your cluster. Without this, once this Network policy is applied, access to DNS will be blocked due to how network policies deny all unspecified traffic by default once applied.
+          - If no addresses are resolved from the FQDNs from the Egress rules that were specified, the default behavior is to block all Egress traffic. This conforms with the default behavior of network policies (networking.k8s.io/v1).
+      displayName: Network Policy
+      kind: NetworkPolicy
+      name: networkpolicies.networking.turbosimone.com
+      specDescriptors:
+      - description: TargetNetwork represents the network where the network policy
+          is effective. If the list is empty, please confirm whether a NAD has been
+          created in the current project.
+        displayName: Target Network
+        path: targetNetwork
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:k8s.cni.cncf.io:v1:NetworkAttachmentDefinition
+      - displayName: Match Labels
+        path: matchLabels
+      - displayName: Label
+        path: matchLabels[0].label
+      - displayName: Value
+        path: matchLabels[0].value
+      - displayName: Match Expressions
+        path: matchExpressions
+      - displayName: Key
+        path: matchExpressions[0].key
+      - displayName: Operator
+        path: matchExpressions[0].operator
+      - displayName: Values
+        path: matchExpressions[0].values
+      - displayName: Value
+        path: matchExpressions[0].values[0]
+      - displayName: Egress
+        path: egress
+      - displayName: ToFQDNs
+        path: egress[0].toFQDNs
+      - displayName: FQDN
+        path: egress[0].toFQDNs[0]
+      - displayName: Ports
+        path: egress[0].ports
+      - displayName: Protocol
+        path: egress[0].ports[0].protocol
+      - displayName: Port
+        path: egress[0].ports[0].port
+      - displayName: Block Private IPs
+        path: egress[0].blockPrivateIPs
+      - displayName: Enabled Network Type
+        path: enabledNetworkType
+      - displayName: Resolve Timeout Seconds
+        path: resolveTimeoutSeconds
+      - displayName: Retry Timeout Seconds
+        path: retryTimeoutSeconds
+      - displayName: TTL Seconds
+        path: ttlSeconds
+      - displayName: Block Private IPs
+        path: blockPrivateIPs
+      version: v1alpha1
+  description: |-
+    The FQDN Egress Operator provides OpenShift with domain-based outbound traffic control capabilities.
+
+    ### &#128640; Why FQDN Egress Operator?
+    Traditional OpenShift MultiNetworkPolicy objects do not support rules based on Fully Qualified Domain Names (FQDNs). However, in many VMware replacement scenarios, customers need to use MultiNetworkPolicy to support east-west network traffic control and want to implement outbound rule control based on FQDNs.
+
+    The FQDN Egress Operator addresses this gap by rewriting a community [fqdn-controller](https://github.com/konsole-is/fqdn-controller) project, can dynamically resolve FQDNs to IP addresses and maintain them as standard MultiNetworkPolicy objects. As operator release style, it can be easily installed and running on the OpenShift platform. FQDN Operator avoids intrusive changes to the network and works with the default CNI, it's a powerful complement to most VMware replacement scenarios.
+
+    ### &#128736; Key Capabilities
+    * **Dynamic Resolving**: Periodically refreshes DNS records to ensure policies stay up-to-date.
+    * **Non-Intrusive**: Works with default CNI and standard Multus-based secondary networks.
+    * **Easy Integration**: Automatically handles `k8s.v1.cni.cncf.io/policy-for` annotations for specified target networks.
+
+    ### &#128214; Quick Example
+    To allow egress traffic to specific [www.redhat.com](https://www.redhat.com) on a secondary network, use the following YAML:
+
+    ```yaml
+    apiVersion: networking.turbosimone.com/v1alpha1
+    kind: NetworkPolicy
+    metadata:
+      name: allow-rhel9--egress-redhat
+      namespace: demo-app
+    spec:
+      targetNetwork: cudn-localnet2
+      matchExpressions:
+        - key: vm.kubevirt.io/name
+          operator: In
+          values:
+            - rhel9-minimum
+            - rhel9-gui-server
+      egress:
+        - toFQDNs:
+            - dns.example.com
+          ports:
+            - protocol: UDP
+              port: 53
+        - toFQDNs:
+            - www.redhat.com
+            - consent-pref.trustarc.com
+            - consent.trustarc.com
+            - static.redhat.com
+            - sso.redhat.com
+            - assets.adobedtm.com
+            - consent-st.trustarc.com
+            - adobedc.demdex.net
+          ports:
+            - protocol: TCP
+              port: 443
+            - protocol: TCP
+              port: 80
+    ```
+
+    ### &#128161; Important Notice
+    * **Website FQDN**: Modern website often include several sites that provide supplementary content. For example, if you want to access [www.redhat.com](https://www.redhat.com), simply allowing [www.redhat.com](https://www.redhat.com) is not enough, you need to allow all its associated supplementary sites. To do this, you can use [urlscan](https://urlscan.io) to find a list of supplementary sites associated with each website that want to be allowed.
+    * **DNS Accessibility**: You should ensure that entities that need to access external websites also have access to your DNS server so that they can resolve the website's address and access it.
+  displayName: FQDN Egress Operator
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - k8s.cni.cncf.io
+          resources:
+          - multi-networkpolicies
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - networking.turbosimone.com
+          resources:
+          - networkpolicies
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - networking.turbosimone.com
+          resources:
+          - networkpolicies/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - networking.turbosimone.com
+          resources:
+          - networkpolicies/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: fqdn-egress-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: fqdn-egress-operator
+          control-plane: controller-manager
+        name: fqdn-egress-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: fqdn-egress-operator
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                app.kubernetes.io/name: fqdn-egress-operator
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --metrics-bind-address=:8443
+                - --leader-elect
+                - --health-probe-bind-address=:8081
+                command:
+                - /manager
+                image: quay.io/ecosystem2022/fqdn-egress-operator:v1.0.0
+                imagePullPolicy: Always
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+              serviceAccountName: fqdn-egress-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: fqdn-egress-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - operator
+  - network
+  - fqdn
+  - egress
+  links:
+  - name: FQDN Egress Operator
+    url: https://github.com/mransonwang/fqdn-egress-operator
+  maintainers:
+  - email: fewang@redhat.com
+    name: Feng Wang
+  maturity: alpha
+  provider:
+    name: Feng Wang
+  version: 1.0.0

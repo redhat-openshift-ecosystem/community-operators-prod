@@ -1,0 +1,26 @@
+apiVersion: v1
+data:
+  values.schema.json: |
+    {
+      "$schema": "http://json-schema.org/schema#",
+      "type": "object",
+      "properties": {
+        "loginsets": {
+          "type": "object",
+          "properties": {
+            "slinky": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+kind: ConfigMap
+metadata:
+  name: chart-schema

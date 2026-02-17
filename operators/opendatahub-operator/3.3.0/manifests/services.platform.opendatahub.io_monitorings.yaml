@@ -1,0 +1,298 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.17.3
+  creationTimestamp: null
+  name: monitorings.services.platform.opendatahub.io
+spec:
+  group: services.platform.opendatahub.io
+  names:
+    kind: Monitoring
+    listKind: MonitoringList
+    plural: monitorings
+    singular: monitoring
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - description: Ready
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    - description: Reason
+      jsonPath: .status.conditions[?(@.type=="Ready")].reason
+      name: Reason
+      type: string
+    - description: URL
+      jsonPath: .status.url
+      name: URL
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Monitoring is the Schema for the monitorings API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: MonitoringSpec defines the desired state of Monitoring
+            properties:
+              alerting:
+                description: Alerting configuration for Prometheus
+                type: object
+              collectorReplicas:
+                description: |-
+                  CollectorReplicas specifies the number of replicas in opentelemetry-collector. If not set, it defaults
+                  to 1 on single-node clusters and 2 on multi-node clusters.
+                format: int32
+                type: integer
+              metrics:
+                description: metrics collection
+                properties:
+                  exporters:
+                    additionalProperties:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    description: |-
+                      Exporters defines custom metrics exporters for sending metrics to external observability tools.
+                      Each key represents the exporter name, and the value contains the exporter configuration.
+                      The configuration follows the OpenTelemetry Collector exporter format.
+                      Reserved names 'prometheus' and 'otlp/tempo' cannot be used as they conflict with built-in exporters.
+                      Maximum 10 exporters allowed, each config must be less than 10KB (enforced at reconciliation time).
+                    type: object
+                    x-kubernetes-validations:
+                    - message: exporter name 'prometheus' is reserved and cannot be
+                        used
+                      rule: '!(''prometheus'' in self)'
+                    - message: exporter name 'otlp/tempo' is reserved and cannot be
+                        used
+                      rule: '!(''otlp/tempo'' in self)'
+                    - message: maximum 10 exporters allowed
+                      rule: size(self) <= 10
+                  replicas:
+                    description: |-
+                      Replicas specifies the number of replicas in monitoringstack. If not set, it defaults
+                      to 1 on single-node clusters and 2 on multi-node clusters.
+                    format: int32
+                    minimum: 0
+                    type: integer
+                  storage:
+                    description: MetricsStorage defines the storage configuration
+                      for the monitoring service
+                    properties:
+                      retention:
+                        default: 90d
+                        description: Retention specifies how long metrics data should
+                          be retained (e.g., "1d", "2w")
+                        type: string
+                      size:
+                        anyOf:
+                        - type: integer
+                        - type: string
+                        default: 5Gi
+                        description: Size specifies the storage size for the MonitoringStack
+                          (e.g, "5Gi", "10Mi")
+                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                        x-kubernetes-int-or-string: true
+                    type: object
+                type: object
+                x-kubernetes-validations:
+                - message: Non-zero replicas require metrics.storage to be configured
+                  rule: has(self.storage) || !has(self.replicas) || self.replicas
+                    == 0
+              namespace:
+                default: opendatahub
+                description: |-
+                  monitoring spec exposed to DSCI api
+                  Namespace for monitoring if it is enabled
+                maxLength: 63
+                pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?)?$
+                type: string
+                x-kubernetes-validations:
+                - message: MonitoringNamespace is immutable
+                  rule: self == oldSelf
+              traces:
+                description: Tracing configuration for OpenTelemetry instrumentation
+                properties:
+                  exporters:
+                    additionalProperties:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    description: |-
+                      Exporters defines custom trace exporters for sending traces to external observability tools.
+                      Each key represents the exporter name, and the value contains the exporter configuration.
+                      The configuration follows the OpenTelemetry Collector exporter format.
+                    type: object
+                  sampleRatio:
+                    default: "0.1"
+                    description: |-
+                      SampleRatio determines the sampling rate for traces
+                      Value should be between 0.0 (no sampling) and 1.0 (sample all traces)
+                    pattern: ^(0(\.[0-9]+)?|1(\.0+)?)$
+                    type: string
+                  storage:
+                    description: TracesStorage defines the storage configuration for
+                      tracing
+                    properties:
+                      backend:
+                        default: pv
+                        description: |-
+                          Backend defines the storage backend type.
+                          Valid values are "pv", "s3", and "gcs".
+                        enum:
+                        - pv
+                        - s3
+                        - gcs
+                        type: string
+                      retention:
+                        default: 2160h
+                        description: Retention specifies how long trace data should
+                          be retained globally (e.g., "60m", "10h")
+                        type: string
+                      secret:
+                        description: |-
+                          Secret specifies the secret name for storage credentials.
+                          This field is required when the backend is not "pv".
+                        type: string
+                      size:
+                        description: |-
+                          Size specifies the size of the storage.
+                          This field is optional.
+                        type: string
+                    required:
+                    - backend
+                    type: object
+                    x-kubernetes-validations:
+                    - message: When backend is s3 or gcs, the 'secret' field must
+                        be specified and non-empty
+                      rule: 'self.backend != ''pv'' ? (has(self.secret) && self.secret
+                        != '''') : true'
+                    - message: Size is supported when backend is pv only
+                      rule: 'self.backend != ''pv'' ? !has(self.size) : true'
+                  tls:
+                    description: TLS configuration for Tempo gRPC connections
+                    properties:
+                      caConfigMap:
+                        description: |-
+                          CAConfigMap specifies the name of the ConfigMap containing the CA certificate
+                          Required for mutual TLS authentication
+                        type: string
+                      certificateSecret:
+                        description: |-
+                          CertificateSecret specifies the name of the secret containing TLS certificates
+                          If not specified, OpenShift service serving certificates will be used
+                        type: string
+                      enabled:
+                        description: |-
+                          Enabled enables TLS for Tempo OTLP ingestion (gRPC/HTTP) and query APIs (HTTP)
+                          TLS is disabled by default to maintain backward compatibility
+                        type: boolean
+                    type: object
+                required:
+                - storage
+                type: object
+            type: object
+            x-kubernetes-validations:
+            - message: Alerting configuration requires metrics.storage to be configured
+              rule: 'has(self.alerting) ? has(self.metrics.storage)  : true'
+            - message: CollectorReplicas can only be set when metrics.storage or traces
+                are configured, and must be > 0
+              rule: '!has(self.collectorReplicas) || (self.collectorReplicas > 0 &&
+                (self.metrics.storage != null || self.traces != null))'
+          status:
+            description: MonitoringStatus defines the observed state of Monitoring
+            properties:
+              conditions:
+                items:
+                  properties:
+                    lastHeartbeatTime:
+                      description: |-
+                        The last time we got an update on a given condition, this should not be set and is
+                        present only for backward compatibility reasons
+                      format: date-time
+                      type: string
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.
+                        If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human-readable message indicating
+                        details about the transition.
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        The value should be a CamelCase string.
+                      type: string
+                    severity:
+                      description: |-
+                        Severity with which to treat failures of this type of condition.
+                        When this is not specified, it defaults to Error.
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-type: atomic
+              observedGeneration:
+                description: The generation observed by the resource controller.
+                format: int64
+                type: integer
+              phase:
+                type: string
+              url:
+                type: string
+            type: object
+        type: object
+        x-kubernetes-validations:
+        - message: Monitoring name must be default-monitoring
+          rule: self.metadata.name == 'default-monitoring'
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

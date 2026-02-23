@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: konflux-operator
+  name: konflux-operator-konfluxrbac-admin-role
+rules:
+- apiGroups:
+  - konflux.konflux-ci.dev
+  resources:
+  - konfluxrbacs
+  verbs:
+  - '*'
+- apiGroups:
+  - konflux.konflux-ci.dev
+  resources:
+  - konfluxrbacs/status
+  verbs:
+  - get

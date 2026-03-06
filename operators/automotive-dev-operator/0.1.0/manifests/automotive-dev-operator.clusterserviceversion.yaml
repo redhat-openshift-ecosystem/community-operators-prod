@@ -1,0 +1,493 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "automotive.sdv.cloud.redhat.com/v1alpha1",
+          "kind": "CatalogImage",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "automotive-dev-operator"
+            },
+            "name": "catalogimage-sample"
+          },
+          "spec": {
+            "metadata": {
+              "architecture": "amd64",
+              "bootc": true,
+              "distro": "autosd"
+            },
+            "registryUrl": "quay.io/example/automotive-image:v1.0.0",
+            "tags": [
+              "production",
+              "stable"
+            ]
+          }
+        },
+        {
+          "apiVersion": "automotive.sdv.cloud.redhat.com/v1alpha1",
+          "kind": "Image",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "automotive-dev-operator"
+            },
+            "name": "image-sample"
+          },
+          "spec": {
+            "architecture": "amd64",
+            "distro": "autosd",
+            "exportFormat": "qcow2",
+            "location": {
+              "registry": {
+                "url": "quay.io/example/automotive-image:v1.0.0"
+              },
+              "type": "registry"
+            },
+            "target": "qemu"
+          }
+        },
+        {
+          "apiVersion": "automotive.sdv.cloud.redhat.com/v1alpha1",
+          "kind": "ImageBuild",
+          "metadata": {
+            "annotations": {
+              "description": "Example ImageBuild CR showing the new nested structure. This example demonstrates a traditional AIB build with optional disk export.\n"
+            },
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "automotive-dev-operator"
+            },
+            "name": "imagebuild-sample"
+          },
+          "spec": {
+            "aib": {
+              "distro": "autosd",
+              "image": "quay.io/centos-sig-automotive/automotive-image-builder:1.0.0",
+              "manifestConfigMap": "mpp",
+              "mode": "image",
+              "target": "qemu"
+            },
+            "architecture": "amd64",
+            "export": {
+              "buildDiskImage": false,
+              "compression": "gzip",
+              "format": "qcow2"
+            }
+          }
+        },
+        {
+          "apiVersion": "automotive.sdv.cloud.redhat.com/v1alpha1",
+          "kind": "OperatorConfig",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "automotive-dev-operator"
+            },
+            "name": "config",
+            "namespace": "automotive-dev-operator-system"
+          },
+          "spec": {
+            "buildAPI": null,
+            "osBuilds": {
+              "enabled": true,
+              "nodeSelector": {
+                "aib": "true"
+              },
+              "pvcSize": "8Gi"
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: Developer Tools
+    com.redhat.openshift.versions: v4.18-v4.20
+    containerImage: quay.io/rh-sdv-cloud/automotive-dev-operator:0.1.0
+    createdAt: "2026-02-08T19:26:05Z"
+    description: The CentOS Automotive Suite Operator enables building automotive
+      OS images on OpenShift clusters.
+    operatorframework.io/suggested-namespace: automotive-dev-operator-system
+    operators.operatorframework.io/builder: operator-sdk-v1.42.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    repository: https://github.com/centos-automotive-suite/automotive-dev-operator
+    support: Red Hat
+  name: automotive-dev-operator.v0.1.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: CatalogImage represents an automotive OS image in the catalog registry
+        for discovery and deployment
+      displayName: Catalog Image
+      kind: CatalogImage
+      name: catalogimages.automotive.sdv.cloud.redhat.com
+      version: v1alpha1
+    - description: ImageBuild is the Schema for the imagebuilds API
+      displayName: Image Build
+      kind: ImageBuild
+      name: imagebuilds.automotive.sdv.cloud.redhat.com
+      version: v1alpha1
+    - description: Image is the Schema for the images API
+      displayName: Image
+      kind: Image
+      name: images.automotive.sdv.cloud.redhat.com
+      version: v1alpha1
+    - description: OperatorConfig is the Schema for the operatorconfigs API
+      displayName: Operator Config
+      kind: OperatorConfig
+      name: operatorconfigs.automotive.sdv.cloud.redhat.com
+      version: v1alpha1
+  description: |
+    The CentOS Automotive Suite Operator enables building automotive OS images on OpenShift clusters.
+
+    For detailed documentation, visit the [project repository](https://github.com/centos-automotive-suite/automotive-dev-operator).
+  displayName: CentOS Automotive Suite
+  icon:
+  - base64data: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTguNTEgMjU4LjUxIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2QxZDFkMTt9LmNscy0ye2ZpbGw6IzhkOGQ4Zjt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPkFzc2V0IDQ8L3RpdGxlPjxnIGlkPSJMYXllcl8yIiBkYXRhLW5hbWU9IkxheWVyIDIiPjxnIGlkPSJMYXllcl8xLTIiIGRhdGEtbmFtZT0iTGF5ZXIgMSI+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTI5LjI1LDIwQTEwOS4xLDEwOS4xLDAsMCwxLDIwNi40LDIwNi40LDEwOS4xLDEwOS4xLDAsMSwxLDUyLjExLDUyLjExLDEwOC40NSwxMDguNDUsMCwwLDEsMTI5LjI1LDIwbTAtMjBoMEM1OC4xNiwwLDAsNTguMTYsMCwxMjkuMjVIMGMwLDcxLjA5LDU4LjE2LDEyOS4yNiwxMjkuMjUsMTI5LjI2aDBjNzEuMDksMCwxMjkuMjYtNTguMTcsMTI5LjI2LTEyOS4yNmgwQzI1OC41MSw1OC4xNiwyMDAuMzQsMCwxMjkuMjUsMFoiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzcuNTQsMTAzLjQxSDE0MS42NkwxNTQuOSw2NS43NmMxLjI1LTQuNC0yLjMzLTguNzYtNy4yMS04Ljc2SDEwMi45M2E3LjMyLDcuMzIsMCwwLDAtNy40LDZsLTEwLDY5LjYxYy0uNTksNC4xNywyLjg5LDcuODksNy40LDcuODloMzYuOUwxMTUuNTUsMTk3Yy0xLjEyLDQuNDEsMi40OCw4LjU1LDcuMjQsOC41NWE3LjU4LDcuNTgsMCwwLDAsNi40Ny0zLjQ4TDE4NCwxMTMuODVDMTg2Ljg2LDEwOS4yNCwxODMuMjksMTAzLjQxLDE3Ny41NCwxMDMuNDFaIi8+PC9nPjwvZz48L3N2Zz4=
+    mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - persistentvolumeclaims
+          - pods
+          - secrets
+          - serviceaccounts
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - create
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods/exec
+          - serviceaccounts/token
+          verbs:
+          - create
+        - apiGroups:
+          - ""
+          resources:
+          - pods/log
+          verbs:
+          - get
+        - apiGroups:
+          - apiextensions.k8s.io
+          resources:
+          - customresourcedefinitions
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - automotive.sdv.cloud.redhat.com
+          resources:
+          - catalogimages
+          - imagebuilds
+          - images
+          - operatorconfigs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - automotive.sdv.cloud.redhat.com
+          resources:
+          - catalogimages/finalizers
+          - imagebuilds/finalizers
+          - images/finalizers
+          - operatorconfigs/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - automotive.sdv.cloud.redhat.com
+          resources:
+          - catalogimages/status
+          - imagebuilds/status
+          - images/status
+          - operatorconfigs/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - image.openshift.io
+          resources:
+          - imagestreams
+          verbs:
+          - create
+          - get
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingresses
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          - clusterroles
+          - rolebindings
+          - roles
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - tekton.dev
+          resources:
+          - pipelineruns
+          - pipelines
+          - taskruns
+          - tasks
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: ado-operator
+      deployments:
+      - label:
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: automotive-dev-operator
+          control-plane: operator
+        name: ado-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: operator
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: operator
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - arm64
+                        - amd64
+                      - key: kubernetes.io/os
+                        operator: In
+                        values:
+                        - linux
+              containers:
+              - args:
+                - --mode=all
+                - --leader-elect
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=0
+                command:
+                - /manager
+                env:
+                - name: BUILD_API_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: OPERATOR_IMAGE
+                  value: quay.io/rh-sdv-cloud/automotive-dev-operator:v0.1.0
+                image: quay.io/rh-sdv-cloud/automotive-dev-operator:v0.1.0
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                ports:
+                - containerPort: 8080
+                  name: build-api
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: "1"
+                    memory: 512Mi
+                  requests:
+                    cpu: 100m
+                    memory: 256Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              initContainers:
+              - command:
+                - /init-secrets
+                env:
+                - name: POD_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                image: quay.io/rh-sdv-cloud/automotive-dev-operator:v0.1.0
+                name: init-oauth-secrets
+                resources:
+                  limits:
+                    cpu: 100m
+                    memory: 64Mi
+                  requests:
+                    cpu: 10m
+                    memory: 32Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: ado-operator
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: ado-operator
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: false
+    type: AllNamespaces
+  keywords:
+  - automotive
+  links:
+  - name: CentOS Automotive Suite
+    url: https://github.com/centos-automotive-suite/automotive-dev-operator
+  maintainers:
+  - email: bzlotnik@redhat.com
+    name: Benny Zlotnik
+  - email: bkhizgiy@redhat.com
+    name: Bella Khizgiyaev
+  maturity: alpha
+  minKubeVersion: 1.31.0
+  provider:
+    name: Red Hat
+    url: https://github.com/centos-automotive-suite
+  version: 0.1.0

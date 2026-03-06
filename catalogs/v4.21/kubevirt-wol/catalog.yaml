@@ -1,0 +1,274 @@
+---
+defaultChannel: stable-v0
+name: kubevirt-wol
+schema: olm.package
+---
+entries:
+- name: kubevirt-wol.v0.0.2
+name: candidate-v0
+package: kubevirt-wol
+schema: olm.channel
+---
+entries:
+- name: kubevirt-wol.v0.0.2
+name: fast-v0
+package: kubevirt-wol
+schema: olm.channel
+---
+entries:
+- name: kubevirt-wol.v0.0.2
+name: stable-v0
+package: kubevirt-wol
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/kubevirt-wol:0.0.2
+name: kubevirt-wol.v0.0.2
+package: kubevirt-wol
+properties:
+- type: olm.gvk
+  value:
+    group: wol.pillon.org
+    kind: WolConfig
+    version: v1beta1
+- type: olm.package
+  value:
+    packageName: kubevirt-wol
+    version: 0.0.2
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "wol.pillon.org/v1beta1",
+            "kind": "WolConfig",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "kubevirt-wol"
+              },
+              "name": "default"
+            },
+            "spec": {
+              "agent": {
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {
+                  "limits": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  }
+                }
+              },
+              "cacheTTL": 300,
+              "discoveryMode": "All",
+              "namespaceSelectors": [
+                "default"
+              ],
+              "wolPorts": [
+                9
+              ]
+            }
+          },
+          {
+            "apiVersion": "wol.pillon.org/v1beta1",
+            "kind": "WolConfig",
+            "metadata": {
+              "name": "explicit-example"
+            },
+            "spec": {
+              "agent": {
+                "resources": {
+                  "limits": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  }
+                }
+              },
+              "cacheTTL": 600,
+              "discoveryMode": "Explicit",
+              "explicitMappings": [
+                {
+                  "macAddress": "52:54:00:12:34:56",
+                  "namespace": "default",
+                  "vmName": "my-vm-1"
+                },
+                {
+                  "macAddress": "52:54:00:ab:cd:ef",
+                  "namespace": "production",
+                  "vmName": "my-vm-2"
+                }
+              ],
+              "wolPorts": [
+                9
+              ]
+            }
+          },
+          {
+            "apiVersion": "wol.pillon.org/v1beta1",
+            "kind": "WolConfig",
+            "metadata": {
+              "name": "labelselector-example"
+            },
+            "spec": {
+              "agent": {
+                "nodeSelector": {
+                  "node-role.kubernetes.io/worker": ""
+                },
+                "resources": {
+                  "limits": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "requests": {
+                    "cpu": "50m",
+                    "memory": "64Mi"
+                  }
+                }
+              },
+              "cacheTTL": 300,
+              "discoveryMode": "LabelSelector",
+              "namespaceSelectors": [
+                "production"
+              ],
+              "vmSelector": {
+                "matchLabels": {
+                  "wol.pillon.org/enabled": "true"
+                }
+              },
+              "wolPorts": [
+                9,
+                7
+              ]
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: OpenShift Optional
+      containerImage: quay.io/kubevirtwol/kubevirt-wol-manager:v0.0.2
+      createdAt: "2025-10-27T02:37:07Z"
+      description: |
+        A Kubernetes Operator that enables Wake-on-LAN functionality for KubeVirt VirtualMachines. This operator listens for WOL magic packets on the network and automatically starts the corresponding VirtualMachines in your Kubernetes cluster.
+      operatorframework.io/suggested-namespace: kubevirt-wol-system
+      operatorframework.io/suggested-namespace-template: |
+        {
+          "apiVersion": "v1",
+          "kind": "Namespace",
+          "metadata": {
+            "name": "kubevirt-wol-system",
+            "annotations": {
+              "openshift.io/node-selector": ""
+            },
+            "labels": {
+              "openshift.io/cluster-monitoring": "true"
+            }
+          }
+        }
+      operators.operatorframework.io/builder: operator-sdk-v1.41.1
+      operators.operatorframework.io/internal-objects: '["servicemonitors.monitoring.coreos.com"]'
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/gpillon/kubevirt-wol
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: WolConfig is the Schema for the Wake-on-LAN configurations API
+        displayName: Wol Config
+        kind: WolConfig
+        name: wolconfigs.wol.pillon.org
+        resources:
+        - kind: DaemonSet
+          name: ""
+          version: apps/v1
+        - kind: ServiceAccount
+          name: ""
+          version: v1
+        - kind: Pod
+          name: ""
+          version: v1
+        specDescriptors:
+        - description: How VMs are discovered (All, LabelSelector, Explicit)
+          displayName: Discovery Mode
+          path: discoveryMode
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select
+        - description: Time-to-live for cached mappings (seconds)
+          displayName: Cache TTL
+          path: cacheTTL
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: UDP ports for Wake-on-LAN packets
+          displayName: WOL Ports
+          path: wolPorts
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:numberList
+        statusDescriptors:
+        - description: Number of monitored VMs
+          displayName: Managed VMs
+          path: managedVMs
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Operator reconciliation status
+          displayName: Conditions
+          path: conditions
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:conditions
+        version: v1beta1
+    description: "A Kubernetes Operator that enables Wake-on-LAN functionality for
+      KubeVirt VirtualMachines.\n\n**Installation**: This operator must be installed
+      in the `kubevirt-wol-system` namespace.\n\n**Prerequisites**: \n- **Required**:
+      KubeVirt must be installed in your cluster.\n- **Optional**: Prometheus Operator
+      (for ServiceMonitor-based metrics collection). The operator works without it,
+      but metrics will not be automatically scraped.\n\n**Features**:\n- Automatically
+      starts VirtualMachines when WOL magic packets are received\n- Supports multiple
+      WOL ports (default: UDP 9)\n- Three discovery modes: All VMs, Label Selector,
+      or Explicit MAC mappings\n- Dynamic agent deployment per WolConfig\n- Automatic
+      cleanup via OwnerReference\n- Prometheus metrics integration (ServiceMonitor
+      optional)\n\n**Post-Installation (OpenShift)**: To enable metrics collection
+      in OpenShift cluster monitoring, run:\n```\noc label namespace <operator-namespace>
+      openshift.io/cluster-monitoring=true\n```\nReplace `<operator-namespace>` with
+      the namespace where the operator is installed (e.g., `kubevirt-wol-system`).\n\nAfter
+      labeling the namespace, the operator metrics will appear in OpenShift Console
+      → Observe → Targets.\n\n**Note on Metrics**: If Prometheus Operator is not installed,
+      the ServiceMonitor resource will not be reconciled, but the operator will continue
+      to function normally. Metrics are still available at the `/metrics` endpoint.\n\n**Usage**:
+      After installation, create a WolConfig resource to configure Wake-on-LAN for
+      your KubeVirt VirtualMachines.\n\n**Documentation**: https://github.com/gpillon/kubevirt-wol\n"
+    displayName: Kubevirt Wake on Lan
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - kubevirt
+    - wol
+    - wake on lan
+    - wake
+    links:
+    - name: Kubevirt Wol
+      url: https://github.com/gpillon/kubevirt-wol
+    maintainers:
+    - email: gpillon@redhat.com
+      name: Giorgio Pillon
+    maturity: alpha
+    minKubeVersion: 1.14.0
+    provider:
+      name: K4all
+      url: https://github.com/gpillon/kubevirt-wol
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/kubevirt-wol:0.0.2
+  name: ""
+- image: quay.io/kubevirtwol/kubevirt-wol-manager:v0.0.2
+  name: ""
+schema: olm.bundle

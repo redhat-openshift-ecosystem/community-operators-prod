@@ -1,6 +1,23 @@
 ---
-# Use `replaces-mode` or `semver-mode`. Once you switch to `semver-mode`, there is no easy way back.
-updateGraph: replaces-mode
 addReviewers: true
+fbc:
+  catalog_mapping:
+  - catalog_names:
+    - v4.12
+    - v4.13
+    - v4.14
+    - v4.15
+    template_name: deprecated.yaml
+    type: olm.template.basic
+  - catalog_names:
+    - v4.16
+    - v4.17
+    - v4.18
+    - v4.19
+    - v4.20
+    - v4.21
+    template_name: basic.yaml
+    type: olm.template.basic
+  enabled: true
 reviewers:
-  - michaelryanmcneill
+- michaelryanmcneill

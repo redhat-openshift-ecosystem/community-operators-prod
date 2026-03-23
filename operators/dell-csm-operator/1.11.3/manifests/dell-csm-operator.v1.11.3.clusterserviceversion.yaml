@@ -37,7 +37,7 @@ metadata:
                     "proxyServerIngress": [
                       {
                         "annotations": {},
-                        "hosts": null,
+                        "hosts": [],
                         "ingressClassName": "nginx"
                       }
                     ],
@@ -123,7 +123,7 @@ metadata:
               "replicas": 2,
               "sideCars": [
                 {
-                  "image": "gcr.io/k8s-staging-sig-storage/objectstorage-sidecar@sha256:7bac5d81555fb21d94cb17cdb16490c438f91d871c0eae5d2577ba1e607791fb",
+                  "image": "gcr.io/k8s-staging-sig-storage/objectstorage-sidecar@sha256:1a357bc1c0ad47e1b223ed605a281b75188ca605ae35cb1e6fb8010ab5bae189",
                   "imagePullPolicy": "IfNotPresent",
                   "name": "objectstorage-provisioner-sidecar"
                 }
@@ -1254,11 +1254,11 @@ metadata:
                   "args": [
                     "--volume-name-prefix=csivol"
                   ],
-                  "image": "registry.k8s.io/sig-storage/csi-provisioner@sha256:e5900dc98b0d02f317ea9572f3824983c47a2fb5d5fe2b160aedf1b99c14c9e4",
+                  "image": "registry.k8s.io/sig-storage/csi-provisioner@sha256:6b5a502366ecd4ed81bcdc768699fe431ab70437324f5a7883e9f49a5d640863",
                   "name": "provisioner"
                 },
                 {
-                  "image": "registry.k8s.io/sig-storage/csi-attacher@sha256:be59d0556508d3dd419cc34c53062f170a28902ef36e832b947c7796458a083d",
+                  "image": "registry.k8s.io/sig-storage/csi-attacher@sha256:8a46d7ecbb798f19d7ccd7e510a2efec00ae7ba50fd82cc2f5ac45cedbab0bc1",
                   "name": "attacher"
                 },
                 {
@@ -1266,7 +1266,7 @@ metadata:
                   "name": "registrar"
                 },
                 {
-                  "image": "registry.k8s.io/sig-storage/csi-resizer@sha256:4a95d94e57ad82f6977cd8d4fdcfcfc0b83f02d990e4e7715b688c20970a906d",
+                  "image": "registry.k8s.io/sig-storage/csi-resizer@sha256:25b17c4f84b0ab061da6397caf407c7251a571df5c4071e4917942684c61689a",
                   "name": "resizer"
                 },
                 {
@@ -1278,7 +1278,7 @@ metadata:
                     "--monitor-interval=60s"
                   ],
                   "enabled": false,
-                  "image": "registry.k8s.io/sig-storage/csi-external-health-monitor-controller@sha256:ac3963bfd4246da386b82d810a348e9d42a9e4b746acaf4dbcbe0766643cc2fa",
+                  "image": "registry.k8s.io/sig-storage/csi-external-health-monitor-controller@sha256:38082bf43b98f921de25924c4b9b9a0a3d1d27d8c912b9a8cbda8c316798e54b",
                   "name": "external-health-monitor"
                 }
               ]
@@ -4222,6 +4222,19 @@ spec:
               verbs:
                 - patch
             - apiGroups:
+                - volumegroup.storage.dell.com
+              resources:
+                - dellcsivolumegroupsnapshots
+                - dellcsivolumegroupsnapshots/status
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
                 - ""
               resources:
                 - namespaces
@@ -4302,7 +4315,7 @@ spec:
                       - name: RELATED_IMAGE_dell-replication-controller-manager
                         value: registry.connect.redhat.com/dell-emc/dell-csm-replication-controller-manager@sha256:7d7d9a19b46d0e06fa57af609be29a441d2be63a20cfddb764904c75c187fe5b
                       - name: RELATED_IMAGE_otel-collector
-                        value: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector@sha256:e38787c822875f4afe459a4e4b798b0cbfb7372669f06643ad293793d25762ce
+                        value: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector@sha256:7a838b2f7a221459a6593b42483c43e7c2a3f86640136c33a436c071c0a410f4
                       - name: RELATED_IMAGE_metrics-powerscale
                         value: registry.connect.redhat.com/dell-emc/dell-csm-metrics-powerscale@sha256:a438e2121372f924f4b4a1daf4543aea514ec665e9312c426024ac9890385a5d
                       - name: RELATED_IMAGE_metrics-powermax
@@ -4316,29 +4329,37 @@ spec:
                       - name: RELATED_IMAGE_kube-rbac-proxy
                         value: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9@sha256:59335acaca515fceed5f0350c46cfcfd6037475f0cf35ae8ab41d37333039e2e
                       - name: RELATED_IMAGE_attacher
-                        value: registry.k8s.io/sig-storage/csi-attacher@sha256:be59d0556508d3dd419cc34c53062f170a28902ef36e832b947c7796458a083d
+                        value: registry.k8s.io/sig-storage/csi-attacher@sha256:8a46d7ecbb798f19d7ccd7e510a2efec00ae7ba50fd82cc2f5ac45cedbab0bc1
                       - name: RELATED_IMAGE_provisioner
-                        value: registry.k8s.io/sig-storage/csi-provisioner@sha256:e5900dc98b0d02f317ea9572f3824983c47a2fb5d5fe2b160aedf1b99c14c9e4
+                        value: registry.k8s.io/sig-storage/csi-provisioner@sha256:6b5a502366ecd4ed81bcdc768699fe431ab70437324f5a7883e9f49a5d640863
                       - name: RELATED_IMAGE_snapshotter
                         value: registry.k8s.io/sig-storage/csi-snapshotter@sha256:c7e0a3718832b6197ce8b29fefb3fed3d84f4fbcdf08f4606140dbec2566501d
                       - name: RELATED_IMAGE_registrar
                         value: registry.k8s.io/sig-storage/csi-node-driver-registrar@sha256:11f199f6bec47403b03cb49c79a41f445884b213b382582a60710b8c6fdc316a
                       - name: RELATED_IMAGE_resizer
-                        value: registry.k8s.io/sig-storage/csi-resizer@sha256:4a95d94e57ad82f6977cd8d4fdcfcfc0b83f02d990e4e7715b688c20970a906d
+                        value: registry.k8s.io/sig-storage/csi-resizer@sha256:25b17c4f84b0ab061da6397caf407c7251a571df5c4071e4917942684c61689a
                       - name: RELATED_IMAGE_externalhealthmonitorcontroller
-                        value: registry.k8s.io/sig-storage/csi-external-health-monitor-controller@sha256:ac3963bfd4246da386b82d810a348e9d42a9e4b746acaf4dbcbe0766643cc2fa
+                        value: registry.k8s.io/sig-storage/csi-external-health-monitor-controller@sha256:38082bf43b98f921de25924c4b9b9a0a3d1d27d8c912b9a8cbda8c316798e54b
                       - name: RELATED_IMAGE_metadataretriever
                         value: registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:d54cefd22172c3ece3136ffab83bf988baa7669728bd3d4affae99232bfea8c3
                       - name: RELATED_IMAGE_nginx
-                        value: quay.io/nginx/nginx-unprivileged@sha256:f9dfa9c20b2b0b7c5cc830374f22f23dee3f750b6c5291ca7e0330b5c88e6403
+                        value: quay.io/nginx/nginx-unprivileged@sha256:620c21188bee45c4145dbf1716117994eda3b9426d3d214de37a9468377a15d1
+                      - name: RELATED_IMAGE_redis
+                        value: docker.io/library/redis@sha256:0804c395e634e624243387d3c3a9c45fcaca876d313c2c8b52c3fdf9a912dded
                       - name: RELATED_IMAGE_redis-commander
-                        value: rediscommander/redis-commander@sha256:19cd0c49f418779fa2822a0496c5e6516d0c792effc39ed20089e6268477e40a
+                        value: docker.io/rediscommander/redis-commander@sha256:19cd0c49f418779fa2822a0496c5e6516d0c792effc39ed20089e6268477e40a
                       - name: RELATED_IMAGE_opa
-                        value: openpolicyagent/opa@sha256:2b1c4b231f6dfa6a2baea4af4109203b10cd4b65e836d72f03bfe5d8dfce7095
+                        value: docker.io/openpolicyagent/opa@sha256:2b1c4b231f6dfa6a2baea4af4109203b10cd4b65e836d72f03bfe5d8dfce7095
                       - name: RELATED_IMAGE_kube-mgmt
-                        value: openpolicyagent/kube-mgmt@sha256:2c233c59becd9ec59a3f507220a8e837d06226172876adc41ebe1252a57f9fb4
+                        value: docker.io/openpolicyagent/kube-mgmt@sha256:2c233c59becd9ec59a3f507220a8e837d06226172876adc41ebe1252a57f9fb4
                       - name: RELATED_IMAGE_objectstorage-provisioner-sidecar
-                        value: gcr.io/k8s-staging-sig-storage/objectstorage-sidecar@sha256:7bac5d81555fb21d94cb17cdb16490c438f91d871c0eae5d2577ba1e607791fb
+                        value: gcr.io/k8s-staging-sig-storage/objectstorage-sidecar@sha256:1a357bc1c0ad47e1b223ed605a281b75188ca605ae35cb1e6fb8010ab5bae189
+                      - name: RELATED_IMAGE_cert-manager-cainjector
+                        value: quay.io/jetstack/cert-manager-cainjector@sha256:2fca0709ab5363e188137095f0420103329d62266614be26f420fe77b8f111a6
+                      - name: RELATED_IMAGE_cert-manager-controller
+                        value: quay.io/jetstack/cert-manager-controller@sha256:b7f2ef147b7a4deb03962a8a17ab700b6f813e672608d7d5e26b453a18d5601d
+                      - name: RELATED_IMAGE_cert-manager-webhook
+                        value: quay.io/jetstack/cert-manager-webhook@sha256:6730d96fc382a57cde4f7519d2a32b40013e0d3bace2ea0579c7c051fbbd608d
                     image: registry.connect.redhat.com/dell-emc/dell-container-storage-modules-operator@sha256:9547300ef7cca3a9e3f33ba43d01b3feb99a78c92bae0838b8f152fa90b80e45
                     imagePullPolicy: Always
                     livenessProbe:
@@ -4451,28 +4472,36 @@ spec:
       name: podmon-node
     - image: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9@sha256:59335acaca515fceed5f0350c46cfcfd6037475f0cf35ae8ab41d37333039e2e
       name: kube-rbac-proxy
-    - image: registry.k8s.io/sig-storage/csi-attacher@sha256:be59d0556508d3dd419cc34c53062f170a28902ef36e832b947c7796458a083d
+    - image: registry.k8s.io/sig-storage/csi-attacher@sha256:8a46d7ecbb798f19d7ccd7e510a2efec00ae7ba50fd82cc2f5ac45cedbab0bc1
       name: attacher
-    - image: registry.k8s.io/sig-storage/csi-provisioner@sha256:e5900dc98b0d02f317ea9572f3824983c47a2fb5d5fe2b160aedf1b99c14c9e4
+    - image: registry.k8s.io/sig-storage/csi-provisioner@sha256:6b5a502366ecd4ed81bcdc768699fe431ab70437324f5a7883e9f49a5d640863
       name: provisioner
     - image: registry.k8s.io/sig-storage/csi-snapshotter@sha256:c7e0a3718832b6197ce8b29fefb3fed3d84f4fbcdf08f4606140dbec2566501d
       name: snapshotter
     - image: registry.k8s.io/sig-storage/csi-node-driver-registrar@sha256:11f199f6bec47403b03cb49c79a41f445884b213b382582a60710b8c6fdc316a
       name: registrar
-    - image: registry.k8s.io/sig-storage/csi-resizer@sha256:4a95d94e57ad82f6977cd8d4fdcfcfc0b83f02d990e4e7715b688c20970a906d
+    - image: registry.k8s.io/sig-storage/csi-resizer@sha256:25b17c4f84b0ab061da6397caf407c7251a571df5c4071e4917942684c61689a
       name: resizer
-    - image: registry.k8s.io/sig-storage/csi-external-health-monitor-controller@sha256:ac3963bfd4246da386b82d810a348e9d42a9e4b746acaf4dbcbe0766643cc2fa
+    - image: registry.k8s.io/sig-storage/csi-external-health-monitor-controller@sha256:38082bf43b98f921de25924c4b9b9a0a3d1d27d8c912b9a8cbda8c316798e54b
       name: externalhealthmonitorcontroller
     - image: registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:d54cefd22172c3ece3136ffab83bf988baa7669728bd3d4affae99232bfea8c3
       name: metadataretriever
-    - image: quay.io/nginx/nginx-unprivileged@sha256:f9dfa9c20b2b0b7c5cc830374f22f23dee3f750b6c5291ca7e0330b5c88e6403
+    - image: quay.io/nginx/nginx-unprivileged@sha256:620c21188bee45c4145dbf1716117994eda3b9426d3d214de37a9468377a15d1
       name: nginx
-    - image: rediscommander/redis-commander@sha256:19cd0c49f418779fa2822a0496c5e6516d0c792effc39ed20089e6268477e40a
+    - image: docker.io/library/redis@sha256:0804c395e634e624243387d3c3a9c45fcaca876d313c2c8b52c3fdf9a912dded
+      name: redis
+    - image: docker.io/rediscommander/redis-commander@sha256:19cd0c49f418779fa2822a0496c5e6516d0c792effc39ed20089e6268477e40a
       name: redis-commander
-    - image: openpolicyagent/opa@sha256:2b1c4b231f6dfa6a2baea4af4109203b10cd4b65e836d72f03bfe5d8dfce7095
+    - image: docker.io/openpolicyagent/opa@sha256:2b1c4b231f6dfa6a2baea4af4109203b10cd4b65e836d72f03bfe5d8dfce7095
       name: opa
-    - image: openpolicyagent/kube-mgmt@sha256:2c233c59becd9ec59a3f507220a8e837d06226172876adc41ebe1252a57f9fb4
+    - image: docker.io/openpolicyagent/kube-mgmt@sha256:2c233c59becd9ec59a3f507220a8e837d06226172876adc41ebe1252a57f9fb4
       name: kube-mgmt
-    - image: gcr.io/k8s-staging-sig-storage/objectstorage-sidecar@sha256:7bac5d81555fb21d94cb17cdb16490c438f91d871c0eae5d2577ba1e607791fb
+    - image: gcr.io/k8s-staging-sig-storage/objectstorage-sidecar@sha256:1a357bc1c0ad47e1b223ed605a281b75188ca605ae35cb1e6fb8010ab5bae189
       name: objectstorage-provisioner-sidecar
+    - image: quay.io/jetstack/cert-manager-cainjector@sha256:2fca0709ab5363e188137095f0420103329d62266614be26f420fe77b8f111a6
+      name: cert-manager-cainjector
+    - image: quay.io/jetstack/cert-manager-controller@sha256:b7f2ef147b7a4deb03962a8a17ab700b6f813e672608d7d5e26b453a18d5601d
+      name: cert-manager-controller
+    - image: quay.io/jetstack/cert-manager-webhook@sha256:6730d96fc382a57cde4f7519d2a32b40013e0d3bace2ea0579c7c051fbbd608d
+      name: cert-manager-webhook
   version: 1.11.3

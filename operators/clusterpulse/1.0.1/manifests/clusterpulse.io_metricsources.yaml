@@ -1,0 +1,462 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  creationTimestamp: null
+  name: metricsources.clusterpulse.io
+spec:
+  group: clusterpulse.io
+  names:
+    kind: MetricSource
+    listKind: MetricSourceList
+    plural: metricsources
+    shortNames:
+    - ms
+    - metricsrc
+    singular: metricsource
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.source.kind
+      name: Source Kind
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.resourcesCollected
+      name: Resources
+      type: integer
+    - jsonPath: .status.clustersCollected
+      name: Clusters
+      type: integer
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: MetricSource defines a custom resource collection configuration
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: MetricSourceSpec defines the desired state of MetricSource
+            properties:
+              aggregations:
+                description: Aggregations defines cluster-wide computations across
+                  all collected resources
+                items:
+                  description: Aggregation defines a cluster-wide computation across
+                    all collected resources
+                  properties:
+                    field:
+                      description: Field to aggregate (not required for count)
+                      type: string
+                    filter:
+                      description: Filter applies a condition before aggregating
+                      properties:
+                        field:
+                          description: Field to filter on
+                          type: string
+                        operator:
+                          description: Operator for comparison
+                          enum:
+                          - equals
+                          - notEquals
+                          - contains
+                          - startsWith
+                          - endsWith
+                          - greaterThan
+                          - lessThan
+                          - in
+                          - matches
+                          type: string
+                        value:
+                          description: Value to compare against
+                          type: string
+                      required:
+                      - field
+                      - operator
+                      - value
+                      type: object
+                    function:
+                      description: Function specifies the aggregation operation
+                      enum:
+                      - count
+                      - sum
+                      - avg
+                      - min
+                      - max
+                      - percentile
+                      - distinct
+                      type: string
+                    groupBy:
+                      description: GroupBy produces aggregations grouped by this field's
+                        values
+                      type: string
+                    name:
+                      description: Name is the identifier for this aggregation
+                      type: string
+                    percentile:
+                      description: Percentile value (only used when function is percentile)
+                      type: integer
+                  required:
+                  - function
+                  - name
+                  type: object
+                type: array
+              collection:
+                description: Collection defines how and when to collect resources
+                properties:
+                  batchSize:
+                    default: 500
+                    description: BatchSize for API pagination
+                    format: int32
+                    minimum: 10
+                    type: integer
+                  intervalSeconds:
+                    default: 60
+                    description: IntervalSeconds between collection cycles (minimum
+                      30)
+                    format: int32
+                    minimum: 30
+                    type: integer
+                  maxResources:
+                    default: 5000
+                    description: MaxResources limits the number of resources collected
+                      per cluster
+                    format: int32
+                    minimum: 1
+                    type: integer
+                  parallelism:
+                    default: 3
+                    description: Parallelism for concurrent field extractions
+                    format: int32
+                    minimum: 1
+                    type: integer
+                  retryAttempts:
+                    default: 3
+                    description: RetryAttempts on transient failures
+                    format: int32
+                    minimum: 0
+                    type: integer
+                  timeoutSeconds:
+                    default: 30
+                    description: TimeoutSeconds for per-cluster collection
+                    format: int32
+                    minimum: 5
+                    type: integer
+                type: object
+              computed:
+                description: Computed defines derived values calculated from extracted
+                  fields
+                items:
+                  description: ComputedField defines a derived value calculated from
+                    extracted fields
+                  properties:
+                    expression:
+                      description: Expression defines the computation using the expression
+                        language
+                      type: string
+                    name:
+                      description: Name is the identifier for this computed field
+                      type: string
+                    type:
+                      default: float
+                      description: Type specifies the result type
+                      enum:
+                      - string
+                      - integer
+                      - float
+                      - boolean
+                      type: string
+                  required:
+                  - expression
+                  - name
+                  type: object
+                type: array
+              fields:
+                description: Fields defines what to extract from each resource instance
+                items:
+                  description: FieldExtraction defines how to extract a single field
+                    from a resource
+                  properties:
+                    default:
+                      description: Default value when the path doesn't exist
+                      type: string
+                    name:
+                      description: Name is the identifier for this extracted field
+                      type: string
+                    path:
+                      description: Path is the JSONPath expression to extract the
+                        value
+                      type: string
+                    type:
+                      default: string
+                      description: Type specifies how to interpret the extracted value
+                      enum:
+                      - string
+                      - integer
+                      - float
+                      - boolean
+                      - quantity
+                      - timestamp
+                      - arrayLength
+                      type: string
+                  required:
+                  - name
+                  - path
+                  type: object
+                type: array
+              rbac:
+                description: RBAC defines how this resource integrates with access
+                  policies
+                properties:
+                  filterAggregations:
+                    default: true
+                    description: FilterAggregations controls whether aggregations
+                      respect RBAC filtering
+                    type: boolean
+                  filterableFields:
+                    description: FilterableFields lists fields that can be filtered
+                      in policies
+                    items:
+                      type: string
+                    type: array
+                  resourceTypeName:
+                    description: ResourceTypeName is the unique identifier for policy
+                      references
+                    type: string
+                required:
+                - resourceTypeName
+                type: object
+              source:
+                description: Source defines which Kubernetes resource to collect from
+                properties:
+                  apiVersion:
+                    description: APIVersion of the target resource (e.g., "v1", "apps/v1")
+                    type: string
+                  kind:
+                    description: Kind of the target resource (e.g., "PersistentVolumeClaim",
+                      "Deployment")
+                    type: string
+                  labelSelector:
+                    description: LabelSelector filters resources by labels
+                    properties:
+                      matchExpressions:
+                        description: matchExpressions is a list of label selector
+                          requirements. The requirements are ANDed.
+                        items:
+                          description: |-
+                            A label selector requirement is a selector that contains values, a key, and an operator that
+                            relates the key and values.
+                          properties:
+                            key:
+                              description: key is the label key that the selector
+                                applies to.
+                              type: string
+                            operator:
+                              description: |-
+                                operator represents a key's relationship to a set of values.
+                                Valid operators are In, NotIn, Exists and DoesNotExist.
+                              type: string
+                            values:
+                              description: |-
+                                values is an array of string values. If the operator is In or NotIn,
+                                the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                the values array must be empty. This array is replaced during a strategic
+                                merge patch.
+                              items:
+                                type: string
+                              type: array
+                              x-kubernetes-list-type: atomic
+                          required:
+                          - key
+                          - operator
+                          type: object
+                        type: array
+                        x-kubernetes-list-type: atomic
+                      matchLabels:
+                        additionalProperties:
+                          type: string
+                        description: |-
+                          matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                          map is equivalent to an element of matchExpressions, whose key field is "key", the
+                          operator is "In", and the values array contains only "value". The requirements are ANDed.
+                        type: object
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  namespaces:
+                    description: Namespaces defines which namespaces to collect from
+                      (only for Namespaced scope)
+                    properties:
+                      exclude:
+                        description: Exclude specifies namespace patterns to exclude
+                          (takes precedence over include)
+                        items:
+                          type: string
+                        type: array
+                      include:
+                        description: Include specifies namespace patterns to include
+                          (supports wildcards)
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  scope:
+                    default: Namespaced
+                    description: 'Scope determines collection behavior: Namespaced
+                      or Cluster'
+                    enum:
+                    - Namespaced
+                    - Cluster
+                    type: string
+                required:
+                - apiVersion
+                - kind
+                type: object
+            required:
+            - fields
+            - source
+            type: object
+          status:
+            description: MetricSourceStatus defines the observed state of MetricSource
+            properties:
+              clustersCollected:
+                description: ClustersCollected is the number of clusters successfully
+                  collected from
+                type: integer
+              conditions:
+                description: Conditions represent the latest observations
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              errorsLastRun:
+                description: ErrorsLastRun is the count of errors in the last collection
+                  cycle
+                type: integer
+              fieldValidation:
+                description: FieldValidation reports validation status for each field
+                items:
+                  description: FieldValidationStatus reports the validation status
+                    of a single field
+                  properties:
+                    field:
+                      description: Field name
+                      type: string
+                    message:
+                      description: Message provides details if status is not valid
+                      type: string
+                    status:
+                      description: Status of validation
+                      enum:
+                      - valid
+                      - invalid
+                      - warning
+                      type: string
+                  required:
+                  - field
+                  - status
+                  type: object
+                type: array
+              lastCollectionDuration:
+                description: LastCollectionDuration is how long the last collection
+                  took
+                type: string
+              lastCollectionTime:
+                description: LastCollectionTime is when collection last completed
+                format: date-time
+                type: string
+              message:
+                description: Message provides additional status information
+                type: string
+              phase:
+                description: Phase indicates the current state
+                enum:
+                - Active
+                - Error
+                - Disabled
+                type: string
+              resourcesCollected:
+                description: ResourcesCollected is the total count from last collection
+                type: integer
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

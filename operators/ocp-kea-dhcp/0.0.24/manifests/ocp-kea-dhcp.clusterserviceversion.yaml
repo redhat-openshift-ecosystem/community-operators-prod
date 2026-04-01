@@ -2,6 +2,7 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
+    com.redhat.openshift.versions: "v4.18"
     alm-examples: |-
       [
         {
@@ -426,6 +427,30 @@ metadata:
               "valid-lifetime": 43200
             }
           }
+        },
+        {
+          "apiVersion": "kea.openshift.io/v1alpha1",
+          "kind": "KeaStorkServer",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "ocp-kea-dhcp"
+            },
+            "name": "stork-example"
+          },
+          "spec": {
+            "database": {
+              "host": "postgres.example.svc.cluster.local",
+              "port": 5432,
+              "name": "stork",
+              "credentialsSecretRef": {
+                "name": "stork-db-credentials"
+              },
+              "sslMode": "disable"
+            },
+            "port": 8080,
+            "enableMetrics": true
+          }
         }
       ]
     capabilities: Basic Install
@@ -433,6 +458,7 @@ metadata:
     containerImage: quay.io/mooyeg/ocp-kea-dhcp:v0.0.24
     createdAt: "2026-03-30T01:44:27Z"
     description: Manages ISC Kea DHCP servers on Kubernetes and OpenShift
+    support: moyegunl@redhat.com
     operators.operatorframework.io/builder: operator-sdk-v1.38.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
     repository: https://github.com/MoOyeg/kea-dhcp-operator

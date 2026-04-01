@@ -1,0 +1,362 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  creationTimestamp: null
+  name: catalogimages.automotive.sdv.cloud.redhat.com
+spec:
+  group: automotive.sdv.cloud.redhat.com
+  names:
+    kind: CatalogImage
+    listKind: CatalogImageList
+    plural: catalogimages
+    singular: catalogimage
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.registryUrl
+      name: Registry
+      type: string
+    - jsonPath: .spec.metadata.architecture
+      name: Architecture
+      type: string
+    - jsonPath: .spec.metadata.distro
+      name: Distro
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: CatalogImage represents an automotive OS image in the catalog
+          registry for discovery and deployment
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: CatalogImageSpec defines the desired state of CatalogImage
+            properties:
+              authSecretRef:
+                description: AuthSecretRef references the secret containing registry
+                  credentials
+                properties:
+                  name:
+                    description: Name is the name of the secret containing registry
+                      credentials
+                    type: string
+                  namespace:
+                    description: Namespace is the namespace of the secret (defaults
+                      to CatalogImage namespace)
+                    type: string
+                required:
+                - name
+                type: object
+              digest:
+                description: Digest is the immutable content-addressable identifier
+                  (sha256:...)
+                pattern: ^sha256:[a-f0-9]{64}$
+                type: string
+              metadata:
+                description: Metadata contains automotive-specific image metadata
+                properties:
+                  architecture:
+                    description: |-
+                      Architecture is the CPU architecture
+                      Supports both AIB canonical values (x86_64, aarch64) and OCI standard names (amd64, arm64)
+                    type: string
+                  bootc:
+                    description: Bootc indicates if this is a bootc-compatible image
+                    type: boolean
+                  buildMode:
+                    description: BuildMode indicates the AIB build mode used (bootc,
+                      image, package)
+                    enum:
+                    - bootc
+                    - image
+                    - package
+                    type: string
+                  distro:
+                    description: |-
+                      Distro is the distribution identifier
+                      Common values include: autosd, autosd10-sig
+                      Run 'aib list-dist' to see all available distributions
+                    type: string
+                  distroVersion:
+                    description: DistroVersion is the distribution version
+                    type: string
+                  exportFormat:
+                    description: |-
+                      ExportFormat indicates the disk image format produced by AIB
+                      Common values include: qcow2, raw, image, vmdk, iso, vhd, tar
+                    type: string
+                  os:
+                    default: linux
+                    description: OS is the operating system (defaults to linux)
+                    type: string
+                  targets:
+                    description: Targets lists compatible hardware targets
+                    items:
+                      description: HardwareTarget represents a hardware platform the
+                        image supports
+                      properties:
+                        name:
+                          description: |-
+                            Name is the target hardware identifier
+                            Common values include: qemu, raspberry-pi, beaglebone, generic
+                            Run 'aib list-targets' to see all available hardware targets
+                          type: string
+                        notes:
+                          description: Notes contains target-specific information
+                          type: string
+                        verified:
+                          default: false
+                          description: Verified indicates if the image has been tested
+                            on this target
+                          type: boolean
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  variant:
+                    description: Variant is the architecture variant (e.g., v7 for
+                      armv7)
+                    type: string
+                type: object
+              registryUrl:
+                description: RegistryURL is the full URL to the image in the container
+                  registry
+                pattern: ^[a-z0-9]+([._-][a-z0-9]+)*(/[a-z0-9]+([._-][a-z0-9]+)*)*:[a-zA-Z0-9_][a-zA-Z0-9._-]*$|^[a-z0-9]+([._-][a-z0-9]+)*\.[a-z]{2,}(:[0-9]{1,5})?(/[a-z0-9]+([._-][a-z0-9]+)*)*:[a-zA-Z0-9_][a-zA-Z0-9._-]*$|^[a-z0-9]+([._-][a-z0-9]+)*\.[a-z]{2,}(:[0-9]{1,5})?(/[a-z0-9]+([._-][a-z0-9]+)*)*@sha256:[a-f0-9]{64}$
+                type: string
+              tags:
+                description: Tags are mutable labels for categorization
+                items:
+                  type: string
+                type: array
+              verificationInterval:
+                default: 1h
+                description: VerificationInterval specifies how often to verify registry
+                  accessibility
+                pattern: ^([0-9]+(\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$
+                type: string
+            required:
+            - registryUrl
+            type: object
+          status:
+            description: CatalogImageStatus defines the observed state of CatalogImage
+            properties:
+              accessCount:
+                description: AccessCount tracks how many times this image has been
+                  accessed
+                format: int64
+                type: integer
+              artifactRefs:
+                description: ArtifactRefs contains references to downloadable artifacts
+                items:
+                  description: ArtifactReference represents a downloadable artifact
+                    associated with the image
+                  properties:
+                    digest:
+                      description: Digest is the content digest for verification (sha256:...)
+                      type: string
+                    format:
+                      description: Format contains format-specific information
+                      type: string
+                    sizeBytes:
+                      description: SizeBytes is the size of the artifact in bytes
+                      format: int64
+                      type: integer
+                    type:
+                      description: Type is the artifact type (e.g., qcow2, raw, vmdk,
+                        container, iso)
+                      type: string
+                    url:
+                      description: URL is the download URL for the artifact
+                      type: string
+                  required:
+                  - type
+                  - url
+                  type: object
+                type: array
+              conditions:
+                description: Conditions represent the latest available observations
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              lastVerificationTime:
+                description: LastVerificationTime is when the registry was last verified
+                format: date-time
+                type: string
+              observedGeneration:
+                description: ObservedGeneration is the most recent generation observed
+                  by the controller
+                format: int64
+                type: integer
+              phase:
+                description: Phase represents the current lifecycle phase
+                enum:
+                - Pending
+                - Verifying
+                - Available
+                - Unavailable
+                - Failed
+                type: string
+              publishedAt:
+                description: PublishedAt is when this image was published to the catalog
+                format: date-time
+                type: string
+              registryMetadata:
+                description: RegistryMetadata contains metadata extracted from the
+                  registry
+                properties:
+                  createdAt:
+                    description: CreatedAt is when the image was created in the registry
+                    format: date-time
+                    type: string
+                  isMultiArch:
+                    description: IsMultiArch indicates if this is a multi-architecture
+                      manifest list
+                    type: boolean
+                  layerCount:
+                    description: LayerCount is the number of image layers
+                    type: integer
+                  mediaType:
+                    description: MediaType is the OCI manifest media type
+                    type: string
+                  platform:
+                    description: Platform contains platform information from the manifest
+                    properties:
+                      architecture:
+                        description: Architecture is the platform architecture
+                        type: string
+                      os:
+                        description: OS is the platform operating system
+                        type: string
+                      variant:
+                        description: Variant is the platform variant
+                        type: string
+                    type: object
+                  platformVariants:
+                    description: |-
+                      PlatformVariants contains information about available platform variants
+                      Only populated for multi-arch images
+                    items:
+                      description: PlatformVariant represents a platform-specific
+                        variant in a multi-arch image
+                      properties:
+                        architecture:
+                          description: Architecture is the CPU architecture (amd64,
+                            arm64, etc.)
+                          type: string
+                        digest:
+                          description: Digest is the digest for this specific platform
+                            variant
+                          type: string
+                        os:
+                          description: OS is the operating system
+                          type: string
+                        sizeBytes:
+                          description: SizeBytes is the size of this variant in bytes
+                          format: int64
+                          type: integer
+                        variant:
+                          description: Variant is the architecture variant (v7, v8,
+                            etc.)
+                          type: string
+                      type: object
+                    type: array
+                  resolvedDigest:
+                    description: ResolvedDigest is the digest resolved from the registry
+                    type: string
+                  sizeBytes:
+                    description: SizeBytes is the total image size in bytes
+                    format: int64
+                    type: integer
+                type: object
+              sourceImageBuild:
+                description: SourceImageBuild references the ImageBuild that created
+                  this catalog entry
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

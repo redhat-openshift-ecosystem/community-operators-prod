@@ -106,6 +106,24 @@ entries:
   replaces: infinispan-operator.v2.4.7
 - name: infinispan-operator.v2.4.9
   replaces: infinispan-operator.v2.4.8
+- name: infinispan-operator.v2.4.17
+  replaces: infinispan-operator.v2.4.16
+- name: infinispan-operator.v2.4.18
+  replaces: infinispan-operator.v2.4.17
+- name: infinispan-operator.v2.5.0
+  replaces: infinispan-operator.v2.4.18
+- name: infinispan-operator.v2.5.1
+  replaces: infinispan-operator.v2.5.0
+- name: infinispan-operator.v2.5.2
+  replaces: infinispan-operator.v2.5.1
+- name: infinispan-operator.v2.5.3
+  replaces: infinispan-operator.v2.5.2
+- name: infinispan-operator.v2.5.4
+  replaces: infinispan-operator.v2.5.3
+- name: infinispan-operator.v2.5.5
+  replaces: infinispan-operator.v2.5.4
+- name: infinispan-operator.v2.5.6
+  replaces: infinispan-operator.v2.5.5
 name: stable
 package: infinispan
 schema: olm.channel
@@ -9466,6 +9484,828 @@ relatedImages:
   name: ""
 schema: olm.bundle
 ---
+image: quay.io/community-operator-pipeline-prod/infinispan@sha256:5e1a1fdb5a78a34155abe77754c774c65335ea8cbfdec2a222ee22a062c2db46
+name: infinispan-operator.v2.4.17
+package: infinispan
+properties:
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Backup
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Batch
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Cache
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Infinispan
+    version: v1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Restore
+    version: v2alpha1
+- type: olm.package
+  value:
+    packageName: infinispan
+    version: 2.4.17
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "infinispan.org/v1",
+            "kind": "Infinispan",
+            "metadata": {
+              "name": "example-infinispan"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Backup",
+            "metadata": {
+              "name": "example-backup"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Batch",
+            "metadata": {
+              "name": "example-batch-inline"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "config": "create counter --concurrency-level=1 --initial-value=5 --storage=VOLATILE --type=weak batch-counter\n"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Cache",
+            "metadata": {
+              "name": "example-cache"
+            },
+            "spec": {
+              "clusterName": "example-infinispan",
+              "name": "mycache",
+              "template": "\u003cdistributed-cache /\u003e"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Restore",
+            "metadata": {
+              "name": "example-restore"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Database
+      certified: "false"
+      containerImage: quay.io/infinispan/operator:2.4.17.Final
+      description: Create and manage Infinispan clusters.
+      operators.operatorframework.io/builder: operator-sdk-v1.24.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/infinispan/infinispan-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Backup is the Schema for the backups API
+        displayName: Backup
+        kind: Backup
+        name: backups.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Names the storage class object for persistent volume claims.
+          displayName: Storage Class Name
+          path: volume.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+        statusDescriptors:
+        - description: Current phase of the backup operation
+          displayName: Phase
+          path: phase
+        - description: The name of the created PersistentVolumeClaim used to store
+            the backup
+          displayName: Persistent Volume Claim
+          path: pvc
+        - description: Reason indicates the reason for any backup related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Batch is the Schema for the batches API
+        displayName: Batch
+        kind: Batch
+        name: batches.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Batch string to be executed
+          displayName: Config Command
+          path: config
+        - description: Name of the ConfigMap containing the batch and resource files
+            to be executed
+          displayName: ConfigMap Name
+          path: configMap
+        - description: Specify resource requirements per container
+          displayName: Container Spec
+          path: container
+        statusDescriptors:
+        - description: The UUID of the Infinispan instance that the Batch is associated
+            with
+          displayName: Cluster UUID
+          path: clusterUID
+        - description: Current phase of the batch operation
+          displayName: Phase
+          path: phase
+        - description: The reason for any batch related failures
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Cache is the Schema for the caches API
+        displayName: Cache
+        kind: Cache
+        name: caches.infinispan.org
+        specDescriptors:
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: adminAuth.secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: clusterName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: How updates to Cache CR template should be applied on the Infinispan
+            server
+          displayName: Update Strategy
+          path: updates.strategy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:recreate
+          - urn:alm:descriptor:com.tectonic.ui:select:retain
+        version: v2alpha1
+      - description: Infinispan is the Schema for the infinispans API
+        displayName: Infinispan Cluster
+        kind: Infinispan
+        name: infinispans.infinispan.org
+        specDescriptors:
+        - description: If true, a dedicated pod is used to ensure that all config
+            resources created on the Infinispan server have a matching CR resource
+          displayName: Toggle Config Listener
+          path: configListener.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The logging level to be used by the ConfigListener pod
+          displayName: Logging Level
+          path: configListener.logging.level
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:debug
+          - urn:alm:descriptor:com.tectonic.ui:select:info
+          - urn:alm:descriptor:com.tectonic.ui:select:error
+        - description: The Persistent Volume Claim that holds custom libraries
+          displayName: Persistent Volume Claim Name
+          path: dependencies.volumeClaimName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim
+        - description: The network hostname for your Infinispan cluster
+          displayName: Route Hostname
+          path: expose.host
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:expose.type:Route
+        - description: If true, a JMX endpoint is exposed on the admin service
+          displayName: Toggle Jmx
+          path: jmx.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The number of nodes in the Infinispan cluster.
+          displayName: Replicas
+          path: replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: A secret that contains CredentialStore alias and password combinations
+          displayName: CredentialStore Secret
+          path: security.credentialStoreSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Enable or disable user authentication
+          displayName: Toggle Authentication
+          path: security.endpointAuthentication
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The secret that contains TLS certificates
+          displayName: Encryption Secret
+          path: security.endpointEncryption.certSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Secret
+        - description: A service that provides TLS certificates
+          displayName: Encryption Service
+          path: security.endpointEncryption.certServiceName
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Service
+        - description: Disable or modify endpoint encryption.
+          displayName: Configure Encryption
+          path: security.endpointEncryption.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Service
+          - urn:alm:descriptor:com.tectonic.ui:select:Secret
+          - urn:alm:descriptor:com.tectonic.ui:select:None
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: security.endpointSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointAuthentication:true
+        - description: Enable/disable container ephemeral storage
+          displayName: Container Ephemeral Storage
+          path: service.container.ephemeralStorage
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The amount of storage for the persistent volume claim.
+          displayName: Storage Size
+          path: service.container.storage
+          x-descriptors:
+          - urn:alm:descriptor:text
+        - description: The storage class object for persistent volume claims
+          displayName: Storage Class Name
+          path: service.container.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.container.ephemeralStorage:false
+        - description: Cache replication factor, or number of copies for each entry.
+          displayName: Number of Owners
+          path: service.replicationFactor
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Deprecated and to be removed on subsequent release. Use .URL
+            with infinispan+xsite schema instead.
+          displayName: Node Port
+          path: service.sites.locations[0].port
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.sites.local.expose.type:NodePort
+        - description: The access secret that allows backups to a remote site
+          displayName: Backup Location Secret
+          path: service.sites.locations[0].secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: The service type
+          displayName: Service Type
+          path: service.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Cache
+          - urn:alm:descriptor:com.tectonic.ui:select:DataGrid
+        statusDescriptors:
+        - description: Infinispan Console URL
+          displayName: Infinispan Console URL
+          path: consoleUrl
+          x-descriptors:
+          - urn:alm:descriptor:org.w3:link
+        - description: The Operand status
+          displayName: Operand Status
+          path: operand
+        - description: The Operator status
+          displayName: Operator Status
+          path: operator
+        - description: The Pod's currently in the cluster
+          displayName: Pod Status
+          path: podStatus
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podStatuses
+        version: v1
+      - description: Restore is the Schema for the restores API
+        displayName: Restore
+        kind: Restore
+        name: restores.infinispan.org
+        specDescriptors:
+        - description: The Infinispan Backup to restore
+          displayName: Backup Name
+          path: backup
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v2alpha1:Backup
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        statusDescriptors:
+        - description: Current phase of the restore operation
+          displayName: Phase
+          path: phase
+        - description: Reason indicates the reason for any restore related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+    description: |
+      Infinispan is an in-memory data store and open-source project.
+
+      ### Infinispan
+      * **Schemaless structure:** Store objects in key/value pairs.
+      * **Grid storage:** Distribute and replicate data across clusters.
+      * **Elasticity:** Scale to meet workload demands without service disruption.
+      * **Polyglot access:** Read, write, and query from multiple client languages with different endpoints.
+      * **Continuous availability:** Create a fault-tolerant caching service that guarantees business continuity.
+
+      ### Operator capabilities
+      * Built-in intelligence to automate Infinispan cluster deployment.
+      * Infinispan CR for service configuration.
+      * Cross site configuration and management.
+      * Deployment of Grafana and Prometheus resources.
+      * Cache CR for fully configurable caches.
+      * Batch CR for scripting bulk resource creation.
+      * REST and Hot Rod endpoints available at port `11222`.
+      * Default application user: `developer`. Infinispan Operator generates credentials in an authentication secret at startup.
+      * Infinispan pods request `0.25` (limit `0.50`) CPUs, 512MiB of memory and 1Gi of ReadWriteOnce persistent storage. Infinispan Operator lets you adjust resource allocation to suit your requirements.
+    displayName: Infinispan Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - infinispan
+    - key value
+    - database
+    - datagrid
+    - open source
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Blog
+      url: https://blog.infinispan.org/
+    - name: Documentation
+      url: https://infinispan.org/documentation
+    - name: Chat
+      url: https://infinispan.zulipchat.com/#narrow/stream/185835-infinispan-cloud
+    - name: Operator Source Code
+      url: https://github.com/infinispan/infinispan-operator
+    maintainers:
+    - email: infinispan-dev@lists.jboss.org
+      name: Infinispan Community
+    maturity: alpha
+    minKubeVersion: 1.24.0
+    provider:
+      name: Infinispan
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/infinispan@sha256:5e1a1fdb5a78a34155abe77754c774c65335ea8cbfdec2a222ee22a062c2db46
+  name: ""
+- image: quay.io/infinispan/operator:2.4.17.Final
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/infinispan@sha256:e43b0581415af648c0b82830377e354a951814d3eb7825bbe31b9f3e633917c5
+name: infinispan-operator.v2.4.18
+package: infinispan
+properties:
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Backup
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Batch
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Cache
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Infinispan
+    version: v1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Restore
+    version: v2alpha1
+- type: olm.package
+  value:
+    packageName: infinispan
+    version: 2.4.18
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "infinispan.org/v1",
+            "kind": "Infinispan",
+            "metadata": {
+              "name": "example-infinispan"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Backup",
+            "metadata": {
+              "name": "example-backup"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Batch",
+            "metadata": {
+              "name": "example-batch-inline"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "config": "create counter --concurrency-level=1 --initial-value=5 --storage=VOLATILE --type=weak batch-counter\n"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Cache",
+            "metadata": {
+              "name": "example-cache"
+            },
+            "spec": {
+              "clusterName": "example-infinispan",
+              "name": "mycache",
+              "template": "\u003cdistributed-cache /\u003e"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Restore",
+            "metadata": {
+              "name": "example-restore"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Database
+      certified: "false"
+      containerImage: quay.io/infinispan/operator:2.4.18.Final
+      description: Create and manage Infinispan clusters.
+      operators.operatorframework.io/builder: operator-sdk-v1.24.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/infinispan/infinispan-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Backup is the Schema for the backups API
+        displayName: Backup
+        kind: Backup
+        name: backups.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Names the storage class object for persistent volume claims.
+          displayName: Storage Class Name
+          path: volume.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+        statusDescriptors:
+        - description: Current phase of the backup operation
+          displayName: Phase
+          path: phase
+        - description: The name of the created PersistentVolumeClaim used to store
+            the backup
+          displayName: Persistent Volume Claim
+          path: pvc
+        - description: Reason indicates the reason for any backup related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Batch is the Schema for the batches API
+        displayName: Batch
+        kind: Batch
+        name: batches.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Batch string to be executed
+          displayName: Config Command
+          path: config
+        - description: Name of the ConfigMap containing the batch and resource files
+            to be executed
+          displayName: ConfigMap Name
+          path: configMap
+        - description: Specify resource requirements per container
+          displayName: Container Spec
+          path: container
+        statusDescriptors:
+        - description: The UUID of the Infinispan instance that the Batch is associated
+            with
+          displayName: Cluster UUID
+          path: clusterUID
+        - description: Current phase of the batch operation
+          displayName: Phase
+          path: phase
+        - description: The reason for any batch related failures
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Cache is the Schema for the caches API
+        displayName: Cache
+        kind: Cache
+        name: caches.infinispan.org
+        specDescriptors:
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: adminAuth.secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: clusterName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: How updates to Cache CR template should be applied on the Infinispan
+            server
+          displayName: Update Strategy
+          path: updates.strategy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:recreate
+          - urn:alm:descriptor:com.tectonic.ui:select:retain
+        version: v2alpha1
+      - description: Infinispan is the Schema for the infinispans API
+        displayName: Infinispan Cluster
+        kind: Infinispan
+        name: infinispans.infinispan.org
+        specDescriptors:
+        - description: If true, a dedicated pod is used to ensure that all config
+            resources created on the Infinispan server have a matching CR resource
+          displayName: Toggle Config Listener
+          path: configListener.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The logging level to be used by the ConfigListener pod
+          displayName: Logging Level
+          path: configListener.logging.level
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:debug
+          - urn:alm:descriptor:com.tectonic.ui:select:info
+          - urn:alm:descriptor:com.tectonic.ui:select:error
+        - description: The Persistent Volume Claim that holds custom libraries
+          displayName: Persistent Volume Claim Name
+          path: dependencies.volumeClaimName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim
+        - description: The network hostname for your Infinispan cluster
+          displayName: Route Hostname
+          path: expose.host
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:expose.type:Route
+        - description: If true, a JMX endpoint is exposed on the admin service
+          displayName: Toggle Jmx
+          path: jmx.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The number of nodes in the Infinispan cluster.
+          displayName: Replicas
+          path: replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: A secret that contains CredentialStore alias and password combinations
+          displayName: CredentialStore Secret
+          path: security.credentialStoreSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Enable or disable user authentication
+          displayName: Toggle Authentication
+          path: security.endpointAuthentication
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The secret that contains TLS certificates
+          displayName: Encryption Secret
+          path: security.endpointEncryption.certSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Secret
+        - description: A service that provides TLS certificates
+          displayName: Encryption Service
+          path: security.endpointEncryption.certServiceName
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Service
+        - description: Disable or modify endpoint encryption.
+          displayName: Configure Encryption
+          path: security.endpointEncryption.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Service
+          - urn:alm:descriptor:com.tectonic.ui:select:Secret
+          - urn:alm:descriptor:com.tectonic.ui:select:None
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: security.endpointSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointAuthentication:true
+        - description: Enable/disable container ephemeral storage
+          displayName: Container Ephemeral Storage
+          path: service.container.ephemeralStorage
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The amount of storage for the persistent volume claim.
+          displayName: Storage Size
+          path: service.container.storage
+          x-descriptors:
+          - urn:alm:descriptor:text
+        - description: The storage class object for persistent volume claims
+          displayName: Storage Class Name
+          path: service.container.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.container.ephemeralStorage:false
+        - description: Cache replication factor, or number of copies for each entry.
+          displayName: Number of Owners
+          path: service.replicationFactor
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Deprecated and to be removed on subsequent release. Use .URL
+            with infinispan+xsite schema instead.
+          displayName: Node Port
+          path: service.sites.locations[0].port
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.sites.local.expose.type:NodePort
+        - description: The access secret that allows backups to a remote site
+          displayName: Backup Location Secret
+          path: service.sites.locations[0].secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: The service type
+          displayName: Service Type
+          path: service.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Cache
+          - urn:alm:descriptor:com.tectonic.ui:select:DataGrid
+        statusDescriptors:
+        - description: Infinispan Console URL
+          displayName: Infinispan Console URL
+          path: consoleUrl
+          x-descriptors:
+          - urn:alm:descriptor:org.w3:link
+        - description: The Operand status
+          displayName: Operand Status
+          path: operand
+        - description: The Operator status
+          displayName: Operator Status
+          path: operator
+        - description: The Pod's currently in the cluster
+          displayName: Pod Status
+          path: podStatus
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podStatuses
+        version: v1
+      - description: Restore is the Schema for the restores API
+        displayName: Restore
+        kind: Restore
+        name: restores.infinispan.org
+        specDescriptors:
+        - description: The Infinispan Backup to restore
+          displayName: Backup Name
+          path: backup
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v2alpha1:Backup
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        statusDescriptors:
+        - description: Current phase of the restore operation
+          displayName: Phase
+          path: phase
+        - description: Reason indicates the reason for any restore related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+    description: |
+      Infinispan is an in-memory data store and open-source project.
+
+      ### Infinispan
+      * **Schemaless structure:** Store objects in key/value pairs.
+      * **Grid storage:** Distribute and replicate data across clusters.
+      * **Elasticity:** Scale to meet workload demands without service disruption.
+      * **Polyglot access:** Read, write, and query from multiple client languages with different endpoints.
+      * **Continuous availability:** Create a fault-tolerant caching service that guarantees business continuity.
+
+      ### Operator capabilities
+      * Built-in intelligence to automate Infinispan cluster deployment.
+      * Infinispan CR for service configuration.
+      * Cross site configuration and management.
+      * Deployment of Grafana and Prometheus resources.
+      * Cache CR for fully configurable caches.
+      * Batch CR for scripting bulk resource creation.
+      * REST and Hot Rod endpoints available at port `11222`.
+      * Default application user: `developer`. Infinispan Operator generates credentials in an authentication secret at startup.
+      * Infinispan pods request `0.25` (limit `0.50`) CPUs, 512MiB of memory and 1Gi of ReadWriteOnce persistent storage. Infinispan Operator lets you adjust resource allocation to suit your requirements.
+    displayName: Infinispan Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - infinispan
+    - key value
+    - database
+    - datagrid
+    - open source
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Blog
+      url: https://blog.infinispan.org/
+    - name: Documentation
+      url: https://infinispan.org/documentation
+    - name: Chat
+      url: https://infinispan.zulipchat.com/#narrow/stream/185835-infinispan-cloud
+    - name: Operator Source Code
+      url: https://github.com/infinispan/infinispan-operator
+    maintainers:
+    - email: infinispan-dev@lists.jboss.org
+      name: Infinispan Community
+    maturity: alpha
+    minKubeVersion: 1.24.0
+    provider:
+      name: Infinispan
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/infinispan@sha256:e43b0581415af648c0b82830377e354a951814d3eb7825bbe31b9f3e633917c5
+  name: ""
+- image: quay.io/infinispan/operator:2.4.18.Final
+  name: ""
+schema: olm.bundle
+---
 image: quay.io/community-operator-pipeline-prod/infinispan@sha256:99c7e13bde135d38155f3ecedb82c37e12693b75f9486f6521b884eeb3e87dc3
 name: infinispan-operator.v2.4.2
 package: infinispan
@@ -12742,5 +13582,2882 @@ relatedImages:
 - image: quay.io/community-operator-pipeline-prod/infinispan@sha256:72e220b81b85242d27e56828fce96b8332f962ab53cf6ed5cfccc9512104d779
   name: ""
 - image: quay.io/infinispan/operator:2.4.9.Final
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/infinispan@sha256:251d904a78bf70811acfdce2d7e914d7b81068527e56867c2828c5f34a35ec50
+name: infinispan-operator.v2.5.0
+package: infinispan
+properties:
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Backup
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Batch
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Cache
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Infinispan
+    version: v1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Restore
+    version: v2alpha1
+- type: olm.package
+  value:
+    packageName: infinispan
+    version: 2.5.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "infinispan.org/v1",
+            "kind": "Infinispan",
+            "metadata": {
+              "name": "example-infinispan"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Backup",
+            "metadata": {
+              "name": "example-backup"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Batch",
+            "metadata": {
+              "name": "example-batch-inline"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "config": "create counter --concurrency-level=1 --initial-value=5 --storage=VOLATILE --type=weak batch-counter\n"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Cache",
+            "metadata": {
+              "name": "example-cache"
+            },
+            "spec": {
+              "clusterName": "example-infinispan",
+              "name": "mycache",
+              "template": "\u003cdistributed-cache /\u003e"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Restore",
+            "metadata": {
+              "name": "example-restore"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Database
+      certified: "false"
+      containerImage: quay.io/infinispan/operator:2.5.0
+      description: Create and manage Infinispan clusters.
+      operators.operatorframework.io/builder: operator-sdk-v1.24.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/infinispan/infinispan-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Backup is the Schema for the backups API
+        displayName: Backup
+        kind: Backup
+        name: backups.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Names the storage class object for persistent volume claims.
+          displayName: Storage Class Name
+          path: volume.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+        statusDescriptors:
+        - description: Current phase of the backup operation
+          displayName: Phase
+          path: phase
+        - description: The name of the created PersistentVolumeClaim used to store
+            the backup
+          displayName: Persistent Volume Claim
+          path: pvc
+        - description: Reason indicates the reason for any backup related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Batch is the Schema for the batches API
+        displayName: Batch
+        kind: Batch
+        name: batches.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Batch string to be executed
+          displayName: Config Command
+          path: config
+        - description: Name of the ConfigMap containing the batch and resource files
+            to be executed
+          displayName: ConfigMap Name
+          path: configMap
+        - description: Specify resource requirements per container
+          displayName: Container Spec
+          path: container
+        statusDescriptors:
+        - description: The UUID of the Infinispan instance that the Batch is associated
+            with
+          displayName: Cluster UUID
+          path: clusterUID
+        - description: Current phase of the batch operation
+          displayName: Phase
+          path: phase
+        - description: The reason for any batch related failures
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Cache is the Schema for the caches API
+        displayName: Cache
+        kind: Cache
+        name: caches.infinispan.org
+        specDescriptors:
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: adminAuth.secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: clusterName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: How updates to Cache CR template should be applied on the Infinispan
+            server
+          displayName: Update Strategy
+          path: updates.strategy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:recreate
+          - urn:alm:descriptor:com.tectonic.ui:select:retain
+        version: v2alpha1
+      - description: Infinispan is the Schema for the infinispans API
+        displayName: Infinispan Cluster
+        kind: Infinispan
+        name: infinispans.infinispan.org
+        specDescriptors:
+        - description: If true, a dedicated pod is used to ensure that all config
+            resources created on the Infinispan server have a matching CR resource
+          displayName: Toggle Config Listener
+          path: configListener.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The logging level to be used by the ConfigListener pod
+          displayName: Logging Level
+          path: configListener.logging.level
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:debug
+          - urn:alm:descriptor:com.tectonic.ui:select:info
+          - urn:alm:descriptor:com.tectonic.ui:select:error
+        - description: The Persistent Volume Claim that holds custom libraries
+          displayName: Persistent Volume Claim Name
+          path: dependencies.volumeClaimName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim
+        - description: The network hostname for your Infinispan cluster
+          displayName: Route Hostname
+          path: expose.host
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:expose.type:Route
+        - description: If true, a JMX endpoint is exposed on the admin service
+          displayName: Toggle Jmx
+          path: jmx.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The number of nodes in the Infinispan cluster.
+          displayName: Replicas
+          path: replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: A secret that contains CredentialStore alias and password combinations
+          displayName: CredentialStore Secret
+          path: security.credentialStoreSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Enable or disable user authentication
+          displayName: Toggle Authentication
+          path: security.endpointAuthentication
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The secret that contains TLS certificates
+          displayName: Encryption Secret
+          path: security.endpointEncryption.certSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Secret
+        - description: A service that provides TLS certificates
+          displayName: Encryption Service
+          path: security.endpointEncryption.certServiceName
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Service
+        - description: Disable or modify endpoint encryption.
+          displayName: Configure Encryption
+          path: security.endpointEncryption.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Service
+          - urn:alm:descriptor:com.tectonic.ui:select:Secret
+          - urn:alm:descriptor:com.tectonic.ui:select:None
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: security.endpointSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointAuthentication:true
+        - description: Enable/disable container ephemeral storage
+          displayName: Container Ephemeral Storage
+          path: service.container.ephemeralStorage
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The amount of storage for the persistent volume claim.
+          displayName: Storage Size
+          path: service.container.storage
+          x-descriptors:
+          - urn:alm:descriptor:text
+        - description: The storage class object for persistent volume claims
+          displayName: Storage Class Name
+          path: service.container.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.container.ephemeralStorage:false
+        - description: Cache replication factor, or number of copies for each entry.
+          displayName: Number of Owners
+          path: service.replicationFactor
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Deprecated and to be removed on subsequent release. Use .URL
+            with infinispan+xsite schema instead.
+          displayName: Node Port
+          path: service.sites.locations[0].port
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.sites.local.expose.type:NodePort
+        - description: The access secret that allows backups to a remote site
+          displayName: Backup Location Secret
+          path: service.sites.locations[0].secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: The service type
+          displayName: Service Type
+          path: service.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Cache
+          - urn:alm:descriptor:com.tectonic.ui:select:DataGrid
+        statusDescriptors:
+        - description: Infinispan Console URL
+          displayName: Infinispan Console URL
+          path: consoleUrl
+          x-descriptors:
+          - urn:alm:descriptor:org.w3:link
+        - description: The Operand status
+          displayName: Operand Status
+          path: operand
+        - description: The Operator status
+          displayName: Operator Status
+          path: operator
+        - description: The Pod's currently in the cluster
+          displayName: Pod Status
+          path: podStatus
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podStatuses
+        version: v1
+      - description: Restore is the Schema for the restores API
+        displayName: Restore
+        kind: Restore
+        name: restores.infinispan.org
+        specDescriptors:
+        - description: The Infinispan Backup to restore
+          displayName: Backup Name
+          path: backup
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v2alpha1:Backup
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        statusDescriptors:
+        - description: Current phase of the restore operation
+          displayName: Phase
+          path: phase
+        - description: Reason indicates the reason for any restore related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+    description: |
+      Infinispan is an in-memory data store and open-source project.
+
+      ### Infinispan
+      * **Schemaless structure:** Store objects in key/value pairs.
+      * **Grid storage:** Distribute and replicate data across clusters.
+      * **Elasticity:** Scale to meet workload demands without service disruption.
+      * **Polyglot access:** Read, write, and query from multiple client languages with different endpoints.
+      * **Continuous availability:** Create a fault-tolerant caching service that guarantees business continuity.
+
+      ### Operator capabilities
+      * Built-in intelligence to automate Infinispan cluster deployment.
+      * Infinispan CR for service configuration.
+      * Cross site configuration and management.
+      * Deployment of Grafana and Prometheus resources.
+      * Cache CR for fully configurable caches.
+      * Batch CR for scripting bulk resource creation.
+      * REST and Hot Rod endpoints available at port `11222`.
+      * Default application user: `developer`. Infinispan Operator generates credentials in an authentication secret at startup.
+      * Infinispan pods request `0.25` (limit `0.50`) CPUs, 512MiB of memory and 1Gi of ReadWriteOnce persistent storage. Infinispan Operator lets you adjust resource allocation to suit your requirements.
+    displayName: Infinispan Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - infinispan
+    - key value
+    - database
+    - datagrid
+    - open source
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Blog
+      url: https://blog.infinispan.org/
+    - name: Documentation
+      url: https://infinispan.org/documentation
+    - name: Chat
+      url: https://infinispan.zulipchat.com/#narrow/stream/185835-infinispan-cloud
+    - name: Operator Source Code
+      url: https://github.com/infinispan/infinispan-operator
+    maintainers:
+    - email: infinispan-dev@lists.jboss.org
+      name: Infinispan Community
+    maturity: alpha
+    minKubeVersion: 1.24.0
+    provider:
+      name: Infinispan
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/infinispan@sha256:251d904a78bf70811acfdce2d7e914d7b81068527e56867c2828c5f34a35ec50
+  name: ""
+- image: quay.io/infinispan/operator:2.5.0
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/infinispan@sha256:ad3ebf1c0b93b43cf8b8f23e9901bd14914cbde20cef1373644fe3d24b49d75c
+name: infinispan-operator.v2.5.1
+package: infinispan
+properties:
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Backup
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Batch
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Cache
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Infinispan
+    version: v1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Restore
+    version: v2alpha1
+- type: olm.package
+  value:
+    packageName: infinispan
+    version: 2.5.1
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "infinispan.org/v1",
+            "kind": "Infinispan",
+            "metadata": {
+              "name": "example-infinispan"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Backup",
+            "metadata": {
+              "name": "example-backup"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Batch",
+            "metadata": {
+              "name": "example-batch-inline"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "config": "create counter --concurrency-level=1 --initial-value=5 --storage=VOLATILE --type=weak batch-counter\n"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Cache",
+            "metadata": {
+              "name": "example-cache"
+            },
+            "spec": {
+              "clusterName": "example-infinispan",
+              "name": "mycache",
+              "template": "\u003cdistributed-cache /\u003e"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Restore",
+            "metadata": {
+              "name": "example-restore"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Database
+      certified: "false"
+      containerImage: quay.io/infinispan/operator:2.5.1
+      description: Create and manage Infinispan clusters.
+      operators.operatorframework.io/builder: operator-sdk-v1.24.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/infinispan/infinispan-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Backup is the Schema for the backups API
+        displayName: Backup
+        kind: Backup
+        name: backups.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Names the storage class object for persistent volume claims.
+          displayName: Storage Class Name
+          path: volume.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+        statusDescriptors:
+        - description: Current phase of the backup operation
+          displayName: Phase
+          path: phase
+        - description: The name of the created PersistentVolumeClaim used to store
+            the backup
+          displayName: Persistent Volume Claim
+          path: pvc
+        - description: Reason indicates the reason for any backup related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Batch is the Schema for the batches API
+        displayName: Batch
+        kind: Batch
+        name: batches.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Batch string to be executed
+          displayName: Config Command
+          path: config
+        - description: Name of the ConfigMap containing the batch and resource files
+            to be executed
+          displayName: ConfigMap Name
+          path: configMap
+        - description: Specify resource requirements per container
+          displayName: Container Spec
+          path: container
+        statusDescriptors:
+        - description: The UUID of the Infinispan instance that the Batch is associated
+            with
+          displayName: Cluster UUID
+          path: clusterUID
+        - description: Current phase of the batch operation
+          displayName: Phase
+          path: phase
+        - description: The reason for any batch related failures
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Cache is the Schema for the caches API
+        displayName: Cache
+        kind: Cache
+        name: caches.infinispan.org
+        specDescriptors:
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: adminAuth.secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: clusterName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: How updates to Cache CR template should be applied on the Infinispan
+            server
+          displayName: Update Strategy
+          path: updates.strategy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:recreate
+          - urn:alm:descriptor:com.tectonic.ui:select:retain
+        version: v2alpha1
+      - description: Infinispan is the Schema for the infinispans API
+        displayName: Infinispan Cluster
+        kind: Infinispan
+        name: infinispans.infinispan.org
+        specDescriptors:
+        - description: If true, a dedicated pod is used to ensure that all config
+            resources created on the Infinispan server have a matching CR resource
+          displayName: Toggle Config Listener
+          path: configListener.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The logging level to be used by the ConfigListener pod
+          displayName: Logging Level
+          path: configListener.logging.level
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:debug
+          - urn:alm:descriptor:com.tectonic.ui:select:info
+          - urn:alm:descriptor:com.tectonic.ui:select:error
+        - description: The Persistent Volume Claim that holds custom libraries
+          displayName: Persistent Volume Claim Name
+          path: dependencies.volumeClaimName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim
+        - description: The network hostname for your Infinispan cluster
+          displayName: Route Hostname
+          path: expose.host
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:expose.type:Route
+        - description: If true, a JMX endpoint is exposed on the admin service
+          displayName: Toggle Jmx
+          path: jmx.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The number of nodes in the Infinispan cluster.
+          displayName: Replicas
+          path: replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: A secret that contains CredentialStore alias and password combinations
+          displayName: CredentialStore Secret
+          path: security.credentialStoreSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Enable or disable user authentication
+          displayName: Toggle Authentication
+          path: security.endpointAuthentication
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The secret that contains TLS certificates
+          displayName: Encryption Secret
+          path: security.endpointEncryption.certSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Secret
+        - description: A service that provides TLS certificates
+          displayName: Encryption Service
+          path: security.endpointEncryption.certServiceName
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Service
+        - description: Disable or modify endpoint encryption.
+          displayName: Configure Encryption
+          path: security.endpointEncryption.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Service
+          - urn:alm:descriptor:com.tectonic.ui:select:Secret
+          - urn:alm:descriptor:com.tectonic.ui:select:None
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: security.endpointSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointAuthentication:true
+        - description: Enable/disable container ephemeral storage
+          displayName: Container Ephemeral Storage
+          path: service.container.ephemeralStorage
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The amount of storage for the persistent volume claim.
+          displayName: Storage Size
+          path: service.container.storage
+          x-descriptors:
+          - urn:alm:descriptor:text
+        - description: The storage class object for persistent volume claims
+          displayName: Storage Class Name
+          path: service.container.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.container.ephemeralStorage:false
+        - description: Cache replication factor, or number of copies for each entry.
+          displayName: Number of Owners
+          path: service.replicationFactor
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Deprecated and to be removed on subsequent release. Use .URL
+            with infinispan+xsite schema instead.
+          displayName: Node Port
+          path: service.sites.locations[0].port
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.sites.local.expose.type:NodePort
+        - description: The access secret that allows backups to a remote site
+          displayName: Backup Location Secret
+          path: service.sites.locations[0].secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: The service type
+          displayName: Service Type
+          path: service.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Cache
+          - urn:alm:descriptor:com.tectonic.ui:select:DataGrid
+        statusDescriptors:
+        - description: Infinispan Console URL
+          displayName: Infinispan Console URL
+          path: consoleUrl
+          x-descriptors:
+          - urn:alm:descriptor:org.w3:link
+        - description: The Operand status
+          displayName: Operand Status
+          path: operand
+        - description: The Operator status
+          displayName: Operator Status
+          path: operator
+        - description: The Pod's currently in the cluster
+          displayName: Pod Status
+          path: podStatus
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podStatuses
+        version: v1
+      - description: Restore is the Schema for the restores API
+        displayName: Restore
+        kind: Restore
+        name: restores.infinispan.org
+        specDescriptors:
+        - description: The Infinispan Backup to restore
+          displayName: Backup Name
+          path: backup
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v2alpha1:Backup
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        statusDescriptors:
+        - description: Current phase of the restore operation
+          displayName: Phase
+          path: phase
+        - description: Reason indicates the reason for any restore related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+    description: |
+      Infinispan is an in-memory data store and open-source project.
+
+      ### Infinispan
+      * **Schemaless structure:** Store objects in key/value pairs.
+      * **Grid storage:** Distribute and replicate data across clusters.
+      * **Elasticity:** Scale to meet workload demands without service disruption.
+      * **Polyglot access:** Read, write, and query from multiple client languages with different endpoints.
+      * **Continuous availability:** Create a fault-tolerant caching service that guarantees business continuity.
+
+      ### Operator capabilities
+      * Built-in intelligence to automate Infinispan cluster deployment.
+      * Infinispan CR for service configuration.
+      * Cross site configuration and management.
+      * Deployment of Grafana and Prometheus resources.
+      * Cache CR for fully configurable caches.
+      * Batch CR for scripting bulk resource creation.
+      * REST and Hot Rod endpoints available at port `11222`.
+      * Default application user: `developer`. Infinispan Operator generates credentials in an authentication secret at startup.
+      * Infinispan pods request `0.25` (limit `0.50`) CPUs, 512MiB of memory and 1Gi of ReadWriteOnce persistent storage. Infinispan Operator lets you adjust resource allocation to suit your requirements.
+    displayName: Infinispan Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - infinispan
+    - key value
+    - database
+    - datagrid
+    - open source
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Blog
+      url: https://blog.infinispan.org/
+    - name: Documentation
+      url: https://infinispan.org/documentation
+    - name: Chat
+      url: https://infinispan.zulipchat.com/#narrow/stream/185835-infinispan-cloud
+    - name: Operator Source Code
+      url: https://github.com/infinispan/infinispan-operator
+    maintainers:
+    - email: infinispan-dev@lists.jboss.org
+      name: Infinispan Community
+    maturity: alpha
+    minKubeVersion: 1.24.0
+    provider:
+      name: Infinispan
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/infinispan@sha256:ad3ebf1c0b93b43cf8b8f23e9901bd14914cbde20cef1373644fe3d24b49d75c
+  name: ""
+- image: quay.io/infinispan/operator:2.5.1
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/infinispan@sha256:dc00f9aba532eceede41bde62f27158f002da6a34a8d0bbce146dc85ecad941e
+name: infinispan-operator.v2.5.2
+package: infinispan
+properties:
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Backup
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Batch
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Cache
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Infinispan
+    version: v1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Restore
+    version: v2alpha1
+- type: olm.package
+  value:
+    packageName: infinispan
+    version: 2.5.2
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "infinispan.org/v1",
+            "kind": "Infinispan",
+            "metadata": {
+              "name": "example-infinispan"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Backup",
+            "metadata": {
+              "name": "example-backup"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Batch",
+            "metadata": {
+              "name": "example-batch-inline"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "config": "create counter --concurrency-level=1 --initial-value=5 --storage=VOLATILE --type=weak batch-counter\n"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Cache",
+            "metadata": {
+              "name": "example-cache"
+            },
+            "spec": {
+              "clusterName": "example-infinispan",
+              "name": "mycache",
+              "template": "\u003cdistributed-cache /\u003e"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Restore",
+            "metadata": {
+              "name": "example-restore"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Database
+      certified: "false"
+      containerImage: quay.io/infinispan/operator:2.5.2
+      description: Create and manage Infinispan clusters.
+      operators.operatorframework.io/builder: operator-sdk-v1.24.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/infinispan/infinispan-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Backup is the Schema for the backups API
+        displayName: Backup
+        kind: Backup
+        name: backups.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Names the storage class object for persistent volume claims.
+          displayName: Storage Class Name
+          path: volume.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+        statusDescriptors:
+        - description: Current phase of the backup operation
+          displayName: Phase
+          path: phase
+        - description: The name of the created PersistentVolumeClaim used to store
+            the backup
+          displayName: Persistent Volume Claim
+          path: pvc
+        - description: Reason indicates the reason for any backup related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Batch is the Schema for the batches API
+        displayName: Batch
+        kind: Batch
+        name: batches.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Batch string to be executed
+          displayName: Config Command
+          path: config
+        - description: Name of the ConfigMap containing the batch and resource files
+            to be executed
+          displayName: ConfigMap Name
+          path: configMap
+        - description: Specify resource requirements per container
+          displayName: Container Spec
+          path: container
+        statusDescriptors:
+        - description: The UUID of the Infinispan instance that the Batch is associated
+            with
+          displayName: Cluster UUID
+          path: clusterUID
+        - description: Current phase of the batch operation
+          displayName: Phase
+          path: phase
+        - description: The reason for any batch related failures
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Cache is the Schema for the caches API
+        displayName: Cache
+        kind: Cache
+        name: caches.infinispan.org
+        specDescriptors:
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: adminAuth.secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: clusterName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: How updates to Cache CR template should be applied on the Infinispan
+            server
+          displayName: Update Strategy
+          path: updates.strategy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:recreate
+          - urn:alm:descriptor:com.tectonic.ui:select:retain
+        version: v2alpha1
+      - description: Infinispan is the Schema for the infinispans API
+        displayName: Infinispan Cluster
+        kind: Infinispan
+        name: infinispans.infinispan.org
+        specDescriptors:
+        - description: If true, a dedicated pod is used to ensure that all config
+            resources created on the Infinispan server have a matching CR resource
+          displayName: Toggle Config Listener
+          path: configListener.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The logging level to be used by the ConfigListener pod
+          displayName: Logging Level
+          path: configListener.logging.level
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:debug
+          - urn:alm:descriptor:com.tectonic.ui:select:info
+          - urn:alm:descriptor:com.tectonic.ui:select:error
+        - description: The Persistent Volume Claim that holds custom libraries
+          displayName: Persistent Volume Claim Name
+          path: dependencies.volumeClaimName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim
+        - description: The network hostname for your Infinispan cluster
+          displayName: Route Hostname
+          path: expose.host
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:expose.type:Route
+        - description: If true, a JMX endpoint is exposed on the admin service
+          displayName: Toggle Jmx
+          path: jmx.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The number of nodes in the Infinispan cluster.
+          displayName: Replicas
+          path: replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: A secret that contains CredentialStore alias and password combinations
+          displayName: CredentialStore Secret
+          path: security.credentialStoreSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Enable or disable user authentication
+          displayName: Toggle Authentication
+          path: security.endpointAuthentication
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The secret that contains TLS certificates
+          displayName: Encryption Secret
+          path: security.endpointEncryption.certSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Secret
+        - description: A service that provides TLS certificates
+          displayName: Encryption Service
+          path: security.endpointEncryption.certServiceName
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Service
+        - description: Disable or modify endpoint encryption.
+          displayName: Configure Encryption
+          path: security.endpointEncryption.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Service
+          - urn:alm:descriptor:com.tectonic.ui:select:Secret
+          - urn:alm:descriptor:com.tectonic.ui:select:None
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: security.endpointSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointAuthentication:true
+        - description: Enable/disable container ephemeral storage
+          displayName: Container Ephemeral Storage
+          path: service.container.ephemeralStorage
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The amount of storage for the persistent volume claim.
+          displayName: Storage Size
+          path: service.container.storage
+          x-descriptors:
+          - urn:alm:descriptor:text
+        - description: The storage class object for persistent volume claims
+          displayName: Storage Class Name
+          path: service.container.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.container.ephemeralStorage:false
+        - description: Cache replication factor, or number of copies for each entry.
+          displayName: Number of Owners
+          path: service.replicationFactor
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Deprecated and to be removed on subsequent release. Use .URL
+            with infinispan+xsite schema instead.
+          displayName: Node Port
+          path: service.sites.locations[0].port
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.sites.local.expose.type:NodePort
+        - description: The access secret that allows backups to a remote site
+          displayName: Backup Location Secret
+          path: service.sites.locations[0].secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: The service type
+          displayName: Service Type
+          path: service.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Cache
+          - urn:alm:descriptor:com.tectonic.ui:select:DataGrid
+        statusDescriptors:
+        - description: Infinispan Console URL
+          displayName: Infinispan Console URL
+          path: consoleUrl
+          x-descriptors:
+          - urn:alm:descriptor:org.w3:link
+        - description: The Operand status
+          displayName: Operand Status
+          path: operand
+        - description: The Operator status
+          displayName: Operator Status
+          path: operator
+        - description: The Pod's currently in the cluster
+          displayName: Pod Status
+          path: podStatus
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podStatuses
+        version: v1
+      - description: Restore is the Schema for the restores API
+        displayName: Restore
+        kind: Restore
+        name: restores.infinispan.org
+        specDescriptors:
+        - description: The Infinispan Backup to restore
+          displayName: Backup Name
+          path: backup
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v2alpha1:Backup
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        statusDescriptors:
+        - description: Current phase of the restore operation
+          displayName: Phase
+          path: phase
+        - description: Reason indicates the reason for any restore related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+    description: |
+      Infinispan is an in-memory data store and open-source project.
+
+      ### Infinispan
+      * **Schemaless structure:** Store objects in key/value pairs.
+      * **Grid storage:** Distribute and replicate data across clusters.
+      * **Elasticity:** Scale to meet workload demands without service disruption.
+      * **Polyglot access:** Read, write, and query from multiple client languages with different endpoints.
+      * **Continuous availability:** Create a fault-tolerant caching service that guarantees business continuity.
+
+      ### Operator capabilities
+      * Built-in intelligence to automate Infinispan cluster deployment.
+      * Infinispan CR for service configuration.
+      * Cross site configuration and management.
+      * Deployment of Grafana and Prometheus resources.
+      * Cache CR for fully configurable caches.
+      * Batch CR for scripting bulk resource creation.
+      * REST and Hot Rod endpoints available at port `11222`.
+      * Default application user: `developer`. Infinispan Operator generates credentials in an authentication secret at startup.
+      * Infinispan pods request `0.25` (limit `0.50`) CPUs, 512MiB of memory and 1Gi of ReadWriteOnce persistent storage. Infinispan Operator lets you adjust resource allocation to suit your requirements.
+    displayName: Infinispan Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - infinispan
+    - key value
+    - database
+    - datagrid
+    - open source
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Blog
+      url: https://blog.infinispan.org/
+    - name: Documentation
+      url: https://infinispan.org/documentation
+    - name: Chat
+      url: https://infinispan.zulipchat.com/#narrow/stream/185835-infinispan-cloud
+    - name: Operator Source Code
+      url: https://github.com/infinispan/infinispan-operator
+    maintainers:
+    - email: infinispan-dev@lists.jboss.org
+      name: Infinispan Community
+    maturity: alpha
+    minKubeVersion: 1.24.0
+    provider:
+      name: Infinispan
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/infinispan@sha256:dc00f9aba532eceede41bde62f27158f002da6a34a8d0bbce146dc85ecad941e
+  name: ""
+- image: quay.io/infinispan/operator:2.5.2
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/infinispan@sha256:435f4158ac21a562fedf4a6a18706e5a5e97c9e4c735e4743ff9c97b6dcaab99
+name: infinispan-operator.v2.5.3
+package: infinispan
+properties:
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Backup
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Batch
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Cache
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Infinispan
+    version: v1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Restore
+    version: v2alpha1
+- type: olm.package
+  value:
+    packageName: infinispan
+    version: 2.5.3
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "infinispan.org/v1",
+            "kind": "Infinispan",
+            "metadata": {
+              "name": "example-infinispan"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Backup",
+            "metadata": {
+              "name": "example-backup"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Batch",
+            "metadata": {
+              "name": "example-batch-inline"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "config": "create counter --concurrency-level=1 --initial-value=5 --storage=VOLATILE --type=weak batch-counter\n"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Cache",
+            "metadata": {
+              "name": "example-cache"
+            },
+            "spec": {
+              "clusterName": "example-infinispan",
+              "name": "mycache",
+              "template": "\u003cdistributed-cache /\u003e"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Restore",
+            "metadata": {
+              "name": "example-restore"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Database
+      certified: "false"
+      containerImage: quay.io/infinispan/operator:2.5.3
+      description: Create and manage Infinispan clusters.
+      operators.operatorframework.io/builder: operator-sdk-v1.24.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/infinispan/infinispan-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Backup is the Schema for the backups API
+        displayName: Backup
+        kind: Backup
+        name: backups.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Names the storage class object for persistent volume claims.
+          displayName: Storage Class Name
+          path: volume.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+        statusDescriptors:
+        - description: Current phase of the backup operation
+          displayName: Phase
+          path: phase
+        - description: The name of the created PersistentVolumeClaim used to store
+            the backup
+          displayName: Persistent Volume Claim
+          path: pvc
+        - description: Reason indicates the reason for any backup related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Batch is the Schema for the batches API
+        displayName: Batch
+        kind: Batch
+        name: batches.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Batch string to be executed
+          displayName: Config Command
+          path: config
+        - description: Name of the ConfigMap containing the batch and resource files
+            to be executed
+          displayName: ConfigMap Name
+          path: configMap
+        - description: Specify resource requirements per container
+          displayName: Container Spec
+          path: container
+        statusDescriptors:
+        - description: The UUID of the Infinispan instance that the Batch is associated
+            with
+          displayName: Cluster UUID
+          path: clusterUID
+        - description: Current phase of the batch operation
+          displayName: Phase
+          path: phase
+        - description: The reason for any batch related failures
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Cache is the Schema for the caches API
+        displayName: Cache
+        kind: Cache
+        name: caches.infinispan.org
+        specDescriptors:
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: adminAuth.secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: clusterName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: How updates to Cache CR template should be applied on the Infinispan
+            server
+          displayName: Update Strategy
+          path: updates.strategy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:recreate
+          - urn:alm:descriptor:com.tectonic.ui:select:retain
+        version: v2alpha1
+      - description: Infinispan is the Schema for the infinispans API
+        displayName: Infinispan Cluster
+        kind: Infinispan
+        name: infinispans.infinispan.org
+        specDescriptors:
+        - description: If true, a dedicated pod is used to ensure that all config
+            resources created on the Infinispan server have a matching CR resource
+          displayName: Toggle Config Listener
+          path: configListener.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The logging level to be used by the ConfigListener pod
+          displayName: Logging Level
+          path: configListener.logging.level
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:debug
+          - urn:alm:descriptor:com.tectonic.ui:select:info
+          - urn:alm:descriptor:com.tectonic.ui:select:error
+        - description: The Persistent Volume Claim that holds custom libraries
+          displayName: Persistent Volume Claim Name
+          path: dependencies.volumeClaimName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim
+        - description: The network hostname for your Infinispan cluster
+          displayName: Route Hostname
+          path: expose.host
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:expose.type:Route
+        - description: If true, a JMX endpoint is exposed on the admin service
+          displayName: Toggle Jmx
+          path: jmx.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The number of nodes in the Infinispan cluster.
+          displayName: Replicas
+          path: replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: A secret that contains CredentialStore alias and password combinations
+          displayName: CredentialStore Secret
+          path: security.credentialStoreSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Enable or disable user authentication
+          displayName: Toggle Authentication
+          path: security.endpointAuthentication
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The secret that contains TLS certificates
+          displayName: Encryption Secret
+          path: security.endpointEncryption.certSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Secret
+        - description: A service that provides TLS certificates
+          displayName: Encryption Service
+          path: security.endpointEncryption.certServiceName
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Service
+        - description: Disable or modify endpoint encryption.
+          displayName: Configure Encryption
+          path: security.endpointEncryption.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Service
+          - urn:alm:descriptor:com.tectonic.ui:select:Secret
+          - urn:alm:descriptor:com.tectonic.ui:select:None
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: security.endpointSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointAuthentication:true
+        - description: Enable/disable container ephemeral storage
+          displayName: Container Ephemeral Storage
+          path: service.container.ephemeralStorage
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The amount of storage for the persistent volume claim.
+          displayName: Storage Size
+          path: service.container.storage
+          x-descriptors:
+          - urn:alm:descriptor:text
+        - description: The storage class object for persistent volume claims
+          displayName: Storage Class Name
+          path: service.container.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.container.ephemeralStorage:false
+        - description: Cache replication factor, or number of copies for each entry.
+          displayName: Number of Owners
+          path: service.replicationFactor
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Deprecated and to be removed on subsequent release. Use .URL
+            with infinispan+xsite schema instead.
+          displayName: Node Port
+          path: service.sites.locations[0].port
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.sites.local.expose.type:NodePort
+        - description: The access secret that allows backups to a remote site
+          displayName: Backup Location Secret
+          path: service.sites.locations[0].secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: The service type
+          displayName: Service Type
+          path: service.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Cache
+          - urn:alm:descriptor:com.tectonic.ui:select:DataGrid
+        statusDescriptors:
+        - description: Infinispan Console URL
+          displayName: Infinispan Console URL
+          path: consoleUrl
+          x-descriptors:
+          - urn:alm:descriptor:org.w3:link
+        - description: The Operand status
+          displayName: Operand Status
+          path: operand
+        - description: The Operator status
+          displayName: Operator Status
+          path: operator
+        - description: The Pod's currently in the cluster
+          displayName: Pod Status
+          path: podStatus
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podStatuses
+        version: v1
+      - description: Restore is the Schema for the restores API
+        displayName: Restore
+        kind: Restore
+        name: restores.infinispan.org
+        specDescriptors:
+        - description: The Infinispan Backup to restore
+          displayName: Backup Name
+          path: backup
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v2alpha1:Backup
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        statusDescriptors:
+        - description: Current phase of the restore operation
+          displayName: Phase
+          path: phase
+        - description: Reason indicates the reason for any restore related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+    description: |
+      Infinispan is an in-memory data store and open-source project.
+
+      ### Infinispan
+      * **Schemaless structure:** Store objects in key/value pairs.
+      * **Grid storage:** Distribute and replicate data across clusters.
+      * **Elasticity:** Scale to meet workload demands without service disruption.
+      * **Polyglot access:** Read, write, and query from multiple client languages with different endpoints.
+      * **Continuous availability:** Create a fault-tolerant caching service that guarantees business continuity.
+
+      ### Operator capabilities
+      * Built-in intelligence to automate Infinispan cluster deployment.
+      * Infinispan CR for service configuration.
+      * Cross site configuration and management.
+      * Deployment of Grafana and Prometheus resources.
+      * Cache CR for fully configurable caches.
+      * Batch CR for scripting bulk resource creation.
+      * REST and Hot Rod endpoints available at port `11222`.
+      * Default application user: `developer`. Infinispan Operator generates credentials in an authentication secret at startup.
+      * Infinispan pods request `0.25` (limit `0.50`) CPUs, 512MiB of memory and 1Gi of ReadWriteOnce persistent storage. Infinispan Operator lets you adjust resource allocation to suit your requirements.
+    displayName: Infinispan Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - infinispan
+    - key value
+    - database
+    - datagrid
+    - open source
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Blog
+      url: https://blog.infinispan.org/
+    - name: Documentation
+      url: https://infinispan.org/documentation
+    - name: Chat
+      url: https://infinispan.zulipchat.com/#narrow/stream/185835-infinispan-cloud
+    - name: Operator Source Code
+      url: https://github.com/infinispan/infinispan-operator
+    maintainers:
+    - email: infinispan-dev@lists.jboss.org
+      name: Infinispan Community
+    maturity: alpha
+    minKubeVersion: 1.24.0
+    provider:
+      name: Infinispan
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/infinispan@sha256:435f4158ac21a562fedf4a6a18706e5a5e97c9e4c735e4743ff9c97b6dcaab99
+  name: ""
+- image: quay.io/infinispan/operator:2.5.3
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/infinispan@sha256:f2170883f6cbad749a4cf13decae1e02fcf5f0d3adc0fcfc65be4152c3675c05
+name: infinispan-operator.v2.5.4
+package: infinispan
+properties:
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Backup
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Batch
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Cache
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Infinispan
+    version: v1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Restore
+    version: v2alpha1
+- type: olm.package
+  value:
+    packageName: infinispan
+    version: 2.5.4
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "infinispan.org/v1",
+            "kind": "Infinispan",
+            "metadata": {
+              "name": "example-infinispan"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Backup",
+            "metadata": {
+              "name": "example-backup"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Batch",
+            "metadata": {
+              "name": "example-batch-inline"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "config": "create counter --concurrency-level=1 --initial-value=5 --storage=VOLATILE --type=weak batch-counter\n"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Cache",
+            "metadata": {
+              "name": "example-cache"
+            },
+            "spec": {
+              "clusterName": "example-infinispan",
+              "name": "mycache",
+              "template": "\u003cdistributed-cache /\u003e"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Restore",
+            "metadata": {
+              "name": "example-restore"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Database
+      certified: "false"
+      containerImage: quay.io/infinispan/operator:2.5.4
+      description: Create and manage Infinispan clusters.
+      operators.operatorframework.io/builder: operator-sdk-v1.24.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/infinispan/infinispan-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Backup is the Schema for the backups API
+        displayName: Backup
+        kind: Backup
+        name: backups.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Names the storage class object for persistent volume claims.
+          displayName: Storage Class Name
+          path: volume.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+        statusDescriptors:
+        - description: Current phase of the backup operation
+          displayName: Phase
+          path: phase
+        - description: The name of the created PersistentVolumeClaim used to store
+            the backup
+          displayName: Persistent Volume Claim
+          path: pvc
+        - description: Reason indicates the reason for any backup related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Batch is the Schema for the batches API
+        displayName: Batch
+        kind: Batch
+        name: batches.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Batch string to be executed
+          displayName: Config Command
+          path: config
+        - description: Name of the ConfigMap containing the batch and resource files
+            to be executed
+          displayName: ConfigMap Name
+          path: configMap
+        - description: Specify resource requirements per container
+          displayName: Container Spec
+          path: container
+        statusDescriptors:
+        - description: The UUID of the Infinispan instance that the Batch is associated
+            with
+          displayName: Cluster UUID
+          path: clusterUID
+        - description: Current phase of the batch operation
+          displayName: Phase
+          path: phase
+        - description: The reason for any batch related failures
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Cache is the Schema for the caches API
+        displayName: Cache
+        kind: Cache
+        name: caches.infinispan.org
+        specDescriptors:
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: adminAuth.secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: clusterName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: How updates to Cache CR template should be applied on the Infinispan
+            server
+          displayName: Update Strategy
+          path: updates.strategy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:recreate
+          - urn:alm:descriptor:com.tectonic.ui:select:retain
+        version: v2alpha1
+      - description: Infinispan is the Schema for the infinispans API
+        displayName: Infinispan Cluster
+        kind: Infinispan
+        name: infinispans.infinispan.org
+        specDescriptors:
+        - description: If true, a dedicated pod is used to ensure that all config
+            resources created on the Infinispan server have a matching CR resource
+          displayName: Toggle Config Listener
+          path: configListener.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The logging level to be used by the ConfigListener pod
+          displayName: Logging Level
+          path: configListener.logging.level
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:debug
+          - urn:alm:descriptor:com.tectonic.ui:select:info
+          - urn:alm:descriptor:com.tectonic.ui:select:error
+        - description: The Persistent Volume Claim that holds custom libraries
+          displayName: Persistent Volume Claim Name
+          path: dependencies.volumeClaimName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim
+        - description: The network hostname for your Infinispan cluster
+          displayName: Route Hostname
+          path: expose.host
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:expose.type:Route
+        - description: If true, a JMX endpoint is exposed on the admin service
+          displayName: Toggle Jmx
+          path: jmx.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The number of nodes in the Infinispan cluster.
+          displayName: Replicas
+          path: replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: A secret that contains CredentialStore alias and password combinations
+          displayName: CredentialStore Secret
+          path: security.credentialStoreSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Enable or disable user authentication
+          displayName: Toggle Authentication
+          path: security.endpointAuthentication
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The secret that contains TLS certificates
+          displayName: Encryption Secret
+          path: security.endpointEncryption.certSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Secret
+        - description: A service that provides TLS certificates
+          displayName: Encryption Service
+          path: security.endpointEncryption.certServiceName
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Service
+        - description: Disable or modify endpoint encryption.
+          displayName: Configure Encryption
+          path: security.endpointEncryption.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Service
+          - urn:alm:descriptor:com.tectonic.ui:select:Secret
+          - urn:alm:descriptor:com.tectonic.ui:select:None
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: security.endpointSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointAuthentication:true
+        - description: Enable/disable container ephemeral storage
+          displayName: Container Ephemeral Storage
+          path: service.container.ephemeralStorage
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The amount of storage for the persistent volume claim.
+          displayName: Storage Size
+          path: service.container.storage
+          x-descriptors:
+          - urn:alm:descriptor:text
+        - description: The storage class object for persistent volume claims
+          displayName: Storage Class Name
+          path: service.container.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.container.ephemeralStorage:false
+        - description: Cache replication factor, or number of copies for each entry.
+          displayName: Number of Owners
+          path: service.replicationFactor
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Deprecated and to be removed on subsequent release. Use .URL
+            with infinispan+xsite schema instead.
+          displayName: Node Port
+          path: service.sites.locations[0].port
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.sites.local.expose.type:NodePort
+        - description: The access secret that allows backups to a remote site
+          displayName: Backup Location Secret
+          path: service.sites.locations[0].secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: The service type
+          displayName: Service Type
+          path: service.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Cache
+          - urn:alm:descriptor:com.tectonic.ui:select:DataGrid
+        statusDescriptors:
+        - description: Infinispan Console URL
+          displayName: Infinispan Console URL
+          path: consoleUrl
+          x-descriptors:
+          - urn:alm:descriptor:org.w3:link
+        - description: The Operand status
+          displayName: Operand Status
+          path: operand
+        - description: The Operator status
+          displayName: Operator Status
+          path: operator
+        - description: The Pod's currently in the cluster
+          displayName: Pod Status
+          path: podStatus
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podStatuses
+        version: v1
+      - description: Restore is the Schema for the restores API
+        displayName: Restore
+        kind: Restore
+        name: restores.infinispan.org
+        specDescriptors:
+        - description: The Infinispan Backup to restore
+          displayName: Backup Name
+          path: backup
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v2alpha1:Backup
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        statusDescriptors:
+        - description: Current phase of the restore operation
+          displayName: Phase
+          path: phase
+        - description: Reason indicates the reason for any restore related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+    description: |
+      Infinispan is an in-memory data store and open-source project.
+
+      ### Infinispan
+      * **Schemaless structure:** Store objects in key/value pairs.
+      * **Grid storage:** Distribute and replicate data across clusters.
+      * **Elasticity:** Scale to meet workload demands without service disruption.
+      * **Polyglot access:** Read, write, and query from multiple client languages with different endpoints.
+      * **Continuous availability:** Create a fault-tolerant caching service that guarantees business continuity.
+
+      ### Operator capabilities
+      * Built-in intelligence to automate Infinispan cluster deployment.
+      * Infinispan CR for service configuration.
+      * Cross site configuration and management.
+      * Deployment of Grafana and Prometheus resources.
+      * Cache CR for fully configurable caches.
+      * Batch CR for scripting bulk resource creation.
+      * REST and Hot Rod endpoints available at port `11222`.
+      * Default application user: `developer`. Infinispan Operator generates credentials in an authentication secret at startup.
+      * Infinispan pods request `0.25` (limit `0.50`) CPUs, 512MiB of memory and 1Gi of ReadWriteOnce persistent storage. Infinispan Operator lets you adjust resource allocation to suit your requirements.
+    displayName: Infinispan Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - infinispan
+    - key value
+    - database
+    - datagrid
+    - open source
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Blog
+      url: https://blog.infinispan.org/
+    - name: Documentation
+      url: https://infinispan.org/documentation
+    - name: Chat
+      url: https://infinispan.zulipchat.com/#narrow/stream/185835-infinispan-cloud
+    - name: Operator Source Code
+      url: https://github.com/infinispan/infinispan-operator
+    maintainers:
+    - email: infinispan-dev@lists.jboss.org
+      name: Infinispan Community
+    maturity: alpha
+    minKubeVersion: 1.24.0
+    provider:
+      name: Infinispan
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/infinispan@sha256:f2170883f6cbad749a4cf13decae1e02fcf5f0d3adc0fcfc65be4152c3675c05
+  name: ""
+- image: quay.io/infinispan/operator:2.5.4
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/infinispan@sha256:079c78cdb6914f885a0526004b31e860208530a4c0d3d98159b4e97ceac8bfcd
+name: infinispan-operator.v2.5.5
+package: infinispan
+properties:
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Backup
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Batch
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Cache
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Infinispan
+    version: v1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Restore
+    version: v2alpha1
+- type: olm.package
+  value:
+    packageName: infinispan
+    version: 2.5.5
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "infinispan.org/v1",
+            "kind": "Infinispan",
+            "metadata": {
+              "name": "example-infinispan"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Backup",
+            "metadata": {
+              "name": "example-backup"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Batch",
+            "metadata": {
+              "name": "example-batch-inline"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "config": "create counter --concurrency-level=1 --initial-value=5 --storage=VOLATILE --type=weak batch-counter\n"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Cache",
+            "metadata": {
+              "name": "example-cache"
+            },
+            "spec": {
+              "clusterName": "example-infinispan",
+              "name": "mycache",
+              "template": "\u003cdistributed-cache /\u003e"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Restore",
+            "metadata": {
+              "name": "example-restore"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Database
+      certified: "false"
+      containerImage: quay.io/infinispan/operator:2.5.5
+      description: Create and manage Infinispan clusters.
+      operators.operatorframework.io/builder: operator-sdk-v1.24.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/infinispan/infinispan-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Backup is the Schema for the backups API
+        displayName: Backup
+        kind: Backup
+        name: backups.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Names the storage class object for persistent volume claims.
+          displayName: Storage Class Name
+          path: volume.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+        statusDescriptors:
+        - description: Current phase of the backup operation
+          displayName: Phase
+          path: phase
+        - description: The name of the created PersistentVolumeClaim used to store
+            the backup
+          displayName: Persistent Volume Claim
+          path: pvc
+        - description: Reason indicates the reason for any backup related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Batch is the Schema for the batches API
+        displayName: Batch
+        kind: Batch
+        name: batches.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Batch string to be executed
+          displayName: Config Command
+          path: config
+        - description: Name of the ConfigMap containing the batch and resource files
+            to be executed
+          displayName: ConfigMap Name
+          path: configMap
+        - description: Specify resource requirements per container
+          displayName: Container Spec
+          path: container
+        statusDescriptors:
+        - description: The UUID of the Infinispan instance that the Batch is associated
+            with
+          displayName: Cluster UUID
+          path: clusterUID
+        - description: Current phase of the batch operation
+          displayName: Phase
+          path: phase
+        - description: The reason for any batch related failures
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Cache is the Schema for the caches API
+        displayName: Cache
+        kind: Cache
+        name: caches.infinispan.org
+        specDescriptors:
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: adminAuth.secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: clusterName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: How updates to Cache CR template should be applied on the Infinispan
+            server
+          displayName: Update Strategy
+          path: updates.strategy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:recreate
+          - urn:alm:descriptor:com.tectonic.ui:select:retain
+        version: v2alpha1
+      - description: Infinispan is the Schema for the infinispans API
+        displayName: Infinispan Cluster
+        kind: Infinispan
+        name: infinispans.infinispan.org
+        specDescriptors:
+        - description: If true, a dedicated pod is used to ensure that all config
+            resources created on the Infinispan server have a matching CR resource
+          displayName: Toggle Config Listener
+          path: configListener.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The logging level to be used by the ConfigListener pod
+          displayName: Logging Level
+          path: configListener.logging.level
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:debug
+          - urn:alm:descriptor:com.tectonic.ui:select:info
+          - urn:alm:descriptor:com.tectonic.ui:select:error
+        - description: The Persistent Volume Claim that holds custom libraries
+          displayName: Persistent Volume Claim Name
+          path: dependencies.volumeClaimName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim
+        - description: The network hostname for your Infinispan cluster
+          displayName: Route Hostname
+          path: expose.host
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:expose.type:Route
+        - description: If true, a JMX endpoint is exposed on the admin service
+          displayName: Toggle Jmx
+          path: jmx.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The number of nodes in the Infinispan cluster.
+          displayName: Replicas
+          path: replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: A secret that contains CredentialStore alias and password combinations
+          displayName: CredentialStore Secret
+          path: security.credentialStoreSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Enable or disable user authentication
+          displayName: Toggle Authentication
+          path: security.endpointAuthentication
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The secret that contains TLS certificates
+          displayName: Encryption Secret
+          path: security.endpointEncryption.certSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Secret
+        - description: A service that provides TLS certificates
+          displayName: Encryption Service
+          path: security.endpointEncryption.certServiceName
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Service
+        - description: Disable or modify endpoint encryption.
+          displayName: Configure Encryption
+          path: security.endpointEncryption.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Service
+          - urn:alm:descriptor:com.tectonic.ui:select:Secret
+          - urn:alm:descriptor:com.tectonic.ui:select:None
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: security.endpointSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointAuthentication:true
+        - description: Enable/disable container ephemeral storage
+          displayName: Container Ephemeral Storage
+          path: service.container.ephemeralStorage
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The amount of storage for the persistent volume claim.
+          displayName: Storage Size
+          path: service.container.storage
+          x-descriptors:
+          - urn:alm:descriptor:text
+        - description: The storage class object for persistent volume claims
+          displayName: Storage Class Name
+          path: service.container.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.container.ephemeralStorage:false
+        - description: Cache replication factor, or number of copies for each entry.
+          displayName: Number of Owners
+          path: service.replicationFactor
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Deprecated and to be removed on subsequent release. Use .URL
+            with infinispan+xsite schema instead.
+          displayName: Node Port
+          path: service.sites.locations[0].port
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.sites.local.expose.type:NodePort
+        - description: The access secret that allows backups to a remote site
+          displayName: Backup Location Secret
+          path: service.sites.locations[0].secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: The service type
+          displayName: Service Type
+          path: service.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Cache
+          - urn:alm:descriptor:com.tectonic.ui:select:DataGrid
+        statusDescriptors:
+        - description: Infinispan Console URL
+          displayName: Infinispan Console URL
+          path: consoleUrl
+          x-descriptors:
+          - urn:alm:descriptor:org.w3:link
+        - description: The Operand status
+          displayName: Operand Status
+          path: operand
+        - description: The Operator status
+          displayName: Operator Status
+          path: operator
+        - description: The Pod's currently in the cluster
+          displayName: Pod Status
+          path: podStatus
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podStatuses
+        version: v1
+      - description: Restore is the Schema for the restores API
+        displayName: Restore
+        kind: Restore
+        name: restores.infinispan.org
+        specDescriptors:
+        - description: The Infinispan Backup to restore
+          displayName: Backup Name
+          path: backup
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v2alpha1:Backup
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        statusDescriptors:
+        - description: Current phase of the restore operation
+          displayName: Phase
+          path: phase
+        - description: Reason indicates the reason for any restore related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+    description: |
+      Infinispan is an in-memory data store and open-source project.
+
+      ### Infinispan
+      * **Schemaless structure:** Store objects in key/value pairs.
+      * **Grid storage:** Distribute and replicate data across clusters.
+      * **Elasticity:** Scale to meet workload demands without service disruption.
+      * **Polyglot access:** Read, write, and query from multiple client languages with different endpoints.
+      * **Continuous availability:** Create a fault-tolerant caching service that guarantees business continuity.
+
+      ### Operator capabilities
+      * Built-in intelligence to automate Infinispan cluster deployment.
+      * Infinispan CR for service configuration.
+      * Cross site configuration and management.
+      * Deployment of Grafana and Prometheus resources.
+      * Cache CR for fully configurable caches.
+      * Batch CR for scripting bulk resource creation.
+      * REST and Hot Rod endpoints available at port `11222`.
+      * Default application user: `developer`. Infinispan Operator generates credentials in an authentication secret at startup.
+      * Infinispan pods request `0.25` (limit `0.50`) CPUs, 512MiB of memory and 1Gi of ReadWriteOnce persistent storage. Infinispan Operator lets you adjust resource allocation to suit your requirements.
+    displayName: Infinispan Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - infinispan
+    - key value
+    - database
+    - datagrid
+    - open source
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Blog
+      url: https://blog.infinispan.org/
+    - name: Documentation
+      url: https://infinispan.org/documentation
+    - name: Chat
+      url: https://infinispan.zulipchat.com/#narrow/stream/185835-infinispan-cloud
+    - name: Operator Source Code
+      url: https://github.com/infinispan/infinispan-operator
+    maintainers:
+    - email: infinispan-dev@lists.jboss.org
+      name: Infinispan Community
+    maturity: alpha
+    minKubeVersion: 1.24.0
+    provider:
+      name: Infinispan
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/infinispan@sha256:079c78cdb6914f885a0526004b31e860208530a4c0d3d98159b4e97ceac8bfcd
+  name: ""
+- image: quay.io/infinispan/operator:2.5.5
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/infinispan@sha256:52a3156df0cb9a27153145f474c701f285aed7cbd38b1978d33c5340d717e4ba
+name: infinispan-operator.v2.5.6
+package: infinispan
+properties:
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Backup
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Batch
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Cache
+    version: v2alpha1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Infinispan
+    version: v1
+- type: olm.gvk
+  value:
+    group: infinispan.org
+    kind: Restore
+    version: v2alpha1
+- type: olm.package
+  value:
+    packageName: infinispan
+    version: 2.5.6
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "infinispan.org/v1",
+            "kind": "Infinispan",
+            "metadata": {
+              "name": "example-infinispan"
+            },
+            "spec": {
+              "replicas": 1
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Backup",
+            "metadata": {
+              "name": "example-backup"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Batch",
+            "metadata": {
+              "name": "example-batch-inline"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "config": "create counter --concurrency-level=1 --initial-value=5 --storage=VOLATILE --type=weak batch-counter\n"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Cache",
+            "metadata": {
+              "name": "example-cache"
+            },
+            "spec": {
+              "clusterName": "example-infinispan",
+              "name": "mycache",
+              "template": "\u003cdistributed-cache /\u003e"
+            }
+          },
+          {
+            "apiVersion": "infinispan.org/v2alpha1",
+            "kind": "Restore",
+            "metadata": {
+              "name": "example-restore"
+            },
+            "spec": {
+              "cluster": "example-infinispan",
+              "container": {
+                "cpu": "1000m",
+                "extraJvmOpts": "-Djava.property=me",
+                "memory": "1Gi"
+              }
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Database
+      certified: "false"
+      containerImage: quay.io/infinispan/operator:2.5.6
+      description: Create and manage Infinispan clusters.
+      operators.operatorframework.io/builder: operator-sdk-v1.24.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+      repository: https://github.com/infinispan/infinispan-operator
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Backup is the Schema for the backups API
+        displayName: Backup
+        kind: Backup
+        name: backups.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Names the storage class object for persistent volume claims.
+          displayName: Storage Class Name
+          path: volume.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+        statusDescriptors:
+        - description: Current phase of the backup operation
+          displayName: Phase
+          path: phase
+        - description: The name of the created PersistentVolumeClaim used to store
+            the backup
+          displayName: Persistent Volume Claim
+          path: pvc
+        - description: Reason indicates the reason for any backup related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Batch is the Schema for the batches API
+        displayName: Batch
+        kind: Batch
+        name: batches.infinispan.org
+        specDescriptors:
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: Batch string to be executed
+          displayName: Config Command
+          path: config
+        - description: Name of the ConfigMap containing the batch and resource files
+            to be executed
+          displayName: ConfigMap Name
+          path: configMap
+        - description: Specify resource requirements per container
+          displayName: Container Spec
+          path: container
+        statusDescriptors:
+        - description: The UUID of the Infinispan instance that the Batch is associated
+            with
+          displayName: Cluster UUID
+          path: clusterUID
+        - description: Current phase of the batch operation
+          displayName: Phase
+          path: phase
+        - description: The reason for any batch related failures
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+      - description: Cache is the Schema for the caches API
+        displayName: Cache
+        kind: Cache
+        name: caches.infinispan.org
+        specDescriptors:
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: adminAuth.secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: clusterName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        - description: How updates to Cache CR template should be applied on the Infinispan
+            server
+          displayName: Update Strategy
+          path: updates.strategy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:recreate
+          - urn:alm:descriptor:com.tectonic.ui:select:retain
+        version: v2alpha1
+      - description: Infinispan is the Schema for the infinispans API
+        displayName: Infinispan Cluster
+        kind: Infinispan
+        name: infinispans.infinispan.org
+        specDescriptors:
+        - description: If true, a dedicated pod is used to ensure that all config
+            resources created on the Infinispan server have a matching CR resource
+          displayName: Toggle Config Listener
+          path: configListener.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The logging level to be used by the ConfigListener pod
+          displayName: Logging Level
+          path: configListener.logging.level
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:debug
+          - urn:alm:descriptor:com.tectonic.ui:select:info
+          - urn:alm:descriptor:com.tectonic.ui:select:error
+        - description: The Persistent Volume Claim that holds custom libraries
+          displayName: Persistent Volume Claim Name
+          path: dependencies.volumeClaimName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim
+        - description: The network hostname for your Infinispan cluster
+          displayName: Route Hostname
+          path: expose.host
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:expose.type:Route
+        - description: If true, a JMX endpoint is exposed on the admin service
+          displayName: Toggle Jmx
+          path: jmx.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The number of nodes in the Infinispan cluster.
+          displayName: Replicas
+          path: replicas
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podCount
+        - description: A secret that contains CredentialStore alias and password combinations
+          displayName: CredentialStore Secret
+          path: security.credentialStoreSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: Enable or disable user authentication
+          displayName: Toggle Authentication
+          path: security.endpointAuthentication
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The secret that contains TLS certificates
+          displayName: Encryption Secret
+          path: security.endpointEncryption.certSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Secret
+        - description: A service that provides TLS certificates
+          displayName: Encryption Service
+          path: security.endpointEncryption.certServiceName
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointEncryption.type:Service
+        - description: Disable or modify endpoint encryption.
+          displayName: Configure Encryption
+          path: security.endpointEncryption.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Service
+          - urn:alm:descriptor:com.tectonic.ui:select:Secret
+          - urn:alm:descriptor:com.tectonic.ui:select:None
+        - description: The secret that contains user credentials.
+          displayName: Authentication Secret
+          path: security.endpointSecretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:security.endpointAuthentication:true
+        - description: Enable/disable container ephemeral storage
+          displayName: Container Ephemeral Storage
+          path: service.container.ephemeralStorage
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The amount of storage for the persistent volume claim.
+          displayName: Storage Size
+          path: service.container.storage
+          x-descriptors:
+          - urn:alm:descriptor:text
+        - description: The storage class object for persistent volume claims
+          displayName: Storage Class Name
+          path: service.container.storageClassName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:StorageClass
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.container.ephemeralStorage:false
+        - description: Cache replication factor, or number of copies for each entry.
+          displayName: Number of Owners
+          path: service.replicationFactor
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+        - description: Deprecated and to be removed on subsequent release. Use .URL
+            with infinispan+xsite schema instead.
+          displayName: Node Port
+          path: service.sites.locations[0].port
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:number
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service.sites.local.expose.type:NodePort
+        - description: The access secret that allows backups to a remote site
+          displayName: Backup Location Secret
+          path: service.sites.locations[0].secretName
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:Secret
+        - description: The service type
+          displayName: Service Type
+          path: service.type
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:select:Cache
+          - urn:alm:descriptor:com.tectonic.ui:select:DataGrid
+        statusDescriptors:
+        - description: Infinispan Console URL
+          displayName: Infinispan Console URL
+          path: consoleUrl
+          x-descriptors:
+          - urn:alm:descriptor:org.w3:link
+        - description: The Operand status
+          displayName: Operand Status
+          path: operand
+        - description: The Operator status
+          displayName: Operator Status
+          path: operator
+        - description: The Pod's currently in the cluster
+          displayName: Pod Status
+          path: podStatus
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:podStatuses
+        version: v1
+      - description: Restore is the Schema for the restores API
+        displayName: Restore
+        kind: Restore
+        name: restores.infinispan.org
+        specDescriptors:
+        - description: The Infinispan Backup to restore
+          displayName: Backup Name
+          path: backup
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v2alpha1:Backup
+        - description: Infinispan cluster name
+          displayName: Cluster Name
+          path: cluster
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes:infinispan.org:v1:Infinispan
+        statusDescriptors:
+        - description: Current phase of the restore operation
+          displayName: Phase
+          path: phase
+        - description: Reason indicates the reason for any restore related failures.
+          displayName: Reason
+          path: reason
+        version: v2alpha1
+    description: |
+      Infinispan is an in-memory data store and open-source project.
+
+      ### Infinispan
+      * **Schemaless structure:** Store objects in key/value pairs.
+      * **Grid storage:** Distribute and replicate data across clusters.
+      * **Elasticity:** Scale to meet workload demands without service disruption.
+      * **Polyglot access:** Read, write, and query from multiple client languages with different endpoints.
+      * **Continuous availability:** Create a fault-tolerant caching service that guarantees business continuity.
+
+      ### Operator capabilities
+      * Built-in intelligence to automate Infinispan cluster deployment.
+      * Infinispan CR for service configuration.
+      * Cross site configuration and management.
+      * Deployment of Grafana and Prometheus resources.
+      * Cache CR for fully configurable caches.
+      * Batch CR for scripting bulk resource creation.
+      * REST and Hot Rod endpoints available at port `11222`.
+      * Default application user: `developer`. Infinispan Operator generates credentials in an authentication secret at startup.
+      * Infinispan pods request `0.25` (limit `0.50`) CPUs, 512MiB of memory and 1Gi of ReadWriteOnce persistent storage. Infinispan Operator lets you adjust resource allocation to suit your requirements.
+    displayName: Infinispan Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - infinispan
+    - key value
+    - database
+    - datagrid
+    - open source
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Blog
+      url: https://blog.infinispan.org/
+    - name: Documentation
+      url: https://infinispan.org/documentation
+    - name: Chat
+      url: https://infinispan.zulipchat.com/#narrow/stream/185835-infinispan-cloud
+    - name: Operator Source Code
+      url: https://github.com/infinispan/infinispan-operator
+    maintainers:
+    - email: infinispan-dev@lists.jboss.org
+      name: Infinispan Community
+    maturity: alpha
+    minKubeVersion: 1.24.0
+    provider:
+      name: Infinispan
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/infinispan@sha256:52a3156df0cb9a27153145f474c701f285aed7cbd38b1978d33c5340d717e4ba
+  name: ""
+- image: quay.io/infinispan/operator:2.5.6
   name: ""
 schema: olm.bundle

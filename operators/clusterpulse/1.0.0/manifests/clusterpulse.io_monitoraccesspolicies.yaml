@@ -1,0 +1,422 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  creationTimestamp: null
+  name: monitoraccesspolicies.clusterpulse.io
+spec:
+  group: clusterpulse.io
+  names:
+    kind: MonitorAccessPolicy
+    listKind: MonitorAccessPolicyList
+    plural: monitoraccesspolicies
+    shortNames:
+    - map
+    - policy
+    singular: monitoraccesspolicy
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.state
+      name: State
+      type: string
+    - jsonPath: .spec.access.effect
+      name: Effect
+      type: string
+    - jsonPath: .spec.identity.priority
+      name: Priority
+      type: integer
+    - jsonPath: .status.affectedUsers
+      name: Users
+      type: integer
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: MonitorAccessPolicy defines an RBAC policy for cluster monitoring
+          access
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: MonitorAccessPolicySpec defines the desired state of MonitorAccessPolicy
+            properties:
+              access:
+                description: Access defines the effect and enablement of this policy
+                properties:
+                  effect:
+                    description: Effect is Allow or Deny
+                    enum:
+                    - Allow
+                    - Deny
+                    type: string
+                  enabled:
+                    default: true
+                    description: Enabled indicates whether this policy is active
+                    type: boolean
+                required:
+                - effect
+                type: object
+              identity:
+                description: Identity defines who this policy applies to
+                properties:
+                  priority:
+                    default: 100
+                    description: Priority determines evaluation order (higher = first)
+                    maximum: 10000
+                    minimum: 1
+                    type: integer
+                  subjects:
+                    description: Subjects specifies the users, groups, and service
+                      accounts
+                    properties:
+                      groups:
+                        description: Groups is a list of group names
+                        items:
+                          type: string
+                        type: array
+                      serviceAccounts:
+                        description: ServiceAccounts is a list of service account
+                          references
+                        items:
+                          description: PolicyServiceAccount references a Kubernetes
+                            service account
+                          properties:
+                            name:
+                              description: Name of the service account
+                              type: string
+                            namespace:
+                              default: default
+                              description: Namespace of the service account
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                      users:
+                        description: Users is a list of usernames or email addresses
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                required:
+                - subjects
+                type: object
+              lifecycle:
+                description: Lifecycle defines validity periods
+                properties:
+                  validity:
+                    description: Validity defines time-based validity
+                    properties:
+                      notAfter:
+                        description: NotAfter - policy expires after this time
+                        type: string
+                      notBefore:
+                        description: NotBefore - policy is not valid before this time
+                        type: string
+                    type: object
+                type: object
+              scope:
+                description: Scope defines what resources are accessible
+                properties:
+                  clusters:
+                    description: Clusters defines cluster access rules
+                    properties:
+                      default:
+                        default: none
+                        description: Default access for clusters not matching any
+                          rule
+                        enum:
+                        - allow
+                        - deny
+                        - none
+                        type: string
+                      rules:
+                        description: Rules defines per-cluster access rules
+                        items:
+                          description: PolicyClusterRule defines access for a set
+                            of clusters
+                          properties:
+                            permissions:
+                              description: Permissions defines what actions are allowed
+                              properties:
+                                view:
+                                  description: View grants basic cluster visibility
+                                  type: boolean
+                                viewMetrics:
+                                  description: ViewMetrics grants access to cluster
+                                    metrics
+                                  type: boolean
+                              type: object
+                            resources:
+                              description: Resources defines resource-level filtering
+                              items:
+                                description: ResourceFilter defines visibility and
+                                  filtering for a resource type
+                                properties:
+                                  aggregations:
+                                    description: Aggregations controls aggregation
+                                      visibility (custom resource types only)
+                                    properties:
+                                      exclude:
+                                        description: Exclude these aggregations
+                                        items:
+                                          type: string
+                                        type: array
+                                      include:
+                                        description: Include only these aggregations
+                                          (takes precedence over exclude)
+                                        items:
+                                          type: string
+                                        type: array
+                                    type: object
+                                  filters:
+                                    description: Filters defines allow/deny criteria
+                                    properties:
+                                      fields:
+                                        additionalProperties:
+                                          description: PatternFilter defines allowed/denied
+                                            patterns
+                                          properties:
+                                            allowed:
+                                              description: Allowed patterns (supports
+                                                wildcards)
+                                              items:
+                                                type: string
+                                              type: array
+                                            denied:
+                                              description: Denied patterns
+                                              items:
+                                                type: string
+                                              type: array
+                                          type: object
+                                        description: Fields filters by field values
+                                          (custom resource types only)
+                                        type: object
+                                      labels:
+                                        additionalProperties:
+                                          type: string
+                                        description: Labels filters by K8s labels
+                                        type: object
+                                      names:
+                                        description: Names filters by resource name
+                                          (supports wildcards)
+                                        properties:
+                                          allowed:
+                                            description: Allowed patterns (supports
+                                              wildcards)
+                                            items:
+                                              type: string
+                                            type: array
+                                          denied:
+                                            description: Denied patterns
+                                            items:
+                                              type: string
+                                            type: array
+                                        type: object
+                                      namespaces:
+                                        description: Namespaces filters by namespace
+                                          (supports wildcards)
+                                        properties:
+                                          allowed:
+                                            description: Allowed patterns (supports
+                                              wildcards)
+                                            items:
+                                              type: string
+                                            type: array
+                                          denied:
+                                            description: Denied patterns
+                                            items:
+                                              type: string
+                                            type: array
+                                        type: object
+                                    type: object
+                                  type:
+                                    description: |-
+                                      Type is the resource type: "nodes", "operators", "namespaces", "pods",
+                                      or a custom resource type name (e.g., "virtualmachines")
+                                    minLength: 1
+                                    type: string
+                                  visibility:
+                                    default: all
+                                    enum:
+                                    - all
+                                    - none
+                                    - filtered
+                                    type: string
+                                required:
+                                - type
+                                type: object
+                              type: array
+                            selector:
+                              description: Selector matches clusters by name, pattern,
+                                or labels
+                              properties:
+                                matchLabels:
+                                  additionalProperties:
+                                    type: string
+                                  description: MatchLabels selects clusters by labels
+                                  type: object
+                                matchNames:
+                                  description: MatchNames selects clusters by exact
+                                    name or wildcard pattern
+                                  items:
+                                    type: string
+                                  type: array
+                                matchPattern:
+                                  description: MatchPattern selects clusters by regex
+                                  maxLength: 256
+                                  type: string
+                              type: object
+                          required:
+                          - selector
+                          type: object
+                        type: array
+                    type: object
+                required:
+                - clusters
+                type: object
+            required:
+            - access
+            - identity
+            - scope
+            type: object
+          status:
+            description: MonitorAccessPolicyStatus defines the observed state of MonitorAccessPolicy
+            properties:
+              affectedGroups:
+                description: AffectedGroups is the count of groups affected by this
+                  policy
+                type: integer
+              affectedServiceAccounts:
+                description: AffectedServiceAccounts is the count of SAs affected
+                  by this policy
+                type: integer
+              affectedUsers:
+                description: AffectedUsers is the count of users affected by this
+                  policy
+                type: integer
+              compiledAt:
+                description: CompiledAt is when the policy was last compiled
+                type: string
+              conditions:
+                description: Conditions represent the latest observations
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              customResourceTypes:
+                description: CustomResourceTypes is the count of custom resource types
+                  referenced
+                type: integer
+              customResourceWarnings:
+                description: CustomResourceWarnings lists warnings about custom resource
+                  references
+                items:
+                  type: string
+                type: array
+              evaluationCount:
+                default: 0
+                description: EvaluationCount tracks how many times this policy has
+                  been evaluated
+                type: integer
+              hash:
+                description: Hash is the spec hash of the compiled policy
+                type: string
+              lastEvaluated:
+                description: LastEvaluated is when this policy was last evaluated
+                type: string
+              message:
+                description: Message provides additional status information
+                type: string
+              state:
+                default: Pending
+                description: State indicates the current policy state
+                enum:
+                - Active
+                - Inactive
+                - Error
+                - Pending
+                - Expired
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

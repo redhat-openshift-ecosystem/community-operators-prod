@@ -1,0 +1,399 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[{"apiVersion":"core.kubebrowser.io/v1alpha1","kind":"BrowserSystem","metadata":{"name":"sample"},"spec":{"enableApiService":true,"enableConsolePlugin":true}},{"apiVersion":"core.kubebrowser.io/v1alpha1","kind":"Browser","metadata":{"name":"sample"},"spec":{"started":false,"browserResources":{"requests":{"cpu":"100m","memory":"500Mi"}}}}]'
+    capabilities: Seamless Upgrades
+    categories: Developer Tools
+    containerImage: ghcr.io/kubebrowser/system-manager:0.0.2
+    createdAt: "2025-08-16T19:21:22Z"
+    description: Provides integrated web browsing functionality
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/proxy-aware: "true"
+    operatorframework.io/initialization-resource: '{"apiVersion": "core.kubebrowser.io/v1alpha1","kind": "BrowserSystem","metadata": {"name": "browsersystem"},"spec": {}}'
+    operatorframework.io/suggested-namespace: kubebrowser
+    operators.openshift.io/infrastructure-features: '["disconnected", "proxy-aware"]'
+    operators.operatorframework.io/builder: operator-sdk-v1.40.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    repository: https://github.com/kubebrowser/operator
+    support: None
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.arm64: supported
+    operatorframework.io/os.linux: supported
+  name: kubebrowser.v0.0.2
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - kind: Browser
+        name: browsers.core.kubebrowser.io
+        version: v1alpha1
+        description: Deploys a browser instance
+      - kind: BrowserSystem
+        name: browsersystems.core.kubebrowser.io
+        version: v1alpha1
+        description: Configures resources needed for running Browsers
+  displayName: KubeBrowser Operator
+  icon:
+    - base64data: "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhLS0gQ3JlYXRlZCB3aXRoIElua3NjYXBlIChodHRwOi8vd3d3Lmlua3NjYXBlLm9yZy8pIC0tPgoKPHN2ZwogICB3aWR0aD0iNTM2LjA3NzciCiAgIGhlaWdodD0iNTM2LjA4MDM4IgogICB2aWV3Qm94PSIwIDAgMTc4LjY5MjU2IDE3OC42OTM0NiIKICAgdmVyc2lvbj0iMS4xIgogICBpZD0ic3ZnMSIKICAgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIKICAgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIgogICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcwogICAgIGlkPSJkZWZzMSIgLz48cGF0aAogICAgIGQ9Im0gODkuMDk0NTI1LDU0LjEyMTIxNyBhIDQuODI3Nzk1Miw0Ljc4ODIyMjQgMCAwIDAgLTEuODUwMjYsMC40NjgxIGwgLTI1LjI0NjA5LDEyLjA2MzE1IGEgNC44Mjc3OTUyLDQuNzg4MjIyNCAwIDAgMCAtMi42MTI2MywzLjI0ODA1IGwgLTYuMjI3ODcsMjcuMDk3MDEgYSA0LjgyNzc5NTIsNC43ODgyMjI0IDAgMCAwIDAuNjU0OTUsMy42NzEyMjMgNC44Mjc3OTUyLDQuNzg4MjIyNCAwIDAgMCAwLjI3NDc0LDAuMzgwODYgbCAxNy40NzQ2MSwyMS43MjY1NiBhIDQuODI3Nzk1Miw0Ljc4ODIyMjQgMCAwIDAgMy43NzQ3NCwxLjgwMjA5IGwgMjguMDIzNDQ1LC0wLjAwNyBhIDQuODI3Nzk1Miw0Ljc4ODIyMjQgMCAwIDAgMy43NzQwOSwtMS43OTgxNyBsIDE3LjQ2ODA5LC0yMS43MzA0NyBhIDQuODI3Nzk1Miw0Ljc4ODIyMjQgMCAwIDAgMC45MzM2LC00LjA1MjA4MyBsIC02LjIzODI4LC0yNy4wOTcwMSBhIDQuODI3Nzk1Miw0Ljc4ODIyMjQgMCAwIDAgLTIuNjExOTgsLTMuMjQ4MDUgTCA5MS40MzU2NzUsNTQuNTg5NDg3IGEgNC44Mjc3OTUyLDQuNzg4MjIyNCAwIDAgMCAtMi4zNDExNSwtMC40NjgxIHoiCiAgICAgc3R5bGU9ImZpbGw6IzJiNzllZTtzdHJva2Utd2lkdGg6MCIKICAgICBpZD0icGF0aDM0MSIgLz48cGF0aAogICAgIGQ9Im0gODcuMjg5MTg1LDIzLjQyNTkwNyBjIC0wLjAxNjIsMCAtMC4wMzEyLC0wLjAwNSAtMC4wNDc1LC0wLjAwNSBsIC02LjVlLTQsLTAuMDA1IGMgLTIuMTAzMzUsMC4wNTQ1IC0zLjc1OTAyLDEuOTkyOTEgLTMuNzAwNTIsNC4zMzAwOCAwLDAuMDI0IDAuMDA0LDAuMDQ2NCAwLjAwNSwwLjA3MDMgMC4wMDYsMC4zMjMxNyAwLjAwMiwwLjcyNzE1IDAuMDIwOCwxLjAxMzY3IDAuMDgzOCwxLjM0NzcxIDAuNDA3OTYsMi4zNzE5MSAwLjYxNTg4LDMuNjEwMDMgMC4zODY5NCwyLjY1MTk0IDAuNzA3MzMsNC44NTAxNyAwLjU5MjQ1LDYuOTAzNjQgLTAuMTAxNzIsMC44NDk2NyAtMC44NzgzOCwxLjYzNTE1IC0xLjE5MjcxLDIuMDAwNjUgbCAtMC4yNzQ3NCw4LjQ3MjY2IC0yNi4zMDU5OSwxMi41NjkwMSAtNi4xOTg1NiwtNC4xODIyOSBjIC0wLjY4Njk5LDAuMDI2OSAtMS43MjQzNywwLjEyMTAyIC0yLjMxOTY3LC0wLjE5MTQxIC0xLjczNDIsLTEuMTA1NTkgLTMuMzI2NjcsLTIuNjUwOTUgLTUuMjUzOSwtNC41MTMwMiAtMC44ODQxOSwtMC44OTE1MSAtMS41MzA3OCwtMS43NTgzNiAtMi41NzYxNywtMi42MTMyOCAtMC4yMzAwMywtMC4xODgxMyAtMC41NzI1NCwtMC40MzE1NCAtMC44MzUyOSwtMC42MjgyNiBsIC0wLjAyNzMsLTAuMDE4OSBjIC0wLjAxNDEsLTAuMDExIC0wLjAzNTgsLTAuMDIzOCAtMC4wNDk1LC0wLjAzNDUgLTEuODQ1NDIsLTEuMzYxMzIgLTQuMzI2ODksLTEuMTQ5OCAtNS41OTcwMSwwLjQ3Nzg2IC0wLjAxMDMsMC4wMTMyIC0wLjAyMzgsMC4wMjI0IC0wLjAzMzksMC4wMzU4IC0xLjI2MDI3LDEuNjY0NiAtMC43OTc1Myw0LjE0MTUxIDEuMDI4NjQsNS41NTk5IDAuMDEzMywwLjAxMDIgMC4wMjk3LDAuMDI4OCAwLjA0MzYsMC4wMzk3IDAuMDIwNiwwLjAxNTYgMC4wNDQ3LDAuMDI0NCAwLjA2NTgsMC4wMzk3IDAuMjU1NjgsMC4xOTcyMyAwLjU2ODI3LDAuNDUwMSAwLjgwMjA4LDAuNjEzOTQgMS4xMDU5LDAuNzc0NTQgMi4xMDU4MSwxLjE2Nzk5IDMuMjAzNzgsMS43NzczNCAyLjMxNDQ2LDEuMzUxMDIgNC4yMzY2OCwyLjQ2NTg2IDUuNzcwODMsMy44MzU5NCAwLjU5NzE4LDAuNjA4MjggMC43MjA1NiwxLjY3NDE1IDAuODE1NzYsMi4xNzU3OCBsIDYuOTU5NjMsNS45MjI1MiAtNi4zNjEzMywyNy42NzY0NCAtNy45MzIyOSwyLjUxOTUzMyBjIC0wLjMzMzcxLDAuNjA2MDQgLTAuODI1NDksMS4zNzg1NSAtMS40MzM1OSwxLjY0NTgzIC0xLjk0NTMsMC42NjY1NSAtNC4zMTE4MiwwLjk5NzM1IC02Ljk2OTQsMS4zNDMxIC0xLjI0ODI2LDAuMTM1NCAtMi4zMjg0OSwwLjEwNzU1IC0zLjY0ODQ0LDAuMzkxOTMgLTAuMzE1ODgsMC4wNjggLTAuNzc1NTQsMC4yMDI5NSAtMS4xMDAyNiwwLjI4NTE1IC0yLjIzNjAzLDAuNTk3MDcgLTMuNjIzNTUsMi43MDAxOSAtMy4xMDgwNyw0LjcyNDYxIDAuMDM0MiwwLjEzNDExIDAuMDk1MiwwLjI1Mzc2IDAuMTQzODgsMC4zODAyMSBoIC02LjVlLTQgYyAwLjY5MDc0LDEuNzk0MTYgMi43NzI1NSwyLjgwMjEyIDQuODg2NzEsMi4yNjg4OCAwLjAwNCwwIDAuMDA4LDAuMDAzIDAuMDExNywwIDAuMDAyLC0wLjAwMyAwLjAwNSwtMC4wMDQgMC4wMDcsLTAuMDA1IDAuMzIxNDEsLTAuMDgwNSAwLjc1Mjk3LC0wLjE3NTIyIDEuMDQ2MjMsLTAuMjYxNzIgMS4yOTUxNSwtMC4zODE2NyAyLjIyMzIsLTAuOTI1MzEgMy4zODQxMSwtMS40MDM2NCAyLjU4OTUxLC0wLjg1NTkgNC45ODIzNywtMi4xNDA5MyA3LjE0Mzg4LC0yLjE0MTkzIDAuNTkyMTIsLTJlLTUgMS4xMjQyNiwwLjM2Mjk0IDEuNjY5MjcsMC43NDQ3OSBsIDkuOTY4MSwtMS45MTkyNyAxNy4xNjI3NiwyMS4zMzg1NCBjIC0xLjE0MDY3LDIuOTMxOTMgLTMuMzY0MDMsOC42MzIzNiAtMy40MjkwMyw4LjgxMjUgMC4yNTcyLDAuNjM3MDEgMC42MzAxOSwxLjI1NDA1IDAuMzQ1NywyLjI1MTMgLTAuNjkyMTksMS45MzY5MSAtMS44NDM0NywzLjgzMDI4IC0zLjIyOTgyLDYuMTIzNyAtMC42NzI0OSwxLjA2MDQ0IC0xLjM2NDMxLDEuODg2MDMgLTEuOTY0ODQsMy4wOTUwNSAtMC4xMzY5OSwwLjI3NTU3IC0wLjMwOTk5LDAuNjg3NzkgLTAuNDQ1MzEsMC45OTA4OSAtMC45NTQzLDIuMTE1MTYgLTAuMTk0NTcsNC41MTYxNyAxLjY5MDc1LDUuMzk5NzQgdiA2LjVlLTQgYyAwLjAxNTQsMC4wMDcgMC4wMjc1LDAuMDE4NCAwLjA0MywwLjAyNTQgMS45MDQzNSwwLjg1OTAxIDQuMjE2ODEsLTAuMTQxOCA1LjE5MjcxLC0yLjI0MDIzIDAuMTM3NDMsLTAuMzA1ODYgMC4zNDQyNywtMC43NDEwOCAwLjQ2NjE0LC0xLjA0MDM3IDAuNTA5MDksLTEuMjUwNzEgMC42NjMyOCwtMi4zMTM3MyAxLjAxMzAyLC0zLjUxOTUzIDAuODAxOTYsLTIuNTU3MTggMS40Njk3NCwtNC42ODA1NyAyLjQ2NDIsLTYuNDgxMTIgMC41NTkxNCwtMC44NzMxMSAxLjI2MzgxLC0wLjk5MTM4IDEuOTExNDYsLTEuMjIwMDUgMC4wMzAzLC0wLjE5MjU3IDMuOTAxMywtNy41MTczNyA0Ljg2NzgzLC05LjMzNTk0IGwgMjcuMTAwOTI1LC0wLjAwNyBjIDEuNTY1OTMsMi42NDY2MyA0LjgyNjgxLDguMTYzODQgNC45MzYxOSw4LjM2MzkzIDAuNjU4MiwwLjE5NjM1IDEuMzc1MTQsMC4yODI1IDEuOTc3MjIsMS4xMjY5NiAxLjA4Mjg4LDEuNzQ4NCAxLjg0NjgsMy44MzUwNCAyLjc3NTM5LDYuMzQ4OTUgMC40MDk2MywxLjE4Njk1IDAuNjE3MiwyLjI0NTk3IDEuMTg4MTUsMy40Njk0MSAwLjEyMDU5LDAuMjU4NTIgMC4zMjE4NywwLjYwNTI4IDAuNDcxMzUsMC44OTEyNyAwLjAxMTYsMC4wMjMyIDAuMDE2NCwwLjA0ODQgMC4wMjg2LDAuMDcxNiAwLjAwOCwwLjAxNTYgMC4wMjI2LDAuMDM0NCAwLjAzMDYsMC4wNDk1IDEuMDgwNTEsMi4wNDQ0NyAzLjQzOTIsMi45MzA1NSA1LjI5Njg3LDEuOTc3ODcgMC4xNzE1NCwtMC4wODggMC4zMjEzNiwtMC4yMDA3MSAwLjQ3MjAxLC0wLjMxMjUgMS40ODA0NCwtMS4wOTg2MiAxLjk0NTIyLC0zLjI2NDMyIDEuMDExMDcsLTUuMTQzMjMgLTAuMTUzMDIsLTAuMjk4MzUgLTAuMzU0MjEsLTAuNzM0NSAtMC41MTIzNywtMS4wMTYyOCAtMC42NjAyMywtMS4xNzc3OSAtMS40MDEyOSwtMS45NjU0NiAtMi4xMjYzMSwtMi45OTA4OCAtMS40OTkyNywtMi4yMjE1MyAtMi43NDQyNSwtNC4wNTg0OSAtMy41MzE5LC01Ljk1ODMzIC0wLjI3NjQ2LC0wLjgxMjA2IDAuMDg2OCwtMS44NTk2NiAwLjIwODk5LC0yLjMyMzU3IGwgLTMuODcxMSwtOC42ODgxNSAxNy41NjA1NSwtMjEuODQ1NzEgYyAyLjgxMDM5LDAuMzk5MjUgNi4wNjk3NiwwLjg0MTU4IDguNjQzMjMsMS4xODIzIDAuNTYzNzMsLTAuMzkyMzUgMS4wNzkxNywtMC44OTM5NSAyLjExNDU4LC0wLjgzODU1IDIuMDQyMDIsMC4yNDM2MSA0LjE1MTU0LDAuOTQxMDIgNi42OTU5NywxLjc4MjU2IDEuMTgzNTksMC40MTk3OCAyLjE0MTIzLDAuOTIyNTkgMy40NTM3NywxLjIzODkzIDAuMjk3LDAuMDcxNyAwLjczMjQ2LDAuMTQ0MDMgMS4wNTcyOSwwLjIwODMzIDIuMjkyOCwwLjQ2Mjk3IDQuNDkwNywtMC44MzE5NyA0LjkwNzU2LC0yLjg5NTgzIDAuMDE5MSwtMC4wOTMxIDAuMDEzMSwtMC4xODUxIDAuMDI0MSwtMC4yNzggMC4yMzM3MSwtMS45NjYzOCAtMS4yMjc0NSwtMy44NTUyMSAtMy40MTczMSwtNC4yOTc1MiAtMC4zMjUyMSwtMC4wNjY4IC0wLjc1NzU4LC0wLjE2NDMgLTEuMDYxODUsLTAuMjE0MiAtMS4zMzI0MywtMC4yMTgxNCAtMi40MDU3NywtMC4xNDM0NCAtMy42NTk1MSwtMC4yMTYxNCAtMi42NzE0NCwtMC4yMTI2NCAtNC44ODk5NywtMC4zNzkxOCAtNi44NjY1MywtMC45NDc5MjMgLTAuODA0NzEsLTAuMjg5ODUgLTEuMzg4MTUsLTEuMjE0ODIgLTEuNjgxNjUsLTEuNjEwMDIgbCAtOC4wODIwMywtMi4xNDQ1MyAtNi41MjY2OSwtMjguMzQ5NjEgYyAyLjQ4MDM3LC0yLjMzODQ5IDUuMzczLC01LjA2NjcxIDUuNTAzMjYsLTUuMTg1NTUgMC4wNDQ2LC0wLjY4NTM0IC0wLjAzMDMsLTEuNDA1MzggMC42NTg4NSwtMi4xODAzNCAxLjQ2MzgyLC0xLjQ0NDc0IDMuMzMxMzQsLTIuNjUwMDMgNS41NzU1MiwtNC4xMTQ1OCAxLjA2NjMxLC0wLjY2MzMxIDIuMDQ2NDYsLTEuMTAyMDQgMy4xMTI2MywtMS45MzA5OSAwLjI0MjIzLC0wLjE4ODI2IDAuNTcxNjksLTAuNDg4MzMgMC44MjQ4NywtMC43MDI0OCAxLjc2Nzg0LC0xLjQ4MzczIDIuMTMwNTMsLTMuOTU5NzIgMC44NDA1LC01LjU3NDg3IC0wLjAxNzUsLTAuMDIyIC0wLjAyOCwtMC4wNDc0IC0wLjA0NjIsLTAuMDY5IHYgMC4wMDMgYyAtMS4zNTM2MywtMS42MTI3OCAtMy45MDQwNCwtMS43MDE4MyAtNS42OTU5NiwtMC4xOTc5MiAtMC4wMjc2LDAuMDIzMiAtMC4wNDg4LDAuMDUwOCAtMC4wNzU1LDAuMDc0MiAtMC4yNDU2NCwwLjIwMjAzIC0wLjU0OTIyLDAuNDM2ODIgLTAuNzU0NTYsMC42MjI0IC0xLjAwMTQ0LDAuOTA1NjcgLTEuNjAzNjUsMS43OTQ5MiAtMi40NDIwNiwyLjcyOTgxIC0xLjgzMTk5LDEuOTU1ODEgLTMuMzQ4NTYsMy41NzkyOCAtNS4wMjUzOSw0Ljc3MDE5IC0wLjY5NTgxLDAuMzczMjYgLTEuNjAzMzIsMC4zOTEyNiAtMi4zMDU5OSwwLjMxODM2IGwgLTYuNDAyOTksNC43NjEwNiAtMjYuNTg4NTQ1LC0xMi42OTU5NiAtMC41OTA1LC03LjMxMjUgYyAtMC41MDgsLTAuNDYyMjUgLTEuMTEyMzEsLTAuODU0NzUgLTEuMjg4NDEsLTEuODc2OTUgLTAuMjE3MDQsLTIuMDQ1MTIgLTAuMDAzLC00LjI1MzkgMC4yNTM5MSwtNi45MjE4OCAwLjE0NTk2LC0xLjI0NzE0IDAuNDExMjMsLTIuMjg0NTIgMC40Mjc3MywtMy42MzQ3NiAwLjAwNCwtMC4zMDY0MyAtMC4wMTY3LC0wLjc1MTY3IC0wLjAyNjcsLTEuMDgzMzQgLTAuMDI1OCwtMS4wMjMxMSAtMC4zNzc4OSwtMS45NjAxMSAtMC45NDAxMSwtMi42NzgzOCAtMC43MTI1NCwtMC45MTA3OCAtMS43NzM3LC0xLjQ3MjQ0IC0yLjkzODE1LC0xLjQ1OTY0IHogbSAxLjgwNTM0LDMwLjY5NTMxIGEgNC44Mjc3OTUyLDQuNzg4MjIyNCAwIDAgMSAyLjM0MTE1LDAuNDY4MSBsIDI1LjI1MDAwNSwxMi4wNTU5OSBhIDQuODI3Nzk1Miw0Ljc4ODIyMjQgMCAwIDEgMi42MTE5OCwzLjI0ODA1IGwgNi4yMzgyOCwyNy4wOTcwMSBhIDQuODI3Nzk1Miw0Ljc4ODIyMjQgMCAwIDEgLTAuOTMzNiw0LjA1MjA4MyBsIC0xNy40NjgwOSwyMS43MzA0NyBhIDQuODI3Nzk1Miw0Ljc4ODIyMjQgMCAwIDEgLTMuNzc0MDksMS43OTgxNyBsIC0yOC4wMjM0NDUsMC4wMDcgYSA0LjgyNzc5NTIsNC43ODgyMjI0IDAgMCAxIC0zLjc3NDc0LC0xLjgwMjA5IGwgLTE3LjQ3NDYxLC0yMS43MjY1NiBhIDQuODI3Nzk1Miw0Ljc4ODIyMjQgMCAwIDEgLTAuMjc0NzQsLTAuMzgwODYgNC44Mjc3OTUyLDQuNzg4MjIyNCAwIDAgMSAtMC42NTQ5NSwtMy42NzEyMjMgbCA2LjIyNzg3LC0yNy4wOTcwMSBhIDQuODI3Nzk1Miw0Ljc4ODIyMjQgMCAwIDEgMi42MTI2MywtMy4yNDgwNSBsIDI1LjI0NjA5LC0xMi4wNjMxNSBhIDQuODI3Nzk1Miw0Ljc4ODIyMjQgMCAwIDEgMS44NTAyNiwtMC40NjgxIHoiCiAgICAgc3R5bGU9ImZpbGw6I2ZmZmZmZjtmaWxsLW9wYWNpdHk6MTtzdHJva2Utd2lkdGg6MCIKICAgICBpZD0icGF0aDMzOSIgLz48cGF0aAogICAgIGQ9Im0gMTU5LjA3MzI5LDMzLjU1NDI1NyAtMTcuMzQ1MDUsMTQuNTIyNzggYyAxLjI5MDAzLDEuNjE1MTUgMC45MjczNCw0LjA5MTE0IC0wLjg0MDUsNS41NzQ4NyAtMC4yNTMxOCwwLjIxNDE1IC0wLjU4MjY0LDAuNTE0MjIgLTAuODI0ODcsMC43MDI0OCAtMS4wNjYxNywwLjgyODk1IC0yLjA0NjMyLDEuMjY3NjggLTMuMTEyNjMsMS45MzA5OSAtMi4yNDQxOCwxLjQ2NDU1IC00LjExMTcsMi42Njk4NCAtNS41NzU1Miw0LjExNDU4IC0wLjY4OTE1LDAuNzc0OTYgLTAuNjE0MjUsMS40OTUgLTAuNjU4ODUsMi4xODAzNCAtMC4xMzAyNiwwLjExODg0IC0zLjAyMjg5LDIuODQ3MDYgLTUuNTAzMjYsNS4xODU1NSBsIDYuNTI2NjksMjguMzQ5NjEgOC4wODIwMywyLjE0NDUzIGMgMC4yOTM1LDAuMzk1MiAwLjg3Njk0LDEuMzIwMTcgMS42ODE2NSwxLjYxMDAyIDEuOTc2NTYsMC41Njg3NDMgNC4xOTUwOSwwLjczNTI4MyA2Ljg2NjUzLDAuOTQ3OTIzIDEuMjUzNzQsMC4wNzI3IDIuMzI3MDgsLTAuMDAyIDMuNjU5NTEsMC4yMTYxNCAwLjMwNDI3LDAuMDQ5OSAwLjczNjY0LDAuMTQ3NCAxLjA2MTg1LDAuMjE0MiAyLjE4OTg2LDAuNDQyMzEgMy42NTEwMiwyLjMzMTE0IDMuNDE3MzEsNC4yOTc1MiBsIDE5LjU4NTk0LDMuODc2OTYgYSA4OS4zMTMzMjQsODkuMzEzMzI0IDAgMCAwIDIuNTY1MTEsLTIwLjA3NjE4MyA4OS4zMTMzMjQsODkuMzEzMzI0IDAgMCAwIC0xOS41ODU5NCwtNTUuNzkyMzEgeiIKICAgICBzdHlsZT0iZmlsbDojNzVhYWYwO3N0cm9rZTojNzVhYWYwO3N0cm9rZS13aWR0aDowLjA2NjY2Njc7c3Ryb2tlLWRhc2hhcnJheTpub25lIgogICAgIGlkPSJwYXRoMzQwIiAvPjxwYXRoCiAgICAgZD0ibSAxNzYuMDk0NTMsMTA5LjQyMjY2IC0xOS41ODU5NCwtMy44NzY5NiBjIC0wLjAxMSwwLjA5MjkgLTAuMDA1LDAuMTg0ODkgLTAuMDI0MSwwLjI3OCAtMC40MTY4NiwyLjA2Mzg2IC0yLjYxNDc2LDMuMzU4OCAtNC45MDc1NiwyLjg5NTgzIC0wLjMyNDgzLC0wLjA2NDMgLTAuNzYwMjksLTAuMTM2NjMgLTEuMDU3MjksLTAuMjA4MzMgLTEuMzEyNTQsLTAuMzE2MzQgLTIuMjcwMTgsLTAuODE5MTUgLTMuNDUzNzcsLTEuMjM4OTMgLTIuNTQ0NDMsLTAuODQxNTQgLTQuNjUzOTUsLTEuNTM4OTUgLTYuNjk1OTcsLTEuNzgyNTYgLTEuMDM1NDEsLTAuMDU1NCAtMS41NTA4NSwwLjQ0NjIgLTIuMTE0NTgsMC44Mzg1NSAtMi41NzM0NywtMC4zNDA3MiAtNS44MzI4NCwtMC43ODMwNSAtOC42NDMyMywtMS4xODIzIGwgLTE3LjU2MDU1LDIxLjg0NTcxIDMuODcxMSw4LjY4ODE1IGMgLTAuMTIyMTksMC40NjM5MSAtMC40ODU0NSwxLjUxMTUxIC0wLjIwODk5LDIuMzIzNTcgMC43ODc2NSwxLjg5OTg0IDIuMDMyNjMsMy43MzY4IDMuNTMxOSw1Ljk1ODMzIDAuNzI1MDIsMS4wMjU0MiAxLjQ2NjA4LDEuODEzMDkgMi4xMjYzMSwyLjk5MDg4IDAuMTU4MTYsMC4yODE3OCAwLjM1OTM1LDAuNzE3OTMgMC41MTIzNywxLjAxNjI4IDAuOTM0MTUsMS44Nzg5MSAwLjQ2OTM3LDQuMDQ0NjEgLTEuMDExMDcsNS4xNDMyMyBsIDguNDAyMzQsMTYuMDY5MDEgYSA4OS4zMTMzMjQsODkuMzEzMzI0IDAgMCAwIDQ2LjgxOTAxLC01OS43NTg0NiB6IgogICAgIHN0eWxlPSJmaWxsOiM3NWFhZjA7c3Ryb2tlOiM3NWFhZjA7c3Ryb2tlLXdpZHRoOjAuMDY2NjY2NztzdHJva2UtZGFzaGFycmF5Om5vbmUiCiAgICAgaWQ9InBhdGgzNDIiIC8+PHBhdGgKICAgICBkPSJtIDEyOS4yNzU1MiwxNjkuMTgxMTIgLTguNDAyMzQsLTE2LjA2OTAxIGMgLTAuMTUwNjUsMC4xMTE3OSAtMC4zMDA0NywwLjIyNDUxIC0wLjQ3MjAxLDAuMzEyNSAtMS44NTc2NywwLjk1MjY4IC00LjIxNjM2LDAuMDY2NiAtNS4yOTY4NywtMS45Nzc4NyAtMC4wMDgsLTAuMDE1MSAtMC4wMjI2LC0wLjAzMzkgLTAuMDMwNiwtMC4wNDk1IC0wLjAxMjIsLTAuMDIzMiAtMC4wMTcsLTAuMDQ4NCAtMC4wMjg2LC0wLjA3MTYgLTAuMTQ5NDgsLTAuMjg1OTkgLTAuMzUwNzYsLTAuNjMyNzUgLTAuNDcxMzUsLTAuODkxMjcgLTAuNTcwOTUsLTEuMjIzNDQgLTAuNzc4NTIsLTIuMjgyNDYgLTEuMTg4MTUsLTMuNDY5NDEgLTAuOTI4NTksLTIuNTEzOTEgLTEuNjkyNTEsLTQuNjAwNTUgLTIuNzc1MzksLTYuMzQ4OTUgLTAuNjAyMDgsLTAuODQ0NDYgLTEuMzE5MDIsLTAuOTMwNjEgLTEuOTc3MjIsLTEuMTI2OTYgLTAuMTA5MzgsLTAuMjAwMDkgLTMuMzcwMjYsLTUuNzE3MyAtNC45MzYxOSwtOC4zNjM5MyBsIC0yNy4xMDA5MjUsMC4wMDcgYyAtMC45NjY1MywxLjgxODU3IC00LjgzNzU1LDkuMTQzMzcgLTQuODY3ODMsOS4zMzU5NCAtMC42NDc2NSwwLjIyODY3IC0xLjM1MjMyLDAuMzQ2OTQgLTEuOTExNDYsMS4yMjAwNSAtMC45OTQ0NiwxLjgwMDU1IC0xLjY2MjI0LDMuOTIzOTQgLTIuNDY0Miw2LjQ4MTEyIC0wLjM0OTc0LDEuMjA1OCAtMC41MDM5MywyLjI2ODgyIC0xLjAxMzAyLDMuNTE5NTMgLTAuMTIxODcsMC4yOTkyOSAtMC4zMjg3MSwwLjczNDUxIC0wLjQ2NjE0LDEuMDQwMzcgLTAuOTc1OSwyLjA5ODQzIC0zLjI4ODM2LDMuMDk5MjQgLTUuMTkyNzEsMi4yNDAyMyAtMC4wMTU1LC0wLjAwNyAtMC4wMjc2LC0wLjAxODIgLTAuMDQzLC0wLjAyNTQgbCAtNy4xODM1OSwxNS45MDk1MSB2IDYuNWUtNCBhIDg5LjMxMzMyNCw4OS4zMTMzMjQgMCAwIDAgMzUuODkyNTcsNy44MDU5OSA4OS4zMTMzMjQsODkuMzEzMzI0IDAgMCAwIDM5LjkyOTA0NSwtOS40Nzg1MiB6IgogICAgIHN0eWxlPSJmaWxsOiMxOTcxZTY7c3Ryb2tlOiMxOTcxZTY7c3Ryb2tlLXdpZHRoOjAuMDY2NjY2NztzdHJva2UtZGFzaGFycmF5Om5vbmUiCiAgICAgaWQ9InBhdGgzNDMiIC8+PHBhdGgKICAgICBkPSJtIDUzLjQ1MzkwNSwxNzAuODUzNjUgNy4xODM1OSwtMTUuOTEwMTYgYyAtMS44ODUzMiwtMC44ODM1NyAtMi42NDUwNSwtMy4yODQ1OCAtMS42OTA3NSwtNS4zOTk3NCAwLjEzNTMyLC0wLjMwMzEgMC4zMDgzMiwtMC43MTUzMiAwLjQ0NTMxLC0wLjk5MDg5IDAuNjAwNTMsLTEuMjA5MDIgMS4yOTIzNSwtMi4wMzQ2MSAxLjk2NDg0LC0zLjA5NTA1IDEuMzg2MzUsLTIuMjkzNDIgMi41Mzc2MywtNC4xODY3OSAzLjIyOTgyLC02LjEyMzcgMC4yODQ0OSwtMC45OTcyNSAtMC4wODg1LC0xLjYxNDI5IC0wLjM0NTcsLTIuMjUxMyAwLjA2NSwtMC4xODAxNCAyLjI4ODM2LC01Ljg4MDU3IDMuNDI5MDMsLTguODEyNSBsIC0xNy4xNjI3NiwtMjEuMzM4NTQgLTkuOTY4MSwxLjkxOTI3IGMgLTAuNTQ1MDEsLTAuMzgxODUgLTEuMDc3MTUsLTAuNzQ0ODEgLTEuNjY5MjcsLTAuNzQ0NzkgLTIuMTYxNTEsMTBlLTQgLTQuNTU0MzcsMS4yODYwMyAtNy4xNDM4OCwyLjE0MTkzIC0xLjE2MDkxLDAuNDc4MzMgLTIuMDg4OTYsMS4wMjE5NyAtMy4zODQxMSwxLjQwMzY0IC0wLjI5MzI2LDAuMDg2NSAtMC43MjQ4MiwwLjE4MTIyIC0xLjA0NjIzLDAuMjYxNzIgLTAuMDAyLDAuMDAxIC0wLjAwNSwwLjAwMiAtMC4wMDcsMC4wMDUgLTAuMDA0LDAuMDAzIC0wLjAwOCwwIC0wLjAxMTcsMCAtMi4xMTQxNiwwLjUzMzI0IC00LjE5NTk3LC0wLjQ3NDcyIC00Ljg4NjcxLC0yLjI2ODg4IGwgLTE4LjU3NDIyMjUsNC44NDMxIGggLTYuNTFlLTQgYSA4OS4zMTMzMjQsODkuMzEzMzI0IDAgMCAwIDQ5LjYzODAyMzUsNTYuMzYwNjggeiIKICAgICBzdHlsZT0iZmlsbDojNDg4ZWVhO3N0cm9rZTojNDg4ZWVhO3N0cm9rZS13aWR0aDowLjA2NjY2Njc7c3Ryb2tlLWRhc2hhcnJheTpub25lIgogICAgIGlkPSJwYXRoMzQ0IiAvPjxwYXRoCiAgICAgZD0ibSAzLjgxNTg4MjUsMTE0LjQ5Mjk3IDE4LjU3NDg3MjUsLTQuODQzMSBjIC0wLjA0ODcsLTAuMTI2NDUgLTAuMTA5NywtMC4yNDYxIC0wLjE0Mzg4LC0wLjM4MDIxIC0wLjUxNTQ4LC0yLjAyNDQyIDAuODcyMDQsLTQuMTI3NTQgMy4xMDgwNywtNC43MjQ2MSAwLjMyNDcyLC0wLjA4MjIgMC43ODQzOCwtMC4yMTcxNSAxLjEwMDI2LC0wLjI4NTE1IDEuMzE5OTUsLTAuMjg0MzggMi40MDAxOCwtMC4yNTY1MyAzLjY0ODQ0LC0wLjM5MTkzIDIuNjU3NTgsLTAuMzQ1NzUgNS4wMjQxLC0wLjY3NjU1IDYuOTY5NCwtMS4zNDMxIDAuNjA4MSwtMC4yNjcyOCAxLjA5OTg4LC0xLjAzOTc5IDEuNDMzNTksLTEuNjQ1ODMgbCA3LjkzMjI5LC0yLjUxOTUzMyA2LjM2MTMzLC0yNy42NzY0NCAtNi45NTk2MywtNS45MjI1MiBjIC0wLjA5NTIsLTAuNTAxNjMgLTAuMjE4NTgsLTEuNTY3NSAtMC44MTU3NiwtMi4xNzU3OCAtMS41MzQxNSwtMS4zNzAwOCAtMy40NTYzNywtMi40ODQ5MiAtNS43NzA4MywtMy44MzU5NCAtMS4wOTc5NywtMC42MDkzNSAtMi4wOTc4OCwtMS4wMDI4IC0zLjIwMzc4LC0xLjc3NzM0IC0wLjIzMzgxLC0wLjE2Mzg0IC0wLjU0NjQsLTAuNDE2NzEgLTAuODAyMDgsLTAuNjEzOTQgLTAuMDIxMSwtMC4wMTUzIC0wLjA0NTIsLTAuMDI0MSAtMC4wNjU4LC0wLjAzOTcgLTAuMDEzOSwtMC4wMTA5IC0wLjAzMDMsLTAuMDI5NSAtMC4wNDM2LC0wLjAzOTcgLTEuODI2MTcsLTEuNDE4MzkgLTIuMjg4OTEsLTMuODk1MyAtMS4wMjg2NCwtNS41NTk5IDAuMDEwMSwtMC4wMTM0IDAuMDIzNiwtMC4wMjI2IDAuMDMzOSwtMC4wMzU4IEwgMTYuNzEwNDEzLDM3LjQ3MDgyNyBBIDg5LjMxMzMyNCw4OS4zMTMzMjQgMCAwIDAgMC4wMzMzMzA0Niw4OS4zNDY0NzcgODkuMzEzMzI0LDg5LjMxMzMyNCAwIDAgMCAzLjgxNTg4MjUsMTE0LjQ5Mjk3IFoiCiAgICAgc3R5bGU9ImZpbGw6IzQ4OGVlYTtzdHJva2U6IzQ4OGVlYTtzdHJva2Utd2lkdGg6MC4wNjY2NjY3O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIKICAgICBpZD0icGF0aDM0NSIgLz48cGF0aAogICAgIGQ9Im0gMTYuNzEwNDEzLDM3LjQ3MDgyNyAxNy40MzM1OTIsMTMuMjExNTkgYyAxLjI3MDEyLC0xLjYyNzY2IDMuNzUxNTksLTEuODM5MTggNS41OTcwMSwtMC40Nzc4NiAwLjAxMzcsMC4wMTA3IDAuMDM1NCwwLjAyMzUgMC4wNDk1LDAuMDM0NSBsIDAuMDI3MywwLjAxODkgYyAwLjI2Mjc1LDAuMTk2NzIgMC42MDUyNiwwLjQ0MDEzIDAuODM1MjksMC42MjgyNiAxLjA0NTM5LDAuODU0OTIgMS42OTE5OCwxLjcyMTc3IDIuNTc2MTcsMi42MTMyOCAxLjkyNzIzLDEuODYyMDcgMy41MTk3LDMuNDA3NDMgNS4yNTM5LDQuNTEzMDIgMC41OTUzLDAuMzEyNDMgMS42MzI2OCwwLjIxODMxIDIuMzE5NjcsMC4xOTE0MSBsIDYuMTk4NTYsNC4xODIyOSAyNi4zMDU5OSwtMTIuNTY5MDEgMC4yNzQ3NCwtOC40NzI2NiBjIDAuMzE0MzMsLTAuMzY1NSAxLjA5MDk5LC0xLjE1MDk4IDEuMTkyNzEsLTIuMDAwNjUgMC4xMTQ4OCwtMi4wNTM0NyAtMC4yMDU1MSwtNC4yNTE3IC0wLjU5MjQ1LC02LjkwMzY0IC0wLjIwNzkyLC0xLjIzODEyIC0wLjUzMjA4LC0yLjI2MjMyIC0wLjYxNTg4LC0zLjYxMDAzIC0wLjAxODQsLTAuMjg2NTIgLTAuMDE0OCwtMC42OTA1IC0wLjAyMDgsLTEuMDEzNjcgLTAuMDAxLC0wLjAyMzkgLTAuMDA1LC0wLjA0NjMgLTAuMDA1LC0wLjA3MDMgLTAuMDU4NSwtMi4zMzcxNyAxLjU5NzE3LC00LjI3NTU4IDMuNzAwNTIsLTQuMzMwMDggbCA2LjVlLTQsMC4wMDUgYyAwLjAxNjMsLTQuMWUtNCAwLjAzMTMsMC4wMDUgMC4wNDc1LDAuMDA1IEwgODYuNzE3NTc1LDAuMjQwMzYzNDkgQSA4OS4zMTMzMjQsODkuMzEzMzI0IDAgMCAwIDE2LjcxMDQxMywzNy40NzA4MjcgWiIKICAgICBzdHlsZT0iZmlsbDojMTk3MWU2O3N0cm9rZTojMTk3MWU2O3N0cm9rZS13aWR0aDowLjA2NjY2Njc7c3Ryb2tlLWRhc2hhcnJheTpub25lIgogICAgIGlkPSJwYXRoMzM3IiAvPjxwYXRoCiAgICAgZD0ibSA4OS4zNDY0NzUsMC4wMzMzMzI0OSBhIDg5LjMxMzMyNCw4OS4zMTMzMjQgMCAwIDAgLTIuNjI4OSwwLjIwNzAzMSBsIDAuNTcxNjEsMjMuMTg1NTQzNTEgYyAxLjE2NDQ1LC0wLjAxMjggMi4yMjU2MSwwLjU0ODg2IDIuOTM4MTUsMS40NTk2NCAwLjU2MjIyLDAuNzE4MjcgMC45MTQzMSwxLjY1NTI3IDAuOTQwMTEsMi42NzgzOCAwLjAxLDAuMzMxNjcgMC4wMzA3LDAuNzc2OTEgMC4wMjY3LDEuMDgzMzQgLTAuMDE2NSwxLjM1MDI0IC0wLjI4MTc3LDIuMzg3NjIgLTAuNDI3NzMsMy42MzQ3NiAtMC4yNTY5MSwyLjY2Nzk4IC0wLjQ3MDk1LDQuODc2NzYgLTAuMjUzOTEsNi45MjE4OCAwLjE3NjEsMS4wMjIyIDAuNzgwNDEsMS40MTQ3IDEuMjg4NDEsMS44NzY5NSBsIDAuNTkwNSw3LjMxMjUgMjYuNTg4NTQ1LDEyLjY5NTk2IDYuNDAyOTksLTQuNzYxMDYgYyAwLjcwMjY3LDAuMDcyOSAxLjYxMDE4LDAuMDU0OSAyLjMwNTk5LC0wLjMxODM2IDEuNjc2ODMsLTEuMTkwOTEgMy4xOTM0LC0yLjgxNDM4IDUuMDI1MzksLTQuNzcwMTkgMC44Mzg0MSwtMC45MzQ4OSAxLjQ0MDYyLC0xLjgyNDE0IDIuNDQyMDYsLTIuNzI5ODEgMC4yMDUzNCwtMC4xODU1OCAwLjUwODkyLC0wLjQyMDM3IDAuNzU0NTYsLTAuNjIyNCAwLjAyNjcsLTAuMDIzNCAwLjA0NzksLTAuMDUxIDAuMDc1NSwtMC4wNzQyIDEuNzkxOTIsLTEuNTAzOTEgNC4zNDIzMywtMS40MTQ4NiA1LjY5NTk2LDAuMTk3OTIgdiAtMC4wMDMgYyAwLjAxODIsMC4wMjE2IDAuMDI4NywwLjA0NyAwLjA0NjIsMC4wNjkgbCAxNy4zNDUwNSwtMTQuNTIyNzggQSA4OS4zMTMzMjQsODkuMzEzMzI0IDAgMCAwIDg5LjM0NjQ3NSwwLjAzMzMzMjQ5IFoiCiAgICAgc3R5bGU9ImZpbGw6IzE5NzFlNjtzdHJva2U6IzE5NzFlNjtzdHJva2Utd2lkdGg6MC4wNjY2NjY3O3N0cm9rZS1kYXNoYXJyYXk6bm9uZSIKICAgICBpZD0icGF0aDMzOCIgLz48L3N2Zz4K"
+      mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apiregistration.k8s.io
+              resources:
+                - apiservices
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - console.openshift.io
+              resources:
+                - consoleplugins
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - core.kubebrowser.io
+              resources:
+                - browsers
+                - browsersystems
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - core.kubebrowser.io
+              resources:
+                - browsers/finalizers
+                - browsersystems/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - core.kubebrowser.io
+              resources:
+                - browsers/status
+                - browsersystems/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: kubebrowser-controller-manager
+      deployments:
+        - label:
+            app.kubernetes.io/managed-by: kustomize
+            app.kubernetes.io/name: operator
+            control-plane: controller-manager
+          name: kubebrowser-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app.kubernetes.io/name: operator
+                control-plane: controller-manager
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  app.kubernetes.io/name: operator
+                  control-plane: controller-manager
+              spec:
+                containers:
+                  - args:
+                      - --metrics-bind-address=:8443
+                      - --leader-elect
+                      - --health-probe-bind-address=:8081
+                      - --webhook-cert-path=/tmp/k8s-webhook-server/serving-certs
+                    command:
+                      - /system-manager
+                    env:
+                      - name: SERVICE_ACCOUNT_NAME
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: spec.serviceAccountName
+                      - name: NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+                      - name: BROWSER_MANAGER_IMAGE
+                        value: ghcr.io/kubebrowser/browser-manager:0.0.2
+                      - name: BROWSER_API_IMAGE
+                        value: ghcr.io/kubebrowser/browser-api:0.0.1
+                      - name: BROWSER_IMAGE
+                        value: ghcr.io/kubebrowser/browser-server:0.0.2
+                      - name: CONSOLE_PLUGIN_IMAGE
+                        value: ghcr.io/kubebrowser/console-plugin:0.0.2
+                      - name: CONSOLE_PLUGIN_NAME
+                        value: kubebrowser-plugin
+                    image: ghcr.io/kubebrowser/system-manager:0.0.2
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 10m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: webhook-certs
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                  seccompProfile:
+                    type: RuntimeDefault
+                serviceAccountName: kubebrowser-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: webhook-certs
+                    secret:
+                      secretName: webhook-server-cert
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: kubebrowser-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - browser
+    - web browser
+    - kubebrowser
+    - chromium
+    - testing
+  links:
+    - name: Github
+      url: https://github.com/kubebrowser
+  maintainers:
+    - email: devmohamed2000@email.com
+      name: Mohamed Fall
+  maturity: alpha
+  minKubeVersion: 1.23.0
+  provider:
+    name: Kubebrowser
+    url: https://github.com/kubebrowser
+  version: 0.0.2
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: kubebrowser-controller-manager
+      failurePolicy: Fail
+      generateName: mbrowsersystem-v1alpha.kb.io
+      rules:
+        - apiGroups:
+            - core.kubebrowser.io
+          apiVersions:
+            - v1alpha1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - browsersystems
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-core-kubebrowser-io-v1alpha1-browsersystem
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: kubebrowser-controller-manager
+      failurePolicy: Fail
+      generateName: vbrowsersystem-v1alpha1.kb.io
+      rules:
+        - apiGroups:
+            - core.kubebrowser.io
+          apiVersions:
+            - v1alpha1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - browsersystems
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-core-kubebrowser-io-v1alpha1-browsersystem
+  description: |-
+    ## About
+
+    This operator integrates a full web-browsing capability directly into your cluster.
+    It introduces a `Browser` custom resource that deploys a Chromium browser inside a pod.
+    A built-in console plugin provides a page with VNC access to the browser, letting you browse the web directly from within your cluster environment.
+    A sidecar REST API allows programmatic remote control of the browser.
+    Without this operator, testing a service typically required creating a `Route`, exec’ing into another pod and running `curl`, or setting up a port-forward. Now you can simply open a browser from inside the cluster.
+
+    ## Features
+
+    - Deploys Chromium browsers inside pods
+    - Provides a REST API for remote browser control
+    - Adds a **Networking -> Browsers** page to the web console for web browsing
+
+    ## Purpose
+
+    The Browser Operator makes it easy to:
+
+    - Test services from within the cluster
+    - Validate network connectivity across namespaces
+    - Verify access to external services
+    - Debug routing, DNS, and access issues directly from the cluster’s perspective
+
+    ## Installing
+
+    After installing the the operator, create a `BrowserSystem` instance. Configure the fields in `.spec` needed, otherwise leave it blank for defaults.
+
+    ```yaml
+    apiVersion: core.kubebrowser.io/v1alpha1
+    kind: BrowserSystem
+    metadata:
+      name: browsersystem
+      namespace: kubebrowser
+    spec:
+      enableApiService: true
+      enableConsolePlugin: true
+    ```
+
+    ## Usage
+
+    Once the operator is installed and the `BrowserSystem` is deployed, you may create a `Browser` resource.
+
+    ```
+    apiVersion: core.kubebrowser.io/v1alpha1
+    kind: Browser
+    metadata:
+      name: mybrowser
+    spec:
+      started: false
+    ```
+
+    If you've configured your `BrowserSystem` to enable the console plugin, you should see and be able to use your browser in the [_browsers_](/browsers) page (accessible under _>Networking>Browsers_).
+  relatedImages:
+    - name: manager
+      image: ghcr.io/kubebrowser/system-manager:0.0.2
+    - name: browser-api
+      image: ghcr.io/kubebrowser/browser-api:0.0.1
+    - name: browser-manager
+      image: ghcr.io/kubebrowser/browser-manager:0.0.2
+    - name: console-plugin
+      image: ghcr.io/kubebrowser/console-plugin:0.0.2

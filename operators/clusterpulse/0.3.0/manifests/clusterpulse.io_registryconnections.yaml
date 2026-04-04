@@ -1,0 +1,189 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.0
+  creationTimestamp: null
+  name: registryconnections.clusterpulse.io
+spec:
+  group: clusterpulse.io
+  names:
+    kind: RegistryConnection
+    listKind: RegistryConnectionList
+    plural: registryconnections
+    shortNames:
+    - rc
+    - regcon
+    singular: registryconnection
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.displayName
+      name: Display Name
+      type: string
+    - jsonPath: .spec.endpoint
+      name: Endpoint
+      type: string
+    - jsonPath: .spec.type
+      name: Type
+      type: string
+    - jsonPath: .status.available
+      name: Available
+      type: boolean
+    - jsonPath: .status.health
+      name: Health
+      type: string
+    - jsonPath: .status.responseTime
+      name: Response Time
+      type: integer
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: RegistryConnection is the Schema for the registryconnections
+          API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: RegistryConnectionSpec defines the desired state of RegistryConnection
+            properties:
+              credentialsRef:
+                description: |-
+                  CredentialsRef references the secret containing registry credentials (optional)
+                  Secret should contain "username" and "password" fields
+                properties:
+                  name:
+                    description: Name of the secret
+                    type: string
+                  namespace:
+                    description: Namespace of the secret (defaults to same namespace
+                      as ClusterConnection)
+                    type: string
+                required:
+                - name
+                type: object
+              displayName:
+                description: DisplayName is a human-friendly name for the registry
+                type: string
+              endpoint:
+                description: Endpoint is the registry endpoint (e.g., https://registry.example.com)
+                type: string
+              healthCheckPaths:
+                description: HealthCheckPaths to verify (defaults to ["/v2/"])
+                items:
+                  type: string
+                type: array
+              insecure:
+                description: Insecure allows connecting to registries with self-signed
+                  certificates
+                type: boolean
+              labels:
+                additionalProperties:
+                  type: string
+                description: Labels for registry categorization
+                type: object
+              monitoring:
+                description: Monitoring configuration
+                properties:
+                  checkCatalog:
+                    description: CheckCatalog enables checking /v2/_catalog endpoint
+                      (requires appropriate permissions)
+                    type: boolean
+                  interval:
+                    description: Interval in seconds between health checks (minimum
+                      30, default 60)
+                    format: int32
+                    type: integer
+                  maxCatalogEntries:
+                    description: MaxCatalogEntries limits the number of catalog entries
+                      to fetch (default 100)
+                    format: int32
+                    type: integer
+                  timeout:
+                    description: Timeout in seconds for health check requests (minimum
+                      5, default 10)
+                    format: int32
+                    type: integer
+                type: object
+              skipTLSVerify:
+                description: SkipTLSVerify skips TLS certificate verification
+                type: boolean
+              type:
+                description: |-
+                  Type is optional and purely informational (all registries use Docker v2 API)
+                  Examples: "dockerhub", "harbor", "ecr", "gcr", "artifactory"
+                  Can be left empty or any string for documentation purposes
+                type: string
+            required:
+            - endpoint
+            type: object
+          status:
+            description: RegistryConnectionStatus defines the observed state of RegistryConnection
+            properties:
+              available:
+                description: Available indicates if the registry is reachable
+                type: boolean
+              features:
+                additionalProperties:
+                  type: boolean
+                description: Features detected from the registry
+                type: object
+              health:
+                description: Health indicates registry health (healthy, degraded,
+                  unhealthy, unknown)
+                type: string
+              lastCheckTime:
+                description: LastCheckTime is the timestamp of the last health check
+                format: date-time
+                type: string
+              message:
+                description: Message provides additional information about the status
+                type: string
+              phase:
+                description: Phase indicates the connection status (Connecting, Connected,
+                  Error, Unknown)
+                type: string
+              repositoryCount:
+                description: RepositoryCount is the number of repositories (if catalog
+                  check is enabled)
+                type: integer
+              responseTime:
+                description: ResponseTime is the last health check response time in
+                  milliseconds
+                format: int64
+                type: integer
+              version:
+                description: Version is the registry version (if detectable)
+                type: string
+            required:
+            - available
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

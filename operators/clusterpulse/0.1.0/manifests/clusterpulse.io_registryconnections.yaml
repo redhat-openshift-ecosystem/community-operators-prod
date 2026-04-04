@@ -1,0 +1,163 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: registryconnections.clusterpulse.io
+spec:
+  group: clusterpulse.io
+  names:
+    kind: RegistryConnection
+    plural: registryconnections
+    shortNames:
+    - rc
+    - regcon
+    singular: registryconnection
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.displayName
+      name: Display Name
+      type: string
+    - jsonPath: .spec.endpoint
+      name: Endpoint
+      type: string
+    - jsonPath: .spec.type
+      name: Type
+      type: string
+    - jsonPath: .status.available
+      name: Available
+      type: boolean
+    - jsonPath: .status.health
+      name: Health
+      type: string
+    - description: Response time in ms
+      jsonPath: .status.responseTime
+      name: Response Time
+      type: integer
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              credentialsRef:
+                description: Reference to secret containing credentials
+                properties:
+                  name:
+                    description: Name of the secret
+                    type: string
+                  namespace:
+                    description: Namespace of the secret
+                    type: string
+                required:
+                - name
+                type: object
+              displayName:
+                description: Human-friendly name for the registry
+                type: string
+              endpoint:
+                description: Registry endpoint URL
+                type: string
+              healthCheckPaths:
+                default:
+                - /v2/
+                description: Additional paths to check for health
+                items:
+                  type: string
+                type: array
+              insecure:
+                default: false
+                description: Allow insecure HTTP connections
+                type: boolean
+              labels:
+                additionalProperties:
+                  type: string
+                description: Labels for registry categorization
+                type: object
+              monitoring:
+                properties:
+                  checkCatalog:
+                    default: false
+                    description: Enable catalog endpoint checking
+                    type: boolean
+                  interval:
+                    default: 60
+                    description: Check interval in seconds
+                    minimum: 30
+                    type: integer
+                  maxCatalogEntries:
+                    default: 100
+                    description: Maximum catalog entries to fetch
+                    maximum: 1000
+                    minimum: 1
+                    type: integer
+                  timeout:
+                    default: 10
+                    description: Request timeout in seconds
+                    minimum: 5
+                    type: integer
+                type: object
+              skipTLSVerify:
+                default: false
+                description: Skip TLS certificate verification
+                type: boolean
+              type:
+                description: Optional type identifier for the registry (informational
+                  only)
+                type: string
+            required:
+            - endpoint
+            type: object
+          status:
+            properties:
+              available:
+                description: Whether registry is reachable
+                type: boolean
+              features:
+                additionalProperties:
+                  type: boolean
+                description: Detected registry features
+                type: object
+              health:
+                description: Health status (healthy, degraded, unhealthy, unknown)
+                type: string
+              lastCheckTime:
+                description: Last health check timestamp
+                format: date-time
+                type: string
+              message:
+                description: Status message
+                type: string
+              phase:
+                description: Current phase (Connecting, Connected, Error, Unknown)
+                type: string
+              repositoryCount:
+                description: Number of repositories (if catalog enabled)
+                type: integer
+              responseTime:
+                description: Response time in milliseconds
+                type: integer
+              version:
+                description: Registry version
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

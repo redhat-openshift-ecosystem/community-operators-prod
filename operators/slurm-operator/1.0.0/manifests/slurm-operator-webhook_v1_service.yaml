@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: slurm-operator-webhook-ca
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: slurm-operator
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: slurm-operator-webhook
+    app.kubernetes.io/version: "25.11"
+    helm.sh/chart: slurm-operator-1.0.0
+  name: slurm-operator-webhook
+spec:
+  ports:
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  - name: health
+    port: 8081
+    protocol: TCP
+    targetPort: 8081
+  selector:
+    app.kubernetes.io/instance: slurm-operator
+    app.kubernetes.io/name: slurm-operator-webhook
+  type: ClusterIP
+status:
+  loadBalancer: {}

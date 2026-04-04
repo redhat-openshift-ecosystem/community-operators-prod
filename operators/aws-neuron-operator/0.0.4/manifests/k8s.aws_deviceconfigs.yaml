@@ -1,0 +1,149 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.1
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: aws-neuron
+    app.kubernetes.io/name: aws-neuron
+    app.kubernetes.io/part-of: aws-neuron
+  name: deviceconfigs.k8s.aws
+spec:
+  group: k8s.aws
+  names:
+    kind: DeviceConfig
+    listKind: DeviceConfigList
+    plural: deviceconfigs
+    shortNames:
+    - awslabsdc
+    singular: deviceconfig
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: DeviceConfig describes how to enable awslabs GPU device
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DeviceConfigSpec describes how the AMD GPU operator should
+              enable AMD GPU device for customer's use.
+            properties:
+              customSchedulerImage:
+                description: custom scheduler image
+                type: string
+              devicePluginImage:
+                description: device plugin image
+                type: string
+              driverVersion:
+                description: defines the Version of the neuron drivers. used for rolling
+                  upgrade
+                type: string
+              driversImage:
+                description: defines image that includes drivers
+                type: string
+              imageRepoSecret:
+                description: pull secrets used for pull/setting images used by operator
+                properties:
+                  name:
+                    default: ""
+                    description: |-
+                      Name of the referent.
+                      This field is effectively required, but due to backwards compatibility is
+                      allowed to be empty. Instances of this type with an empty value here are
+                      almost certainly wrong.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                type: object
+                x-kubernetes-map-type: atomic
+              nodeMetricsImage:
+                description: node metrics image
+                type: string
+              schedulerExtensionImage:
+                description: scheduler extension image
+                type: string
+              selector:
+                additionalProperties:
+                  type: string
+                description: Selector describes on which nodes the GPU Operator should
+                  enable the GPU device.
+                type: object
+              useInTreeDrivers:
+                description: if the in-tree driver should be used instead of OOT drivers
+                type: boolean
+            required:
+            - customSchedulerImage
+            - devicePluginImage
+            - driversImage
+            - nodeMetricsImage
+            - schedulerExtensionImage
+            type: object
+          status:
+            description: ModuleStatus defines the observed state of Module.
+            properties:
+              devicePlugin:
+                description: DevicePlugin contains the status of the Device Plugin
+                  deployment
+                properties:
+                  availableNumber:
+                    description: number of the actually deployed and running pods
+                    format: int32
+                    type: integer
+                  desiredNumber:
+                    description: number of the pods that should be deployed for daemonset
+                    format: int32
+                    type: integer
+                  nodesMatchingSelectorNumber:
+                    description: number of nodes that are targeted by the DeviceConfig
+                      selector
+                    format: int32
+                    type: integer
+                type: object
+              driver:
+                description: Driver contains the status of the Drivers deployment
+                properties:
+                  availableNumber:
+                    description: number of the actually deployed and running pods
+                    format: int32
+                    type: integer
+                  desiredNumber:
+                    description: number of the pods that should be deployed for daemonset
+                    format: int32
+                    type: integer
+                  nodesMatchingSelectorNumber:
+                    description: number of nodes that are targeted by the DeviceConfig
+                      selector
+                    format: int32
+                    type: integer
+                type: object
+            required:
+            - driver
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

@@ -1,0 +1,403 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  creationTimestamp: null
+  name: networkpolicies.networking.turbosimone.com
+spec:
+  group: networking.turbosimone.com
+  names:
+    kind: NetworkPolicy
+    listKind: NetworkPolicyList
+    plural: networkpolicies
+    shortNames:
+    - fenp
+    - fnp
+    singular: networkpolicy
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Ready condition status
+      jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    - description: Resolved condition status
+      jsonPath: .status.conditions[?(@.type=="Resolved")].status
+      name: Resolved
+      type: string
+    - description: Number of resolved IPs before filtering
+      jsonPath: .status.totalAddressCount
+      name: Resolved IPs
+      type: integer
+    - description: Number of applied IPs
+      jsonPath: .status.appliedAddressCount
+      name: Applied IPs
+      type: integer
+    - description: Time of last FQDN resolved
+      jsonPath: .status.latestLookupTime
+      name: Last Lookup
+      type: date
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          NetworkPolicy is the Schema for the networkpolicies API.
+
+            - Please ensure the pods you apply this network policy to have a separate policy allowing access to CoreDNS / KubeDNS pods in your cluster. Without this, once this Network policy is applied, access to DNS will be blocked due to how network policies deny all unspecified traffic by default once applied.
+            - If no addresses are resolved from the FQDNs from the Egress rules that were specified, the default behavior is to block all Egress traffic. This conforms with the default behavior of network policies (networking.k8s.io/v1).
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: NetworkPolicySpec defines the desired state of NetworkPolicy.
+            properties:
+              blockPrivateIPs:
+                description: |-
+                  When set to true, all private IPs are omitted from the rules unless otherwise specified at the EgressRule level.
+
+                   - Defaults to false if not specified
+                type: boolean
+              egress:
+                description: Egress defines the outbound network traffic rules for
+                  the selected pods.
+                items:
+                  description: |-
+                    EgressRule defines rules for outbound network traffic to the specified FQDNs on the specified ports.
+                    Each FQDNs IP's will be looked up periodically to update the underlying NetworkPolicy.
+                  properties:
+                    blockPrivateIPs:
+                      description: When set, overwrites the default behavior of the
+                        same field in NetworkPolicySpec.
+                      type: boolean
+                    ports:
+                      description: Ports describes the ports to allow traffic on.
+                      items:
+                        description: Shadow MultiNetworkPolicyPort struct
+                        properties:
+                          port:
+                            description: The specific port number to allow.
+                            format: int32
+                            maximum: 65535
+                            minimum: 1
+                            type: integer
+                          protocol:
+                            default: TCP
+                            description: Protocol defines network protocols supported
+                              for things like container ports.
+                            enum:
+                            - TCP
+                            - UDP
+                            - SCTP
+                            type: string
+                        required:
+                        - port
+                        - protocol
+                        type: object
+                      maxItems: 10
+                      type: array
+                      x-kubernetes-list-map-keys:
+                      - protocol
+                      - port
+                      x-kubernetes-list-type: map
+                    toFQDNs:
+                      description: ToFQDNs are the FQDNs to which traffic is allowed
+                        (outgoing).
+                      items:
+                        description: FQDN is short for Fully Qualified Domain Name
+                          and represents a complete domain name that uniquely identifies
+                          a host on the internet. It must consist of one or more labels
+                          separated by dots (e.g., "api.example.com"), where each
+                          label can contain letters, digits, and hyphens, but cannot
+                          start or end with a hyphen. The FQDN must end with a top-level
+                          domain (e.g., ".com", ".org") of at least two characters.
+                        pattern: ^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$
+                        type: string
+                      maxItems: 100
+                      type: array
+                      x-kubernetes-list-type: set
+                  required:
+                  - ports
+                  - toFQDNs
+                  type: object
+                maxItems: 30
+                type: array
+                x-kubernetes-validations:
+                - message: spec.egress in body should not contain overlapping toFQDNs
+                    and ports across different rules
+                  rule: self.all(i, self.filter(j, j.toFQDNs.exists(f, f in i.toFQDNs)
+                    && j.ports.exists(p, p in i.ports)).size() == 1)
+              enabledNetworkType:
+                default: ipv4
+                description: |-
+                  EnabledNetworkType defines which type of IP addresses to allow.
+
+                   - Options are one of: 'all', 'ipv4', 'ipv6'
+                   - Defaults to 'ipv4' if not specified
+                enum:
+                - all
+                - ipv4
+                - ipv6
+                type: string
+              matchExpressions:
+                description: MatchExpressions defines which pods this network policy
+                  shall apply to.
+                items:
+                  description: Shadow LabelSelectorRequirement struct
+                  properties:
+                    key:
+                      default: vm.kubevirt.io/name
+                      description: Key is the label key that the selector applies
+                        to.
+                      enum:
+                      - vm.kubevirt.io/name
+                      - app.kubernetes.io/name
+                      type: string
+                    operator:
+                      default: In
+                      description: Operator represents a key's relationship to a set
+                        of values. Valid operators are In and NotIn.
+                      enum:
+                      - In
+                      - NotIn
+                      type: string
+                    values:
+                      description: Values is an array of string values. If the operator
+                        is In or NotIn, the values array must be non-empty.
+                      items:
+                        description: The value corresponding to the label.
+                        minLength: 1
+                        type: string
+                      maxItems: 50
+                      type: array
+                      x-kubernetes-list-type: set
+                  required:
+                  - key
+                  - operator
+                  - values
+                  type: object
+                maxItems: 30
+                type: array
+                x-kubernetes-validations:
+                - message: spec.matchExpressions in body should not contain overlapping
+                    values for the same key and operator
+                  rule: self.all(i, self.filter(j, i.key == j.key && i.operator ==
+                    j.operator && j.values.exists(v, v in i.values)).size() == 1)
+              matchLabels:
+                description: MatchLabels defines which pods this network policy shall
+                  apply to.
+                items:
+                  description: Shadow MatchLabel struct
+                  properties:
+                    label:
+                      default: vm.kubevirt.io/name
+                      description: Label is typically used to identify a pod.
+                      enum:
+                      - vm.kubevirt.io/name
+                      - app.kubernetes.io/name
+                      type: string
+                    value:
+                      description: The value corresponding to the label.
+                      minLength: 1
+                      type: string
+                  required:
+                  - label
+                  - value
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - label
+                - value
+                x-kubernetes-list-type: map
+              resolveTimeoutSeconds:
+                default: 3
+                description: |-
+                  The timeout to use for lookups of the FQDNs.
+
+                   - Defaults to 3 seconds if not specified
+                   - Maximum value is 60 seconds
+                   - Minimum value is 1 second
+                   - Must be less than TTLSeconds
+                format: int32
+                maximum: 60
+                minimum: 1
+                type: integer
+              retryTimeoutSeconds:
+                default: 3600
+                description: |-
+                  How long the resolving of an individual FQDN should be retried in case of errors before being removed from the underlying network policy. This ensures intermittent failures in name resolution do not clear existing addresses causing unwanted service disruption.
+
+                   - Defaults to 3600 (1 hour) if not specified (nil)
+                   - Maximum value is 86400 (24 hours)
+                format: int32
+                maximum: 86400
+                type: integer
+              targetNetwork:
+                description: TargetNetwork represents the network where the network
+                  policy is effective. If the list is empty, please confirm whether
+                  a NAD has been created in the current project.
+                minLength: 1
+                type: string
+              ttlSeconds:
+                default: 60
+                description: |-
+                  The interval at which the IP addresses of the FQDNs are re-evaluated.
+
+                   - Defaults to 60 seconds if not specified
+                   - Maximum value is 1800 seconds
+                   - Minimum value is 5 seconds
+                   - Must be greater than ResolveTimeoutSeconds
+                format: int32
+                maximum: 1800
+                minimum: 5
+                type: integer
+            required:
+            - egress
+            - targetNetwork
+            type: object
+          status:
+            description: NetworkPolicyStatus defines the observed state of NetworkPolicy.
+            properties:
+              appliedAddressCount:
+                description: AppliedAddressCount counts the number of unique IPs applied
+                  in the generated network policy
+                format: int32
+                type: integer
+              conditions:
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              fqdns:
+                description: FQDNs lists the status of each FQDN in the network policy
+                items:
+                  description: FQDNStatus defines the status of a given FQDN
+                  properties:
+                    addresses:
+                      description: Addresses is the list of resolved addresses for
+                        the given FQDN. The list is cleared if LastSuccessfulTime
+                        exceeds the time limit specified by NetworkPolicySpec.RetryTimeoutSeconds
+                      items:
+                        type: string
+                      type: array
+                    fqdn:
+                      description: FQDN is the FQDN this status refers to
+                      pattern: ^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$
+                      type: string
+                    lastSuccessfulTime:
+                      description: LastSuccessfulTime is the last time the FQDN was
+                        resolved successfully. I.e. the last time the ResolvedReason
+                        was NetworkPolicyResolvedSuccess
+                      format: date-time
+                      type: string
+                    lastTransitionTime:
+                      description: LastTransitionTime is the last time the reason
+                        changed
+                      format: date-time
+                      type: string
+                    resolvedMessage:
+                      description: ResolvedMessage is a message describing the reason
+                        for the status
+                      type: string
+                    resolvedReason:
+                      description: ResolvedReason describes the last resolved status
+                      type: string
+                  required:
+                  - fqdn
+                  type: object
+                type: array
+              latestLookupTime:
+                description: LatestLookupTime is the last time the IPs were resolved
+                format: date-time
+                type: string
+              observedGeneration:
+                format: int64
+                type: integer
+              totalAddressCount:
+                description: TotalAddressCount is the number of total IPs resolved
+                  from the FQDNs before filtering
+                format: int32
+                type: integer
+            required:
+            - conditions
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

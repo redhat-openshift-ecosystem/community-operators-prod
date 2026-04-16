@@ -1,0 +1,17 @@
+---
+entries:
+- defaultChannel: alpha
+  name: nfs-provisioner-operator
+  schema: olm.package
+- entries:
+  - name: nfs-provisioner-operator.v0.0.8
+  - name: nfs-provisioner-operator.v0.0.9
+    replaces: nfs-provisioner-operator.v0.0.8
+  name: alpha
+  package: nfs-provisioner-operator
+  schema: olm.channel
+- image: quay.io/jooholee/nfs-provisioner-operator-bundle:0.0.8
+  schema: olm.bundle
+- image: quay.io/jooholee/nfs-provisioner-operator-bundle:0.0.9
+  schema: olm.bundle
+schema: olm.template.basic

@@ -1,0 +1,67 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  creationTimestamp: null
+  name: catfacts.ryanmillerc.github.io
+spec:
+  group: ryanmillerc.github.io
+  names:
+    kind: CatFact
+    listKind: CatFactList
+    plural: catfacts
+    singular: catfact
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: "CatFact is a Kubernetes model of a fact about cats \U0001F431"
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: CatFactSpec defines the desired state of CatFact
+            properties:
+              fact:
+                description: |-
+                  A fact about cats. If this field is omitted, a random fact will be
+                  generated from https://catfact.ninja/fact.
+                type: string
+              iconName:
+                description: |-
+                  Icon to use when displayed in the OpenShift UI. See
+                  https://github.com/RyanMillerC/cat-facts-operator/README.md for available
+                  icon names. If this field is omitted, a random iconName will be applied.
+                type: string
+            type: object
+          status:
+            description: CatFactStatus defines the observed state of CatFact
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

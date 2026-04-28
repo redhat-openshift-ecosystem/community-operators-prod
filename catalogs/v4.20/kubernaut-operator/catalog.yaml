@@ -6,8 +6,10 @@ schema: olm.package
 entries:
 - name: kubernaut-operator.v1.3.2
 - name: kubernaut-operator.v1.3.3
+- name: kubernaut-operator.v1.3.4
   skips:
   - kubernaut-operator.v1.3.2
+  - kubernaut-operator.v1.3.3
 name: candidate-v1
 package: kubernaut-operator
 schema: olm.channel
@@ -395,6 +397,204 @@ relatedImages:
 - image: quay.io/kubernaut-ai/gateway@sha256:428da6f304ddf4813916884ea82b326041590ff9c4bc6b76a7b24a8f97dc7287
   name: gateway
 - image: quay.io/kubernaut-ai/kubernaut-operator@sha256:adf03a90fba1527dd0caa99ba09a15c7b553c5b562bfc1f471a904eb090ca24c
+  name: kubernaut-operator
+- image: quay.io/kubernaut-ai/kubernautagent@sha256:ac811a1d1c07b2567a04df1e0e2a2eaf7f3b6d40dd8a648ef255d3c22ecf0bdc
+  name: kubernaut-agent
+- image: quay.io/kubernaut-ai/notification@sha256:7fb5d3fa890f0e9bc7bf5f682a4d066e12e4b620b041ea991743b533b40585a5
+  name: notification
+- image: quay.io/kubernaut-ai/remediationorchestrator@sha256:0f630935d0382a6093f0d7192cc65827d3b1a615b78a51725494296c11328355
+  name: remediationorchestrator
+- image: quay.io/kubernaut-ai/signalprocessing@sha256:bd1c8dbeb186a2ec0c3e8aab9178bd11877a0a89b4f1bb4a1db3fde614589de5
+  name: signalprocessing
+- image: quay.io/kubernaut-ai/workflowexecution@sha256:545d3c406ff7167f93400a93a2ca6a13b1cd9f45b004c048aec050968d4d10b1
+  name: workflowexecution
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/kubernaut-operator:1.3.4
+name: kubernaut-operator.v1.3.4
+package: kubernaut-operator
+properties:
+- type: olm.gvk
+  value:
+    group: kubernaut.ai
+    kind: Kubernaut
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: kubernaut-operator
+    version: 1.3.4
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "kubernaut.ai/v1alpha1",
+            "kind": "Kubernaut",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "kubernaut-operator"
+              },
+              "name": "kubernaut",
+              "namespace": "kubernaut-system"
+            },
+            "spec": {
+              "aiAnalysis": {
+                "policy": {
+                  "configMapName": "aianalysis-policies"
+                }
+              },
+              "gateway": {
+                "route": {
+                  "enabled": true
+                }
+              },
+              "kubernautAgent": {
+                "llm": {
+                  "credentialsSecretName": "llm-credentials",
+                  "model": "claude-sonnet-4-6",
+                  "provider": "vertex_ai",
+                  "sdkConfigMapName": "kubernaut-agent-sdk-config"
+                }
+              },
+              "monitoring": {
+                "enabled": true
+              },
+              "postgresql": {
+                "host": "postgresql.kubernaut-system.svc.cluster.local",
+                "port": 5432,
+                "secretName": "postgresql-secret"
+              },
+              "signalProcessing": {
+                "policy": {
+                  "configMapName": "signalprocessing-policy"
+                }
+              },
+              "valkey": {
+                "host": "valkey.kubernaut-system.svc.cluster.local",
+                "port": 6379,
+                "secretName": "valkey-secret"
+              }
+            }
+          }
+        ]
+      capabilities: Full Lifecycle
+      categories: AI/Machine Learning,Monitoring
+      com.redhat.openshift.versions: v4.18
+      containerImage: quay.io/kubernaut-ai/kubernaut-operator@sha256:2ed49996c3a13e0d9b18ce8bea483b9303123d2c28760187423f9cecba9a9214
+      createdAt: "2026-04-28T22:13:00Z"
+      description: Automated Kubernetes remediation powered by AI — detects issues,
+        analyzes root causes, and executes verified fixes.
+      documentation: https://jordigilh.github.io/kubernaut-docs/latest/
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "true"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: kubernaut-system
+      operators.operatorframework.io/builder: operator-sdk-v1.42.2
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/jordigilh/kubernaut-operator
+      support: jgil@redhat.com
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: |-
+          Kubernaut is the Schema for the kubernauts API.
+          It declares a single Kubernaut deployment within the namespace it is created in.
+        displayName: Kubernaut
+        kind: Kubernaut
+        name: kubernauts.kubernaut.ai
+        version: v1alpha1
+    description: |
+      ## Kubernaut Operator for OpenShift
+
+      The Kubernaut Operator deploys and manages the **Kubernaut AIOps Remediation Platform**
+      on OpenShift Container Platform (OCP) 4.18+.
+
+      Kubernaut automatically detects Kubernetes issues via AlertManager signals, performs
+      AI-powered root cause analysis, selects and executes remediation workflows, and
+      verifies effectiveness — all with policy-governed approval gates.
+
+      ### Features
+
+      - **Single CR deployment**: one `Kubernaut` custom resource deploys all 10 services
+      - **BYO infrastructure**: bring your own PostgreSQL and Valkey/Redis
+      - **OCP-native**: auto-wires Prometheus, AlertManager, service-ca TLS, and Routes
+      - **Policy-governed**: Rego policies control signal classification and AI analysis approval
+      - **LLM-powered analysis**: integrates with OpenAI, Anthropic, and other LLM providers
+      - **Full lifecycle management**: automated DB migrations, OCP service-CA TLS integration, RBAC provisioning
+      - **Ansible integration**: optional AWX/AAP for Ansible-based remediation workflows
+
+      ### Prerequisites
+
+      - OpenShift Container Platform 4.18+ (Kubernetes 1.31+)
+      - PostgreSQL database with credentials in a Secret
+      - Valkey/Redis with credentials in a Secret
+      - LLM API credentials (e.g., OpenAI API key) in a Secret
+      - Rego policy ConfigMaps for AI analysis and signal processing
+
+      ### Getting Started
+
+      1. Create the required BYO secrets (PostgreSQL, Valkey, LLM credentials)
+      2. Create Rego policy ConfigMaps
+      3. Apply a `Kubernaut` CR — see the sample in the operator bundle
+    displayName: Kubernaut Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+    keywords:
+    - kubernaut
+    - remediation
+    - ai
+    - openshift
+    - kubernetes
+    - alertmanager
+    - sre
+    - aiops
+    links:
+    - name: Documentation
+      url: https://jordigilh.github.io/kubernaut-docs/latest/
+    - name: Kubernaut
+      url: https://github.com/jordigilh/kubernaut
+    - name: Kubernaut Operator
+      url: https://github.com/jordigilh/kubernaut-operator
+    maintainers:
+    - email: jgil@redhat.com
+      name: Jordi Gil
+    maturity: alpha
+    minKubeVersion: 1.31.0
+    provider:
+      name: Kubernaut AI
+      url: https://github.com/jordigilh/kubernaut
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/kubernaut-operator:1.3.4
+  name: ""
+- image: quay.io/kubernaut-ai/aianalysis@sha256:b908326271741b903557605188f6303dfb966f32dab4c494127183b7b24d44db
+  name: aianalysis
+- image: quay.io/kubernaut-ai/authwebhook@sha256:9de8ef5a47b1e6eeed758cffbff2ded11f19ab757789a8e7b981b2e2b2f2f047
+  name: authwebhook
+- image: quay.io/kubernaut-ai/datastorage@sha256:1c9b865d4eaef05ea87c339eaf41fde4c6213816b195cb5fc9ea03788903013e
+  name: data-storage
+- image: quay.io/kubernaut-ai/db-migrate@sha256:99f65904b158132ffad21009736a45d5a4ba5c4ebece90938272e771eb4fcffe
+  name: db-migrate
+- image: quay.io/kubernaut-ai/effectivenessmonitor@sha256:7f8a505ac2587b954d8f9f3de5adf0b4119d4dd4375f66923f30c0eb691a1717
+  name: effectivenessmonitor
+- image: quay.io/kubernaut-ai/gateway@sha256:428da6f304ddf4813916884ea82b326041590ff9c4bc6b76a7b24a8f97dc7287
+  name: gateway
+- image: quay.io/kubernaut-ai/kubernaut-operator@sha256:2ed49996c3a13e0d9b18ce8bea483b9303123d2c28760187423f9cecba9a9214
   name: kubernaut-operator
 - image: quay.io/kubernaut-ai/kubernautagent@sha256:ac811a1d1c07b2567a04df1e0e2a2eaf7f3b6d40dd8a648ef255d3c22ecf0bdc
   name: kubernaut-agent

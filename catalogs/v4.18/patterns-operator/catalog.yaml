@@ -136,6 +136,20 @@ entries:
   replaces: patterns-operator.v0.0.63
 - name: patterns-operator.v0.0.65
   replaces: patterns-operator.v0.0.64
+- name: patterns-operator.v0.0.66
+  replaces: patterns-operator.v0.0.65
+- name: patterns-operator.v0.0.67
+  replaces: patterns-operator.v0.0.66
+- name: patterns-operator.v0.0.68
+  replaces: patterns-operator.v0.0.67
+- name: patterns-operator.v0.0.69
+  replaces: patterns-operator.v0.0.68
+- name: patterns-operator.v0.0.70
+  replaces: patterns-operator.v0.0.69
+- name: patterns-operator.v0.0.71
+  replaces: patterns-operator.v0.0.70
+- name: patterns-operator.v0.0.72
+  replaces: patterns-operator.v0.0.71
 name: fast
 package: patterns-operator
 schema: olm.channel
@@ -13039,6 +13053,1064 @@ relatedImages:
   name: manager
 schema: olm.bundle
 ---
+image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.66
+name: patterns-operator.v0.0.66
+package: patterns-operator
+properties:
+- type: olm.gvk
+  value:
+    group: gitops.hybrid-cloud-patterns.io
+    kind: Pattern
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: patterns-operator
+    version: 0.0.66
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "gitops.hybrid-cloud-patterns.io/v1alpha1",
+            "kind": "Pattern",
+            "metadata": {
+              "name": "pattern-sample"
+            },
+            "spec": {
+              "clusterGroupName": "hub",
+              "gitSpec": {
+                "targetRepo": "https://github.com/validatedpatterns/multicloud-gitops",
+                "targetRevision": "main"
+              },
+              "multiSourceConfig": {
+                "enabled": true
+              }
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      containerImage: quay.io/validatedpatterns/patterns-operator:0.0.66
+      createdAt: "2026-03-17 09:52:29"
+      description: "An operator to deploy and manage architecture patterns from https://validatedpatterns.io.
+        \nThis operator collects some Analytics like cluster version, cloud type,
+        etc. To disable this\nadd \"ANALYTICS: false\" to the environment variables
+        in the subscription."
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "true"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: patterns-operator
+      operators.openshift.io/must-gather-image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+      operators.operatorframework.io/builder: operator-sdk-v1.37.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/validatedpatterns/patterns-operator
+      support: validatedpatterns@googlegroups.com
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Pattern is the Schema for the patterns API
+        displayName: Pattern
+        kind: Pattern
+        name: patterns.gitops.hybrid-cloud-patterns.io
+        resources:
+        - kind: Pattern
+          name: patterns
+          version: v1alpha1
+        specDescriptors:
+        - displayName: Name
+          path: extraParameters[0].name
+        - displayName: Value
+          path: extraParameters[0].value
+        - displayName: Cluster Group Name
+          path: clusterGroupName
+        - displayName: Git Config
+          path: gitSpec
+        - displayName: Multi Source Config
+          path: multiSourceConfig
+        - description: |-
+            .Name is dot separated per the helm --set syntax, such as:
+              global.something.field
+          displayName: Extra Parameters
+          path: extraParameters
+        - description: URLs to additional Helm parameter files
+          displayName: Extra Value Files
+          path: extraValueFiles
+        - displayName: Git Ops Config
+          path: gitOpsSpec
+        - description: Analytics UUID. Leave empty to autogenerate a random one. Not
+            PII information
+          displayName: Analytics UUID
+          path: analyticsUUID
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Comma separated capabilities to enable certain experimental
+            features
+          displayName: Experimental Capabilities
+          path: experimentalCapabilities
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable in-cluster git server (avoids the need
+            of forking the upstream repository)
+          displayName: In Cluster Git Server
+          path: gitSpec.inClusterGitServer
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Git repo containing the pattern to deploy. Must use https/http
+            or, for ssh, git@server:foo/bar.git
+          displayName: Target Repo
+          path: gitSpec.targetRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:false
+        - description: |-
+            Upstream git repo containing the pattern to deploy. Used when in-cluster fork to point to the upstream pattern repository.
+            Takes precedence over TargetRepo
+          displayName: Origin Repo
+          path: gitSpec.originRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:true
+        - description: (DEPRECATED) Branch, tag or commit in the upstream git repository.
+            Does not support short-sha's. Default to HEAD
+          displayName: Origin Revision
+          path: gitSpec.originRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:hidden
+        - description: 'Branch, tag, or commit to deploy.  Does not support short-sha''s.
+            Default: HEAD'
+          displayName: Target Revision
+          path: gitSpec.targetRevision
+        - description: Optional. FQDN of the git server if automatic parsing from
+            TargetRepo is broken
+          displayName: Hostname
+          path: gitSpec.hostname
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            Optional. K8s secret name where the info for connecting to git can be found. The supported secrets are modeled after the
+            private repositories in argo (https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repositories)
+            currently ssh and username+password are supported
+          displayName: Token Secret
+          path: gitSpec.tokenSecret
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Optional. K8s secret namespace where the token for connecting
+            to git can be found
+          displayName: Token Secret Namespace
+          path: gitSpec.tokenSecretNamespace
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable multi-source support when deploying the
+            clustergroup argo application
+          displayName: Enabled
+          path: multiSourceConfig.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The helm chart url to fetch the helm charts from in order to
+            deploy the pattern. Defaults to https://charts.validatedpatterns.io/
+          displayName: Helm Repo Url
+          path: multiSourceConfig.helmRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Which chart version for the clustergroup helm chart. Defaults
+            to "0.8.*"
+          displayName: Cluster Group Chart Version
+          path: multiSourceConfig.clusterGroupChartVersion
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The url when deploying the clustergroup helm chart directly from a git repo
+            Defaults to '' which means not used (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Git Repo Url
+          path: multiSourceConfig.clusterGroupGitRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The git reference when deploying the clustergroup helm chart directly from a git repo
+            Defaults to 'main'. (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Chart Git Revision
+          path: multiSourceConfig.clusterGroupChartGitRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: 'Require manual intervention before Argo will sync new content.
+            Default: False'
+          displayName: Manual Sync
+          path: gitOpsSpec.manualSync
+        statusDescriptors:
+        - displayName: Analytics Sent
+          path: analyticsSent
+        - displayName: Analytics UUID
+          path: analyticsUUID
+        - displayName: App Cluster Domain
+          path: appClusterDomain
+        - displayName: Cluster Domain
+          path: clusterDomain
+        - displayName: Cluster ID
+          path: clusterID
+        - displayName: Cluster Name
+          path: clusterName
+        - displayName: Cluster Platform
+          path: clusterPlatform
+        - displayName: Cluster Version
+          path: clusterVersion
+        - description: "DeletionPhase tracks the current phase of pattern deletion\nValues:
+            \"\" (not deleting), \"DeleteSpokeChildApps\" (Phase 1: Delete child applications
+            from spoke clusters), \"DeleteSpoke\" (Phase 2: Delete app of apps from
+            spoke),\n\t\t\t\t \"DeleteHubChildApps\" (Phase 3: Delete applications
+            from hub), \"DeleteHub\" (Phase 4: Delete app of apps from hub)"
+          displayName: Deletion Phase
+          path: deletionPhase
+        - description: Last error encountered by the pattern
+          displayName: Last Error
+          path: lastError
+        - description: Last action related to the pattern
+          displayName: Last Step
+          path: lastStep
+        - displayName: Local Checkout Path
+          path: path
+        - description: Number of updates to the pattern
+          displayName: Version
+          path: version
+        version: v1alpha1
+    description: Deploys and manages architecture patterns from https://validatedpatterns.io
+    displayName: Validated Patterns Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - Validated
+    - Pattern
+    - Blueprint
+    - Architecture
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Hybrid Cloud Patterns
+      url: https://validatedpatterns.io
+    maintainers:
+    - email: validatedpatterns@googlegroups.com
+      name: patterns-team
+    maturity: alpha
+    minKubeVersion: 1.23.0
+    provider:
+      name: Red Hat
+      url: https://www.redhat.com/en/products/edge/validated-patterns
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.66
+  name: ""
+- image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+  name: must-gather-ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d-annotation
+- image: quay.io/validatedpatterns/patterns-operator@sha256:6634ab429389d9ecd8d5889cfddaf2214a241029952d795d86caccae7ab9e473
+  name: manager
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.67
+name: patterns-operator.v0.0.67
+package: patterns-operator
+properties:
+- type: olm.gvk
+  value:
+    group: gitops.hybrid-cloud-patterns.io
+    kind: Pattern
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: patterns-operator
+    version: 0.0.67
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "gitops.hybrid-cloud-patterns.io/v1alpha1",
+            "kind": "Pattern",
+            "metadata": {
+              "name": "pattern-sample"
+            },
+            "spec": {
+              "clusterGroupName": "hub",
+              "gitSpec": {
+                "targetRepo": "https://github.com/validatedpatterns/multicloud-gitops",
+                "targetRevision": "main"
+              },
+              "multiSourceConfig": {
+                "enabled": true
+              }
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      containerImage: quay.io/validatedpatterns/patterns-operator:0.0.67
+      createdAt: "2026-03-25 09:35:05"
+      description: "An operator to deploy and manage architecture patterns from https://validatedpatterns.io.
+        \nThis operator collects some Analytics like cluster version, cloud type,
+        etc. To disable this\nadd \"ANALYTICS: false\" to the environment variables
+        in the subscription."
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "true"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: patterns-operator
+      operators.openshift.io/must-gather-image: quay.io/validatedpatterns/must-gather:latest
+      operators.operatorframework.io/builder: operator-sdk-v1.42.2+git
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/validatedpatterns/patterns-operator
+      support: validatedpatterns@googlegroups.com
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Pattern is the Schema for the patterns API
+        displayName: Pattern
+        kind: Pattern
+        name: patterns.gitops.hybrid-cloud-patterns.io
+        resources:
+        - kind: Pattern
+          name: patterns
+          version: v1alpha1
+        specDescriptors:
+        - displayName: Name
+          path: extraParameters[0].name
+        - displayName: Value
+          path: extraParameters[0].value
+        - displayName: Cluster Group Name
+          path: clusterGroupName
+        - displayName: Git Config
+          path: gitSpec
+        - displayName: Multi Source Config
+          path: multiSourceConfig
+        - description: |-
+            .Name is dot separated per the helm --set syntax, such as:
+              global.something.field
+          displayName: Extra Parameters
+          path: extraParameters
+        - description: URLs to additional Helm parameter files
+          displayName: Extra Value Files
+          path: extraValueFiles
+        - displayName: Git Ops Config
+          path: gitOpsSpec
+        - description: Analytics UUID. Leave empty to autogenerate a random one. Not
+            PII information
+          displayName: Analytics UUID
+          path: analyticsUUID
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Comma separated capabilities to enable certain experimental
+            features
+          displayName: Experimental Capabilities
+          path: experimentalCapabilities
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable in-cluster git server (avoids the need
+            of forking the upstream repository)
+          displayName: In Cluster Git Server
+          path: gitSpec.inClusterGitServer
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Git repo containing the pattern to deploy. Must use https/http
+            or, for ssh, git@server:foo/bar.git
+          displayName: Target Repo
+          path: gitSpec.targetRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:false
+        - description: |-
+            Upstream git repo containing the pattern to deploy. Used when in-cluster fork to point to the upstream pattern repository.
+            Takes precedence over TargetRepo
+          displayName: Origin Repo
+          path: gitSpec.originRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:true
+        - description: (DEPRECATED) Branch, tag or commit in the upstream git repository.
+            Does not support short-sha's. Default to HEAD
+          displayName: Origin Revision
+          path: gitSpec.originRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:hidden
+        - description: 'Branch, tag, or commit to deploy.  Does not support short-sha''s.
+            Default: HEAD'
+          displayName: Target Revision
+          path: gitSpec.targetRevision
+        - description: Optional. FQDN of the git server if automatic parsing from
+            TargetRepo is broken
+          displayName: Hostname
+          path: gitSpec.hostname
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            Optional. K8s secret name where the info for connecting to git can be found. The supported secrets are modeled after the
+            private repositories in argo (https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repositories)
+            currently ssh and username+password are supported
+          displayName: Token Secret
+          path: gitSpec.tokenSecret
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Optional. K8s secret namespace where the token for connecting
+            to git can be found
+          displayName: Token Secret Namespace
+          path: gitSpec.tokenSecretNamespace
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable multi-source support when deploying the
+            clustergroup argo application
+          displayName: Enabled
+          path: multiSourceConfig.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The helm chart url to fetch the helm charts from in order to
+            deploy the pattern. Defaults to https://charts.validatedpatterns.io/
+          displayName: Helm Repo Url
+          path: multiSourceConfig.helmRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Which chart version for the clustergroup helm chart. Defaults
+            to "0.8.*"
+          displayName: Cluster Group Chart Version
+          path: multiSourceConfig.clusterGroupChartVersion
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The url when deploying the clustergroup helm chart directly from a git repo
+            Defaults to '' which means not used (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Git Repo Url
+          path: multiSourceConfig.clusterGroupGitRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The git reference when deploying the clustergroup helm chart directly from a git repo
+            Defaults to 'main'. (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Chart Git Revision
+          path: multiSourceConfig.clusterGroupChartGitRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: 'Require manual intervention before Argo will sync new content.
+            Default: False'
+          displayName: Manual Sync
+          path: gitOpsSpec.manualSync
+        statusDescriptors:
+        - displayName: Analytics Sent
+          path: analyticsSent
+        - displayName: Analytics UUID
+          path: analyticsUUID
+        - displayName: App Cluster Domain
+          path: appClusterDomain
+        - displayName: Cluster Domain
+          path: clusterDomain
+        - displayName: Cluster ID
+          path: clusterID
+        - displayName: Cluster Name
+          path: clusterName
+        - displayName: Cluster Platform
+          path: clusterPlatform
+        - displayName: Cluster Version
+          path: clusterVersion
+        - description: "DeletionPhase tracks the current phase of pattern deletion\nValues:
+            \"\" (not deleting), \"DeleteSpokeChildApps\" (Phase 1: Delete child applications
+            from spoke clusters), \"DeleteSpoke\" (Phase 2: Delete app of apps from
+            spoke),\n\t\t\t\t \"DeleteHubChildApps\" (Phase 3: Delete applications
+            from hub), \"DeleteHub\" (Phase 4: Delete app of apps from hub)"
+          displayName: Deletion Phase
+          path: deletionPhase
+        - description: Last error encountered by the pattern
+          displayName: Last Error
+          path: lastError
+        - description: Last action related to the pattern
+          displayName: Last Step
+          path: lastStep
+        - displayName: Local Checkout Path
+          path: path
+        - description: Number of updates to the pattern
+          displayName: Version
+          path: version
+        version: v1alpha1
+    description: Deploys and manages architecture patterns from https://validatedpatterns.io
+    displayName: Validated Patterns Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - Validated
+    - Pattern
+    - Blueprint
+    - Architecture
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Hybrid Cloud Patterns
+      url: https://validatedpatterns.io
+    maintainers:
+    - email: validatedpatterns@googlegroups.com
+      name: patterns-team
+    maturity: alpha
+    minKubeVersion: 1.23.0
+    provider:
+      name: Red Hat
+      url: https://www.redhat.com/en/products/edge/validated-patterns
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.67
+  name: ""
+- image: quay.io/validatedpatterns/patterns-operator:0.0.67
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.68
+name: patterns-operator.v0.0.68
+package: patterns-operator
+properties:
+- type: olm.gvk
+  value:
+    group: gitops.hybrid-cloud-patterns.io
+    kind: Pattern
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: patterns-operator
+    version: 0.0.68
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "gitops.hybrid-cloud-patterns.io/v1alpha1",
+            "kind": "Pattern",
+            "metadata": {
+              "name": "pattern-sample"
+            },
+            "spec": {
+              "clusterGroupName": "hub",
+              "gitSpec": {
+                "targetRepo": "https://github.com/validatedpatterns/multicloud-gitops",
+                "targetRevision": "main"
+              },
+              "multiSourceConfig": {
+                "enabled": true
+              }
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      containerImage: quay.io/validatedpatterns/patterns-operator:0.0.68
+      createdAt: "2026-03-26 12:21:47"
+      description: "An operator to deploy and manage architecture patterns from https://validatedpatterns.io.
+        \nThis operator collects some Analytics like cluster version, cloud type,
+        etc. To disable this\nadd \"ANALYTICS: false\" to the environment variables
+        in the subscription."
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "true"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: patterns-operator
+      operators.openshift.io/must-gather-image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+      operators.operatorframework.io/builder: operator-sdk-v1.42.2+git
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/validatedpatterns/patterns-operator
+      support: validatedpatterns@googlegroups.com
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Pattern is the Schema for the patterns API
+        displayName: Pattern
+        kind: Pattern
+        name: patterns.gitops.hybrid-cloud-patterns.io
+        resources:
+        - kind: Pattern
+          name: patterns
+          version: v1alpha1
+        specDescriptors:
+        - displayName: Name
+          path: extraParameters[0].name
+        - displayName: Value
+          path: extraParameters[0].value
+        - displayName: Cluster Group Name
+          path: clusterGroupName
+        - displayName: Git Config
+          path: gitSpec
+        - displayName: Multi Source Config
+          path: multiSourceConfig
+        - description: |-
+            .Name is dot separated per the helm --set syntax, such as:
+              global.something.field
+          displayName: Extra Parameters
+          path: extraParameters
+        - description: URLs to additional Helm parameter files
+          displayName: Extra Value Files
+          path: extraValueFiles
+        - displayName: Git Ops Config
+          path: gitOpsSpec
+        - description: Analytics UUID. Leave empty to autogenerate a random one. Not
+            PII information
+          displayName: Analytics UUID
+          path: analyticsUUID
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Comma separated capabilities to enable certain experimental
+            features
+          displayName: Experimental Capabilities
+          path: experimentalCapabilities
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable in-cluster git server (avoids the need
+            of forking the upstream repository)
+          displayName: In Cluster Git Server
+          path: gitSpec.inClusterGitServer
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Git repo containing the pattern to deploy. Must use https/http
+            or, for ssh, git@server:foo/bar.git
+          displayName: Target Repo
+          path: gitSpec.targetRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:false
+        - description: |-
+            Upstream git repo containing the pattern to deploy. Used when in-cluster fork to point to the upstream pattern repository.
+            Takes precedence over TargetRepo
+          displayName: Origin Repo
+          path: gitSpec.originRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:true
+        - description: (DEPRECATED) Branch, tag or commit in the upstream git repository.
+            Does not support short-sha's. Default to HEAD
+          displayName: Origin Revision
+          path: gitSpec.originRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:hidden
+        - description: 'Branch, tag, or commit to deploy.  Does not support short-sha''s.
+            Default: HEAD'
+          displayName: Target Revision
+          path: gitSpec.targetRevision
+        - description: Optional. FQDN of the git server if automatic parsing from
+            TargetRepo is broken
+          displayName: Hostname
+          path: gitSpec.hostname
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            Optional. K8s secret name where the info for connecting to git can be found. The supported secrets are modeled after the
+            private repositories in argo (https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repositories)
+            currently ssh and username+password are supported
+          displayName: Token Secret
+          path: gitSpec.tokenSecret
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Optional. K8s secret namespace where the token for connecting
+            to git can be found
+          displayName: Token Secret Namespace
+          path: gitSpec.tokenSecretNamespace
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable multi-source support when deploying the
+            clustergroup argo application
+          displayName: Enabled
+          path: multiSourceConfig.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The helm chart url to fetch the helm charts from in order to
+            deploy the pattern. Defaults to https://charts.validatedpatterns.io/
+          displayName: Helm Repo Url
+          path: multiSourceConfig.helmRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Which chart version for the clustergroup helm chart. Defaults
+            to "0.8.*"
+          displayName: Cluster Group Chart Version
+          path: multiSourceConfig.clusterGroupChartVersion
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The url when deploying the clustergroup helm chart directly from a git repo
+            Defaults to '' which means not used (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Git Repo Url
+          path: multiSourceConfig.clusterGroupGitRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The git reference when deploying the clustergroup helm chart directly from a git repo
+            Defaults to 'main'. (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Chart Git Revision
+          path: multiSourceConfig.clusterGroupChartGitRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: 'Require manual intervention before Argo will sync new content.
+            Default: False'
+          displayName: Manual Sync
+          path: gitOpsSpec.manualSync
+        statusDescriptors:
+        - displayName: Analytics Sent
+          path: analyticsSent
+        - displayName: Analytics UUID
+          path: analyticsUUID
+        - displayName: App Cluster Domain
+          path: appClusterDomain
+        - displayName: Cluster Domain
+          path: clusterDomain
+        - displayName: Cluster ID
+          path: clusterID
+        - displayName: Cluster Name
+          path: clusterName
+        - displayName: Cluster Platform
+          path: clusterPlatform
+        - displayName: Cluster Version
+          path: clusterVersion
+        - description: "DeletionPhase tracks the current phase of pattern deletion\nValues:
+            \"\" (not deleting), \"DeleteSpokeChildApps\" (Phase 1: Delete child applications
+            from spoke clusters), \"DeleteSpoke\" (Phase 2: Delete app of apps from
+            spoke),\n\t\t\t\t \"DeleteHubChildApps\" (Phase 3: Delete applications
+            from hub), \"DeleteHub\" (Phase 4: Delete app of apps from hub)"
+          displayName: Deletion Phase
+          path: deletionPhase
+        - description: Last error encountered by the pattern
+          displayName: Last Error
+          path: lastError
+        - description: Last action related to the pattern
+          displayName: Last Step
+          path: lastStep
+        - displayName: Local Checkout Path
+          path: path
+        - description: Number of updates to the pattern
+          displayName: Version
+          path: version
+        version: v1alpha1
+    description: Deploys and manages architecture patterns from https://validatedpatterns.io
+    displayName: Validated Patterns Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - Validated
+    - Pattern
+    - Blueprint
+    - Architecture
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Hybrid Cloud Patterns
+      url: https://validatedpatterns.io
+    maintainers:
+    - email: validatedpatterns@googlegroups.com
+      name: patterns-team
+    maturity: alpha
+    minKubeVersion: 1.23.0
+    provider:
+      name: Red Hat
+      url: https://www.redhat.com/en/products/edge/validated-patterns
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.68
+  name: ""
+- image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+  name: must-gather-ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d-annotation
+- image: quay.io/validatedpatterns/patterns-operator@sha256:77c3770386cd7b37999895c2a6680e6b61017c56f9571ca661c56cfbfd8e6ad1
+  name: manager
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.69
+name: patterns-operator.v0.0.69
+package: patterns-operator
+properties:
+- type: olm.gvk
+  value:
+    group: gitops.hybrid-cloud-patterns.io
+    kind: Pattern
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: patterns-operator
+    version: 0.0.69
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "gitops.hybrid-cloud-patterns.io/v1alpha1",
+            "kind": "Pattern",
+            "metadata": {
+              "name": "pattern-sample"
+            },
+            "spec": {
+              "clusterGroupName": "hub",
+              "gitSpec": {
+                "targetRepo": "https://github.com/validatedpatterns/multicloud-gitops",
+                "targetRevision": "main"
+              },
+              "multiSourceConfig": {
+                "enabled": true
+              }
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      containerImage: quay.io/validatedpatterns/patterns-operator:0.0.69
+      createdAt: "2026-03-26 18:51:39"
+      description: "An operator to deploy and manage architecture patterns from https://validatedpatterns.io.
+        \nThis operator collects some Analytics like cluster version, cloud type,
+        etc. To disable this\nadd \"ANALYTICS: false\" to the environment variables
+        in the subscription."
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "true"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: patterns-operator
+      operators.openshift.io/must-gather-image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+      operators.operatorframework.io/builder: operator-sdk-v1.42.2+git
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/validatedpatterns/patterns-operator
+      support: validatedpatterns@googlegroups.com
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Pattern is the Schema for the patterns API
+        displayName: Pattern
+        kind: Pattern
+        name: patterns.gitops.hybrid-cloud-patterns.io
+        resources:
+        - kind: Pattern
+          name: patterns
+          version: v1alpha1
+        specDescriptors:
+        - displayName: Name
+          path: extraParameters[0].name
+        - displayName: Value
+          path: extraParameters[0].value
+        - displayName: Cluster Group Name
+          path: clusterGroupName
+        - displayName: Git Config
+          path: gitSpec
+        - displayName: Multi Source Config
+          path: multiSourceConfig
+        - description: |-
+            .Name is dot separated per the helm --set syntax, such as:
+              global.something.field
+          displayName: Extra Parameters
+          path: extraParameters
+        - description: URLs to additional Helm parameter files
+          displayName: Extra Value Files
+          path: extraValueFiles
+        - displayName: Git Ops Config
+          path: gitOpsSpec
+        - description: Analytics UUID. Leave empty to autogenerate a random one. Not
+            PII information
+          displayName: Analytics UUID
+          path: analyticsUUID
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Comma separated capabilities to enable certain experimental
+            features
+          displayName: Experimental Capabilities
+          path: experimentalCapabilities
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable in-cluster git server (avoids the need
+            of forking the upstream repository)
+          displayName: In Cluster Git Server
+          path: gitSpec.inClusterGitServer
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Git repo containing the pattern to deploy. Must use https/http
+            or, for ssh, git@server:foo/bar.git
+          displayName: Target Repo
+          path: gitSpec.targetRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:false
+        - description: |-
+            Upstream git repo containing the pattern to deploy. Used when in-cluster fork to point to the upstream pattern repository.
+            Takes precedence over TargetRepo
+          displayName: Origin Repo
+          path: gitSpec.originRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:true
+        - description: (DEPRECATED) Branch, tag or commit in the upstream git repository.
+            Does not support short-sha's. Default to HEAD
+          displayName: Origin Revision
+          path: gitSpec.originRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:hidden
+        - description: 'Branch, tag, or commit to deploy.  Does not support short-sha''s.
+            Default: HEAD'
+          displayName: Target Revision
+          path: gitSpec.targetRevision
+        - description: Optional. FQDN of the git server if automatic parsing from
+            TargetRepo is broken
+          displayName: Hostname
+          path: gitSpec.hostname
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            Optional. K8s secret name where the info for connecting to git can be found. The supported secrets are modeled after the
+            private repositories in argo (https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repositories)
+            currently ssh and username+password are supported
+          displayName: Token Secret
+          path: gitSpec.tokenSecret
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Optional. K8s secret namespace where the token for connecting
+            to git can be found
+          displayName: Token Secret Namespace
+          path: gitSpec.tokenSecretNamespace
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable multi-source support when deploying the
+            clustergroup argo application
+          displayName: Enabled
+          path: multiSourceConfig.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The helm chart url to fetch the helm charts from in order to
+            deploy the pattern. Defaults to https://charts.validatedpatterns.io/
+          displayName: Helm Repo Url
+          path: multiSourceConfig.helmRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Which chart version for the clustergroup helm chart. Defaults
+            to "0.8.*"
+          displayName: Cluster Group Chart Version
+          path: multiSourceConfig.clusterGroupChartVersion
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The url when deploying the clustergroup helm chart directly from a git repo
+            Defaults to '' which means not used (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Git Repo Url
+          path: multiSourceConfig.clusterGroupGitRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The git reference when deploying the clustergroup helm chart directly from a git repo
+            Defaults to 'main'. (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Chart Git Revision
+          path: multiSourceConfig.clusterGroupChartGitRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: 'Require manual intervention before Argo will sync new content.
+            Default: False'
+          displayName: Manual Sync
+          path: gitOpsSpec.manualSync
+        statusDescriptors:
+        - displayName: Analytics Sent
+          path: analyticsSent
+        - displayName: Analytics UUID
+          path: analyticsUUID
+        - displayName: App Cluster Domain
+          path: appClusterDomain
+        - displayName: Cluster Domain
+          path: clusterDomain
+        - displayName: Cluster ID
+          path: clusterID
+        - displayName: Cluster Name
+          path: clusterName
+        - displayName: Cluster Platform
+          path: clusterPlatform
+        - displayName: Cluster Version
+          path: clusterVersion
+        - description: "DeletionPhase tracks the current phase of pattern deletion\nValues:
+            \"\" (not deleting), \"DeleteSpokeChildApps\" (Phase 1: Delete child applications
+            from spoke clusters), \"DeleteSpoke\" (Phase 2: Delete app of apps from
+            spoke),\n\t\t\t\t \"DeleteHubChildApps\" (Phase 3: Delete applications
+            from hub), \"DeleteHub\" (Phase 4: Delete app of apps from hub)"
+          displayName: Deletion Phase
+          path: deletionPhase
+        - description: Last error encountered by the pattern
+          displayName: Last Error
+          path: lastError
+        - description: Last action related to the pattern
+          displayName: Last Step
+          path: lastStep
+        - displayName: Local Checkout Path
+          path: path
+        - description: Number of updates to the pattern
+          displayName: Version
+          path: version
+        version: v1alpha1
+    description: Deploys and manages architecture patterns from https://validatedpatterns.io
+    displayName: Validated Patterns Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - Validated
+    - Pattern
+    - Blueprint
+    - Architecture
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Hybrid Cloud Patterns
+      url: https://validatedpatterns.io
+    maintainers:
+    - email: validatedpatterns@googlegroups.com
+      name: patterns-team
+    maturity: alpha
+    minKubeVersion: 1.23.0
+    provider:
+      name: Red Hat
+      url: https://www.redhat.com/en/products/edge/validated-patterns
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.69
+  name: ""
+- image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+  name: must-gather-ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d-annotation
+- image: quay.io/validatedpatterns/patterns-operator@sha256:9f9ad640632d09b692a995f94efa12e431917db48de2ff372d7c1132582a456b
+  name: manager
+schema: olm.bundle
+---
 image: quay.io/openshift-community-operators/patterns-operator@sha256:d620983488f41cd86bb6286ead2bb845f966760491fa4f7dbfe544c4cf9e0a8b
 name: patterns-operator.v0.0.7
 package: patterns-operator
@@ -13188,6 +14260,805 @@ relatedImages:
   name: ""
 - image: quay.io/openshift-community-operators/patterns-operator@sha256:d620983488f41cd86bb6286ead2bb845f966760491fa4f7dbfe544c4cf9e0a8b
   name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.70
+name: patterns-operator.v0.0.70
+package: patterns-operator
+properties:
+- type: olm.gvk
+  value:
+    group: gitops.hybrid-cloud-patterns.io
+    kind: Pattern
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: patterns-operator
+    version: 0.0.70
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "gitops.hybrid-cloud-patterns.io/v1alpha1",
+            "kind": "Pattern",
+            "metadata": {
+              "name": "pattern-sample"
+            },
+            "spec": {
+              "clusterGroupName": "hub",
+              "gitSpec": {
+                "targetRepo": "https://github.com/validatedpatterns/multicloud-gitops",
+                "targetRevision": "main"
+              },
+              "multiSourceConfig": {
+                "enabled": true
+              }
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      containerImage: quay.io/validatedpatterns/patterns-operator:0.0.70
+      createdAt: "2026-04-13 08:26:22"
+      description: "An operator to deploy and manage architecture patterns from https://validatedpatterns.io.
+        \nThis operator collects some Analytics like cluster version, cloud type,
+        etc. To disable this\nadd \"ANALYTICS: false\" to the environment variables
+        in the subscription."
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "true"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: patterns-operator
+      operators.openshift.io/must-gather-image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+      operators.operatorframework.io/builder: operator-sdk-v1.42.2+git
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/validatedpatterns/patterns-operator
+      support: validatedpatterns@googlegroups.com
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Pattern is the Schema for the patterns API
+        displayName: Pattern
+        kind: Pattern
+        name: patterns.gitops.hybrid-cloud-patterns.io
+        resources:
+        - kind: Pattern
+          name: patterns
+          version: v1alpha1
+        specDescriptors:
+        - displayName: Name
+          path: extraParameters[0].name
+        - displayName: Value
+          path: extraParameters[0].value
+        - displayName: Cluster Group Name
+          path: clusterGroupName
+        - displayName: Git Config
+          path: gitSpec
+        - displayName: Multi Source Config
+          path: multiSourceConfig
+        - description: |-
+            .Name is dot separated per the helm --set syntax, such as:
+              global.something.field
+          displayName: Extra Parameters
+          path: extraParameters
+        - description: URLs to additional Helm parameter files
+          displayName: Extra Value Files
+          path: extraValueFiles
+        - displayName: Git Ops Config
+          path: gitOpsSpec
+        - description: Analytics UUID. Leave empty to autogenerate a random one. Not
+            PII information
+          displayName: Analytics UUID
+          path: analyticsUUID
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Comma separated capabilities to enable certain experimental
+            features
+          displayName: Experimental Capabilities
+          path: experimentalCapabilities
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable in-cluster git server (avoids the need
+            of forking the upstream repository)
+          displayName: In Cluster Git Server
+          path: gitSpec.inClusterGitServer
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Git repo containing the pattern to deploy. Must use https/http
+            or, for ssh, git@server:foo/bar.git
+          displayName: Target Repo
+          path: gitSpec.targetRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:false
+        - description: |-
+            Upstream git repo containing the pattern to deploy. Used when in-cluster fork to point to the upstream pattern repository.
+            Takes precedence over TargetRepo
+          displayName: Origin Repo
+          path: gitSpec.originRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:true
+        - description: (DEPRECATED) Branch, tag or commit in the upstream git repository.
+            Does not support short-sha's. Default to HEAD
+          displayName: Origin Revision
+          path: gitSpec.originRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:hidden
+        - description: 'Branch, tag, or commit to deploy.  Does not support short-sha''s.
+            Default: HEAD'
+          displayName: Target Revision
+          path: gitSpec.targetRevision
+        - description: Optional. FQDN of the git server if automatic parsing from
+            TargetRepo is broken
+          displayName: Hostname
+          path: gitSpec.hostname
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            Optional. K8s secret name where the info for connecting to git can be found. The supported secrets are modeled after the
+            private repositories in argo (https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repositories)
+            currently ssh and username+password are supported
+          displayName: Token Secret
+          path: gitSpec.tokenSecret
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Optional. K8s secret namespace where the token for connecting
+            to git can be found
+          displayName: Token Secret Namespace
+          path: gitSpec.tokenSecretNamespace
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable multi-source support when deploying the
+            clustergroup argo application
+          displayName: Enabled
+          path: multiSourceConfig.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The helm chart url to fetch the helm charts from in order to
+            deploy the pattern. Defaults to https://charts.validatedpatterns.io/
+          displayName: Helm Repo Url
+          path: multiSourceConfig.helmRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Which chart version for the clustergroup helm chart. Defaults
+            to "0.8.*"
+          displayName: Cluster Group Chart Version
+          path: multiSourceConfig.clusterGroupChartVersion
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The url when deploying the clustergroup helm chart directly from a git repo
+            Defaults to '' which means not used (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Git Repo Url
+          path: multiSourceConfig.clusterGroupGitRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The git reference when deploying the clustergroup helm chart directly from a git repo
+            Defaults to 'main'. (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Chart Git Revision
+          path: multiSourceConfig.clusterGroupChartGitRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: 'Require manual intervention before Argo will sync new content.
+            Default: False'
+          displayName: Manual Sync
+          path: gitOpsSpec.manualSync
+        statusDescriptors:
+        - displayName: Analytics Sent
+          path: analyticsSent
+        - displayName: Analytics UUID
+          path: analyticsUUID
+        - displayName: App Cluster Domain
+          path: appClusterDomain
+        - displayName: Cluster Domain
+          path: clusterDomain
+        - displayName: Cluster ID
+          path: clusterID
+        - displayName: Cluster Name
+          path: clusterName
+        - displayName: Cluster Platform
+          path: clusterPlatform
+        - displayName: Cluster Version
+          path: clusterVersion
+        - description: "DeletionPhase tracks the current phase of pattern deletion\nValues:
+            \"\" (not deleting), \"DeleteSpokeChildApps\" (Phase 1: Delete child applications
+            from spoke clusters), \"DeleteSpoke\" (Phase 2: Delete app of apps from
+            spoke),\n\t\t\t\t \"DeleteHubChildApps\" (Phase 3: Delete applications
+            from hub), \"DeleteHub\" (Phase 4: Delete app of apps from hub)"
+          displayName: Deletion Phase
+          path: deletionPhase
+        - description: Last error encountered by the pattern
+          displayName: Last Error
+          path: lastError
+        - description: Last action related to the pattern
+          displayName: Last Step
+          path: lastStep
+        - displayName: Local Checkout Path
+          path: path
+        - description: Number of updates to the pattern
+          displayName: Version
+          path: version
+        version: v1alpha1
+    description: Deploys and manages architecture patterns from https://validatedpatterns.io
+    displayName: Validated Patterns Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - Validated
+    - Pattern
+    - Blueprint
+    - Architecture
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Hybrid Cloud Patterns
+      url: https://validatedpatterns.io
+    maintainers:
+    - email: validatedpatterns@googlegroups.com
+      name: patterns-team
+    maturity: alpha
+    minKubeVersion: 1.23.0
+    provider:
+      name: Red Hat
+      url: https://www.redhat.com/en/products/edge/validated-patterns
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.70
+  name: ""
+- image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+  name: must-gather-ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d-annotation
+- image: quay.io/validatedpatterns/patterns-operator@sha256:12855d993a1ba1f8c45768d8ad0bc77f1ffc3658a000882a7401896e4028b150
+  name: manager
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.71
+name: patterns-operator.v0.0.71
+package: patterns-operator
+properties:
+- type: olm.gvk
+  value:
+    group: gitops.hybrid-cloud-patterns.io
+    kind: Pattern
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: patterns-operator
+    version: 0.0.71
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "gitops.hybrid-cloud-patterns.io/v1alpha1",
+            "kind": "Pattern",
+            "metadata": {
+              "name": "pattern-sample"
+            },
+            "spec": {
+              "clusterGroupName": "hub",
+              "gitSpec": {
+                "targetRepo": "https://github.com/validatedpatterns/multicloud-gitops",
+                "targetRevision": "main"
+              },
+              "multiSourceConfig": {
+                "enabled": true
+              }
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      containerImage: quay.io/validatedpatterns/patterns-operator:0.0.71
+      createdAt: "2026-04-16 14:57:09"
+      description: "An operator to deploy and manage architecture patterns from https://validatedpatterns.io.
+        \nThis operator collects some Analytics like cluster version, cloud type,
+        etc. To disable this\nadd \"ANALYTICS: false\" to the environment variables
+        in the subscription."
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "true"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: patterns-operator
+      operators.openshift.io/must-gather-image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+      operators.operatorframework.io/builder: operator-sdk-v1.42.2+git
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/validatedpatterns/patterns-operator
+      support: validatedpatterns@googlegroups.com
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Pattern is the Schema for the patterns API
+        displayName: Pattern
+        kind: Pattern
+        name: patterns.gitops.hybrid-cloud-patterns.io
+        resources:
+        - kind: Pattern
+          name: patterns
+          version: v1alpha1
+        specDescriptors:
+        - displayName: Name
+          path: extraParameters[0].name
+        - displayName: Value
+          path: extraParameters[0].value
+        - displayName: Cluster Group Name
+          path: clusterGroupName
+        - displayName: Git Config
+          path: gitSpec
+        - displayName: Multi Source Config
+          path: multiSourceConfig
+        - description: |-
+            .Name is dot separated per the helm --set syntax, such as:
+              global.something.field
+          displayName: Extra Parameters
+          path: extraParameters
+        - description: URLs to additional Helm parameter files
+          displayName: Extra Value Files
+          path: extraValueFiles
+        - displayName: Git Ops Config
+          path: gitOpsSpec
+        - description: Analytics UUID. Leave empty to autogenerate a random one. Not
+            PII information
+          displayName: Analytics UUID
+          path: analyticsUUID
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Comma separated capabilities to enable certain experimental
+            features
+          displayName: Experimental Capabilities
+          path: experimentalCapabilities
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable in-cluster git server (avoids the need
+            of forking the upstream repository)
+          displayName: In Cluster Git Server
+          path: gitSpec.inClusterGitServer
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Git repo containing the pattern to deploy. Must use https/http
+            or, for ssh, git@server:foo/bar.git
+          displayName: Target Repo
+          path: gitSpec.targetRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:false
+        - description: |-
+            Upstream git repo containing the pattern to deploy. Used when in-cluster fork to point to the upstream pattern repository.
+            Takes precedence over TargetRepo
+          displayName: Origin Repo
+          path: gitSpec.originRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:true
+        - description: (DEPRECATED) Branch, tag or commit in the upstream git repository.
+            Does not support short-sha's. Default to HEAD
+          displayName: Origin Revision
+          path: gitSpec.originRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:hidden
+        - description: 'Branch, tag, or commit to deploy.  Does not support short-sha''s.
+            Default: HEAD'
+          displayName: Target Revision
+          path: gitSpec.targetRevision
+        - description: Optional. FQDN of the git server if automatic parsing from
+            TargetRepo is broken
+          displayName: Hostname
+          path: gitSpec.hostname
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            Optional. K8s secret name where the info for connecting to git can be found. The supported secrets are modeled after the
+            private repositories in argo (https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repositories)
+            currently ssh and username+password are supported
+          displayName: Token Secret
+          path: gitSpec.tokenSecret
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Optional. K8s secret namespace where the token for connecting
+            to git can be found
+          displayName: Token Secret Namespace
+          path: gitSpec.tokenSecretNamespace
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable multi-source support when deploying the
+            clustergroup argo application
+          displayName: Enabled
+          path: multiSourceConfig.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The helm chart url to fetch the helm charts from in order to
+            deploy the pattern. Defaults to https://charts.validatedpatterns.io/
+          displayName: Helm Repo Url
+          path: multiSourceConfig.helmRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Which chart version for the clustergroup helm chart. Defaults
+            to "0.8.*"
+          displayName: Cluster Group Chart Version
+          path: multiSourceConfig.clusterGroupChartVersion
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The url when deploying the clustergroup helm chart directly from a git repo
+            Defaults to '' which means not used (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Git Repo Url
+          path: multiSourceConfig.clusterGroupGitRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The git reference when deploying the clustergroup helm chart directly from a git repo
+            Defaults to 'main'. (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Chart Git Revision
+          path: multiSourceConfig.clusterGroupChartGitRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: 'Require manual intervention before Argo will sync new content.
+            Default: False'
+          displayName: Manual Sync
+          path: gitOpsSpec.manualSync
+        statusDescriptors:
+        - displayName: Analytics Sent
+          path: analyticsSent
+        - displayName: Analytics UUID
+          path: analyticsUUID
+        - displayName: App Cluster Domain
+          path: appClusterDomain
+        - displayName: Cluster Domain
+          path: clusterDomain
+        - displayName: Cluster ID
+          path: clusterID
+        - displayName: Cluster Name
+          path: clusterName
+        - displayName: Cluster Platform
+          path: clusterPlatform
+        - displayName: Cluster Version
+          path: clusterVersion
+        - description: "DeletionPhase tracks the current phase of pattern deletion\nValues:
+            \"\" (not deleting), \"DeleteSpokeChildApps\" (Phase 1: Delete child applications
+            from spoke clusters), \"DeleteSpoke\" (Phase 2: Delete app of apps from
+            spoke),\n\t\t\t\t \"DeleteHubChildApps\" (Phase 3: Delete applications
+            from hub), \"DeleteHub\" (Phase 4: Delete app of apps from hub)"
+          displayName: Deletion Phase
+          path: deletionPhase
+        - description: Last error encountered by the pattern
+          displayName: Last Error
+          path: lastError
+        - description: Last action related to the pattern
+          displayName: Last Step
+          path: lastStep
+        - displayName: Local Checkout Path
+          path: path
+        - description: Number of updates to the pattern
+          displayName: Version
+          path: version
+        version: v1alpha1
+    description: Deploys and manages architecture patterns from https://validatedpatterns.io
+    displayName: Validated Patterns Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - Validated
+    - Pattern
+    - Blueprint
+    - Architecture
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Hybrid Cloud Patterns
+      url: https://validatedpatterns.io
+    maintainers:
+    - email: validatedpatterns@googlegroups.com
+      name: patterns-team
+    maturity: alpha
+    minKubeVersion: 1.23.0
+    provider:
+      name: Red Hat
+      url: https://www.redhat.com/en/products/edge/validated-patterns
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.71
+  name: ""
+- image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+  name: must-gather-ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d-annotation
+- image: quay.io/validatedpatterns/patterns-operator-console@sha256:85564bbe2b0ddef446f6ccc0cf3ac116ea0d6fdcaa299b1c0923c85e0876da2e
+  name: patterns-operator-console-plugin
+- image: quay.io/validatedpatterns/patterns-operator@sha256:6dd4e307443b9ddbc6990c5d24664e2bef76b1f39d06187a8931115abc277290
+  name: manager
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.72
+name: patterns-operator.v0.0.72
+package: patterns-operator
+properties:
+- type: olm.gvk
+  value:
+    group: gitops.hybrid-cloud-patterns.io
+    kind: Pattern
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: patterns-operator
+    version: 0.0.72
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "gitops.hybrid-cloud-patterns.io/v1alpha1",
+            "kind": "Pattern",
+            "metadata": {
+              "name": "pattern-sample"
+            },
+            "spec": {
+              "clusterGroupName": "hub",
+              "gitSpec": {
+                "targetRepo": "https://github.com/validatedpatterns/multicloud-gitops",
+                "targetRevision": "main"
+              },
+              "multiSourceConfig": {
+                "enabled": true
+              }
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      containerImage: quay.io/validatedpatterns/patterns-operator:0.0.72
+      createdAt: "2026-04-27 09:33:08"
+      description: "An operator to deploy and manage architecture patterns from https://validatedpatterns.io.
+        \nThis operator collects some Analytics like cluster version, cloud type,
+        etc. To disable this\nadd \"ANALYTICS: false\" to the environment variables
+        in the subscription."
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "true"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: patterns-operator
+      operators.openshift.io/must-gather-image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+      operators.operatorframework.io/builder: operator-sdk-v1.42.2+git
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/validatedpatterns/patterns-operator
+      support: validatedpatterns@googlegroups.com
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Pattern is the Schema for the patterns API
+        displayName: Pattern
+        kind: Pattern
+        name: patterns.gitops.hybrid-cloud-patterns.io
+        resources:
+        - kind: Pattern
+          name: patterns
+          version: v1alpha1
+        specDescriptors:
+        - displayName: Name
+          path: extraParameters[0].name
+        - displayName: Value
+          path: extraParameters[0].value
+        - displayName: Cluster Group Name
+          path: clusterGroupName
+        - displayName: Git Config
+          path: gitSpec
+        - displayName: Multi Source Config
+          path: multiSourceConfig
+        - description: |-
+            .Name is dot separated per the helm --set syntax, such as:
+              global.something.field
+          displayName: Extra Parameters
+          path: extraParameters
+        - description: URLs to additional Helm parameter files
+          displayName: Extra Value Files
+          path: extraValueFiles
+        - displayName: Git Ops Config
+          path: gitOpsSpec
+        - description: Analytics UUID. Leave empty to autogenerate a random one. Not
+            PII information
+          displayName: Analytics UUID
+          path: analyticsUUID
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Comma separated capabilities to enable certain experimental
+            features
+          displayName: Experimental Capabilities
+          path: experimentalCapabilities
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable in-cluster git server (avoids the need
+            of forking the upstream repository)
+          displayName: In Cluster Git Server
+          path: gitSpec.inClusterGitServer
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: Git repo containing the pattern to deploy. Must use https/http
+            or, for ssh, git@server:foo/bar.git
+          displayName: Target Repo
+          path: gitSpec.targetRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:false
+        - description: |-
+            Upstream git repo containing the pattern to deploy. Used when in-cluster fork to point to the upstream pattern repository.
+            Takes precedence over TargetRepo
+          displayName: Origin Repo
+          path: gitSpec.originRepo
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:gitSpec.inClusterGitServer:true
+        - description: (DEPRECATED) Branch, tag or commit in the upstream git repository.
+            Does not support short-sha's. Default to HEAD
+          displayName: Origin Revision
+          path: gitSpec.originRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:hidden
+        - description: 'Branch, tag, or commit to deploy.  Does not support short-sha''s.
+            Default: HEAD'
+          displayName: Target Revision
+          path: gitSpec.targetRevision
+        - description: Optional. FQDN of the git server if automatic parsing from
+            TargetRepo is broken
+          displayName: Hostname
+          path: gitSpec.hostname
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            Optional. K8s secret name where the info for connecting to git can be found. The supported secrets are modeled after the
+            private repositories in argo (https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repositories)
+            currently ssh and username+password are supported
+          displayName: Token Secret
+          path: gitSpec.tokenSecret
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Optional. K8s secret namespace where the token for connecting
+            to git can be found
+          displayName: Token Secret Namespace
+          path: gitSpec.tokenSecretNamespace
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: (EXPERIMENTAL) Enable multi-source support when deploying the
+            clustergroup argo application
+          displayName: Enabled
+          path: multiSourceConfig.enabled
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - description: The helm chart url to fetch the helm charts from in order to
+            deploy the pattern. Defaults to https://charts.validatedpatterns.io/
+          displayName: Helm Repo Url
+          path: multiSourceConfig.helmRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: Which chart version for the clustergroup helm chart. Defaults
+            to "0.8.*"
+          displayName: Cluster Group Chart Version
+          path: multiSourceConfig.clusterGroupChartVersion
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The url when deploying the clustergroup helm chart directly from a git repo
+            Defaults to '' which means not used (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Git Repo Url
+          path: multiSourceConfig.clusterGroupGitRepoUrl
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: |-
+            The git reference when deploying the clustergroup helm chart directly from a git repo
+            Defaults to 'main'. (Only used when developing the clustergroup helm chart)
+          displayName: Cluster Group Chart Git Revision
+          path: multiSourceConfig.clusterGroupChartGitRevision
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+          - urn:alm:descriptor:com.tectonic.ui:advanced
+        - description: 'Require manual intervention before Argo will sync new content.
+            Default: False'
+          displayName: Manual Sync
+          path: gitOpsSpec.manualSync
+        statusDescriptors:
+        - displayName: Analytics Sent
+          path: analyticsSent
+        - displayName: Analytics UUID
+          path: analyticsUUID
+        - displayName: App Cluster Domain
+          path: appClusterDomain
+        - displayName: Cluster Domain
+          path: clusterDomain
+        - displayName: Cluster ID
+          path: clusterID
+        - displayName: Cluster Name
+          path: clusterName
+        - displayName: Cluster Platform
+          path: clusterPlatform
+        - displayName: Cluster Version
+          path: clusterVersion
+        - description: "DeletionPhase tracks the current phase of pattern deletion\nValues:
+            \"\" (not deleting), \"DeleteSpokeChildApps\" (Phase 1: Delete child applications
+            from spoke clusters), \"DeleteSpoke\" (Phase 2: Delete app of apps from
+            spoke),\n\t\t\t\t \"DeleteHubChildApps\" (Phase 3: Delete applications
+            from hub), \"DeleteHub\" (Phase 4: Delete app of apps from hub)"
+          displayName: Deletion Phase
+          path: deletionPhase
+        - description: Last error encountered by the pattern
+          displayName: Last Error
+          path: lastError
+        - description: Last action related to the pattern
+          displayName: Last Step
+          path: lastStep
+        - displayName: Local Checkout Path
+          path: path
+        - description: Number of updates to the pattern
+          displayName: Version
+          path: version
+        version: v1alpha1
+    description: Deploys and manages architecture patterns from https://validatedpatterns.io
+    displayName: Validated Patterns Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - Validated
+    - Pattern
+    - Blueprint
+    - Architecture
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+    links:
+    - name: Hybrid Cloud Patterns
+      url: https://validatedpatterns.io
+    maintainers:
+    - email: validatedpatterns@googlegroups.com
+      name: patterns-team
+    maturity: alpha
+    minKubeVersion: 1.23.0
+    provider:
+      name: Red Hat
+      url: https://www.redhat.com/en/products/edge/validated-patterns
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/patterns-operator:0.0.72
+  name: ""
+- image: quay.io/validatedpatterns/must-gather@sha256:ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d
+  name: must-gather-ac23dfe8c3b8404f75f4bdf0eb54470acc98bbb5f892de34d2580066e93ee63d-annotation
+- image: quay.io/validatedpatterns/patterns-operator-console@sha256:97c704a1b6fae99de6944220a7a34aa1635a980412e8b59f7e3d8cc817fc4872
+  name: patterns-operator-console-plugin
+- image: quay.io/validatedpatterns/patterns-operator@sha256:6ba40d6ff4c590426cc0d39997c4b69defe1fbd75fc7ee6291a19f599f4a2d9e
+  name: manager
 schema: olm.bundle
 ---
 image: quay.io/openshift-community-operators/patterns-operator@sha256:d5b9ba1fa74396c2fb4479ff1ca131ec5a7ca0f6231ba2e625cd8052dc3f9f4f

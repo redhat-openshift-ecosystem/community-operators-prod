@@ -1,0 +1,368 @@
+---
+defaultChannel: stable-v1
+name: cat-facts-operator
+schema: olm.package
+---
+entries:
+- name: cat-facts-operator.v1.0.0
+- name: cat-facts-operator.v1.1.0
+  replaces: cat-facts-operator.v1.0.0
+  skips:
+  - cat-facts-operator.v1.0.0
+name: stable-v1
+package: cat-facts-operator
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/cat-facts-operator:1.0.0
+name: cat-facts-operator.v1.0.0
+package: cat-facts-operator
+properties:
+- type: olm.gvk
+  value:
+    group: ryanmillerc.github.io
+    kind: CatFact
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: cat-facts-operator
+    version: 1.0.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "ryanmillerc.github.io/v1alpha1",
+            "kind": "CatFact",
+            "metadata": {
+              "name": "default-catfact"
+            },
+            "spec": {}
+          },
+          {
+            "apiVersion": "ryanmillerc.github.io/v1alpha1",
+            "kind": "CatFact",
+            "metadata": {
+              "name": "example-catfact"
+            },
+            "spec": {
+              "fact": "Cats sleep 12-16 hours per day.",
+              "iconName": "Smiling"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      certified: "false"
+      com.redhat.openshift.versions: '>=4.19'
+      console.openshift.io/plugins: '["cat-facts-operator-console-plugin"]'
+      containerImage: quay.io/ryanmillerc/cat-facts-operator:v1.0.0
+      createdAt: "2026-04-22T03:05:24Z"
+      description: Combining Hybrid-Cloud Technology With Cats
+      operatorframework.io/suggested-namespace: cat-facts-operator
+      operators.operatorframework.io/builder: operator-sdk-v1.42.2
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/RyanMillerC/cat-facts-operator
+      support: Ryan Miller
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: "CatFact is a Kubernetes model of a fact about cats \U0001F431"
+        displayName: Cat Fact
+        kind: CatFact
+        name: catfacts.ryanmillerc.github.io
+        version: v1alpha1
+    description: |
+      ### Cat Facts? &#x1F640;
+
+      * **Do you like to have fun?**
+      * **Do you like OpenShift?**
+
+      If you answered either question, **install this operator!** (You don't even have to like cats...)
+
+      ### Seriously, what is it? &#x1F914;
+
+      Red Hat allows applications to extend OpenShift's web UI with [OpenShift
+      Console Dynamic Plugins][dynamic-plugins]. Red Hat provides docs for building
+      plugins and [deploying through Helm]. They don't provide a good operator-based
+      deployment reference.
+
+      Cat Facts Operator is the **community reference for operator-based OpenShift
+      console dynamic plugin deployment,** combining hybrid-cloud technology with cats.
+
+      The operator is Go-based and built with [Operator SDK]. The operator also bundles
+      a React+PatternFly 6-based [OpenShift Console Dynamic Plugin][dynamic-plugins]
+      that serves custom content in the OpenShift web console to manage operator
+      resources.
+
+      Cat Facts Operator provides a Custom Resource Definition (CRD) for *CatFact*. A
+      CatFact is a Kubernetes resource that contains metadata along with a fact about
+      cats. Facts are queried from https://catfact.ninja/fact, a free API that
+      generates cat facts.
+
+      ### Requirements &#x1F4CB;
+
+      * OKD/OpenShift 4.19 or later (Kubernetes 1.32.0+)
+
+      **NOTE:** OCP 4.19+ is required because the OpenShift dynamic console plugin
+      uses PatternFly 6, which was introduced starting with OpenShift 4.19.
+
+      ### Installing &#x1F680;
+
+      Follow the prompts on the install operator page. Accept the default options for
+      everything **except for Console Plugin**. For security, OpenShift defaults
+      *Console Plugin* to *Disabled* on operators that come from community catalogs.
+      **Select *Enable* for *Console Plugin* before installing the operator.**
+
+      It will take a few moments for the operator controller and console dynamic plugin
+      containers to download and launch. Within a few moments, you'll be able to
+      refresh and enjoy Cat Facts Operator.
+
+      ### How to Use Cat Facts &#x1F63B;
+
+      1. Navigate to *Cat Facts > Cat Fact Catalog* on the left-side navigation pane
+         of the OpenShift console
+      2. Select *Create CatFact*
+      3. Select the new CatFact card to view it
+      4. Select *Create CatFact* again
+      5. Select *Create CatFact* 20 more times!!!
+      6. If you get bored and want to delete all your CatFacts, select *Delete All*
+
+      ### Uninstalling &#x1F63F;
+
+      To uninstall, go to *Ecosystem > Installed Operators* in the OpenShift console.
+      Select "Cat Facts Operator" and uninstall.
+
+      After uninstalling, run these commands to clean up resources the operator
+      leaves behind:
+
+      ```bash
+      oc delete catfacts --all -A
+      oc delete crd catfacts.ryanmillerc.github.io
+      oc delete csv --all -n cat-facts-operator
+      oc delete consoleplugin cat-facts-operator-console-plugin
+      oc delete namespace cat-facts-operator
+      ```
+
+      ### Acknowledgments
+
+      Cat facts are generated by the public [Cat Facts][cat-facts-api] API.
+
+      Cat icons/emojis used in this project were created by Emily Jäger, licensed under
+      [CC BY-SA 4.0], and are [available here][cat-icons].
+
+      [CC BY-SA 4.0]: https://creativecommons.org/licenses/by-sa/4.0
+      [dynamic-plugins]: https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/web_console/dynamic-plugins
+      [Operator SDK]: https://sdk.operatorframework.io/
+      [cat-facts-api]: https://catfact.ninja
+      [cat-icons]: https://openmoji.org/library/#group=smileys-emotion%2Fcat-face
+      [deploying through Helm]: https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/web_console/dynamic-plugins#deploy-on-cluster_deploy-plugin-cluster
+    displayName: Cat Facts Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+    keywords:
+    - Cats
+    - Cool
+    links:
+    - name: Cat Facts Operator Source Code
+      url: https://github.com/RyanMillerC/cat-facts-operator
+    maintainers:
+    - email: RyanMillerC@outlook.com
+      name: Ryan Miller
+    maturity: stable
+    minKubeVersion: 1.32.0
+    provider:
+      name: Ryan Miller
+      url: https://github.com/RyanMillerC/cat-facts-operator
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/cat-facts-operator:1.0.0
+  name: ""
+- image: quay.io/ryanmillerc/cat-facts-operator:v1.0.0
+  name: ""
+- image: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9:latest
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/cat-facts-operator:1.1.0
+name: cat-facts-operator.v1.1.0
+package: cat-facts-operator
+properties:
+- type: olm.gvk
+  value:
+    group: ryanmillerc.github.io
+    kind: CatFact
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: cat-facts-operator
+    version: 1.1.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "ryanmillerc.github.io/v1alpha1",
+            "kind": "CatFact",
+            "metadata": {
+              "name": "default-catfact"
+            },
+            "spec": {}
+          },
+          {
+            "apiVersion": "ryanmillerc.github.io/v1alpha1",
+            "kind": "CatFact",
+            "metadata": {
+              "name": "example-catfact"
+            },
+            "spec": {
+              "fact": "Cats sleep 12-16 hours per day.",
+              "iconName": "Smiling"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional
+      certified: "false"
+      com.redhat.openshift.versions: '>=4.19'
+      console.openshift.io/plugins: '["cat-facts-operator-console-plugin"]'
+      containerImage: quay.io/ryanmillerc/cat-facts-operator:v1.1.0
+      createdAt: "2026-05-04T04:06:59Z"
+      description: Combining Hybrid-Cloud Technology With Cats
+      operatorframework.io/suggested-namespace: cat-facts-operator
+      operators.operatorframework.io/builder: operator-sdk-v1.42.2
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/RyanMillerC/cat-facts-operator
+      support: Ryan Miller
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: "CatFact is a Kubernetes model of a fact about cats \U0001F431"
+        displayName: Cat Fact
+        kind: CatFact
+        name: catfacts.ryanmillerc.github.io
+        version: v1alpha1
+    description: |
+      ### Cat Facts? &#x1F640;
+
+      * **Do you like to have fun?**
+      * **Do you like OpenShift?**
+
+      If you answered either question, **install this operator!** (You don't even have to like cats...)
+
+      ### Seriously, what is it? &#x1F914;
+
+      Red Hat allows applications to extend OpenShift's web UI with [OpenShift
+      Console Dynamic Plugins][dynamic-plugins]. Red Hat provides docs for building
+      plugins and [deploying through Helm]. They don't provide a good operator-based
+      deployment reference.
+
+      Cat Facts Operator is the **community reference for operator-based OpenShift
+      console dynamic plugin deployment,** combining hybrid-cloud technology with cats.
+
+      The operator is Go-based and built with [Operator SDK]. The operator also bundles
+      a React+PatternFly 6-based [OpenShift Console Dynamic Plugin][dynamic-plugins]
+      that serves custom content in the OpenShift web console to manage operator
+      resources.
+
+      Cat Facts Operator provides a Custom Resource Definition (CRD) for *CatFact*. A
+      CatFact is a Kubernetes resource that contains metadata along with a fact about
+      cats. Facts are queried from https://catfact.ninja/fact, a free API that
+      generates cat facts.
+
+      ### Requirements &#x1F4CB;
+
+      * OKD/OpenShift 4.19 or later (Kubernetes 1.32.0+)
+
+      **NOTE:** OCP 4.19+ is required because the OpenShift dynamic console plugin
+      uses PatternFly 6, which was introduced starting with OpenShift 4.19.
+
+      ### Installing &#x1F680;
+
+      Follow the prompts on the install operator page. Accept the default options for
+      everything **except for Console Plugin**. For security, OpenShift defaults
+      *Console Plugin* to *Disabled* on operators that come from community catalogs.
+      **Select *Enable* for *Console Plugin* before installing the operator.**
+
+      It will take a few moments for the operator controller and console dynamic plugin
+      containers to download and launch. Within a few moments, you'll be able to
+      refresh and enjoy Cat Facts Operator.
+
+      ### How to Use Cat Facts &#x1F63B;
+
+      1. Navigate to *Cat Facts > Cat Fact Catalog* on the left-side navigation pane
+         of the OpenShift console
+      2. Select *Create CatFact*
+      3. Select the new CatFact card to view it
+      4. Select *Create CatFact* again
+      5. Select *Create CatFact* 20 more times!!!
+      6. If you get bored and want to delete all your CatFacts, select *Delete All*
+
+      ### Uninstalling &#x1F63F;
+
+      To uninstall, go to *Ecosystem > Installed Operators* in the OpenShift console.
+      Select "Cat Facts Operator" and uninstall.
+
+      After uninstalling, run these commands to clean up resources the operator
+      leaves behind:
+
+      ```bash
+      oc delete catfacts --all -A
+      oc delete crd catfacts.ryanmillerc.github.io
+      oc delete csv --all -n cat-facts-operator
+      oc delete consoleplugin cat-facts-operator-console-plugin
+      oc delete namespace cat-facts-operator
+      ```
+
+      ### Acknowledgments
+
+      Cat facts are generated by the public [Cat Facts][cat-facts-api] API.
+
+      Cat icons/emojis used in this project were created by Emily Jäger, licensed under
+      [CC BY-SA 4.0], and are [available here][cat-icons].
+
+      [CC BY-SA 4.0]: https://creativecommons.org/licenses/by-sa/4.0
+      [dynamic-plugins]: https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/web_console/dynamic-plugins
+      [Operator SDK]: https://sdk.operatorframework.io/
+      [cat-facts-api]: https://catfact.ninja
+      [cat-icons]: https://openmoji.org/library/#group=smileys-emotion%2Fcat-face
+      [deploying through Helm]: https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/web_console/dynamic-plugins#deploy-on-cluster_deploy-plugin-cluster
+    displayName: Cat Facts Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+    keywords:
+    - Cats
+    - Cool
+    links:
+    - name: Cat Facts Operator Source Code
+      url: https://github.com/RyanMillerC/cat-facts-operator
+    maintainers:
+    - email: RyanMillerC@outlook.com
+      name: Ryan Miller
+    maturity: stable
+    minKubeVersion: 1.32.0
+    provider:
+      name: Ryan Miller
+      url: https://github.com/RyanMillerC/cat-facts-operator
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/cat-facts-operator:1.1.0
+  name: ""
+- image: quay.io/ryanmillerc/cat-facts-operator:v1.1.0
+  name: ""
+- image: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9:latest
+  name: ""
+schema: olm.bundle

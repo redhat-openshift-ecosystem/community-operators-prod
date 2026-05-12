@@ -55,7 +55,7 @@ metadata:
                   {
                     "commander": "docker.io/rediscommander/redis-commander@sha256:19cd0c49f418779fa2822a0496c5e6516d0c792effc39ed20089e6268477e40a",
                     "name": "redis",
-                    "redis": "redis:8.2.0-alpine",
+                    "redis": "docker.io/library/redis@sha256:7521abdff715d396aa482183942f3fe643344287c29ccb66eee16ac08a92190f",
                     "redisCommander": "rediscommander",
                     "redisName": "redis-csm",
                     "redisReplicas": 5,
@@ -911,6 +911,10 @@ metadata:
                   {
                     "name": "X_CSI_PODMON_ARRAY_CONNECTIVITY_TIMEOUT",
                     "value": "10s"
+                  },
+                  {
+                    "name": "X_CSM_AUTH_ENABLED",
+                    "value": "false"
                   }
                 ],
                 "image": "registry.connect.redhat.com/dell-emc/dell-csm-powerstore@sha256:0b4e3f64ec340bb16bda3719fb447c17ee09529cbcf1bb08354470aac10e93cc",
@@ -1744,7 +1748,7 @@ metadata:
       ]
     capabilities: Seamless Upgrades
     categories: Storage
-    containerImage: registry.connect.redhat.com/dell-emc/dell-container-storage-modules-operator@sha256:sha256:3b44b9dd39a3831a54aac1bf9cbe8d72582e7b4612ba0b17daff1bfc0c244bdc
+    containerImage: registry.connect.redhat.com/dell-emc/dell-container-storage-modules-operator@sha256:3b44b9dd39a3831a54aac1bf9cbe8d72582e7b4612ba0b17daff1bfc0c244bdc
     createdAt: "2026-04-24T14:39:08Z"
     description: Easily install and manage Dell’s CSI Drivers and CSM
     features.operators.openshift.io/disconnected: "true"
@@ -4446,6 +4450,8 @@ spec:
                         value: registry.connect.redhat.com/dell-emc/dell-csm-metadata-retriever@sha256:6de94d91a17a401b5f2e5cdf7bb50cd053521deaf1e189340d21c4249e8c4bf1
                       - name: RELATED_IMAGE_nginx
                         value: quay.io/nginx/nginx-unprivileged@sha256:f9dfa9c20b2b0b7c5cc830374f22f23dee3f750b6c5291ca7e0330b5c88e6403
+                      - name: RELATED_IMAGE_redis
+                        value: docker.io/library/redis@sha256:7521abdff715d396aa482183942f3fe643344287c29ccb66eee16ac08a92190f
                       - name: RELATED_IMAGE_redis-commander
                         value: docker.io/rediscommander/redis-commander@sha256:19cd0c49f418779fa2822a0496c5e6516d0c792effc39ed20089e6268477e40a
                       - name: RELATED_IMAGE_opa
@@ -4575,6 +4581,8 @@ spec:
       name: metadataretriever
     - image: quay.io/nginx/nginx-unprivileged@sha256:f9dfa9c20b2b0b7c5cc830374f22f23dee3f750b6c5291ca7e0330b5c88e6403
       name: nginx
+    - image: docker.io/library/redis@sha256:7521abdff715d396aa482183942f3fe643344287c29ccb66eee16ac08a92190f
+      name: redis
     - image: docker.io/rediscommander/redis-commander@sha256:19cd0c49f418779fa2822a0496c5e6516d0c792effc39ed20089e6268477e40a
       name: redis-commander
     - image: docker.io/openpolicyagent/opa@sha256:2b1c4b231f6dfa6a2baea4af4109203b10cd4b65e836d72f03bfe5d8dfce7095

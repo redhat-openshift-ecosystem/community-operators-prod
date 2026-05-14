@@ -10,6 +10,10 @@ entries:
   skips:
   - kubernaut-operator.v1.3.2
   - kubernaut-operator.v1.3.3
+- name: kubernaut-operator.v1.4.1
+  replaces: kubernaut-operator.v1.3.4
+  skips:
+  - kubernaut-operator.v1.3.4
 name: candidate-v1
 package: kubernaut-operator
 schema: olm.channel
@@ -606,4 +610,205 @@ relatedImages:
   name: signalprocessing
 - image: quay.io/kubernaut-ai/workflowexecution@sha256:545d3c406ff7167f93400a93a2ca6a13b1cd9f45b004c048aec050968d4d10b1
   name: workflowexecution
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/kubernaut-operator:1.4.1
+name: kubernaut-operator.v1.4.1
+package: kubernaut-operator
+properties:
+- type: olm.gvk
+  value:
+    group: kubernaut.ai
+    kind: Kubernaut
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: kubernaut-operator
+    version: 1.4.1
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "kubernaut.ai/v1alpha1",
+            "kind": "Kubernaut",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "kubernaut-operator"
+              },
+              "name": "kubernaut",
+              "namespace": "kubernaut-system"
+            },
+            "spec": {
+              "aiAnalysis": {
+                "policy": {
+                  "configMapName": "aianalysis-policies"
+                }
+              },
+              "gateway": {
+                "route": {
+                  "enabled": true
+                }
+              },
+              "kubernautAgent": {
+                "llm": {
+                  "credentialsSecretName": "llm-credentials",
+                  "model": "claude-sonnet-4-6",
+                  "provider": "vertex_ai"
+                }
+              },
+              "monitoring": {
+                "enabled": true
+              },
+              "postgresql": {
+                "host": "postgresql.kubernaut-system.svc.cluster.local",
+                "port": 5432,
+                "secretName": "postgresql-secret"
+              },
+              "signalProcessing": {
+                "policy": {
+                  "configMapName": "signalprocessing-policy"
+                }
+              },
+              "valkey": {
+                "host": "valkey.kubernaut-system.svc.cluster.local",
+                "port": 6379,
+                "secretName": "valkey-secret"
+              }
+            }
+          }
+        ]
+      capabilities: Full Lifecycle
+      categories: AI/Machine Learning,Monitoring
+      com.redhat.openshift.versions: v4.18
+      containerImage: quay.io/kubernaut-ai/kubernaut-operator:1.4.1
+      createdAt: "2026-05-14T02:57:22Z"
+      description: Automated Kubernetes remediation powered by AI — detects issues,
+        analyzes root causes, and executes verified fixes.
+      documentation: https://jordigilh.github.io/kubernaut-docs/latest/
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "true"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: kubernaut-system
+      operators.operatorframework.io/builder: operator-sdk-v1.42.2
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/jordigilh/kubernaut-operator
+      support: jgil@redhat.com
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: |-
+          Kubernaut is the Schema for the kubernauts API.
+          It declares a single Kubernaut deployment within the namespace it is created in.
+        displayName: Kubernaut
+        kind: Kubernaut
+        name: kubernauts.kubernaut.ai
+        version: v1alpha1
+    description: |
+      ## Kubernaut Operator for OpenShift
+
+      The Kubernaut Operator deploys and manages the **Kubernaut AIOps Remediation Platform**
+      on OpenShift Container Platform (OCP) 4.18+.
+
+      Kubernaut automatically detects Kubernetes issues via AlertManager signals, performs
+      AI-powered root cause analysis, selects and executes remediation workflows, and
+      verifies effectiveness — all with policy-governed approval gates.
+
+      ### Features
+
+      - **Single CR deployment**: one `Kubernaut` custom resource deploys all 10 services
+      - **BYO infrastructure**: bring your own PostgreSQL and Valkey/Redis
+      - **OCP-native**: auto-wires Prometheus, AlertManager, service-ca TLS, and Routes
+      - **Policy-governed**: Rego policies control signal classification and AI analysis approval
+      - **LLM-powered analysis**: integrates with OpenAI, Anthropic, and other LLM providers
+      - **Full lifecycle management**: automated DB migrations, OCP service-CA TLS integration, RBAC provisioning
+      - **Ansible integration**: optional AWX/AAP for Ansible-based remediation workflows
+
+      ### Prerequisites
+
+      - OpenShift Container Platform 4.18+ (Kubernetes 1.31+)
+      - PostgreSQL database with credentials in a Secret
+      - Valkey/Redis with credentials in a Secret
+      - LLM API credentials (e.g., OpenAI API key) in a Secret
+      - Rego policy ConfigMaps for AI analysis and signal processing
+
+      ### Getting Started
+
+      1. Create the required BYO secrets (PostgreSQL, Valkey, LLM credentials)
+      2. Create Rego policy ConfigMaps
+      3. Apply a `Kubernaut` CR — see the sample in the operator bundle
+    displayName: Kubernaut Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+    keywords:
+    - kubernaut
+    - remediation
+    - ai
+    - openshift
+    - kubernetes
+    - alertmanager
+    - sre
+    - aiops
+    links:
+    - name: Documentation
+      url: https://jordigilh.github.io/kubernaut-docs/latest/
+    - name: Kubernaut
+      url: https://github.com/jordigilh/kubernaut
+    - name: Kubernaut Operator
+      url: https://github.com/jordigilh/kubernaut-operator
+    maintainers:
+    - email: jgil@redhat.com
+      name: Jordi Gil
+    maturity: alpha
+    minKubeVersion: 1.31.0
+    provider:
+      name: Kubernaut AI
+      url: https://github.com/jordigilh/kubernaut
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/kubernaut-operator:1.4.1
+  name: ""
+- image: quay.io/kubernaut-ai/aianalysis@sha256:caf91c421b331cd4392d97fd1b09bedf7f1447bad3d59b10b78c964b956dd0e3
+  name: aianalysis
+- image: quay.io/kubernaut-ai/authwebhook@sha256:d637a346aef6393cf03840bb0b99107e01013664d8f3759a5bceb93db6ef04f1
+  name: authwebhook
+- image: quay.io/kubernaut-ai/datastorage@sha256:11e0043b5c7ab7f642bdaa6434ee6fd292a2c6a474eaaa302eacdfe54abe0bb4
+  name: data-storage
+- image: quay.io/kubernaut-ai/db-migrate@sha256:a45b9ea5da5740e7e5b297ea55d52150d6f824059cfc548ac472b9765b5ffa44
+  name: db-migrate
+- image: quay.io/kubernaut-ai/effectivenessmonitor@sha256:b9173d391927623a1d4068fa73855cf820b08293e47e5f42762a9b41751bcd36
+  name: effectivenessmonitor
+- image: quay.io/kubernaut-ai/gateway@sha256:216bf49196899df5a0298c7e8621202f3cafa3e5a8a26ef58606bffdbc5bbdbf
+  name: gateway
+- image: quay.io/kubernaut-ai/kubernaut-operator:1.4.1
+  name: ""
+- image: quay.io/kubernaut-ai/kubernautagent@sha256:b679a4e4125cb06b41e1a3d16417a2d24d4a49e2db1a0cdef4ef1c5a536d9a32
+  name: kubernaut-agent
+- image: quay.io/kubernaut-ai/notification@sha256:31733a6cf0a5187f135326be2487ff6c39728f1d0e3445d246d3fe87c5d22306
+  name: notification
+- image: quay.io/kubernaut-ai/remediationorchestrator@sha256:ab6520e25b7eb225356491eb37be2c7ccacc0b0b0996cfb6abef042ea465dbd0
+  name: remediationorchestrator
+- image: quay.io/kubernaut-ai/signalprocessing@sha256:74217c2afe5c8e714ac4705f3cfba26923cec13da621718b61e531f23a171255
+  name: signalprocessing
+- image: quay.io/kubernaut-ai/workflowexecution@sha256:ffa742174ff9dd738cbf4b09a7a72bbf5c0f5f0ad7f65cd6b177af20f2d002a5
+  name: workflowexecution
+- image: registry.access.redhat.com/ubi10/ubi-minimal@sha256:2a4785f399dc7ae2f3ca85f68bac0ccac47f3e73464a47c21e4f7ae46b55a053
+  name: init-ubi-minimal
+- image: registry.redhat.io/rhel10/postgresql-16@sha256:6626034c7e8a171610212a220efd417eb5ab7792b5dbd912d38976ffe0627301
+  name: init-postgres
 schema: olm.bundle

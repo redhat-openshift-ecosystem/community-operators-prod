@@ -27,6 +27,8 @@ entries:
   replaces: rabbitmq-messaging-topology-operator.v1.17.4
 - name: rabbitmq-messaging-topology-operator.v1.18.2
   replaces: rabbitmq-messaging-topology-operator.v1.18.1
+- name: rabbitmq-messaging-topology-operator.v1.19.2
+  replaces: rabbitmq-messaging-topology-operator.v1.18.2
 name: stable
 package: rabbitmq-messaging-topology-operator
 schema: olm.channel
@@ -3326,5 +3328,229 @@ relatedImages:
 - image: quay.io/community-operator-pipeline-prod/rabbitmq-messaging-topology-operator@sha256:8b221a9aebcfa2ddb6e1f1220d2ba53a4ca79ba17494b3b2a46092f590867037
   name: ""
 - image: quay.io/rabbitmqoperator/messaging-topology-operator:1.18.2
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/rabbitmq-messaging-topology-operator:1.19.2
+name: rabbitmq-messaging-topology-operator.v1.19.2
+package: rabbitmq-messaging-topology-operator
+properties:
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: Binding
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: Exchange
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: Federation
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: OperatorPolicy
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: Permission
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: Policy
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: Queue
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: SchemaReplication
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: Shovel
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: SuperStream
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: TopicPermission
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: User
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: rabbitmq.com
+    kind: Vhost
+    version: v1beta1
+- type: olm.gvk.required
+  value:
+    group: rabbitmq.com
+    kind: RabbitmqCluster
+    version: v1beta1
+- type: olm.package
+  value:
+    packageName: rabbitmq-messaging-topology-operator
+    version: 1.19.2
+- type: olm.package.required
+  value:
+    packageName: rabbitmq-cluster-operator
+    versionRange: '>2.0.0'
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |
+        [{"apiVersion":"rabbitmq.com/v1beta1","kind":"Binding","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1beta1","kind":"Exchange","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1beta1","kind":"Federation","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1beta1","kind":"Permission","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1beta1","kind":"Policy","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1beta1","kind":"OperatorPolicy","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1beta1","kind":"Queue","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1beta1","kind":"SchemaReplication","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1beta1","kind":"Shovel","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1alpha1","kind":"SuperStream","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1beta1","kind":"User","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1beta1","kind":"Vhost","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}},{"apiVersion":"rabbitmq.com/v1beta1","kind":"TopicPermission","metadata":{"name":"test"},"spec":{"rabbitmqClusterReference":{"name":"rabbitmq-cluster"}}}]
+      capabilities: Full Lifecycle
+      categories: Streaming & Messaging
+      certified: "false"
+      containerImage: quay.io/rabbitmqoperator/messaging-topology-operator:1.19.2
+      createdAt: 2026-05-12T14:22:59
+      description: Kubernetes operator to allow developers to create and manage RabbitMQ
+        messaging topologies within a RabbitMQ cluster using a declarative Kubernetes
+        API.
+      repository: https://github.com/rabbitmq/messaging-topology-operator
+      support: VMware Tanzu
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Binding
+        displayName: Binding
+        kind: Binding
+        name: bindings.rabbitmq.com
+        version: v1beta1
+      - description: Exchange
+        displayName: Exchange
+        kind: Exchange
+        name: exchanges.rabbitmq.com
+        version: v1beta1
+      - description: Federation
+        displayName: Federation
+        kind: Federation
+        name: federations.rabbitmq.com
+        version: v1beta1
+      - description: Permission
+        displayName: Permission
+        kind: Permission
+        name: permissions.rabbitmq.com
+        version: v1beta1
+      - description: TopicPermission
+        displayName: TopicPermission
+        kind: TopicPermission
+        name: topicpermissions.rabbitmq.com
+        version: v1beta1
+      - description: Policy
+        displayName: Policy
+        kind: Policy
+        name: policies.rabbitmq.com
+        version: v1beta1
+      - description: OperatorPolicy
+        displayName: OperatorPolicy
+        kind: OperatorPolicy
+        name: operatorpolicies.rabbitmq.com
+        version: v1beta1
+      - description: Queue
+        displayName: Queue
+        kind: Queue
+        name: queues.rabbitmq.com
+        version: v1beta1
+      - description: Schema Replication
+        displayName: SchemaReplication
+        kind: SchemaReplication
+        name: schemareplications.rabbitmq.com
+        version: v1beta1
+      - description: Shovel
+        displayName: Shovel
+        kind: Shovel
+        name: shovels.rabbitmq.com
+        version: v1beta1
+      - description: Super Stream
+        displayName: SuperStream
+        kind: SuperStream
+        name: superstreams.rabbitmq.com
+        version: v1alpha1
+      - description: User
+        displayName: User
+        kind: User
+        name: users.rabbitmq.com
+        version: v1beta1
+      - description: Vhost
+        displayName: Vhost
+        kind: Vhost
+        name: vhosts.rabbitmq.com
+        version: v1beta1
+      required:
+      - description: Rabbitmq Cluster
+        displayName: RabbitmqCluster
+        kind: RabbitmqCluster
+        name: rabbitmqclusters.rabbitmq.com
+        version: v1beta1
+    description: |
+      ## About the managed application
+      RabbitMQ is an open-source message-broker software that originally implemented the Advanced Message Queuing Protocol and has since been extended with a plug-in architecture to support Streaming Text Oriented Messaging Protocol, MQ Telemetry Transport, and other protocols.
+      ## About this Operator
+      Kubernetes operator to allow developers to create and manage RabbitMQ messaging topologies within a RabbitMQ cluster using a declarative Kubernetes API. A Messaging topology is the collection of objects such as exchanges, queues, bindings and policies that provides specific messaging or streaming scenario. This operator is used with RabbitMQ clusters deployed via the RabbitMQ Cluster Kubernetes Operator. This repository contains custom controllers and custom resource definitions (CRDs) enabling a declarative API for RabbitMQ messaging topologies.
+      ## Prerequisites for enabling this Operator
+      The operator works on top of the RabbitMQ cluster operator.
+      Messaging Topology Operator is tested with the latest release of RabbitMQ Cluster Operator. It uses the generated default user secret from RabbitmqCluster (set in rabbitmqcluster.status.binding) to authenticate with RabbitMQ server.
+    displayName: rabbitmq-messaging-topology-operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - rabbitmq
+    - messaging
+    - amqp
+    - amqp10
+    - stomp
+    - mqtt
+    - mqtt5
+    - queues
+    - streaming
+    links:
+    - name: GitHub
+      url: https://github.com/rabbitmq/messaging-topology-operator
+    - name: Documentation
+      url: https://www.rabbitmq.com/kubernetes/operator/install-topology-operator.html
+    maintainers:
+    - email: rabbitmq-users@googlegroups.com
+      name: VMware Tanzu
+    maturity: stable
+    nativeAPIs:
+    - group: ""
+      kind: Secret
+      version: v1
+    - group: ""
+      kind: Service
+      version: v1
+    provider:
+      name: VMware Tanzu
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/rabbitmq-messaging-topology-operator:1.19.2
+  name: ""
+- image: quay.io/rabbitmqoperator/messaging-topology-operator:1.19.2
   name: ""
 schema: olm.bundle

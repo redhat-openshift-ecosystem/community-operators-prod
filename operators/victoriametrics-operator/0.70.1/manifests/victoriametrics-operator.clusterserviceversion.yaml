@@ -577,8 +577,8 @@ metadata:
     capabilities: Deep Insights
     categories: Monitoring
     certified: "false"
-    containerImage: quay.io/victoriametrics/operator@sha256:779ed9e8c25ba08b510a81492c7efed536201acaf693a32dcc610ce03662621d
-    createdAt: "2026-05-18T07:32:31Z"
+    containerImage: quay.io/victoriametrics/operator@sha256:24e192cb77739bc75a38a3d9af4123e028e9c6b194361eb7b606588c4f373b0c
+    createdAt: "2026-05-20T09:15:14Z"
     description: Provides monitoring capabilities for kubernetes clusters and applications
     features.operators.openshift.io/cnf: "false"
     features.operators.openshift.io/cni: "false"
@@ -602,7 +602,7 @@ metadata:
     operatorframework.io/arch.amd64: supported
     operatorframework.io/arch.arm64: supported
     operatorframework.io/arch.ppc64le: supported
-  name: victoriametrics-operator.v0.70.0
+  name: victoriametrics-operator.v0.70.1
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -1429,7 +1429,7 @@ spec:
                         valueFrom:
                           fieldRef:
                             fieldPath: metadata.annotations['olm.targetNamespaces']
-                    image: quay.io/victoriametrics/operator@sha256:779ed9e8c25ba08b510a81492c7efed536201acaf693a32dcc610ce03662621d
+                    image: quay.io/victoriametrics/operator@sha256:24e192cb77739bc75a38a3d9af4123e028e9c6b194361eb7b606588c4f373b0c
                     livenessProbe:
                       httpGet:
                         path: /health
@@ -1474,7 +1474,7 @@ spec:
                     secret:
                       secretName: webhook-server-cert
               containers:
-                - image: quay.io/victoriametrics/operator@sha256:779ed9e8c25ba08b510a81492c7efed536201acaf693a32dcc610ce03662621d
+                - image: quay.io/victoriametrics/operator@sha256:24e192cb77739bc75a38a3d9af4123e028e9c6b194361eb7b606588c4f373b0c
       permissions:
         - rules:
             - apiGroups:
@@ -1539,7 +1539,7 @@ spec:
   minKubeVersion: 1.23.0
   provider:
     name: VictoriaMetrics
-  version: 0.70.0
+  version: 0.70.1
   webhookdefinitions:
     - admissionReviewVersions:
         - v1
@@ -1923,5 +1923,5 @@ spec:
       webhookPath: /validate-operator-victoriametrics-com-v1beta1-vmuser
   relatedImages:
     - name: victoriametrics-operator
-      image: quay.io/victoriametrics/operator@sha256:779ed9e8c25ba08b510a81492c7efed536201acaf693a32dcc610ce03662621d
+      image: quay.io/victoriametrics/operator@sha256:24e192cb77739bc75a38a3d9af4123e028e9c6b194361eb7b606588c4f373b0c
   replaces: victoriametrics-operator.v0.68.4

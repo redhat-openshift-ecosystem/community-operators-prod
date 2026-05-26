@@ -1,0 +1,22 @@
+apiVersion: v1
+data:
+  epilog-90-dcgm.sh: "#!/bin/bash\n# SPDX-FileCopyrightText: Copyright (C) SchedMD
+    LLC.\n# SPDX-FileCopyrightText: Copyright (C) NVIDIA CORPORATION & AFFILIATES.
+    All rights reserved.\n# SPDX-License-Identifier: Apache-2.0\n#\n# DCGM GPU-to-Job
+    Mapping Epilog Script\n#\n# This script runs when jobs complete on GPU nodes and
+    cleans up job mapping files\n# to prevent stale job mappings in the DCGM exporter.\n\nfunction
+    log_msg() {\n\techo \"[$(date)] [$$] $*\" >&2\n}\n\nfunction set_globals() {\n\tdeclare
+    -g METRICS_DIR=\"/var/lib/dcgm-exporter/job-mapping\"\n}\n\nfunction clean_gpu_job_files()
+    {\n\tif [[ -z ${SLURM_JOB_GPUS:-} ]]; then\n\t\tlog_msg \"no gres gpus requested
+    by user\"\n\t\treturn\n\tfi\n\n\tmapfile -t -d ',' cuda_devs <<<\"${SLURM_JOB_GPUS:-}\"\n\tcuda_devs[-1]=\"${cuda_devs[-1]%$'\\n'}\"\n\n\tfor
+    gpu_id in \"${cuda_devs[@]}\"; do\n\t\tlog_msg \"removing ${METRICS_DIR:-}/${gpu_id:-99}\"\n\t\trm
+    -f \"${METRICS_DIR:-}/${gpu_id:-99}\" || log_msg \"unable to remove file ${METRICS_DIR:-}/${gpu_id:-99}\"\n\tdone\n}\n\nset
+    -o nounset -o errexit -o pipefail -o errtrace\nset_globals\nclean_gpu_job_files\n"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: slurm
+    app.kubernetes.io/version: "25.11"
+    helm.sh/chart: slurm-1.1.0
+  name: slurm-epilog-dcgm

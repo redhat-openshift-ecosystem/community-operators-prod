@@ -1,0 +1,508 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: monitoraccesspolicies.clusterpulse.io
+spec:
+  group: clusterpulse.io
+  names:
+    kind: MonitorAccessPolicy
+    plural: monitoraccesspolicies
+    shortNames:
+    - map
+    - policy
+    singular: monitoraccesspolicy
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.access.effect
+      name: Effect
+      type: string
+    - jsonPath: .spec.identity.priority
+      name: Priority
+      type: integer
+    - jsonPath: .spec.access.enabled
+      name: Enabled
+      type: boolean
+    - jsonPath: .status.state
+      name: State
+      type: string
+    - jsonPath: .status.affectedUsers
+      name: Users
+      type: integer
+    - jsonPath: .status.affectedGroups
+      name: Groups
+      type: integer
+    - description: Number of custom resource types
+      jsonPath: .status.customResourceTypes
+      name: Custom
+      type: integer
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              access:
+                properties:
+                  effect:
+                    description: Allow or Deny access
+                    enum:
+                    - Allow
+                    - Deny
+                    type: string
+                  enabled:
+                    default: true
+                    description: Whether this policy is active
+                    type: boolean
+                required:
+                - effect
+                type: object
+              identity:
+                properties:
+                  priority:
+                    default: 100
+                    description: Higher priority policies are evaluated first
+                    maximum: 10000
+                    minimum: 1
+                    type: integer
+                  subjects:
+                    minProperties: 1
+                    properties:
+                      groups:
+                        description: List of group names
+                        items:
+                          type: string
+                        type: array
+                      serviceAccounts:
+                        items:
+                          properties:
+                            name:
+                              description: Service account name
+                              type: string
+                            namespace:
+                              default: default
+                              description: Service account namespace
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                      users:
+                        description: List of usernames or email addresses
+                        items:
+                          pattern: ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                          type: string
+                        type: array
+                    type: object
+                required:
+                - subjects
+                type: object
+              lifecycle:
+                properties:
+                  validity:
+                    properties:
+                      notAfter:
+                        description: Policy expires after this time
+                        format: date-time
+                        type: string
+                      notBefore:
+                        description: Policy is not valid before this time
+                        format: date-time
+                        type: string
+                    type: object
+                type: object
+              operations:
+                properties:
+                  audit:
+                    properties:
+                      logAccess:
+                        default: false
+                        description: Log all access attempts using this policy
+                        type: boolean
+                      requireReason:
+                        default: false
+                        description: Require reason for access
+                        type: boolean
+                    type: object
+                type: object
+              scope:
+                properties:
+                  clusters:
+                    properties:
+                      default:
+                        default: none
+                        description: Default access for clusters not matching any
+                          rule
+                        enum:
+                        - allow
+                        - deny
+                        - none
+                        type: string
+                      rules:
+                        items:
+                          properties:
+                            permissions:
+                              properties:
+                                view:
+                                  default: true
+                                  description: Can view basic cluster information
+                                  type: boolean
+                                viewAuditInfo:
+                                  default: false
+                                  description: Can view audit and policy information
+                                  type: boolean
+                                viewCosts:
+                                  default: false
+                                  description: Can view cost metrics
+                                  type: boolean
+                                viewMetadata:
+                                  default: false
+                                  description: Can view metadata about filtered resources
+                                    (total counts, what's hidden)
+                                  type: boolean
+                                viewMetrics:
+                                  default: false
+                                  description: Can view cluster-wide metrics (CPU,
+                                    memory, pod counts)
+                                  type: boolean
+                                viewSecrets:
+                                  default: false
+                                  description: Can view secret references
+                                  type: boolean
+                                viewSensitive:
+                                  default: false
+                                  description: Can view sensitive information
+                                  type: boolean
+                              type: object
+                            resources:
+                              properties:
+                                custom:
+                                  additionalProperties:
+                                    description: Filter configuration for a custom
+                                      resource type
+                                    properties:
+                                      aggregations:
+                                        description: Control which aggregations are
+                                          visible
+                                        properties:
+                                          exclude:
+                                            description: Hide these aggregations
+                                            items:
+                                              type: string
+                                            type: array
+                                          include:
+                                            description: |
+                                              Only show these aggregations.
+                                              Takes precedence over exclude.
+                                            items:
+                                              type: string
+                                            type: array
+                                        type: object
+                                      filters:
+                                        description: Filter criteria for custom resources
+                                        properties:
+                                          fields:
+                                            additionalProperties:
+                                              description: Filter for a specific field
+                                              properties:
+                                                allowed:
+                                                  description: Allowed values or patterns
+                                                  items:
+                                                    x-kubernetes-int-or-string: true
+                                                  type: array
+                                                conditions:
+                                                  description: Operator-based filter
+                                                    conditions
+                                                  items:
+                                                    properties:
+                                                      operator:
+                                                        description: Comparison operator
+                                                        enum:
+                                                        - equals
+                                                        - notEquals
+                                                        - contains
+                                                        - startsWith
+                                                        - endsWith
+                                                        - greaterThan
+                                                        - lessThan
+                                                        - in
+                                                        - notIn
+                                                        - matches
+                                                        type: string
+                                                      value:
+                                                        description: Value to compare
+                                                          against
+                                                        x-kubernetes-int-or-string: true
+                                                    required:
+                                                    - operator
+                                                    - value
+                                                    type: object
+                                                  type: array
+                                                denied:
+                                                  description: Denied values or patterns
+                                                  items:
+                                                    x-kubernetes-int-or-string: true
+                                                  type: array
+                                              type: object
+                                            description: |
+                                              Field-based filters keyed by field name.
+                                              Only fields listed in MetricSource rbac.filterableFields can be filtered.
+                                            type: object
+                                          names:
+                                            description: Resource name filtering
+                                            properties:
+                                              allowed:
+                                                description: Allowed name patterns
+                                                items:
+                                                  type: string
+                                                type: array
+                                              denied:
+                                                description: Denied name patterns
+                                                items:
+                                                  type: string
+                                                type: array
+                                            type: object
+                                          namespaces:
+                                            description: Namespace-based filtering
+                                            properties:
+                                              allowed:
+                                                description: Allowed namespace patterns
+                                                  (supports wildcards)
+                                                items:
+                                                  type: string
+                                                type: array
+                                              denied:
+                                                description: Denied namespace patterns
+                                                items:
+                                                  type: string
+                                                type: array
+                                            type: object
+                                        type: object
+                                      visibility:
+                                        default: all
+                                        description: Visibility level for this custom
+                                          resource type
+                                        enum:
+                                        - all
+                                        - none
+                                        - filtered
+                                        type: string
+                                    type: object
+                                  description: |
+                                    Custom resource filters keyed by resourceTypeName from MetricSource.
+                                    Each key maps to a filter configuration for that resource type.
+                                  type: object
+                                namespaces:
+                                  properties:
+                                    filters:
+                                      properties:
+                                        allowed:
+                                          description: Allowed namespace names or
+                                            patterns
+                                          items:
+                                            type: string
+                                          type: array
+                                        denied:
+                                          description: Denied namespace names or patterns
+                                          items:
+                                            type: string
+                                          type: array
+                                      type: object
+                                    visibility:
+                                      default: all
+                                      description: Namespace visibility level
+                                      enum:
+                                      - all
+                                      - none
+                                      - filtered
+                                      type: string
+                                  type: object
+                                nodes:
+                                  properties:
+                                    filters:
+                                      properties:
+                                        hideByLabels:
+                                          additionalProperties:
+                                            type: string
+                                          description: Hide nodes with specific labels
+                                          type: object
+                                        hideMasters:
+                                          default: false
+                                          description: Hide master/control plane nodes
+                                          type: boolean
+                                        labelSelector:
+                                          additionalProperties:
+                                            type: string
+                                          description: Label selector for nodes
+                                          type: object
+                                      type: object
+                                    visibility:
+                                      default: all
+                                      description: Node visibility level
+                                      enum:
+                                      - all
+                                      - none
+                                      - filtered
+                                      type: string
+                                  type: object
+                                operators:
+                                  properties:
+                                    filters:
+                                      properties:
+                                        allowedNames:
+                                          description: Specific operator names to
+                                            show
+                                          items:
+                                            type: string
+                                          type: array
+                                        allowedNamespaces:
+                                          description: Namespaces where operators
+                                            are visible
+                                          items:
+                                            type: string
+                                          type: array
+                                        deniedNames:
+                                          description: Specific operator names to
+                                            hide
+                                          items:
+                                            type: string
+                                          type: array
+                                        deniedNamespaces:
+                                          description: Namespaces where operators
+                                            are hidden
+                                          items:
+                                            type: string
+                                          type: array
+                                      type: object
+                                    visibility:
+                                      default: all
+                                      description: Operator visibility level
+                                      enum:
+                                      - all
+                                      - none
+                                      - filtered
+                                      type: string
+                                  type: object
+                                pods:
+                                  properties:
+                                    filters:
+                                      properties:
+                                        allowedNamespaces:
+                                          description: Namespaces where pods are visible
+                                          items:
+                                            type: string
+                                          type: array
+                                      type: object
+                                    visibility:
+                                      default: all
+                                      description: Pod visibility level
+                                      enum:
+                                      - all
+                                      - none
+                                      - filtered
+                                      type: string
+                                  type: object
+                              type: object
+                            selector:
+                              minProperties: 1
+                              properties:
+                                matchLabels:
+                                  additionalProperties:
+                                    type: string
+                                  description: Label selector for clusters
+                                  type: object
+                                matchNames:
+                                  description: Exact cluster names or patterns with
+                                    wildcards
+                                  items:
+                                    type: string
+                                  type: array
+                                matchPattern:
+                                  description: Regex pattern for cluster names
+                                  type: string
+                              type: object
+                          required:
+                          - selector
+                          type: object
+                        type: array
+                    type: object
+                required:
+                - clusters
+                type: object
+            required:
+            - identity
+            - access
+            - scope
+            type: object
+          status:
+            properties:
+              affectedGroups:
+                type: integer
+              affectedServiceAccounts:
+                type: integer
+              affectedUsers:
+                type: integer
+              compiledAt:
+                format: date-time
+                type: string
+              conditions:
+                items:
+                  properties:
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    message:
+                      type: string
+                    reason:
+                      type: string
+                    status:
+                      type: string
+                    type:
+                      type: string
+                  type: object
+                type: array
+              customResourceTypes:
+                description: Number of custom resource types referenced by this policy
+                type: integer
+              customResourceWarnings:
+                description: Warnings about custom resource references
+                items:
+                  type: string
+                type: array
+              evaluationCount:
+                default: 0
+                type: integer
+              hash:
+                type: string
+              lastEvaluated:
+                format: date-time
+                type: string
+              message:
+                type: string
+              state:
+                default: Pending
+                enum:
+                - Active
+                - Inactive
+                - Error
+                - Pending
+                - Expired
+                type: string
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

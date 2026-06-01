@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+  name: kubebrowser-browser-vnc
+rules:
+- apiGroups:
+  - subresource.kubebrowser.io
+  resources:
+  - browsers/vnc
+  verbs:
+  - get

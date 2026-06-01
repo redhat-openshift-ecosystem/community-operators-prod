@@ -1,0 +1,250 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "apicur.io/v1alpha1",
+          "kind": "Apicurito",
+          "metadata": {
+            "labels": {
+              "app": "apicurito"
+            },
+            "name": "apicurito"
+          },
+          "spec": {
+            "size": 3
+          }
+        }
+      ]
+    capabilities: Seamless Upgrades
+    categories: Integration & Delivery
+    certified: "false"
+    containerImage: quay.io/apicurio/apicurito-operator:1.0.3
+    description: Manages the installation and upgrades of apicurito, a small/minimal
+      version of Apicurio
+    operators.operatorframework.io/builder: operator-sdk-v1.13.0+git
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v2
+    repository: https://github.com/Apicurio/apicurio-operators/tree/master/apicurito
+    support: Apicurito
+  name: apicurito.v1.0.3
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: Apicurito is the Schema for the apicuritoes API
+      displayName: Apicurito
+      kind: Apicurito
+      name: apicuritoes.apicur.io
+      resources:
+      - kind: ClusterRole
+        name: ""
+        version: rbac.authorization.k8s.io/v1
+      - kind: Deployment
+        name: ""
+        version: apps/v1
+      - kind: Role
+        name: ""
+        version: rbac.authorization.k8s.io/v1
+      - kind: ServiceAccount
+        name: ""
+        version: v1
+      specDescriptors:
+      - description: The number of pods to scale
+        displayName: Size
+        path: size
+      statusDescriptors:
+      - description: The phase the operator has reached, eg. INSTALLED, STARTING
+        displayName: Phase
+        path: phase
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.phase
+      - description: The currently installed version of Apicurito
+        displayName: Version
+        path: version
+        x-descriptors:
+        - urn:alm:descriptor:text
+      version: v1alpha1
+  description: |+
+    The API Designer is a small/minimal version of Apicurio, a standalone API design studio that can be used to create new or edit existing API designs (using the OpenAPI specification).
+
+    This operator supports the installation and upgrade of apicurito. Apicurito components are:
+       - apicurito-ui (Apicurito API designer application)
+       - apicurito-generator (Apicurito fuse project generator)
+       - apicurito route (to access apicurito from outside openshift)
+
+    ### How to install
+    When the operator is installed (you have created a subscription and the operator is running in the selected namespace) create a new CR of Kind Apicurito (click the Create New button). The CR spec contains all defaults.
+
+    At the moment, following fields are supported as part of the CR:
+       - size: how many pods apicurito operands will have.
+
+  displayName: API Designer
+  icon:
+  - base64data: PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSIyMDBweCIgaGVpZ2h0PSIyMDBweCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDIwMCAyMDAiIHhtbDpzcGFjZT0icHJlc2VydmUiPiAgPGltYWdlIGlkPSJpbWFnZTAiIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiB4PSIwIiB5PSIwIgogICAgaHJlZj0iZGF0YTppbWFnZS9wbmc7YmFzZTY0LGlWQk9SdzBLR2dvQUFBQU5TVWhFVWdBQUFNZ0FBQURJQ0FNQUFBQ2FobDZzQUFBQUJHZEJUVUVBQUxHUEMveGhCUUFBQUNCalNGSk4KQUFCNkpnQUFnSVFBQVBvQUFBQ0E2QUFBZFRBQUFPcGdBQUE2bUFBQUYzQ2N1bEU4QUFBQjQxQk1WRVgvLy84QUFBQUFBQUFBQUFBQQpBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFCL2YzKy92NzkvZjM5L2YzOS9mMzhBQUFBQUFBQUFBQUFBCkFBQS9QejkvZjM4QUFBQUFBQUFBQUFCL2YzOEFBQUFBQUFBQUFBQi9mMysvdjc4QUFBQUFBQUFBQUFBQUFBQi9mMzhBQUFBQUFBQUEKQUFCL2YzOS9mMzhBQUFBL1B6OEFBQUEvUHo5L2YzOEFBQUFBQUFBQUFBRE1BQURNQUFETUFBRE1BQURNQUFETUFBRE1BQURNQUFCLwpmMy9sZjMvbGYzL2xmMy9NQUFETUFBRE1BQURNQUFEbGYzL01BQURNQUFETUFBRE1BQURNQUFETUFBRGxmMzkvZjMveXY3L2xmMy9NCkFBRE1BQUFBQUFETUFBQy92Ny9sZjMvTUFBRGxmMy9sZjMrL3Y3L01BQURNQUFBQUFBRFlQei9NQUFEbGYzL01BQUEvUHovbGYzL3kKdjcvbGYzL01BQUFBQUFETUFBRE1BQURNQUFETUFBRE1BQURNQUFEbGYzL01BQUFBQUFETUFBQy92Ny9NQUFEbGYzOEFBQUEvUHovTQpBQUFBQUFEbGYzL2xmMy9NQUFCL2YzL2xmMy9NQUFETUFBQi9mMzkvZjM4QUFBRE1BQURsZjM4QUFBRFlQejhBQUFCL2YzL1lQei9NCkFBRE1BQUIvZjMvTUFBQi9mMy95djc4QUFBQUFBQURNQUFCL2YzL3l2Ny9NQUFCL2YzL1lQei9ZUHo4L1B6OC9Qei9NQUFDL3Y3L1kKUHovTUFBQUFBQURNQUFELy8vOG1aL3BpQUFBQW5uUlNUbE1BUUlDWXdPRDNzRkFRV0pDZ0tIQWdCQ2hRY0tmWDM3ZUhDR0NJZUVpUAp4L3RnR085SThDQkFuK2VyZUZob2Y4K0RNTHV2TUNCZ2tNRFFnRENvRUJoTWY1L1A4NGdvb09Ed1FGRDNNQmdFYUsvWDBMQW9RTjhJCkVBeW43OHRrNXl3UWsxQUlZTGVvKzcrWDAxZzRJSEMvZUFpSE9KZHpxN2hJRkxnY2NJL3JhSC9id3lUelVNZ3NaMmpJUEpoY0dMTTQKeHpnVTJFeHZWRzlRMnhCN0tFZnFBMzRBQUFBQllrdEhSQUNJQlIxSUFBQUFCM1JKVFVVSDVnSUhGekE2Ni8xalVnQUFDUnhKUkVGVQplTnJ0bmZsREUwY1V4emN4Q1VUU0tLalFvQWdVdzJHdGxBSUpoSklLQWlHRUkwQkRxTFFhcWRUWWxsQzFkN1hhMXRyYjF0NW45bDl0CklJbHNrcG1kNDcxbEkrNzNKMzU2bVE4N2IrYk5tNWszaW1McENaRE5aai9nY0RpemorUnlPR3JzdFRhejJ5VWk5OEU2aHl0TGtjdmgKc1Q5bGRndDVWT3R4WnBseTFuZ1BtZDFRcWc3WE54dzVlc3pGcGlpb3NlbnBobnFmMmEydWtMdjVHRGVDVnNmZFpyZThWQ2VrS0haVQpVMjkyNDR0cU9kbkszNkVJYW1zOTJmNk0yUkNLMjh2aDIyeDEyRTN1WXFmOEdCamI4aDgwRWFQVEErcFRaZkowbWtQaDYrckd4T2c1Ci9ld1pVd2JqWmhUZk1QdHJnTWJiQ2ptOXBtRzQ2L0F3L00rWlJhSDR6blpnVWZRKzMyZGVsRktMTnVTYTV4bmJud090Vi9sclRjUlEKK2w1QXd1aHZNVFB5OVhtUU1Cd0R2RDg1YUFnSTBxRGJ3ZFdwQmdQQm9XRlZEUm5BTVlBMGxaOWkvdEpJNEVXMXFBQTJSbGMvQmtSYgpVL3VvM3ErRVh6bzNOcTVxZFg0aWpNclJnUE0xdkhxL01Ua1ZVUW1ham1LQzlCck9NVE1WVXltYXhhTHdlWHN3TUxybktQYm5aeGZpClZJcWNGcEZJZkVzWUdQNW1tdjNCSVpVbEhKZjNZbkE0YVhOSGRKbUpnVVRpeHVoWGpiUlZlWWdIQThWUEd1UlNWcVhxZjVsb096RzIKd3NtaExrNUNPUkF3WEdUMzRQQU43U2c4QWdQQm1BZnJTSWFUVXlJWTJ5U3JBSXc1aERqUlZmZEtwZUh3d3FJZ2g2cGVrT2R3SStRWQpsa2pEMVl3d3hiYUMwaUFPT0VjUGFiaUtya21CU0EvQ1hYQU9vbjhFNVRDa0hkNzNxaUgrOGRwRldRNVZ2WGpKbkk3bHF2U1BGTmRFClRsVmNnc01MNzFmOUZVWkhoa0VjYWt4ODhUdUg0Q0I5NVVZbnAyRWNxam9rREhJWmpOSFlVR1l5dWM0ZGtkQzEvTG9ZeHdDWXcxaysKOENhQjNhcWdLMklnWUUrdmRIVGVRSmVoRFJFTTN4dmdEM0syekdRNGVGV3d4YkdWOFhSNmJHenMycmx0WGN2OWxVNi91Uks3K3BZQQpDRHd6dWxTV1Nod1Jjdk9WcWREYnRMWnRDaVFqUnNFYzJiS09GZWJuV0FuTm9DVVkyOEVjNWZrUzNxaGtPQU5jZHBScUM0alJWc2JCCjVSK0xZd3VKVFV3S1JXbUdmbyttTWc1MnYxb0pwSEFaZGdSZWhiU1gybnVIaFJISlFGWi9WSUZYaFZ2WFMrd0Z6dXRCcktWdjNEU0MKUWxFT1FUbWNwZmIwL1h6S0dJaHRnWWVzMHYyUGdCN0dFR3FDdWt6dkFqa2FTNnlGOVRpTTJNWjVKQjgwc2ZoZWlibjNhUkN4K0FMeQpZRnNtTDdSbmxlemtVQVBGNllTaEZBcDg3TFZyalkxUWZkeVliVTdFRC9LQk5saThSRW43cEQ5a04rU2p6ZGxFWXYxS1VZbEVZbE5rCnNuRkRPMWJKYXVvQ0VXT1lFVTROUmtNdlV0WmcweCtIWnZqMkZLSFJpVWRyTEVYY2hrcnIvWDQ0RUdRdWg0ZW5NdXhob2dZSVVuSysKaEpqNWlkRC9vOUhRVUl4RlVZUUo2bi9XVDRBYzJtZ3hTWmpTcjhiWGs4UWZucjExZStOVFRvaUNMbTRrNlNCbmdDQjNOTGFLSTI5awpPWkQvNzYxR00rVGtiVGdZRVdNb1NDY1ZmQmNJb2tsa3JlWi9iSXE1VUJvTVNhYTA5ZUswb3pBT3Y4YlVsZHd2eGRnWXMwTGJWcVdhCnBwdjlEQWFpUGRmM3VUbys4UVdENHVidHRHaHFwVVRVSGRKT0dNZVN4bFJnalJuWVJnRWZJeTlxcmc0NGkyaFg2aEZXOW1rVGpLR3EKNTJqR1llbkZlNXB3TWNyY0YvOVMxc1UxaWxOc0ErT1RKbGJiUzVXQ3A0SlhLS1p0TUpDVFlpQUlKREdLWlRzTTVJNFFSazRqdkFFSgpWWlRSL1Q0TTVDdFJFT1ZyS01nM1pMc3dEcjhZeEk2Z0l4ZDUvd3JvSWg1QmlHMmxnRnR4RWFKVkx3eEU2dHJuVGFDYkVCY21zTFdJClU1UWhyemdNaEJnK3dLYkRHam1RV3pBUVltWU1kZy9CSzRxUTF5dyt5SFdZaTBoZXY1My9GZ1JDR3JaZ3llc2xZWVNDNUU0OEZVVWEKdG1BZ01vTnZYckFSbUdEd094QklzekJBVWQrRFFBZ0pDTmpwTFBuaUFWRVFDR0g4TlFza1ZWMGcwaHlLZ2czeWcxa2dvQUdZQUFMYgpjZ09BZ0VKZ2JKQkc4ZlpiSUJiSUV3WFN1bDlBdGl3UUM4UUNzVUFlSzVCZUFBaG9pWWdOY2srK1lnRDZ3Z29XL2NvdmRXRVhTdEJCCkpQTnowQVVpUGtoV3RqaElvTnBBN28rS1ErVDBBTGlWaUE4aW1ka0M1bjZOQU1uT2lXTW9Tcm9LUVM1TGNJQXZ4eGdCSXBIYmtyNWEKYVN5SW43c0NUVUhBUFFYRFFDcXU4YkEwVnEwZzJkTWlKT0szcnZZT2hIenBtNndBK0hLbGtTQlpQNi9ISnpBd0RBVEpacnU0T0ZJSQpsMFFOQnJuWDNYQ2RoWkdJZzQraEdBK1NVNisrcDh3Z25EbmJHNUNjMDN1cEFVdEc3bXlzU1NEWmJGdGo2OWFQZHEzRFhMb2RUNDhECnlndVlCRkxRN2xYd0ZEYkQzb0xzRmhtQUxXbE5CK2tvbWgrQk45cFVrT3hQQmZOSXQ5bk5BN0h0RjVEaUZSOWdrc0Ywa0VlSGdaT1AKdDdQN05YWGhIejYrSUs2U1VyaWJSbndUdzBIOG5scGJaYzR1SE0yd0w0TlZEMGpqNVJhZDgzVHprK3MzeEt1RW1RRFN3N08weXFBcwpEdzBGOGYvTXdaR0x2SkEraWxFZ3ZWN2VGUEF2RXloQnBFRWdRdWNHRUM2UUdBYlNKd0tDRXRnYkF5S2FrTTlVSjRoTGVQdHR2anB6CnY5MmlIRXFWWnVOYkpFQVU2TjAzQTBEOFVqdlUwRHcyUG9pTFhVYWRKR2ptRkIvRUxnNnhJK0JrVWozYjA4QWhHQjFFK3JaQ0VoYlcKbzRPSTdycnRDallDVjlGSjdPbzZWQU00TG90K1c4RzA0N0svVmhQSXZqbEJkM1MvZ01nRWpCYUlCV0tCV0NBV2lBVmlnVmdnRm9nRgpZb0ZZSUJaSWxZS0FTaVZBUUVDYkpOZ2dvbVhidEFKbDZGS1Y5a0FGWHU0Q1FFQzFhZ2oyUUkveUNOZWYwd2h5dG02WVpMQVJBUEliCkFFUTVMdzlDZkRVTjhucUtaQzJudkFEbm40aGxBV3ZsT1dRSzZlM3FnalFIcGI2cy9GdVV4MEVndjB1RFRKQU55dGRrZFl1MXZFelMKTjVSaUtZcEYyZUp0OHNXMWRwU1VQZk0wVHJNbzYrN3lwWnp5RW4xMXM2Z3htc0ZSdVFjaUlKc2pPMW9kbHdPaHY4OXdVZ3FrWGFETgpaQTFLY2VnOFlOY2lCUUthUlBLU21rcDBpbFVmbG5pZlIveFFFRUYvaUdQRTlJdFZpOWNCcmVWc3E3N0V6d1RQNkJzVWZvRVdPUFFXCmxSSzlzRFRPc2pqZ0V1TG9nYzJGdXhLTmdUTk1pMzhLT2NoZlNCeTUrZjF2RVFjSnpyTXRDamk4OEgxcFBhMExjUEE5YmNkZDVCdVYKUTJUeHp2dDRNK2NUNEM1Y0R2N0xNaEcrNTIwVTVaL2pQTEZLSzkvaGNSRk5ibkJnUEZ4SUNwaGtkcThPYUtSSUZqdWxJdm9tK0FrRwpDTTQ4V0trUnhrRzBvTWpuMkZIOUVlb2oyajNkN1hMbFhIajA0RmFjZW9aMi9GKzVoeE50SHRKU3kyazNqcUlnNHZXU3RSRGdPVEwzCmlmS1FaUWtqUm1RcVZYRlZmRGpJTzFUUjFPbDFMQlVnSEFkc1dCRUpXNE9CVUxIdTdOQnk2TDg5KzExTFdQb2ZTSDBuOFVzMHR4d0EKQUFBbGRFVllkR1JoZEdVNlkzSmxZWFJsQURJd01qSXRNREl0TURkVU1qQTZORGc2TlRnck1ETTZNRENBVzBuQUFBQUFKWFJGV0hSawpZWFJsT20xdlpHbG1lUUF5TURJeUxUQXlMVEEzVkRJd09qUTRPalU0S3pBek9qQXc4UWJ4ZkFBQUFBQkpSVTVFcmtKZ2dnPT0iIC8+Cjwvc3ZnPgo=
+    mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - console.openshift.io
+          resources:
+          - consoleyamlsamples
+          - consolelinks
+          verbs:
+          - get
+          - create
+          - list
+          - update
+          - delete
+        serviceAccountName: apicurito
+      deployments:
+      - name: apicurito
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app: apicurito
+              name: fuse-apicurito
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                app: apicurito
+                name: fuse-apicurito
+            spec:
+              containers:
+              - env:
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['olm.targetNamespaces']
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: OPERATOR_NAME
+                  value: fuse-apicurito
+                image: quay.io/apicurio/apicurito-operator:1.0.3
+                imagePullPolicy: Always
+                name: apicurito
+                resources: {}
+              serviceAccountName: apicurito
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - services
+          - endpoints
+          - persistentvolumeclaims
+          - events
+          - configmaps
+          - secrets
+          - serviceaccounts
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          verbs:
+          - '*'
+        - apiGroups:
+          - apps.openshift.io
+          - image.openshift.io
+          - route.openshift.io
+          resources:
+          - deploymentconfigs
+          - imagestreams
+          - routes
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - services
+          - services/finalizers
+          verbs:
+          - list
+          - get
+          - watch
+          - create
+          - update
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - get
+          - create
+        - apiGroups:
+          - apps
+          resourceNames:
+          - apicurito
+          resources:
+          - deployments/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - apicur.io
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          verbs:
+          - get
+          - list
+          - create
+          - update
+          - watch
+        serviceAccountName: apicurito
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: false
+    type: AllNamespaces
+  keywords:
+  - api
+  - apicurio
+  - apicurito
+  labels:
+    name: apicurito
+  links:
+  - name: Apicurito source code
+    url: https://github.com/Apicurio/apicurito
+  - name: Apicurito operator source code
+    url: https://github.com/Apicurio/apicurio-operators/tree/master/apicurito
+  maintainers:
+  - email: apicurio@lists.jboss.org
+    name: Apicurito Project
+  maturity: alpha
+  provider:
+    name: Apicurio Project
+  replaces: apicurito.v1.0.2
+  selector:
+    matchLabels:
+      name: apicurito
+  version: 1.0.3

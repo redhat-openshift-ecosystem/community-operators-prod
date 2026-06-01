@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/name: korrel8r
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+  name: korrel8r-engine-view
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - get
+  - list

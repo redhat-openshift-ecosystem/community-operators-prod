@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    name: windows-exporter
+  name: windows-exporter
+spec:
+  ports:
+  - name: metrics
+    port: 9182
+    protocol: TCP
+    targetPort: 9182
+status:
+  loadBalancer: {}

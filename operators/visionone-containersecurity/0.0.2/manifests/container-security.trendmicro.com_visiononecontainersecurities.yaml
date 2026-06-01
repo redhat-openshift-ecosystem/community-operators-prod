@@ -1,0 +1,145 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: visiononecontainersecurities.container-security.trendmicro.com
+spec:
+  group: container-security.trendmicro.com
+  names:
+    kind: VisionOneContainerSecurity
+    listKind: VisionOneContainerSecurityList
+    plural: visiononecontainersecurities
+    singular: visiononecontainersecurity
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: VisionOneContainerSecurity is the Schema for the visiononecontainersecurities
+          API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: VisionOneContainerSecuritySpec defines the desired state
+              of VisionOneContainerSecurity.
+            properties:
+              visionOne:
+                properties:
+                  bootstrapToken:
+                    type: string
+                  clusterName:
+                    type: string
+                  clusterNamePrefix:
+                    type: string
+                  clusterRegistrationKey:
+                    type: boolean
+                  endpoint:
+                    type: string
+                  exclusion:
+                    properties:
+                      namespaces:
+                        items:
+                          type: string
+                        type: array
+                      osNsPrefixes:
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  groupId:
+                    type: string
+                  inventoryCollection:
+                    properties:
+                      enabled:
+                        type: boolean
+                    type: object
+                  malwareScanning:
+                    properties:
+                      enabled:
+                        type: boolean
+                      excludedPaths:
+                        items:
+                          type: string
+                        type: array
+                      scanTimeoutSeconds:
+                        type: integer
+                    type: object
+                  policyId:
+                    type: string
+                  policyOperator:
+                    properties:
+                      clusterPolicyName:
+                        type: string
+                    type: object
+                  runtimeSecurity:
+                    properties:
+                      enabled:
+                        type: boolean
+                    type: object
+                  secretScanning:
+                    properties:
+                      enabled:
+                        type: boolean
+                    type: object
+                  vulnerabilityScanning:
+                    properties:
+                      enabled:
+                        type: boolean
+                    type: object
+                required:
+                - endpoint
+                type: object
+            required:
+            - visionOne
+            type: object
+          status:
+            description: Status defines the observed state of VisionOneContainerSecurity
+            properties:
+              conditions:
+                description: Conditions represent the latest available observations
+                  of an object's state.
+                items:
+                  properties:
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    message:
+                      type: string
+                    reason:
+                      type: string
+                    status:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                  - type
+                  - status
+                  type: object
+                type: array
+              deployedRelease:
+                description: Information about the deployed Helm release
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

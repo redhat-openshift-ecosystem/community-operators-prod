@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: odf-node-recovery-operator
+  name: odf-node-recovery-operator-noderecovery-viewer-role
+rules:
+- apiGroups:
+  - odf.openshift.io
+  resources:
+  - noderecoveries
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - odf.openshift.io
+  resources:
+  - noderecoveries/status
+  verbs:
+  - get

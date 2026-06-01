@@ -1,0 +1,130 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/name: codeflare-operator
+    app.kubernetes.io/part-of: codeflare
+  name: quotasubtrees.quota.codeflare.dev
+spec:
+  group: quota.codeflare.dev
+  names:
+    kind: QuotaSubtree
+    listKind: QuotaSubtreeList
+    plural: quotasubtrees
+    singular: quotasubtree
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: QuotaSubtree is a specification for a quota subtree resource
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: QuotaSubtreeSpec is the spec for a resource plan
+            properties:
+              children:
+                items:
+                  description: Child is the spec for a QuotaSubtree resource
+                  properties:
+                    name:
+                      type: string
+                    namespace:
+                      type: string
+                    path:
+                      type: string
+                    quotas:
+                      description: Quota is the spec for a QuotaSubtree resource
+                      properties:
+                        disabled:
+                          type: boolean
+                        hardLimit:
+                          type: boolean
+                        requests:
+                          additionalProperties:
+                            anyOf:
+                            - type: integer
+                            - type: string
+                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                            x-kubernetes-int-or-string: true
+                          type: object
+                      type: object
+                  type: object
+                type: array
+              parent:
+                type: string
+              parentNamespace:
+                type: string
+            type: object
+          status:
+            description: QuotaSubtreeStatus is the status for a QuotaSubtree resource
+            properties:
+              children:
+                items:
+                  description: ResourceAllocation is the spec for the child status
+                  properties:
+                    allocated:
+                      description: ResourceAllocationStatus is the spec for the child
+                        resource usage
+                      properties:
+                        requests:
+                          additionalProperties:
+                            type: string
+                          type: object
+                      type: object
+                    name:
+                      type: string
+                    namespace:
+                      type: string
+                    path:
+                      type: string
+                  type: object
+                type: array
+              totalAllocation:
+                description: ResourceAllocation is the spec for the child status
+                properties:
+                  allocated:
+                    description: ResourceAllocationStatus is the spec for the child
+                      resource usage
+                    properties:
+                      requests:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+                  path:
+                    type: string
+                type: object
+            required:
+            - children
+            - totalAllocation
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

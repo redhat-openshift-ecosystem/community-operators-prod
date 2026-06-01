@@ -1,0 +1,211 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: benchmarks.ripsaw.cloudbulldozer.io
+spec:
+  group: ripsaw.cloudbulldozer.io
+  names:
+    kind: Benchmark
+    listKind: BenchmarkList
+    plural: benchmarks
+    singular: benchmark
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: The type of test to perform
+      jsonPath: .spec.workload.name
+      name: Type
+      type: string
+    - description: The state of the benchmark
+      jsonPath: .status.state
+      name: State
+      type: string
+    - description: The state of metadata collection
+      jsonPath: .status.metadata
+      name: Metadata State
+      type: string
+    - description: If Cerberus is connected or not
+      jsonPath: .status.cerberus
+      name: Cerberus
+      type: string
+    - description: System metrics collect status
+      jsonPath: .status.system_metrics
+      name: System metrics
+      type: string
+    - jsonPath: .status.uuid
+      name: UUID
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        properties:
+          spec:
+            properties:
+              cerberus_url:
+                type: string
+              cerberus_validate_certs:
+                type: boolean
+              cleanup:
+                type: boolean
+              clustername:
+                type: string
+              drop_cache_kernel:
+                type: boolean
+              drop_cache_rook_ceph:
+                type: boolean
+              elasticsearch:
+                properties:
+                  index_name:
+                    type: string
+                  parallel:
+                    type: boolean
+                  url:
+                    type: string
+                  verify_cert:
+                    type: boolean
+                type: object
+              global_overrides:
+                items:
+                  type: string
+                  x-kubernetes-preserve-unknown-fields: true
+                type: array
+              hostpath:
+                type: string
+              job_params:
+                items:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                type: array
+              metadata:
+                default: {}
+                properties:
+                  collection:
+                    default: false
+                    type: boolean
+                  force:
+                    default: false
+                    type: boolean
+                  image:
+                    default: quay.io/cloud-bulldozer/backpack:latest
+                    type: string
+                  label:
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  privileged:
+                    default: false
+                    type: boolean
+                  serviceaccount:
+                    default: default
+                    type: string
+                  ssl:
+                    default: false
+                    type: boolean
+                  stockpileSkipTags:
+                    default: []
+                    items:
+                      type: string
+                    type: array
+                  stockpileTags:
+                    default:
+                    - common
+                    - k8s
+                    - openshift
+                    items:
+                      type: string
+                    type: array
+                  targeted:
+                    default: true
+                    type: boolean
+                type: object
+              prometheus:
+                properties:
+                  es_parallel:
+                    type: boolean
+                  es_url:
+                    type: string
+                  prom_token:
+                    type: string
+                  prom_url:
+                    type: string
+                type: object
+              system_metrics:
+                properties:
+                  collection:
+                    default: false
+                    type: boolean
+                  es_url:
+                    type: string
+                  image:
+                    default: quay.io/cloud-bulldozer/kube-burner:latest
+                    type: string
+                  index_name:
+                    default: system-metrics
+                    type: string
+                  metrics_profile:
+                    default: node-metrics.yml
+                    type: string
+                  prom_token:
+                    type: string
+                  prom_url:
+                    default: https://prometheus-k8s.openshift-monitoring.svc.cluster.local:9091
+                    type: string
+                  step:
+                    default: 30s
+                    type: string
+                type: object
+              test_user:
+                type: string
+              uuid:
+                type: string
+              workload:
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+            type: object
+          status:
+            properties:
+              cerberus:
+                type: string
+              complete:
+                type: boolean
+              message:
+                default: None
+                type: string
+              metadata:
+                type: string
+              node_hi_idx:
+                type: string
+              node_idx:
+                type: string
+              node_low_idx:
+                type: string
+              pod_hi_idx:
+                type: string
+              pod_idx:
+                type: string
+              pod_low_idx:
+                type: string
+              state:
+                type: string
+              suuid:
+                type: string
+              system_metrics:
+                default: Not collected
+                type: string
+              uuid:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

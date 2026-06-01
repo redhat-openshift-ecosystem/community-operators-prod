@@ -1,0 +1,83 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: mcads.codeflare.codeflare.dev
+spec:
+  group: codeflare.codeflare.dev
+  names:
+    kind: MCAD
+    listKind: MCADList
+    plural: mcads
+    singular: mcad
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: MCAD is the Schema for the mcads API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: MCADSpec defines the desired state of MCAD
+            properties:
+              agentConfigs:
+                default: "null"
+                description: 'AgentConfigs TODO: Add details'
+                type: string
+              dispatcherMode:
+                default: false
+                description: DispatcherMode determines whether the MCAD Controller
+                  should be launched in Dispatcher mode.
+                type: boolean
+              enableMonitoring:
+                default: true
+                description: EnableMonitoring determines if monitoring artifacts are
+                  deployed for the MCAD instance.
+                type: boolean
+              multiCluster:
+                default: false
+                description: MultiCluster determines if MCAD will be routing traffic
+                  to multiple clusters.
+                type: boolean
+              podCreationTimeout:
+                default: 300
+                description: 'PodCreationTimeout TODO: Add details and confirm values'
+                type: integer
+              preemptionEnabled:
+                default: false
+                description: PreemptionEnabled determines if scheduled jobs can be
+                  preempted for others
+                type: boolean
+              quotaRestURL:
+                default: "null"
+                description: 'QuotaRestURL TODO: Add details'
+                type: string
+            type: object
+          status:
+            description: MCADStatus defines the observed state of MCAD
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

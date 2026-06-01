@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: odf-node-recovery-operator
+    control-plane: controller-manager
+  name: odf-node-recovery-operator-controller-manager-metrics-monitor
+spec:
+  endpoints:
+  - authorization:
+      credentials:
+        key: token
+        name: odf-node-recovery-operator-metrics-reader
+    path: /metrics
+    port: https
+    scheme: https
+    tlsConfig:
+      insecureSkipVerify: true
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: odf-node-recovery-operator
+      control-plane: controller-manager

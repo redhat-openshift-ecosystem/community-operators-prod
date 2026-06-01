@@ -1,0 +1,378 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "automotive.sig.centos.org/v1",
+          "kind": "ContainerBuild",
+          "metadata": {
+            "name": "cb-sample"
+          },
+          "spec": {}
+        },
+        {
+          "apiVersion": "automotive.sig.centos.org/v1",
+          "kind": "ImageBuild",
+          "metadata": {
+            "name": "imagebuild-sample"
+          },
+          "spec": null
+        },
+        {
+          "apiVersion": "automotive.sig.centos.org/v1",
+          "kind": "OperatorConfig",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "automotive-infra"
+            },
+            "name": "operatorconfig-sample",
+            "namespace": "automotive-infra-operator"
+          },
+          "spec": null
+        }
+      ]
+    capabilities: Basic Install
+    categories: Integration & Delivery
+    containerImage: quay.io/fedora-sig-robotics/infra-ci-operator:v0.0.6
+    createdAt: "2024-10-09T12:59:32Z"
+    description: Streamline CI/CD for RHIVOS and its ecosystem using OpenShift Pipelines
+    features.operators.openshift.io/cnf: "false"
+    features.operators.openshift.io/cni: "false"
+    features.operators.openshift.io/csi: "false"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/suggested-namespace: automotive-infra-operator
+    operators.operatorframework.io/builder: operator-sdk-v1.36.1
+    operators.operatorframework.io/project_layout: ansible.sdk.operatorframework.io/v1
+    repository: https://gitlab.com/fedora/sigs/robotics/infra/infra-ci-operator
+    support: https://gitlab.com/fedora/sigs/robotics/infra/infra-ci-operator/issues
+  name: automotive-infra.v0.0.6
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: ContainerBuild
+      name: containerbuilds.automotive.sig.centos.org
+      version: v1
+    - kind: ImageBuild
+      name: imagebuilds.automotive.sig.centos.org
+      version: v1
+    - kind: OperatorConfig
+      name: operatorconfigs.automotive.sig.centos.org
+      version: v1
+  description: This operator is designed to streamline CI/CD for RHIVOS and its ecosystem
+    using OpenShift Pipelines
+  displayName: Automotive-CI
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          - pods
+          - pods/exec
+          - pods/log
+          - services
+          - serviceaccounts
+          - configmaps
+          - persistentvolumeclaims
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - batch
+          resources:
+          - cronjobs
+          verbs:
+          - create
+          - get
+          - delete
+          - list
+          - watch
+          - patch
+        - apiGroups:
+          - triggers.tekton.dev
+          resources:
+          - eventlisteners
+          - triggerbindings
+          - triggers
+          - triggertemplates
+          verbs:
+          - create
+          - get
+          - delete
+          - list
+          - watch
+          - patch
+        - apiGroups:
+          - tekton.dev
+          resources:
+          - pipelines
+          - tasks
+          - clustertasks
+          verbs:
+          - create
+          - get
+          - delete
+          - list
+          - watch
+          - patch
+        - apiGroups:
+          - automotive.sig.centos.org
+          resources:
+          - containerbuilds
+          - containerbuilds/status
+          - containerbuilds/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          verbs:
+          - create
+          - get
+          - delete
+          - list
+          - watch
+          - patch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - roles
+          - rolebindings
+          verbs:
+          - '*'
+        - apiGroups:
+          - automotive.sig.centos.org
+          resources:
+          - operatorconfigs
+          - operatorconfigs/status
+          - operatorconfigs/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - automotive.sig.centos.org
+          resources:
+          - imagebuilds
+          - imagebuilds/status
+          - imagebuilds/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - security.openshift.io
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: automotive-infra-controller-manager
+      deployments:
+      - label:
+          control-plane: controller-manager
+        name: automotive-infra-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.11.0
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: "1"
+                    memory: 2Gi
+                  requests:
+                    cpu: 5m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+              - args:
+                - --health-probe-bind-address=:6789
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                - --leader-election-id=automotive-infra
+                env:
+                - name: WATCH_NAMESPACE
+                  value: ''
+                - name: DEPLOY_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: ANSIBLE_GATHERING
+                  value: explicit
+                image: quay.io/fedora-sig-robotics/infra-ci-operator:v0.0.6
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 6789
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 6789
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: "1"
+                    memory: 2Gi
+                  requests:
+                    cpu: 10m
+                    memory: 256Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: automotive-infra-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: automotive-infra-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: false
+    type: AllNamespaces
+  keywords:
+  - Automotive
+  - RHIVOS
+  - Pipelines
+  - CI
+  links:
+  - name: Automotive infra Operator
+    url: https://gitlab.com/fedora/sigs/robotics/infra/infra-ci-operator
+  maintainers:
+  - email: automotive-sig@lists.centos.org
+    name: Automotive SIG CentOS Community
+  maturity: alpha
+  provider:
+    name: Automotive SIG CentOS
+  version: 0.0.6
+  replaces: automotive-infra.v0.0.5

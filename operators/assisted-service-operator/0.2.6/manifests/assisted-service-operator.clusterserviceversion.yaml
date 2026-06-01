@@ -1,0 +1,742 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "agent-install.openshift.io/v1beta1",
+          "kind": "AgentServiceConfig",
+          "metadata": {
+            "name": "agent"
+          },
+          "spec": {
+            "databaseStorage": {
+              "accessModes": [
+                "ReadWriteOnce"
+              ],
+              "resources": {
+                "requests": {
+                  "storage": "10Gi"
+                }
+              }
+            },
+            "filesystemStorage": {
+              "accessModes": [
+                "ReadWriteOnce"
+              ],
+              "resources": {
+                "requests": {
+                  "storage": "100Gi"
+                }
+              }
+            },
+            "mustGatherImages": [
+              {
+                "name": "cnv",
+                "openshiftVersion": "4.8",
+                "url": "registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel8:v2.6.5"
+              },
+              {
+                "name": "ocs",
+                "openshiftVersion": "4.8",
+                "url": "registry.redhat.io/ocs4/ocs-must-gather-rhel8"
+              },
+              {
+                "name": "lso",
+                "openshiftVersion": "4.8",
+                "url": "registry.redhat.io/openshift4/ose-local-storage-mustgather-rhel8"
+              }
+            ],
+            "osImages": [
+              {
+                "cpuArchitecture": "x86_64",
+                "openshiftVersion": "4.8",
+                "rootFSUrl": "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.8/4.8.14/rhcos-live-rootfs.x86_64.img",
+                "url": "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.8/4.8.14/rhcos-4.8.14-x86_64-live.x86_64.iso",
+                "version": "48.84.202109241901-0"
+              },
+              {
+                "cpuArchitecture": "x86_64",
+                "openshiftVersion": "4.9",
+                "rootFSUrl": "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.9/4.9.0/rhcos-live-rootfs.x86_64.img",
+                "url": "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.9/4.9.0/rhcos-4.9.0-x86_64-live.x86_64.iso",
+                "version": "49.84.202110081407-0"
+              },
+              {
+                "cpuArchitecture": "arm64",
+                "openshiftVersion": "4.9",
+                "rootFSUrl": "https://mirror.openshift.com/pub/openshift-v4/aarch64/dependencies/rhcos/4.9/4.9.0/rhcos-4.9.0-aarch64-live-rootfs.aarch64.img",
+                "url": "https://mirror.openshift.com/pub/openshift-v4/aarch64/dependencies/rhcos/4.9/4.9.0/rhcos-4.9.0-aarch64-live.aarch64.iso",
+                "version": "49.84.202110080947-0"
+              },
+              {
+                "cpuArchitecture": "x86_64",
+                "openshiftVersion": "4.10",
+                "rootFSUrl": "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/4.10.0-0.nightly-2021-11-29-191648/rhcos-4.10.0-0.nightly-2021-11-29-191648-x86_64-live-rootfs.x86_64.img",
+                "url": "https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/4.10.0-0.nightly-2021-11-29-191648/rhcos-4.10.0-0.nightly-2021-11-29-191648-x86_64-live.x86_64.iso",
+                "version": "410.84.202111291603-0"
+              }
+            ]
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: OpenShift Optional
+    containerImage: quay.io/edge-infrastructure/assisted-service@sha256:ead8f1feac2b593ed170f58041b7b927e4f510e6ca31016f9aa3f79bf27d1027
+    createdAt: 2022-01-14T21:44:02Z
+    description: The Infrastructure Operator for Red Hat OpenShift is responsible for managing the deployment of the Assisted Service.
+    olm.skipRange: '>=0.0.1 <0.2.6'
+    operatorframework.io/suggested-namespace: assisted-installer
+    operators.operatorframework.io/builder: operator-sdk-v1.10.0+git
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    repository: https://github.com/openshift/assisted-service
+    support: https://github.com/openshift/assisted-service/issues/new
+  name: assisted-service-operator.v0.2.6
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - kind: AgentClusterInstall
+        name: agentclusterinstalls.extensions.hive.openshift.io
+        version: v1beta1
+      - displayName: Agent
+        kind: Agent
+        name: agents.agent-install.openshift.io
+        version: v1beta1
+      - description: AgentServiceConfig represents an Assisted Service deployment. Only an AgentServiceConfig with name="agent" will be reconciled. All other names will be rejected.
+        displayName: Agent Service Config
+        kind: AgentServiceConfig
+        name: agentserviceconfigs.agent-install.openshift.io
+        specDescriptors:
+          - description: DatabaseStorage defines the spec of the PersistentVolumeClaim to be created for the database's filesystem. With respect to the resource requests, minimum 10GiB is recommended.
+            displayName: Storage for database
+            path: databaseStorage
+          - description: FileSystemStorage defines the spec of the PersistentVolumeClaim to be created for the assisted-service's filesystem (logs, etc). With respect to the resource requests, the amount of filesystem storage consumed will depend largely on the number of clusters created (~200MB per cluster and ~2-3GiB per supported OpenShift version). Minimum 100GiB recommended.
+            displayName: Storage for service filesystem
+            path: filesystemStorage
+          - description: 'MirrorRegistryRef is the reference to the configmap that contains mirror registry configuration In case no configuration is need, this field will be nil. ConfigMap must contain to entries: ca-bundle.crt - hold the contents of mirror registry certificate/s registries.conf - holds the content of registries.conf file configured with mirror registries'
+            displayName: Mirror Registry and Certificate ConfigMap Name
+            path: mirrorRegistryRef
+          - description: MustGatherImages defines a collection of operator related must-gather images that are used if one the operators fails to be successfully deployed
+            displayName: Must-Gather Images
+            path: mustGatherImages
+          - description: OSImages defines a collection of Operating System images (ie. RHCOS images) that the assisted-service should use as the base when generating discovery ISOs.
+            displayName: Operating System Images
+            path: osImages
+        version: v1beta1
+      - displayName: InfraEnv
+        kind: InfraEnv
+        name: infraenvs.agent-install.openshift.io
+        version: v1beta1
+      - displayName: NMStateConfig
+        kind: NMStateConfig
+        name: nmstateconfigs.agent-install.openshift.io
+        version: v1beta1
+  description: |-
+    The Infrastructure Operator for Red Hat OpenShift is responsible for managing
+    the deployment of the Assisted Service. Assisted Service is used to orchestrate
+    baremetal OpenShift installations.
+
+    The Assisted Service can currently install clusters with highly-available
+    control planes (3 hosts and above) and can also install Single-Node
+    OpenShift (SNO).  Highly available clusters are configured to use
+    OpenShift's `baremetal` platform (typically used in
+    [bare metal IPI deployments](https://docs.openshift.com/container-platform/4.7/installing/installing_bare_metal_ipi/ipi-install-overview.html)),
+    while SNO uses `none` (typically used in
+    [UPI deployments](https://docs.openshift.com/container-platform/4.7/installing/installing_platform_agnostic/installing-platform-agnostic.html)).
+
+    When creating the AgentServiceConfig CR. It is important to note that the
+    controller will only ever reconcile an AgentServiceConfig named "agent",
+    any other name will be ignored.
+  displayName: Infrastructure Operator for Red Hat OpenShift
+  icon:
+    - base64data: PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTQ1Ij48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2UwMDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPlJlZEhhdC1Mb2dvLUhhdC1Db2xvcjwvdGl0bGU+PHBhdGggZD0iTTE1Ny43Nyw2Mi42MWExNCwxNCwwLDAsMSwuMzEsMy40MmMwLDE0Ljg4LTE4LjEsMTcuNDYtMzAuNjEsMTcuNDZDNzguODMsODMuNDksNDIuNTMsNTMuMjYsNDIuNTMsNDRhNi40Myw2LjQzLDAsMCwxLC4yMi0xLjk0bC0zLjY2LDkuMDZhMTguNDUsMTguNDUsMCwwLDAtMS41MSw3LjMzYzAsMTguMTEsNDEsNDUuNDgsODcuNzQsNDUuNDgsMjAuNjksMCwzNi40My03Ljc2LDM2LjQzLTIxLjc3LDAtMS4wOCwwLTEuOTQtMS43My0xMC4xM1oiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMjcuNDcsODMuNDljMTIuNTEsMCwzMC42MS0yLjU4LDMwLjYxLTE3LjQ2YTE0LDE0LDAsMCwwLS4zMS0zLjQybC03LjQ1LTMyLjM2Yy0xLjcyLTcuMTItMy4yMy0xMC4zNS0xNS43My0xNi42QzEyNC44OSw4LjY5LDEwMy43Ni41LDk3LjUxLjUsOTEuNjkuNSw5MCw4LDgzLjA2LDhjLTYuNjgsMC0xMS42NC01LjYtMTcuODktNS42LTYsMC05LjkxLDQuMDktMTIuOTMsMTIuNSwwLDAtOC40MSwyMy43Mi05LjQ5LDI3LjE2QTYuNDMsNi40MywwLDAsMCw0Mi41Myw0NGMwLDkuMjIsMzYuMywzOS40NSw4NC45NCwzOS40NU0xNjAsNzIuMDdjMS43Myw4LjE5LDEuNzMsOS4wNSwxLjczLDEwLjEzLDAsMTQtMTUuNzQsMjEuNzctMzYuNDMsMjEuNzdDNzguNTQsMTA0LDM3LjU4LDc2LjYsMzcuNTgsNTguNDlhMTguNDUsMTguNDUsMCwwLDEsMS41MS03LjMzQzIyLjI3LDUyLC41LDU1LC41LDc0LjIyYzAsMzEuNDgsNzQuNTksNzAuMjgsMTMzLjY1LDcwLjI4LDQ1LjI4LDAsNTYuNy0yMC40OCw1Ni43LTM2LjY1LDAtMTIuNzItMTEtMjcuMTYtMzAuODMtMzUuNzgiLz48L3N2Zz4=
+      mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - nodes
+                - pods
+                - endpoints
+                - services
+                - secrets
+              verbs:
+                - get
+                - watch
+                - list
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - get
+                - watch
+                - list
+                - create
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - get
+                - watch
+                - list
+                - delete
+                - create
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - config.openshift.io
+              resources:
+                - clusterversions
+              verbs:
+                - get
+                - list
+            - apiGroups:
+                - route.openshift.io
+              resources:
+                - routes
+              verbs:
+                - create
+                - get
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+            - apiGroups:
+                - ""
+              resources:
+                - namespaces
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - admissionregistration.k8s.io
+              resources:
+                - validatingwebhookconfigurations
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - agent-install.openshift.io
+              resources:
+                - agents
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - agent-install.openshift.io
+              resources:
+                - agents/ai-deprovision
+              verbs:
+                - update
+            - apiGroups:
+                - agent-install.openshift.io
+              resources:
+                - agents/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - agent-install.openshift.io
+              resources:
+                - agentserviceconfigs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - agent-install.openshift.io
+              resources:
+                - agentserviceconfigs/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - agent-install.openshift.io
+              resources:
+                - agentserviceconfigs/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - agent-install.openshift.io
+              resources:
+                - infraenvs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - agent-install.openshift.io
+              resources:
+                - infraenvs/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - agent-install.openshift.io
+              resources:
+                - nmstateconfigs
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - apiregistration.k8s.io
+              resources:
+                - apiservices
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - persistentvolumeclaims
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - extensions.hive.openshift.io
+              resources:
+                - agentclusterinstalls
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - extensions.hive.openshift.io
+              resources:
+                - agentclusterinstalls/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - extensions.hive.openshift.io
+              resources:
+                - agentclusterinstalls/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - hive.openshift.io
+              resources:
+                - clusterdeployments
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - hive.openshift.io
+              resources:
+                - clusterdeployments/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - hive.openshift.io
+              resources:
+                - clusterdeployments/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - hive.openshift.io
+              resources:
+                - clusterimagesets
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - metal3.io
+              resources:
+                - baremetalhosts
+              verbs:
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - monitoring.coreos.com
+              resources:
+                - servicemonitors
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - clusterrolebindings
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - clusterroles
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - route.openshift.io
+              resources:
+                - routes
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+          serviceAccountName: assisted-service
+      deployments:
+        - name: infrastructure-operator
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                control-plane: infrastructure-operator
+            strategy: {}
+            template:
+              metadata:
+                labels:
+                  control-plane: infrastructure-operator
+              spec:
+                containers:
+                  - args:
+                      - --leader-elect
+                    command:
+                      - /assisted-service-operator
+                    env:
+                      - name: SERVICE_IMAGE
+                        value: quay.io/edge-infrastructure/assisted-service@sha256:ead8f1feac2b593ed170f58041b7b927e4f510e6ca31016f9aa3f79bf27d1027
+                      - name: IMAGE_SERVICE_IMAGE
+                        value: quay.io/edge-infrastructure/assisted-image-service@sha256:62840188f873bad0a9e8544037f1f6c3ae05ad787b8a400357fb94a9e1cad451
+                      - name: DATABASE_IMAGE
+                        value: quay.io/edge-infrastructure/postgresql-12-centos7@sha256:94727d70e0afbf4e167e078744f3a10ac9d82edc553d57b0ecbb5443264f07e1
+                      - name: AGENT_IMAGE
+                        value: quay.io/edge-infrastructure/assisted-installer-agent@sha256:0fcba60242d12916b4145679942ebaf73e6c300b28e0f764417ed0998f7e139c
+                      - name: CONTROLLER_IMAGE
+                        value: quay.io/edge-infrastructure/assisted-installer-controller@sha256:8b12d1fab00b80bea721dfb036b18a26ce1a4a0ccd6ceb3ddfb6fd1d8433c1ac
+                      - name: INSTALLER_IMAGE
+                        value: quay.io/edge-infrastructure/assisted-installer@sha256:05bc0612e880ea433fa62d8498b5bbf4ae2363dc520dfb75445e7cf2391bb8a7
+                      - name: OS_IMAGES
+                        value: '[{"openshift_version":"4.8","cpu_architecture":"x86_64","url":"https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.8/4.8.14/rhcos-4.8.14-x86_64-live.x86_64.iso","rootfs_url":"https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.8/4.8.14/rhcos-live-rootfs.x86_64.img","version":"48.84.202109241901-0"},{"openshift_version":"4.9","cpu_architecture":"x86_64","url":"https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.9/4.9.0/rhcos-4.9.0-x86_64-live.x86_64.iso","rootfs_url":"https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/4.9/4.9.0/rhcos-live-rootfs.x86_64.img","version":"49.84.202110081407-0"},{"openshift_version":"4.9","cpu_architecture":"arm64","url":"https://mirror.openshift.com/pub/openshift-v4/aarch64/dependencies/rhcos/4.9/4.9.0/rhcos-4.9.0-aarch64-live.aarch64.iso","rootfs_url":"https://mirror.openshift.com/pub/openshift-v4/aarch64/dependencies/rhcos/4.9/4.9.0/rhcos-4.9.0-aarch64-live-rootfs.aarch64.img","version":"49.84.202110080947-0"},{"openshift_version":"4.10","cpu_architecture":"x86_64","url":"https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/4.10.0-0.nightly-2021-11-29-191648/rhcos-4.10.0-0.nightly-2021-11-29-191648-x86_64-live.x86_64.iso","rootfs_url":"https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/4.10.0-0.nightly-2021-11-29-191648/rhcos-4.10.0-0.nightly-2021-11-29-191648-x86_64-live-rootfs.x86_64.img","version":"410.84.202111291603-0"}]'
+                      - name: SERVICE_ACCOUNT_NAME
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: spec.serviceAccountName
+                      - name: NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+                      - name: POD_NAME
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.name
+                    image: quay.io/edge-infrastructure/assisted-service@sha256:ead8f1feac2b593ed170f58041b7b927e4f510e6ca31016f9aa3f79bf27d1027
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 200Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                serviceAccountName: assisted-service
+                terminationGracePeriodSeconds: 10
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+                - endpoints
+                - services
+              verbs:
+                - get
+                - watch
+                - list
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - get
+                - watch
+                - list
+                - delete
+                - create
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+            - apiGroups:
+                - ""
+              resourceNames:
+                - assisted-service-leader-election-helper
+                - assisted-service-migration-helper
+                - assisted-service-baseiso-helper
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - update
+                - delete
+            - apiGroups:
+                - ""
+                - coordination.k8s.io
+              resources:
+                - configmaps
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps/status
+              verbs:
+                - get
+                - update
+                - patch
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: assisted-service
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+  keywords:
+    - assisted-service
+    - assisted-installer
+    - OpenShift
+  links:
+    - name: Assisted Service
+      url: https://github.com/openshift/assisted-service
+    - name: Assisted Image Service
+      url: https://github.com/openshift/assisted-image-service
+    - name: Assisted Installer
+      url: https://github.com/openshift/assisted-installer
+    - name: Assisted Installer Controller
+      url: https://github.com/openshift/assisted-installer
+    - name: Assisted Installer Agent
+      url: https://github.com/openshift/assisted-installer-agent
+  maintainers:
+    - email: support@redhat.com
+      name: Support
+  maturity: alpha
+  provider:
+    name: Red Hat
+  relatedImages:
+    - image: quay.io/edge-infrastructure/assisted-service@sha256:ead8f1feac2b593ed170f58041b7b927e4f510e6ca31016f9aa3f79bf27d1027
+      name: controller
+    - image: quay.io/edge-infrastructure/assisted-image-service@sha256:62840188f873bad0a9e8544037f1f6c3ae05ad787b8a400357fb94a9e1cad451
+      name: image-service
+    - image: quay.io/edge-infrastructure/postgresql-12-centos7@sha256:94727d70e0afbf4e167e078744f3a10ac9d82edc553d57b0ecbb5443264f07e1
+      name: postgresql
+    - image: quay.io/edge-infrastructure/assisted-installer@sha256:05bc0612e880ea433fa62d8498b5bbf4ae2363dc520dfb75445e7cf2391bb8a7
+      name: installer
+    - image: quay.io/edge-infrastructure/assisted-installer-agent@sha256:0fcba60242d12916b4145679942ebaf73e6c300b28e0f764417ed0998f7e139c
+      name: agent
+    - image: quay.io/edge-infrastructure/assisted-installer-controller@sha256:8b12d1fab00b80bea721dfb036b18a26ce1a4a0ccd6ceb3ddfb6fd1d8433c1ac
+      name: reporter
+  version: 0.2.6
+  replaces: assisted-service-operator.v0.2.5

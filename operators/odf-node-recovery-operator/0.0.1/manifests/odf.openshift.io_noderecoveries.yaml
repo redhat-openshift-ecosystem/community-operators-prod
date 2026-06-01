@@ -1,0 +1,170 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.3
+  creationTimestamp: null
+  name: noderecoveries.odf.openshift.io
+spec:
+  group: odf.openshift.io
+  names:
+    kind: NodeRecovery
+    listKind: NodeRecoveryList
+    plural: noderecoveries
+    shortNames:
+    - noderec
+    singular: noderecovery
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.startTime
+      name: Created At
+      type: string
+    - jsonPath: .status.completionTime
+      name: Completed At
+      type: string
+    - description: Status
+      jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.conditions[?(@.status=="True")].type
+      name: State
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: NodeRecovery is the Schema for the noderecoveries API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          status:
+            description: NodeRecoveryStatus defines the observed state of NodeRecovery
+            properties:
+              completionTime:
+                description: |-
+                  Represents time when the job was completed. It is not guaranteed to
+                  be set in happens-before order across separate operations.
+                  It is represented in RFC3339 form and is in UTC.
+                  The completion time is set when the reconciliation finishes successfully, and only then.
+                  The value cannot be updated or removed. The value indicates the same or
+                  later point in time as the startTime field.
+                format: date-time
+                type: string
+              conditions:
+                description: Current conditions state of CR.
+                items:
+                  description: PodCondition contains details for the current condition
+                    of this pod.
+                  properties:
+                    lastProbeTime:
+                      description: Last time we probed the condition.
+                      format: date-time
+                      type: string
+                    lastTransitionTime:
+                      description: Last time the condition transitioned from one status
+                        to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: Human-readable message indicating details about
+                        last transition.
+                      type: string
+                    reason:
+                      description: Unique, one-word, CamelCase reason for the condition's
+                        last transition.
+                      type: string
+                    status:
+                      description: Status is the status of the condition. Can be True,
+                        False, Unknown
+                      enum:
+                      - "True"
+                      - "False"
+                      type: string
+                    type:
+                      description: Type is the type of the condition.
+                      type: string
+                  required:
+                  - lastProbeTime
+                  - lastTransitionTime
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              crashLoopBackOffPods:
+                description: |-
+                  CrashLoopBackOffPods captures whether there were OSD pods in CrashLoopBackOff when reconciling the CR. This value is used by the reconciler along with the `PendingPods` to determine
+                  if the reconciliation requires a restart the ODF operator.
+                type: boolean
+              forcedOSDRemoval:
+                description: |-
+                  ForcedOSDRemoval indicates if the reconciliation of the CR required to trigger the OSD Removal job with the ForcedOSDRemoval flag as true or false. If true it means the initial attempt to run the job timed out after 10 minutes
+                  and the reconciliation loop triggered a second job with the flag set to true to ensure success.
+                type: boolean
+              nodeDevice:
+                description: NodeDevice contains a list of node name and device name
+                  pair used by the reconciliation to track which nodes and devices
+                  have failed based on the OSD pods that are in CrashLoopbackOff
+                items:
+                  properties:
+                    nodeName:
+                      type: string
+                    pvName:
+                      type: string
+                  required:
+                  - nodeName
+                  - pvName
+                  type: object
+                type: array
+              osdIDs:
+                description: |-
+                  CrashedOSDDeploymentIDs contains a list of the OSD IDs that match the ceph osd pods that are in CrashLoopbackOff status. This value is used during the reconciliation loop to cleanup the
+                  pods that are not being removed when the deployment is scaled down to 0
+                items:
+                  type: string
+                type: array
+              pendingPods:
+                description: |-
+                  PendingPods captures whether there were OSD pods in pending phase when reconciling the CR. This value is used by the reconciler along with `CrashLoopBackOffPods` to determine
+                  if the reconciliation requires a restart of the ODF operator.
+                type: boolean
+              phase:
+                description: |-
+                  INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
+                  Important: Run "make" to regenerate code after modifying this file
+                enum:
+                - Running
+                - Completed
+                - Failed
+                type: string
+              startTime:
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

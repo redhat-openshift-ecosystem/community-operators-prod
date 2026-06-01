@@ -1,0 +1,468 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "coherence.oracle.com/v1",
+          "kind": "Coherence",
+          "metadata": {
+            "name": "coherence-sample"
+          },
+          "spec": {
+            "replicas": 3
+          }
+        },
+        {
+          "apiVersion": "coherence.oracle.com/v1",
+          "kind": "CoherenceJob",
+          "metadata": {
+            "name": "coherence-job-sample"
+          },
+          "spec": {
+            "replicas": 1
+          }
+        }
+      ]
+    capabilities: Full Lifecycle
+    categories: Database
+    certified: "false"
+    containerImage: container-registry.oracle.com/middleware/coherence-operator:3.5.2
+    createdAt: "2025-06-26T14:23:17Z"
+    description: The Oracle Coherence Kubernetes Operator enables easy management
+      of Coherence clusters in a Kubernetes environment.
+    features.operators.openshift.io/cnf: "false"
+    features.operators.openshift.io/cni: "false"
+    features.operators.openshift.io/csi: "false"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.arm64: supported
+    operatorframework.io/os.linux: supported
+    operators.openshift.io/infrastructure-features: '["disconnected"]'
+    operators.operatorframework.io/builder: operator-sdk-v1.40.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    repository: https://github.com/oracle/coherence-operator
+    support: Oracle Corporation
+  name: coherence-operator.v3.5.2
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: Coherence is the top level schema for the Coherence API and custom
+        resource definition (CRD).
+      displayName: Coherence
+      kind: Coherence
+      name: coherence.coherence.oracle.com
+      resources:
+      - kind: StatefulSet
+        name: coherence-cluster
+        version: v1
+      specDescriptors:
+      - description: The desired number of member Pods for the cluster.
+        displayName: Replicas
+        path: replicas
+      statusDescriptors:
+      - description: The desired number of member Pods for the deployment.
+        displayName: Replicas
+        path: replicas
+      - displayName: ReadyReplicas
+        path: readyReplicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:readyReplicas
+      version: v1
+    - description: |-
+        CoherenceJob is the top level schema for the CoherenceJob API and custom resource definition (CRD)
+        for configuring Coherence Job workloads.
+      displayName: Coherence Job
+      kind: CoherenceJob
+      name: coherencejob.coherence.oracle.com
+      resources:
+      - kind: Job
+        name: coherence-job
+        version: v1
+      specDescriptors:
+      - description: The desired number of Pods for the job.
+        displayName: Replicas
+        path: replicas
+      statusDescriptors:
+      - description: The desired number of Pods for the job.
+        displayName: Replicas
+        path: replicas
+      - displayName: ReadyReplicas
+        path: readyReplicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:readyReplicas
+      version: v1
+  description: |
+    The Oracle Coherence Kubernetes Operator enables easy management of Coherence clusters in a Kubernetes environment.
+
+    ### Installation Guide & Configuration
+
+    For the complete installation guide and all configuration options please refer to
+    [Coherence Operator Documentation](https://oracle.github.io/coherence-operator/docs/latest/#/about/01_overview).
+  displayName: Coherence Kubernetes Operator
+  icon:
+  - base64data: iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAACXBIWXMAAAsTAAALEwEAmpwYAAAIK2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNS40LjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgICAgICAgICAgeG1sbnM6ZXhpZj0iaHR0cDovL25zLmFkb2JlLmNvbS9leGlmLzEuMC8iCiAgICAgICAgICAgIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIKICAgICAgICAgICAgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iCiAgICAgICAgICAgIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiCiAgICAgICAgICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIKICAgICAgICAgICAgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIj4KICAgICAgICAgPHRpZmY6UmVzb2x1dGlvblVuaXQ+MjwvdGlmZjpSZXNvbHV0aW9uVW5pdD4KICAgICAgICAgPHRpZmY6T3JpZW50YXRpb24+MTwvdGlmZjpPcmllbnRhdGlvbj4KICAgICAgICAgPGV4aWY6UGl4ZWxYRGltZW5zaW9uPjYwMDwvZXhpZjpQaXhlbFhEaW1lbnNpb24+CiAgICAgICAgIDxleGlmOkNvbG9yU3BhY2U+NjU1MzU8L2V4aWY6Q29sb3JTcGFjZT4KICAgICAgICAgPGV4aWY6UGl4ZWxZRGltZW5zaW9uPjExMjwvZXhpZjpQaXhlbFlEaW1lbnNpb24+CiAgICAgICAgIDxkYzpmb3JtYXQ+aW1hZ2UvcG5nPC9kYzpmb3JtYXQ+CiAgICAgICAgIDx4bXBNTTpPcmlnaW5hbERvY3VtZW50SUQ+eG1wLmRpZDpkNDMwYzI2Yi05YTNhLTQzN2ItYWZlMy02NWRjYjgyZTY1NTc8L3htcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD4KICAgICAgICAgPHhtcE1NOkhpc3Rvcnk+CiAgICAgICAgICAgIDxyZGY6U2VxPgogICAgICAgICAgICAgICA8cmRmOmxpIHJkZjpwYXJzZVR5cGU9IlJlc291cmNlIj4KICAgICAgICAgICAgICAgICAgPHN0RXZ0OnNvZnR3YXJlQWdlbnQ+QWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCk8L3N0RXZ0OnNvZnR3YXJlQWdlbnQ+CiAgICAgICAgICAgICAgICAgIDxzdEV2dDp3aGVuPjIwMjAtMDUtMjlUMDc6NTI6MjUtMDQ6MDA8L3N0RXZ0OndoZW4+CiAgICAgICAgICAgICAgICAgIDxzdEV2dDppbnN0YW5jZUlEPnhtcC5paWQ6ZDQzMGMyNmItOWEzYS00MzdiLWFmZTMtNjVkY2I4MmU2NTU3PC9zdEV2dDppbnN0YW5jZUlEPgogICAgICAgICAgICAgICAgICA8c3RFdnQ6YWN0aW9uPmNyZWF0ZWQ8L3N0RXZ0OmFjdGlvbj4KICAgICAgICAgICAgICAgPC9yZGY6bGk+CiAgICAgICAgICAgIDwvcmRmOlNlcT4KICAgICAgICAgPC94bXBNTTpIaXN0b3J5PgogICAgICAgICA8eG1wTU06SW5zdGFuY2VJRD54bXAuaWlkOmQ0MzBjMjZiLTlhM2EtNDM3Yi1hZmUzLTY1ZGNiODJlNjU1NzwveG1wTU06SW5zdGFuY2VJRD4KICAgICAgICAgPHhtcE1NOkRvY3VtZW50SUQ+eG1wLmRpZDpkNDMwYzI2Yi05YTNhLTQzN2ItYWZlMy02NWRjYjgyZTY1NTc8L3ht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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - apiextensions.k8s.io
+          resources:
+          - customresourcedefinitions
+          verbs:
+          - get
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - mutatingwebhookconfigurations
+          - validatingwebhookconfigurations
+          verbs:
+          - create
+          - delete
+          - get
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - endpoints
+          - events
+          - pods
+          - pods/exec
+          - secrets
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - batch
+          resources:
+          - jobs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - cert-manager.io
+          resources:
+          - certificates
+          - issuers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - coherence.oracle.com
+          resources:
+          - coherence
+          - coherence/finalizers
+          - coherence/status
+          - coherencejob
+          - coherencejob/finalizers
+          - coherencejob/status
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - nodes
+          verbs:
+          - get
+        serviceAccountName: coherence-operator-service-account
+      deployments:
+      - label:
+          app: coherence-operator
+          app.kubernetes.io/component: manager
+          app.kubernetes.io/instance: coherence-operator-manager
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: coherence-operator
+          app.kubernetes.io/part-of: coherence-operator
+          app.kubernetes.io/version: 3.5.2
+          control-plane: coherence
+          version: 3.5.2
+        name: coherence-operator-controller-manager
+        spec:
+          progressDeadlineSeconds: 600
+          replicas: 3
+          selector:
+            matchLabels:
+              control-plane: coherence
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                alpha.image.policy.openshift.io/resolve-names: '*'
+              labels:
+                app: coherence-operator
+                app.kubernetes.io/component: manager
+                app.kubernetes.io/created-by: controller-manager
+                app.kubernetes.io/instance: coherence-operator-manager
+                app.kubernetes.io/managed-by: kustomize
+                app.kubernetes.io/name: coherence-operator
+                app.kubernetes.io/part-of: coherence-operator
+                app.kubernetes.io/version: 3.5.2
+                control-plane: coherence
+                version: 3.5.2
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - amd64
+                        - arm64
+                      - key: kubernetes.io/os
+                        operator: In
+                        values:
+                        - linux
+                podAntiAffinity:
+                  preferredDuringSchedulingIgnoredDuringExecution:
+                  - podAffinityTerm:
+                      labelSelector:
+                        matchLabels:
+                          app.kubernetes.io/instance: coherence-operator-manager
+                          app.kubernetes.io/name: coherence-operator
+                          app.kubernetes.io/version: 3.5.2
+                          control-plane: coherence
+                      topologyKey: topology.kubernetes.io/zone
+                    weight: 50
+                  - podAffinityTerm:
+                      labelSelector:
+                        matchLabels:
+                          app.kubernetes.io/instance: coherence-operator-manager
+                          app.kubernetes.io/name: coherence-operator
+                          app.kubernetes.io/version: 3.5.2
+                          control-plane: coherence
+                      topologyKey: oci.oraclecloud.com/fault-domain
+                    weight: 10
+                  - podAffinityTerm:
+                      labelSelector:
+                        matchLabels:
+                          app.kubernetes.io/instance: coherence-operator-manager
+                          app.kubernetes.io/name: coherence-operator
+                          app.kubernetes.io/version: 3.5.2
+                          control-plane: coherence
+                      topologyKey: kubernetes.io/hostname
+                    weight: 1
+              containers:
+              - args:
+                - operator
+                - --enable-leader-election
+                command:
+                - /files/runner
+                env:
+                - name: OPERATOR_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: OPERATOR_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: WEBHOOK_SERVICE
+                  value: coherence-operator-webhook
+                - name: WEBHOOK_SECRET
+                  value: coherence-operator-coherence-webhook-server-cert
+                - name: SERVICE_NAME
+                  value: coherence-operator-rest
+                - name: CERT_TYPE
+                  value: self-signed
+                envFrom:
+                - configMapRef:
+                    name: env-vars
+                    optional: true
+                image: container-registry.oracle.com/middleware/coherence-operator:3.5.2
+                livenessProbe:
+                  failureThreshold: 3
+                  httpGet:
+                    path: /healthz
+                    port: health
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                name: manager
+                ports:
+                - containerPort: 8000
+                  name: operator
+                  protocol: TCP
+                - containerPort: 9443
+                  name: webhook-server
+                  protocol: TCP
+                - containerPort: 8080
+                  name: metrics
+                  protocol: TCP
+                - containerPort: 8088
+                  name: health
+                  protocol: TCP
+                readinessProbe:
+                  failureThreshold: 3
+                  httpGet:
+                    path: /readyz
+                    port: health
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 100m
+                    memory: 256Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                volumeMounts:
+                - mountPath: /tmp/k8s-webhook-server/serving-certs
+                  name: cert
+                  readOnly: true
+                - mountPath: /coherence-operator/config
+                  name: config
+                  readOnly: true
+              securityContext:
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+              serviceAccountName: coherence-operator-service-account
+              terminationGracePeriodSeconds: 10
+              topologySpreadConstraints:
+              - labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: coherence-operator-manager
+                    app.kubernetes.io/name: coherence-operator
+                    app.kubernetes.io/version: 3.5.2
+                    control-plane: coherence
+                maxSkew: 1
+                topologyKey: topology.kubernetes.io/zone
+                whenUnsatisfiable: ScheduleAnyway
+              volumes:
+              - configMap:
+                  name: coherence-operator
+                  optional: true
+                name: config
+              - name: cert
+                secret:
+                  defaultMode: 420
+                  optional: true
+                  secretName: coherence-operator-coherence-webhook-server-cert
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: coherence-operator-service-account
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: true
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - Coherence
+  - Oracle
+  - In Memory Data
+  - Caching
+  links:
+  - name: Coherence Kubernetes Operator
+    url: https://oracle.github.io/coherence-operator/docs/latest
+  - name: Oracle Coherence
+    url: https://coherence.community
+  maintainers:
+  - email: jonathan.knight@oracle.com
+    name: Jonathan Knight
+  maturity: mature
+  minKubeVersion: 1.26.0
+  provider:
+    name: Oracle Corporation
+    url: https://github.com/oracle/coherence-operator
+  version: 3.5.2

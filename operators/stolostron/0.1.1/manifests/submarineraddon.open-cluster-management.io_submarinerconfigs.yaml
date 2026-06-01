@@ -1,0 +1,248 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.5.0
+  creationTimestamp: null
+  name: submarinerconfigs.submarineraddon.open-cluster-management.io
+spec:
+  group: submarineraddon.open-cluster-management.io
+  names:
+    kind: SubmarinerConfig
+    listKind: SubmarinerConfigList
+    plural: submarinerconfigs
+    singular: submarinerconfig
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: SubmarinerConfig represents the configuration for Submariner, the submariner-addon will use it to configure the Submariner.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Spec defines the configuration of the Submariner
+            properties:
+              IPSecIKEPort:
+                default: 500
+                description: IPSecIKEPort represents IPsec IKE port (default 500).
+                type: integer
+              IPSecNATTPort:
+                default: 4500
+                description: IPSecNATTPort represents IPsec NAT-T port (default 4500).
+                type: integer
+              NATTDiscoveryPort:
+                default: 4900
+                description: NATTDiscoveryPort specifies the port used for NAT-T Discovery (default UDP/4900).
+                type: integer
+              NATTEnable:
+                default: true
+                description: NATTEnable represents IPsec NAT-T enabled (default true).
+                type: boolean
+              airGappedDeployment:
+                default: false
+                description: AirGappedDeployment specifies that the cluster is in an air-gapped environment without access to external servers.
+                type: boolean
+              cableDriver:
+                default: libreswan
+                description: CableDriver represents the submariner cable driver implementation. Available options are libreswan (default) strongswan, wireguard, and vxlan.
+                type: string
+              credentialsSecret:
+                description: CredentialsSecret is a reference to the secret with a certain cloud platform credentials, the supported platform includes AWS, GCP, Azure, ROKS and OSD. The submariner-addon will use these credentials to prepare Submariner cluster environment. If the submariner cluster environment requires submariner-addon preparation, this field should be specified.
+                properties:
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
+                    type: string
+                type: object
+              gatewayConfig:
+                description: GatewayConfig represents the gateways configuration of the Submariner.
+                properties:
+                  aws:
+                    description: AWS represents the configuration for Amazon Web Services. If the platform of managed cluster is not Amazon Web Services, this field will be ignored.
+                    properties:
+                      instanceType:
+                        default: m5n.large
+                        description: InstanceType represents the Amazon Web Services EC2 instance type of the gateway node that will be created on the managed cluster. The default value is `m5n.large`.
+                        type: string
+                    type: object
+                  azure:
+                    description: Azure represents the configuration for Azure Cloud Platform. If the platform of managed cluster is not Azure Cloud Platform, this field will be ignored.
+                    properties:
+                      instanceType:
+                        default: Standard_F4s_v2
+                        description: InstanceType represents the Azure Cloud Platform instance type of the gateway node that will be created on the managed cluster. The default value is `Standard_F4s_v2`.
+                        type: string
+                    type: object
+                  gateways:
+                    default: 1
+                    description: Gateways represents the count of worker nodes that will be used to deploy the Submariner gateway component on the managed cluster. The default value is 1, if the value is greater than 1, the Submariner gateway HA will be enabled automatically.
+                    type: integer
+                  gcp:
+                    description: GCP represents the configuration for Google Cloud Platform. If the platform of managed cluster is not Google Cloud Platform, this field will be ignored.
+                    properties:
+                      instanceType:
+                        default: n1-standard-4
+                        description: InstanceType represents the Google Cloud Platform instance type of the gateway node that will be created on the managed cluster. The default value is `n1-standard-4`.
+                        type: string
+                    type: object
+                  rhos:
+                    description: RHOS represents the configuration for Redhat Openstack Platform. If the platform of managed cluster is not Redhat Openstack Platform, this field will be ignored.
+                    properties:
+                      instanceType:
+                        default: PnTAE.CPU_4_Memory_8192_Disk_50
+                        description: InstanceType represents the Redhat Openstack instance type of the gateway node that will be created on the managed cluster. The default value is `PnTAE.CPU_4_Memory_8192_Disk_50`.
+                        type: string
+                    type: object
+                type: object
+              globalCIDR:
+                description: GlobalCIDR specifies the global CIDR used by the cluster.
+                type: string
+              imagePullSpecs:
+                description: ImagePullSpecs represents the desired images of submariner components installed on the managed cluster. If not specified, the default submariner images that was defined by submariner operator will be used.
+                properties:
+                  lighthouseAgentImagePullSpec:
+                    description: LighthouseAgentImagePullSpec represents the desired image of the lighthouse agent.
+                    type: string
+                  lighthouseCoreDNSImagePullSpec:
+                    description: LighthouseCoreDNSImagePullSpec represents the desired image of lighthouse coredns.
+                    type: string
+                  metricsProxyImagePullSpec:
+                    description: MetricsProxyImagePullSpec represents the desired image of the metrics proxy.
+                    type: string
+                  nettestImagePullSpec:
+                    description: NettestImagePullSpec represents the desired image of nettest.
+                    type: string
+                  submarinerGlobalnetImagePullSpec:
+                    description: SubmarinerGlobalnetImagePullSpec represents the desired image of the submariner globalnet.
+                    type: string
+                  submarinerImagePullSpec:
+                    description: SubmarinerImagePullSpec represents the desired image of submariner.
+                    type: string
+                  submarinerNetworkPluginSyncerImagePullSpec:
+                    description: SubmarinerNetworkPluginSyncerImagePullSpec represents the desired image of the submariner networkplugin syncer.
+                    type: string
+                  submarinerRouteAgentImagePullSpec:
+                    description: SubmarinerRouteAgentImagePullSpec represents the desired image of the submariner route agent.
+                    type: string
+                type: object
+              insecureBrokerConnection:
+                default: false
+                description: InsecureBrokerConnection disables certificate validation when contacting the broker. This is useful for scenarios where the certificate chain isn't the same everywhere, e.g. with self-signed certificates with a different trust chain in each cluster.
+                type: boolean
+              loadBalancerEnable:
+                default: false
+                description: LoadBalancerEnable enables or disables load balancer mode. When enabled, a LoadBalancer is created in the submariner-operator namespace (default false).
+                type: boolean
+              subscriptionConfig:
+                description: SubscriptionConfig represents a Submariner subscription. SubscriptionConfig can be used to customize the Submariner subscription.
+                properties:
+                  channel:
+                    description: Channel represents the channel of a submariner subscription.
+                    type: string
+                  installPlanApproval:
+                    description: InstallPlanApproval determines whether subscription installation plans are applied automatically.
+                    type: string
+                  source:
+                    default: redhat-operators
+                    description: Source represents the catalog source of a submariner subscription. The default value is redhat-operators
+                    type: string
+                  sourceNamespace:
+                    default: openshift-marketplace
+                    description: SourceNamespace represents the catalog source namespace of a submariner subscription. The default value is openshift-marketplace
+                    type: string
+                  startingCSV:
+                    description: StartingCSV represents the startingCSV of a submariner subscription.
+                    type: string
+                type: object
+            type: object
+          status:
+            description: Status represents the current status of submariner configuration
+            properties:
+              conditions:
+                description: Conditions contain the different condition statuses for this configuration.
+                items:
+                  description: "Condition contains details for one aspect of the current state of this API Resource. --- This struct is intended for direct use as an array at the field path .status.conditions.  For example, \n \ttype FooStatus struct{ \t    // Represents the observations of a foo's current state. \t    // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\" \t    // +patchMergeKey=type \t    // +patchStrategy=merge \t    // +listType=map \t    // +listMapKey=type \t    Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"` \n \t    // other fields \t}"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition transitioned from one status to another. This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating the reason for the condition's last transition. Producers of specific condition types may define expected values and meanings for this field, and whether the values are considered a guaranteed API. The value should be a CamelCase string. This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase. --- Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be useful (see .node.status.conditions), the ability to deconflict is important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              managedClusterInfo:
+                description: ManagedClusterInfo represents the information of a managed cluster.
+                properties:
+                  clusterName:
+                    description: ClusterName represents the name of the managed cluster.
+                    type: string
+                  infraId:
+                    description: InfraId represents the infrastructure id of the managed cluster.
+                    type: string
+                  networkType:
+                    description: NetworkType represents the network type (cni) of the managed cluster.
+                    type: string
+                  platform:
+                    description: Platform represents the cloud provider of the managed cluster.
+                    type: string
+                  region:
+                    description: Region represents the cloud region of the managed cluster.
+                    type: string
+                  vendor:
+                    description: Vendor represents the kubernetes vendor of the managed cluster.
+                    type: string
+                  vendorVersion:
+                    description: VendorVersion represents k8s vendor version of the managed cluster.
+                    type: string
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

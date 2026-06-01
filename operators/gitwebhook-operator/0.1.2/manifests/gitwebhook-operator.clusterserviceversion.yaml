@@ -1,0 +1,358 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "redhatcop.redhat.io/v1alpha1",
+          "kind": "GitWebhook",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "gitwebhook-operator",
+              "app.kubernetes.io/instance": "gitwebhook-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "gitwebhook",
+              "app.kubernetes.io/part-of": "gitwebhook-operator"
+            },
+            "name": "gitwebhook-sample"
+          },
+          "spec": null
+        }
+      ]
+    capabilities: Full Lifecycle
+    categories: Developer Tools
+    certified: 'false'
+    containerImage: quay.io/redhat-cop/gitwebhook-operator@sha256:2810d75eebb24069dbbedf6a82285136c6f16b4cc58b59f1b0fbdc38560cf8a8
+    createdAt: "2024-05-10T18:17:13Z"
+    description: An operator to create git webhooks declaratively
+    operatorframework.io/cluster-monitoring: 'true'
+    operatorframework.io/suggested-namespace: gitwebhook-operator
+    operators.openshift.io/infrastructure-features: '["Disconnected"]'
+    operators.operatorframework.io/builder: operator-sdk-v1.25.2
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    repository: https://github.com/redhat-cop/gitwebhook-operator
+    support: Best Effort
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.arm64: supported
+    operatorframework.io/arch.ppc64le: supported
+    operatorframework.io/arch.s390x: supported
+    operatorframework.io/os.linux: supported
+  name: gitwebhook-operator.v0.1.2
+  namespace: placeholder
+spec:
+  annotations:
+    service.beta.openshift.io/inject-cabundle: 'true'
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: GitWebhook is the Schema for the gitwebhooks API
+        displayName: Git Webhook
+        kind: GitWebhook
+        name: gitwebhooks.redhatcop.redhat.io
+        version: v1alpha1
+  description: "This operator automates the setting up of git webhooks. Its main purpose is to stream line the configuration of operators such as Tekton or ArgoCD which rely on git webhooks for some of their functionalities.\n\n## The GitWebhook CRD\n \nA CRD is provided by this operator to create a git web hook, here is an example for github\n\n```yaml\napiVersion: redhatcop.redhat.io/v1alpha1\nkind: GitWebhook\nmetadata:\n  name: gitwebhook-github\nspec:\n  gitHub:\n    gitServerCredentials:\n      name: github-pat\n  repositoryOwner: ${repo_owner}\n  ownerType: user\n  repositoryName: ${repo_name}\n  webhookURL: https://hellowebhook.com\n  insecureSSL: false\n  webhookSecret:\n    name: webhook-secret\n  events:\n    - push  \n  contentType: json\n  active: true  \n```    \n\nhere is an explanation of each field:\n\n- `gihub` specifies how to connect to the git api server. It also requires a local reference to a secret (in the same namespace) containing a key `token` with a valid github token to be used to authenticate. A similar `gitLab` section exists when connecting to gitlab. Only one of `gitLab` or `gitHub` can be defined. \n- `repositoryOwner` and `repositoryName` identify the repository for which we want to receive events.\n- `ownerType` can have two values: `user` and `organization` and identifies the kind of owner.\n- `webhookURL` is the URL for to be called.\n - `insecureSSL` defines whether the target URL certificate should be validated (default `false`). \n- `webhookSecret` defines a local reference to a secret containing the `secret` key. The value is a shared secret between the webhook caller and the received for farther validation or identification of the caller.\n- `events` is the list of the repo-level events that the webhook should generate. The list of valid events for github can be found [here](https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads). The list of valid events for gitlab can be found [here](https://docs.gitlab.com/ee/user/project/integrations/webhook_events.html).\n - `contentType` defines the format of the webhook payload (default `json`) (github).\n - `active` whether the webhook should be turned on (default `true`) (github).\n - `pushEventBranchFilter` a regular expression to filter from which branches push events should be generated (gitlab only).\n\n## Security Considerations\n\nThis operator does not own credentials for the git server, but instead always allocate a new connection based on the credentials referenced in the CR and every reconcile cycle. As a result there is no risk of security escalation or credential leaking between tenants of a cluster using this operator. On the other hand it is the responsibility of the namespace owners or the platform owner to ensure that valid git credentials are always available in the namespace where the GitWebhook CRs need to defined.\n\n## Current support\n\nCurrently this operator support creating repo-level webhooks for github and gitlab. Potentially this operator could be extended to support org-level webhook or other git systems. Contributions are welcome.  "
+  displayName: GitWebhook operator
+  icon:
+    - base64data: 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
+      mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ''
+              resources:
+                - events
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - watch
+            - apiGroups:
+                - ''
+              resources:
+                - secrets
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - redhatcop.redhat.io
+              resources:
+                - gitwebhooks
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - redhatcop.redhat.io
+              resources:
+                - gitwebhooks/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - redhatcop.redhat.io
+              resources:
+                - gitwebhooks/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: controller-manager
+      deployments:
+        - label:
+            app.kubernetes.io/component: manager
+            app.kubernetes.io/created-by: gitwebhook-operator
+            app.kubernetes.io/instance: gitwebhook-operator
+            app.kubernetes.io/managed-by: kustomize
+            app.kubernetes.io/name: deployment
+            app.kubernetes.io/part-of: gitwebhook-operator
+            control-plane: gitwebhook-operator
+          name: gitwebhook-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                control-plane: gitwebhook-operator
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: gitwebhook-operator
+              spec:
+                affinity:
+                  nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      nodeSelectorTerms:
+                        - matchExpressions:
+                            - key: kubernetes.io/arch
+                              operator: In
+                              values:
+                                - amd64
+                                - arm64
+                                - ppc64le
+                                - s390x
+                            - key: kubernetes.io/os
+                              operator: In
+                              values:
+                                - linux
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                      - --tls-cert-file=/etc/certs/tls/tls.crt
+                      - --tls-private-key-file=/etc/certs/tls/tls.key
+                    image: gcr.io/kubebuilder/kube-rbac-proxy@sha256:d99a8d144816b951a67648c12c0b988936ccd25cf3754f3cd85ab8c01592248f
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                    volumeMounts:
+                      - mountPath: /etc/certs/tls
+                        name: tls-cert
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    image: quay.io/redhat-cop/gitwebhook-operator@sha256:2810d75eebb24069dbbedf6a82285136c6f16b4cc58b59f1b0fbdc38560cf8a8
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 10m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: cert
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: cert
+                    secret:
+                      defaultMode: 420
+                      secretName: webhook-server-cert
+                  - name: tls-cert
+                    secret:
+                      defaultMode: 420
+                      secretName: gitwebhook-operator-certs
+      permissions:
+        - rules:
+            - apiGroups:
+                - ''
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ''
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: controller-manager
+    strategy: deployment
+  installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - gitops
+    - webhook
+    - github
+    - gitlab
+  links:
+    - name: GitWbehook Operator
+      url: https://github.com/redhat-cop/gitwebhook-operator
+    - name: Container Image
+      url: https://quay.io/redhat-cop/gitwebhook-operator
+  maintainers:
+    - email: rspazzol@redhat.com
+      name: Raffaele Spazzoli
+  maturity: alpha
+  provider:
+    name: Red Hat Community of Practice
+  version: 0.1.2
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: gitwebhook-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mgitwebhook.kb.io
+      rules:
+        - apiGroups:
+            - redhatcop.redhat.io
+          apiVersions:
+            - v1alpha1
+          operations:
+            - CREATE
+          resources:
+            - gitwebhooks
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-redhatcop-redhat-io-v1alpha1-gitwebhook
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: gitwebhook-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vgitwebhook.kb.io
+      rules:
+        - apiGroups:
+            - redhatcop.redhat.io
+          apiVersions:
+            - v1alpha1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - gitwebhooks
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-redhatcop-redhat-io-v1alpha1-gitwebhook
+  relatedImages:
+    - name: gcr.io/kubebuilder/kube-rbac-proxy
+      image: gcr.io/kubebuilder/kube-rbac-proxy@sha256:d99a8d144816b951a67648c12c0b988936ccd25cf3754f3cd85ab8c01592248f
+    - name: quay.io/redhat-cop/gitwebhook-operator
+      image: quay.io/redhat-cop/gitwebhook-operator@sha256:2810d75eebb24069dbbedf6a82285136c6f16b4cc58b59f1b0fbdc38560cf8a8

@@ -1,0 +1,106 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.11.1
+  creationTimestamp: null
+  name: anomalyengines.observability-analytics.redhat.com
+spec:
+  group: observability-analytics.redhat.com
+  names:
+    kind: AnomalyEngine
+    listKind: AnomalyEngineList
+    plural: anomalyengines
+    singular: anomalyengine
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: AnomalyEngine is the Schema for the anomalyengines API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AnomalyEngineSpec defines the desired state of AnomalyEngine
+            properties:
+              anomalyqueryconfiguration:
+                description: AnomalyQueryConfiguration defines the query/configuration
+                  to detect anomaly You can take a look on below link to understand
+                  how to define these data structure https://github.com/openshift/incluster-anomaly-detection/tree/main#understanding-anomaly-configurations
+                type: string
+              cronjobconfig:
+                description: CronJobConfig defines configuration required to setup
+                  cronjob
+                properties:
+                  anomalyqueries:
+                    description: Comma-separated keys from anomalyqueryconfiguration.
+                      If not defined, the system will go through all the defined configurations.
+                      For example, if there are five configurations defined but we
+                      only want to run two for the time being, then those specific
+                      keys need to be defined here.
+                    type: string
+                  loglevel:
+                    description: Pod log level - DEBUG/INFO/ERROR etc
+                    type: string
+                  name:
+                    description: Name of the cronjob
+                    type: string
+                  resource:
+                    description: ResourceConfig defines cpu/memory resource properties
+                      required for AnomalyEngine pod
+                    properties:
+                      cpulimit:
+                        type: string
+                      cpurequest:
+                        type: string
+                      memorylimit:
+                        type: string
+                      memoryrequest:
+                        type: string
+                    type: object
+                  schedule:
+                    description: Schedule for the cronjob
+                    type: string
+                type: object
+              namespace:
+                description: The namespace under which Anomaly Engine cronjobs will
+                  run
+                type: string
+              serviceaccountrolebinding:
+                description: ServiceAccountRoleBinding defines Service account role
+                  binding properties to support AnomalyEngine
+                properties:
+                  clusterrolename:
+                    description: Name of the Cluster Role which have view/read access
+                      to mornitoring/thanos-api
+                    type: string
+                  name:
+                    description: Name of the Service Account
+                    type: string
+                type: object
+            type: object
+          status:
+            description: AnomalyEngineStatus defines the observed state of AnomalyEngine
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

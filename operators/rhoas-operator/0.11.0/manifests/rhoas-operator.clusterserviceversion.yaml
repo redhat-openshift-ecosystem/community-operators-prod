@@ -1,0 +1,228 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: >-
+      [
+        {
+          "apiVersion": "rhoas.redhat.com/v1alpha1",
+          "kind": "ServiceRegistryConnection",
+          "metadata": {
+            "name": "example",
+            "namespace": "example-namespace",
+            "labels": {
+              "app.kubernetes.io/component": "external-service",
+              "app.kubernetes.io/managed-by": "rhoas"
+            }
+          },
+          "spec": {
+            "accessTokenSecretName": "rh-managed-services-api-accesstoken",
+            "serviceRegistryId": "exampleId",
+            "credentials": {
+              "serviceAccountSecretName": "service-account-secret"
+            }
+          }
+        },
+        {
+          "apiVersion": "rhoas.redhat.com/v1alpha1",
+          "kind": "CloudServiceAccountRequest",
+          "metadata": {
+            "name": "example",
+            "namespace": "example-namespace"
+          },
+          "spec": {
+            "serviceAccountName": "rhoas-sa",
+            "serviceAccountDescription": "Operator created service account",
+            "serviceAccountSecretName": "service-account-credentials",
+            "accessTokenSecretName": "rh-managed-services-api-accesstoken"
+          }
+        },
+        {
+          "apiVersion": "rhoas.redhat.com/v1alpha1",
+          "kind": "CloudServicesRequest",
+          "metadata": {
+            "name": "example",
+            "namespace": "example-namespace",
+            "labels": {
+              "app.kubernetes.io/component": "external-service",
+              "app.kubernetes.io/managed-by": "rhoas"
+            }
+          },
+          "spec": {
+            "accessTokenSecretName": "rh-cloud-services-api-accesstoken"
+          }
+        }
+      ]
+    categories: 'Developer Tools, OpenShift Optional, Integration & Delivery'
+    certified: 'false'
+    description: 'Red Hat OpenShift Application Services Operator'
+    capabilities: Seamless Upgrades
+    repository: 'https://github.com/redhat-developer/app-services-operator'
+    containerImage: quay.io/rhoas/service-operator:0.11.0
+    createdAt: 2023-01-19 13:35:28
+    olm.skipRange: ">=0.0.1 <0.11.0"    
+  name: rhoas-operator.0.11.0
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: Creates RHOAS Service Accounts
+      displayName: Cloud Service Account Request
+      kind: CloudServiceAccountRequest
+      name: cloudserviceaccountrequests.rhoas.redhat.com
+      version: v1alpha1
+    - description: Cloud Services Request
+      displayName:  Cloud Services Request
+      kind: CloudServicesRequest
+      name: cloudservicesrequests.rhoas.redhat.com
+      version: v1alpha1
+    - description: Binds Kafka Instance
+      displayName: Kafka Connection
+      kind: KafkaConnection
+      name: kafkaconnections.rhoas.redhat.com
+      version: v1alpha1   
+    - description: Binds Service Registry Instance
+      displayName: Service Registry Connection
+      kind: ServiceRegistryConnection
+      name: serviceregistryconnections.rhoas.redhat.com
+      version: v1alpha1                  
+  icon:
+  - base64data: PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI1LjIuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAzNyAzNyIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMzcgMzc7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4KCS5zdDB7ZmlsbDojRUUwMDAwO30KCS5zdDF7ZmlsbDojRkZGRkZGO30KPC9zdHlsZT4KPGc+Cgk8cGF0aCBkPSJNMjcuNSwwLjVoLTE4Yy00Ljk3LDAtOSw0LjAzLTksOXYxOGMwLDQuOTcsNC4wMyw5LDksOWgxOGM0Ljk3LDAsOS00LjAzLDktOXYtMThDMzYuNSw0LjUzLDMyLjQ3LDAuNSwyNy41LDAuNUwyNy41LDAuNXoiCgkJLz4KCTxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0yNS41MSwyMi4xN0gxMi42NGMtMi45OCwwLTUuNDEtMi40Mi01LjQxLTUuNDFjMC0zLjE1LDIuNjctNS43LDUuOTItNS4zOGMxLjE4LTIuMjcsMy41Mi0zLjcsNi4xLTMuNwoJCWMzLjc1LDAsNi44MSwzLjAyLDYuODgsNi43NmMxLjcxLDAuNDQsMi45NCwxLjk4LDIuOTQsMy43OWMwLDEuOTYtMS40NSwzLjYtMy4zMywzLjg5QzI1LjY4LDIyLjE1LDI1LjYsMjIuMTcsMjUuNTEsMjIuMTd6CgkJIE0xMi42NCwxMi42MWMtMi4yOSwwLTQuMTYsMS44Ni00LjE2LDQuMTVzMS44Niw0LjE2LDQuMTYsNC4xNmgxMi41YzEuNDgsMCwyLjY4LTEuMiwyLjY4LTIuNjhjMC0xLjM3LTEuMDMtMi41MS0yLjQtMi42NQoJCWMtMC4zMy0wLjA0LTAuNTgtMC4zMi0wLjU2LTAuNjZsMC4wMS0wLjEyYzAuMDEtMC4wOCwwLjAxLTAuMTcsMC4wMS0wLjI1YzAtMy4xLTIuNTItNS42My01LjYzLTUuNjNjLTIuMjQsMC00LjI3LDEuMzMtNS4xNiwzLjM5CgkJYy0wLjEyLDAuMjctMC40LDAuNDItMC42OSwwLjM3QzEzLjE1LDEyLjYzLDEyLjg5LDEyLjYxLDEyLjY0LDEyLjYxeiIvPgoJPHBhdGggY2xhc3M9InN0MCIgZD0iTTI1LjUsMjMuODdjLTEuMjMsMC0yLjI2LDAuODUtMi41NCwyaC0xLjkyYy0wLjIzLTAuOTQtMC45Ny0xLjY4LTEuOTItMS45MnYtNy45NWwwLjkzLDAuOTMKCQljMC4xMiwwLjEyLDAuMjgsMC4xOCwwLjQ0LDAuMThzMC4zMi0wLjA2LDAuNDQtMC4xOGMwLjI0LTAuMjQsMC4yNC0wLjY0LDAtMC44OGwtMi0yYy0wLjI0LTAuMjQtMC42NC0wLjI0LTAuODgsMGwtMiwyCgkJYy0wLjI0LDAuMjQtMC4yNCwwLjY0LDAsMC44OGMwLjI0LDAuMjQsMC42NCwwLjI0LDAuODgsMGwwLjkzLTAuOTN2Ny45NWMtMC45NCwwLjIzLTEuNjgsMC45Ny0xLjkyLDEuOTJoLTEuOTIKCQljLTAuMjgtMS4xNS0xLjMxLTItMi41NC0yYy0xLjQ1LDAtMi42MiwxLjE4LTIuNjIsMi42MnMxLjE4LDIuNjIsMi42MiwyLjYyYzEuMjMsMCwyLjI2LTAuODUsMi41NC0yaDEuOTJjMC4yOCwxLjE1LDEuMzEsMiwyLjU0LDIKCQlzMi4yNi0wLjg1LDIuNTQtMmgxLjkyYzAuMjgsMS4xNSwxLjMxLDIsMi41NCwyYzEuNDUsMCwyLjYyLTEuMTgsMi42Mi0yLjYyUzI2Ljk1LDIzLjg3LDI1LjUsMjMuODd6IE0xMS41LDI3Ljg3CgkJYy0wLjc2LDAtMS4zOC0wLjYyLTEuMzgtMS4zOHMwLjYyLTEuMzgsMS4zOC0xLjM4czEuMzgsMC42MiwxLjM4LDEuMzhTMTIuMjYsMjcuODcsMTEuNSwyNy44N3ogTTE4LjUsMjcuODcKCQljLTAuNzYsMC0xLjM4LTAuNjItMS4zOC0xLjM4czAuNjItMS4zOCwxLjM4LTEuMzhzMS4zOCwwLjYyLDEuMzgsMS4zOFMxOS4yNiwyNy44NywxOC41LDI3Ljg3eiBNMjUuNSwyNy44NwoJCWMtMC43NiwwLTEuMzgtMC42Mi0xLjM4LTEuMzhzMC42Mi0xLjM4LDEuMzgtMS4zOHMxLjM4LDAuNjIsMS4zOCwxLjM4UzI2LjI2LDI3Ljg3LDI1LjUsMjcuODd6Ii8+CjwvZz4KPC9zdmc+Cg==
+    mediatype: image/svg+xml
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  install:
+    strategy: deployment
+    spec: 
+      permissions:
+      - serviceAccountName: rhoas-operator 
+        rules:
+        - apiGroups:
+            - 'apiextensions.k8s.io'
+          resources:
+            - 'customresourcedefinitions'  
+          verbs:
+            - get
+            - list
+            - watch
+        - apiGroups:
+            - ""
+          resources:
+            - secrets
+          verbs:
+            - create
+            - delete
+            - get
+            - list
+            - patch
+            - update
+            - watch
+        - apiGroups:
+            - rhoas.redhat.com
+          resources:
+            - 'kafkaconnections'
+            - 'kafkaconnections/status'
+            - 'kafkaconnections/finalizers'
+            - 'serviceregistryconnections'
+            - 'serviceregistryconnections/status'
+            - 'serviceregistryconnections/finalizers'
+            - 'cloudservicesrequests'
+            - 'cloudservicesrequests/status'
+            - 'cloudservicesrequests/finalizers'
+            - 'cloudserviceaccountrequests'
+            - 'cloudserviceaccountrequests/status'
+            - 'cloudserviceaccountrequests/finalizers'
+          verbs:
+            - create
+            - delete
+            - get
+            - list
+            - patch
+            - update
+            - watch
+        - apiGroups:
+            - console.openshift.io
+          resources:
+            - 'consolequickstarts'
+            - 'consolequickstarts/status'
+            - 'consolequickstarts/finalizers'
+          verbs:
+            - create
+            - delete
+            - get
+            - list
+            - patch
+            - update
+            - watch
+      deployments:
+      - name: rhoas-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              name: rhoas-operator
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                name: rhoas-operator
+            spec:
+              containers:
+              - image: quay.io/rhoas/service-operator:0.11.0
+                env:
+                  - name: CLOUD_SERVICES_API
+                    value: https://api.openshift.com
+                imagePullPolicy: Always
+                name: rhoas-operator
+                resources:
+                  limits:
+                    cpu: 60m
+                    memory: 512Mi
+                  requests:
+                    cpu: 30m
+                    memory: 128Mi                
+              serviceAccountName: rhoas-operator
+  description:  >-
+    **OpenShift Application Services Operator (RHOAS-Operator)** creates instances of Red Hat OpenShift Application Services in your cluster.
+    Operator is currently available as limited Beta and it cannot be consumed without invitation.
+
+
+    Red Hat OpenShift Application Services, when added to Red Hat OpenShift Dedicated, 
+    provide a streamlined developer experience for building, deploying, 
+    and scaling cloud-native applications in open hybrid-cloud environments.   
+    
+
+    RHOAS-Operator enables developers to connect with their Application Services directly in their own cluster by using
+    [RHOAS cli](https://github.com/redhat-developer/app-services-cli) and OpenShift Console UI.  
+    
+
+    RHOAS-Operator requires developers to connect with their Red Hat OpenShift Streams for Apache Kafka (RHOSAK) instances.  
+    
+
+  displayName: OpenShift Application Services (RHOAS)
+  keywords:
+  - cloud
+  - rhoas
+  - kafka
+  - serviceregistry
+  - app-services
+  - application
+  - services
+  maintainers:
+  - email: rhosak-eval-support@redhat.com
+    name: Red Hat
+  maturity: beta
+  links:
+    - name: RHOAS Operator Documentation
+      url: 'https://github.com/redhat-developer/app-services-operator/tree/main/docs'  
+  provider:
+    name: Red Hat Inc.
+    url: https://github.com/redhat-developer/app-services-operator/
+  version: 0.11.0

@@ -1,0 +1,33 @@
+organization: community-operators
+
+maintainers:
+  - Allda
+  - ezopezo
+  - haripate
+  - mporrato
+  - tomasbakk
+
+tests:
+  - name: DeployableByOLM
+    ignore_operators:
+      - ^ack-.*
+      - ^community-windows-machine-config-operator
+  - name: check_dangling_bundles
+    ignore_operators:
+      - ^assisted-service-operator
+  - name: check_operator_name
+    ignore_operators:
+      - ^ibm-block-csi-operator-community
+      - ^postgresql
+  - name: preflight-trigger
+    ignore_operators:
+      - ^ack-.*
+
+allowed_bundle_registries:
+  - quay.io/community-operator-pipeline-prod/
+  - quay.io/openshift-community-operators/
+
+index_image:
+  repository: quay.io/redhat/redhat----community-operator-index
+  pending_repository: quay.io/redhat/redhat----community-operator-index-pending
+  public_repository_mirror: registry.redhat.io/redhat/community-operator-index

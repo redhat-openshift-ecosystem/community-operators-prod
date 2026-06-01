@@ -1,0 +1,20 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: dpa-viewer-role
+rules:
+- apiGroups:
+  - oadp.openshift.io
+  resources:
+  - dataprotectionapplications
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - oadp.openshift.io
+  resources:
+  - dataprotectionapplications/status
+  verbs:
+  - get

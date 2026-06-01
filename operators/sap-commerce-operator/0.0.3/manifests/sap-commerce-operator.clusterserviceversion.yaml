@@ -1,0 +1,453 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "hybris.hybris.org/v1alpha1",
+          "kind": "HybrisApp",
+          "metadata": {
+            "name": "hybrisapp-sample"
+          },
+          "spec": {
+            "apachejvmRouteName": "",
+            "baseImageName": "hybris-base",
+            "baseImageTag": "v0.2",
+            "hybrisANTTaskNames": "",
+            "podHealthyProbePath": "/platform/init",
+            "sourceRepoLocalPropertiesOverride": "",
+            "sourceRepoRef": "main",
+            "sourceRepoURL": "https://github.com/redhat-sap/sap-commerce-app-example.git",
+            "startupProbeFailureThreshold": 100,
+            "startupProbePeriodSecond": 60
+          }
+        },
+        {
+          "apiVersion": "hybris.hybris.org/v1alpha1",
+          "kind": "HybrisBase",
+          "metadata": {
+            "name": "hybrisbase-sample"
+          },
+          "spec": {
+            "URL": "http://nexus.redhat.com/nexus/service/local/repositories/releases/content/org/hybris/hybris/1.0/hybris-1.0.tar.gz",
+            "buildSourceRepo": "https://github.com/redhat-sap/sap-commerce-operator",
+            "buildSourceRepoBranch": "main",
+            "imageName": "hybris-base",
+            "imageTag": "v0.2",
+            "jdkURL": "https://github.com/SAP/SapMachine/releases/download/sapmachine-11.0.5/sapmachine-jdk-11.0.5-1.x86_64.rpm",
+            "password": "admin123",
+            "username": "admin"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: Database
+    containerImage: quay.io/redhat-sap-cop/hybris-operator:0.0.3
+    description: Builds and runs SAP Commerce in OpenShift
+    operators.operatorframework.io/builder: operator-sdk-v1.6.1+git
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    repository: https://github.com/redhat-sap/sap-commerce-operator
+    support: Red Hat
+  name: sap-commerce-operator.v0.0.3
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: HybrisApp is the Schema for the hybrisapps API
+      displayName: Hybris Application
+      kind: HybrisApp
+      name: hybrisapps.hybris.hybris.org
+      specDescriptors:
+      - description: Hybris app Apache Tomcat server.xml jvmRoute name
+        displayName: Apache Tomcat jvmRoute name
+        path: apachejvmRouteName
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Hybris base image name
+        displayName: Base Image Name
+        path: baseImageName
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Hybris base image tag
+        displayName: Base Image Tag
+        path: baseImageTag
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Hybris app ANT tasks
+        displayName: Specify ANT tasks, e.g. clean,compile,deploy
+        path: hybrisANTTaskNames
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Pod Healthy Probe path for startup and readiness probe
+        displayName: Pod Healthy Probe Path
+        path: podHealthyProbePath
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: Hybris app repository source location
+        displayName: Source Repo Context
+        path: sourceRepoContext
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Hybris app repository local.properties override location
+        displayName: Source Repo Local Properties Override
+        path: sourceRepoLocalPropertiesOverride
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Hybris app source repository reference
+        displayName: Source Repo Ref or Branch Name
+        path: sourceRepoRef
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Hybris app source repository URL
+        displayName: Source Repo URL
+        path: sourceRepoURL
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Failure Threshold second for Startup Probe
+        displayName: Startup Probe Failure Threshold
+        path: startupProbeFailureThreshold
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: Period Second for Startup Probe
+        displayName: Startup Probe Period Second
+        path: startupProbePeriodSecond
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      statusDescriptors:
+      - description: Name of the build for the Hybris base image
+        displayName: Build Name
+        path: buildConditions[0].buildName
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Conditions
+        path: buildConditions[0].conditions
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.conditions
+      - description: Conditions of the deploymentConfig for the Hybris app
+        displayName: Conditions
+        path: deploymentConfigConditions.conditions
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.conditions
+      - description: Conditions of the route for the Hybris app
+        displayName: Conditions
+        path: routeConditions[0].conditions
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.conditions
+      - description: Host of the route for the Hybris app
+        displayName: Host
+        path: routeConditions[0].host
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Name of the route for the Hybris app
+        displayName: Route Name
+        path: routeConditions[0].routeName
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      version: v1alpha1
+    - description: HybrisBase is the Schema for the Hybris Base API
+      displayName: Hybris Base
+      kind: HybrisBase
+      name: hybrisbases.hybris.hybris.org
+      specDescriptors:
+      - description: Hybris package download URL used to download the package and build the base image
+        displayName: Hybris package download URL
+        path: URL
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: SAP account username used to download the Hybris package
+        displayName: User Name
+        path: username
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: SAP account password used to download the Hybris package
+        displayName: Password
+        path: password
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:password
+      - description: Source Repo stores the s2i Dockerfile
+        displayName: Build Source Repo
+        path: buildSourceRepo
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: Source Repo branch stores the s2i Dockerfile
+        displayName: Build Source Repo Branch
+        path: buildSourceRepoBranch
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: Name of the Hybris base image to be built
+        displayName: Image Name
+        path: imageName
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Tag of the Hybris base image to be built
+        displayName: Image Tag
+        path: imageTag
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: SAP Jdk download URL used to build the base image
+        displayName: Jdk URL
+        path: jdkURL
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      statusDescriptors:
+      - description: Name of the build for the Hybris base image
+        displayName: Build Name
+        path: buildConditions[0].buildName
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Conditions
+        path: buildConditions[0].conditions
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.conditions
+      version: v1alpha1
+  description: |-
+    Builds and runs SAP Commerce in OpenShift
+
+    * The operator provides APIs to initialize SAP Commerce with the provided SAP Commerce Server. Though there are no restrictions from the operator on the base package to be used from SAP, the default SAP base image provides a server preconfigured with an application server based on Apache Tomcat. Both HSQLDB and Tomcat are included in the SAP Commerce package, and are designed to be used for testing, development, and demonstration purposes. The custom classes created for various business needs along with an external RDBMS configuration can be used in a HybrisApp creation to execute SAP Commerce in a production setup.
+
+    * The operator also enables the use of SAP Commerce in a clustered model. A SAP Commerce Cluster is a number of individual SAP Commerce installations using a common set of data on one database. A cluster configuration lets you balance the load between the nodes to scale SAP Commerce in a way that is transparent to the user.
+
+    * The clustering offers few communication protocols as options (UDP: both multicast or unicast, or JGroups). In order to support multicast for SAP Commerce clustering the corresponding OpenShift namespace has to be enabled for multicast usage.
+
+    For more details on SAP Commerce consult the product documentation: [https://help.sap.com/viewer/product/SAP_COMMERCE](https://help.sap.com/viewer/product/SAP_COMMERCE)
+  displayName: SAP Commerce Operator
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: default
+      deployments:
+      - name: sap-commerce-operator-hybris-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: hybris-controller-manager
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                control-plane: hybris-controller-manager
+            spec:
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=10
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.5.0
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                resources: {}
+              - args:
+                - --metrics-addr=127.0.0.1:8080
+                - --enable-leader-election
+                command:
+                - /manager
+                env:
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['olm.targetNamespaces']
+                image: quay.io/redhat-sap-cop/hybris-operator:0.0.3
+                imagePullPolicy: Always
+                name: manager
+                resources:
+                  limits:
+                    cpu: 100m
+                    memory: 30Mi
+                  requests:
+                    cpu: 100m
+                    memory: 20Mi
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps/status
+          verbs:
+          - get
+          - update
+          - patch
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - apps.openshift.io
+          resources:
+          - deploymentconfigs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - build.openshift.io
+          resources:
+          - buildconfigs
+          - builds
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - secrets
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - hybris.hybris.org
+          resources:
+          - hybrisapps
+          - hybrisapps/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - hybris.hybris.org
+          resources:
+          - hybrisapps/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - hybris.hybris.org
+          resources:
+          - hybrisbases
+          - hybrisbases/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - hybris.hybris.org
+          resources:
+          - hybrisbases/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - image.openshift.io
+          resources:
+          - imagestreams
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        serviceAccountName: default
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - sap-commerce-operator
+  links:
+  - name: SAP Commerce Operator
+    url: https://github.com/redhat-sap/sap-commerce-operator
+  maintainers:
+  - email: support@redhat.com
+    name: Red Hat
+  maturity: alpha
+  minKubeVersion: 1.19.0
+  provider:
+    name: Red Hat, Inc.
+    url: https://www.redhat.com
+  replaces: sap-commerce-operator.v0.0.2
+  version: 0.0.3

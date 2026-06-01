@@ -1,0 +1,420 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "gitops.hybrid-cloud-patterns.io/v1alpha1",
+          "kind": "Pattern",
+          "metadata": {
+            "name": "pattern-sample"
+          },
+          "spec": {
+            "clusterGroupName": "hub",
+            "gitSpec": {
+              "multiSourceSupport": false,
+              "targetRepo": "https://github.com/validatedpatterns/multicloud-gitops",
+              "targetRevision": "main"
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: OpenShift Optional
+    containerImage: quay.io/hybridcloudpatterns/patterns-operator:0.0.36
+    createdAt: 2023-12-12 16:01:46
+    description: An operator to deploy and manage architecture patterns from https://validatedpatterns.io
+    operators.operatorframework.io/builder: operator-sdk-v1.30.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    repository: https://github.com/validatedpatterns/patterns-operator
+  name: patterns-operator.v0.0.36
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: Pattern is the Schema for the patterns API
+      displayName: Pattern
+      kind: Pattern
+      name: patterns.gitops.hybrid-cloud-patterns.io
+      resources:
+      - kind: Pattern
+        name: patterns
+        version: v1alpha1
+      specDescriptors:
+      - displayName: Name
+        path: extraParameters[0].name
+      - description: Git repo containing the pattern to deploy. Must use https/http
+          or, for ssh, git@server:foo/bar.git
+        displayName: Target Repo
+        path: gitSpec.targetRepo
+      - displayName: Value
+        path: extraParameters[0].value
+      - description: 'Branch, tag, or commit to deploy.  Does not support short-sha''s.
+          Default: HEAD'
+        displayName: Target Revision
+        path: gitSpec.targetRevision
+      - displayName: Cluster Group Name
+        path: clusterGroupName
+      - description: Upstream git repo containing the pattern to deploy. Used when
+          in-cluster fork to point to the upstream pattern repository
+        displayName: Origin Repo
+        path: gitSpec.originRepo
+      - displayName: Git Config
+        path: gitSpec
+      - description: Branch, tag or commit in the upstream git repository. Does not
+          support short-sha's. Default to HEAD
+        displayName: Origin Revision
+        path: gitSpec.originRevision
+      - description: 'Interval in seconds to poll for drifts between origin and target
+          repositories. Default: 180 seconds'
+        displayName: Poll Interval
+        path: gitSpec.pollInterval
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - displayName: Multi Source Config
+        path: multiSourceConfig
+      - description: '.Name is dot separated per the helm --set syntax, such as: global.something.field'
+        displayName: Extra Parameters
+        path: extraParameters
+      - description: Optional. FQDN of the git server if automatic parsing from TargetRepo
+          is broken
+        displayName: Hostname
+        path: gitSpec.hostname
+      - description: URLs to additional Helm parameter files
+        displayName: Extra Value Files
+        path: extraValueFiles
+      - description: Optional. K8s secret name where the info for connecting to git
+          can be found. The supported secrets are modeled after the private repositories
+          in argo (https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repositories)
+          currently ssh and username+password are supported
+        displayName: Token Secret
+        path: gitSpec.tokenSecret
+      - displayName: Git Ops Config
+        path: gitOpsSpec
+      - description: Optional. K8s secret namespace where the token for connecting
+          to git can be found
+        displayName: Token Secret Namespace
+        path: gitSpec.tokenSecretNamespace
+      - description: The helm chart url to fetch the helm charts from in order to
+          deploy the pattern. Defaults to https://charts.validatedpatterns.io/
+        displayName: Helm Repo Url
+        path: multiSourceConfig.helmRepoUrl
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+      - description: Analytics UUID. Leave empty to autogenerate a random one. Not
+          PII information
+        displayName: Analytics UUID
+        path: analyticsUUID
+      - description: Which chart version for the clustergroup helm chart. Defaults
+          to "0.8.*"
+        displayName: Cluster Group Chart Version
+        path: multiSourceConfig.clusterGroupChartVersion
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+      - description: (EXPERIMENTAL) Enable multi-source support when deploying the
+          clustergroup argo application
+        displayName: Enabled
+        path: multiSourceConfig.enabled
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: The url when deploying the clustergroup helm chart directly from
+          a git repo Defaults to '' which means not used (Only used when developing
+          the clustergroup helm chart)
+        displayName: Cluster Group Git Repo Url
+        path: multiSourceConfig.clusterGroupGitRepoUrl
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+      - description: The git reference when deploying the clustergroup helm chart
+          directly from a git repo Defaults to 'main'. (Only used when developing
+          the clustergroup helm chart)
+        displayName: Cluster Group Chart Git Revision
+        path: multiSourceConfig.clusterGroupChartGitRevision
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:multiSourceConfig.enabled:true
+      - description: 'Require manual intervention before Argo will sync new content.
+          Default: False'
+        displayName: Manual Sync
+        path: gitOpsSpec.manualSync
+      statusDescriptors:
+      - displayName: Analytics Sent
+        path: analyticsSent
+      - displayName: Analytics UUID
+        path: analyticsUUID
+      - displayName: App Cluster Domain
+        path: appClusterDomain
+      - displayName: Cluster Domain
+        path: clusterDomain
+      - displayName: Cluster ID
+        path: clusterID
+      - displayName: Cluster Name
+        path: clusterName
+      - displayName: Cluster Platform
+        path: clusterPlatform
+      - displayName: Cluster Version
+        path: clusterVersion
+      - description: Last error encountered by the pattern
+        displayName: Last Error
+        path: lastError
+      - description: Last action related to the pattern
+        displayName: Last Step
+        path: lastStep
+      - displayName: Local Checkout Path
+        path: path
+      - description: Number of updates to the pattern
+        displayName: Version
+        path: version
+      version: v1alpha1
+  description: Deploys and manages architecture patterns from https://validatedpatterns.io
+  displayName: Validated Patterns Operator
+  icon:
+  - base64data: iVBORw0KGgoAAAANSUhEUgAAAMgAAADIAgMAAADQNkYNAAAAAXNSR0IArs4c6QAAAAxQTFRF+/v7IWSdx3A4LDpGRm1eQgAAAnhJREFUaN7t2Ltt5TAQhWFzBcGAE0WKnbsJqgQFYj1WKQwJVqGSVICA2fu+ehwM52DD1eRf8p+I/Pg477zzzvu3q0aeTDT55Ekz0+SbJ36hyS9PRFjheFKJsJU/edKIsJW/eeJF2Mq/PBFhKzueVFcysbOwpLmSmZ2FJf5KFnYWloiwlR1PqjuZ2Fk40tzJzM7CEX8nCzsLR0TYyo4n1ZNM7CwMaZ5kZmdhiH+ShZ2FISJsZceT6k0mdhY7ad5kZmexE/8mCzuLnYiwlR1PqjWZ2FmspFmTmZ3FSvyaLOwsViLCVnY8qbZkYmexkWZLZnYWG/FbsrCz2IgIW9nxpNqTiZ3FQpo9mdlZLMTvycLOYiEibGXHk+pIJnaWMmmOZGZnKRN/JAs7C/+OKd8fNFWBgI8B16nkC5C6QCIgvUp+AGkLJAEyqCQDEgokAxLUxoC4IhkB0Sp/AVIXSQREq/wDSFskCZBBbXwkoUgyIEFtfCDOQEZAOq3xgdQGEgHptcYH0hpIAmRQG+9JMJAMSFAb74gzkRGQTmu8I7WJREB6rfGOtCaSABnUxlsSTCQDEtTGG+KMZASk0xpvSG0kEZBea7whrZEkQAa18ZoEI8mABLXxijgzGQHptMYrUptJBKTXGq9IayYJkEFt/CbBTDIgQW38Io4gIyCd1vhFaoJEQHqt8Yu0BEmADGrjJwkEyYAEtfGDOIqMgHRa4wepKRIB6bXGD9JSJAEyqI3vJFAkAxLUxjfiSDIC0mmNb6QmSQSk1xrfSEuSBMigNr6SQJIMSFAbX4ijyQhIpzW+kJomEZBea3whLU0SIIPaOKcQCsOcd955/9f9BYUNIA2v1ub2AAAAAElFTkSuQmCC
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+          - list
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - create
+          - get
+          - update
+          - watch
+        - apiGroups:
+          - argoproj.io
+          resources:
+          - applications
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - clusterversions
+          verbs:
+          - get
+          - list
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - infrastructures
+          verbs:
+          - get
+          - list
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - ingresses
+          verbs:
+          - get
+          - list
+        - apiGroups:
+          - gitops.hybrid-cloud-patterns.io
+          resources:
+          - patterns
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - gitops.hybrid-cloud-patterns.io
+          resources:
+          - patterns/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - gitops.hybrid-cloud-patterns.io
+          resources:
+          - patterns/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - operator.open-cluster-management.io
+          resources:
+          - multiclusterhubs
+          verbs:
+          - get
+          - list
+        - apiGroups:
+          - operator.openshift.io
+          resources:
+          - openshiftcontrollermanagers
+          verbs:
+          - get
+          - list
+        - apiGroups:
+          - operators.coreos.com
+          resources:
+          - subscriptions
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: patterns-operator-controller-manager
+      deployments:
+      - label:
+          control-plane: controller-manager
+        name: patterns-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=10
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources: {}
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                command:
+                - /manager
+                image: quay.io/hybridcloudpatterns/patterns-operator:0.0.36
+                imagePullPolicy: IfNotPresent
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 256Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: patterns-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: patterns-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - Validated
+  - Pattern
+  - Blueprint
+  - Architecture
+  links:
+  - name: Hybrid Cloud Patterns
+    url: https://validatedpatterns.io
+  maintainers:
+  - email: hybrid-cloud-patterns@googlegroups.com
+    name: patterns-team
+  maturity: alpha
+  provider:
+    name: Red Hat
+    url: https://www.redhat.com/en/products/edge/validated-patterns
+  version: 0.0.36

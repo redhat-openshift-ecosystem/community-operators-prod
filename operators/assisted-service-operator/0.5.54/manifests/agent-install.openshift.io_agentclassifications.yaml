@@ -1,0 +1,105 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.6.2
+  creationTimestamp: null
+  name: agentclassifications.agent-install.openshift.io
+spec:
+  group: agent-install.openshift.io
+  names:
+    kind: AgentClassification
+    listKind: AgentClassificationList
+    plural: agentclassifications
+    singular: agentclassification
+  scope: Namespaced
+  versions:
+  - name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: AgentClassification is the Schema for the AgentClassifications
+          API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AgentClassificationSpec defines the desired state of AgentClassification
+            properties:
+              labelKey:
+                description: LabelKey specifies the label key to apply to matched
+                  Agents
+                type: string
+              labelValue:
+                description: LabelValue specifies the label value to apply to matched
+                  Agents
+                type: string
+              query:
+                description: Query is in gojq format (https://github.com/itchyny/gojq#difference-to-jq)
+                  and will be invoked on each Agent's inventory. The query should
+                  return a boolean. The operator will apply the label to any Agent
+                  for which "true" is returned.
+                type: string
+            required:
+            - labelKey
+            - labelValue
+            - query
+            type: object
+          status:
+            description: AgentClassificationStatus defines the observed state of AgentClassification
+            properties:
+              conditions:
+                items:
+                  description: Condition represents the state of the operator's reconciliation
+                    functionality.
+                  properties:
+                    lastHeartbeatTime:
+                      format: date-time
+                      type: string
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    message:
+                      type: string
+                    reason:
+                      type: string
+                    status:
+                      type: string
+                    type:
+                      description: ConditionType is the state of the operator's reconciliation
+                        functionality.
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+              errorCount:
+                description: ErrorCount shows how many Agents encountered errors when
+                  matching the classification
+                type: integer
+              matchedCount:
+                description: MatchedCount shows how many Agents currently match the
+                  classification
+                type: integer
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

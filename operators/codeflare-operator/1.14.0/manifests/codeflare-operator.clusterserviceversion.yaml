@@ -1,0 +1,613 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+    categories: AI/Machine Learning, Big Data
+    containerImage: quay.io/project-codeflare/codeflare-operator:v1.14.0
+    createdAt: "2025-01-21T17:29:57Z"
+    operatorframework.io/suggested-namespace: openshift-operators
+    operators.operatorframework.io/builder: operator-sdk-v1.27.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    repository: https://github.com/project-codeflare/codeflare-operator
+    support: Community
+  name: codeflare-operator.v1.14.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: AppWrapper
+      name: appwrappers.workload.codeflare.dev
+      version: v1beta2
+  description: CodeFlare allows you to scale complex pipelines anywhere
+  displayName: CodeFlare Operator
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - nodes
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - mutatingwebhookconfigurations
+          verbs:
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - validatingwebhookconfigurations
+          verbs:
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - apiextensions.k8s.io
+          resources:
+          - customresourcedefinitions
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        - apiGroups:
+          - batch
+          resources:
+          - jobs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - ingresses
+          verbs:
+          - get
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - serviceaccounts
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - dscinitialization.opendatahub.io
+          resources:
+          - dscinitializations
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - kubeflow.org
+          resources:
+          - pytorchjobs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - kueue.x-k8s.io
+          resources:
+          - clusterqueues
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - kueue.x-k8s.io
+          resources:
+          - resourceflavors
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - kueue.x-k8s.io
+          resources:
+          - workloadpriorityclasses
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - kueue.x-k8s.io
+          resources:
+          - workloads
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - kueue.x-k8s.io
+          resources:
+          - workloads/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - kueue.x-k8s.io
+          resources:
+          - workloads/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingresses
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - networkpolicies
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ray.io
+          resources:
+          - rayclusters
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ray.io
+          resources:
+          - rayclusters/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - ray.io
+          resources:
+          - rayclusters/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - ray.io
+          resources:
+          - rayjobs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          - routes/custom-host
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - scheduling.k8s.io
+          resources:
+          - priorityclasses
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - scheduling.sigs.k8s.io
+          resources:
+          - podgroups
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - scheduling.x-k8s.io
+          resources:
+          - podgroups
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - workload.codeflare.dev
+          resources:
+          - appwrappers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - workload.codeflare.dev
+          resources:
+          - appwrappers/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - workload.codeflare.dev
+          resources:
+          - appwrappers/status
+          verbs:
+          - get
+          - patch
+          - update
+        serviceAccountName: codeflare-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/name: codeflare-operator
+          app.kubernetes.io/part-of: codeflare
+        name: codeflare-operator-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: codeflare-operator
+              app.kubernetes.io/part-of: codeflare
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                app.kubernetes.io/name: codeflare-operator
+                app.kubernetes.io/part-of: codeflare
+            spec:
+              containers:
+              - command:
+                - /manager
+                env:
+                - name: NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                image: quay.io/project-codeflare/codeflare-operator:v1.14.0
+                imagePullPolicy: Always
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                ports:
+                - containerPort: 9443
+                  name: webhook-server
+                  protocol: TCP
+                - containerPort: 8080
+                  name: metrics
+                  protocol: TCP
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: "1"
+                    memory: 1Gi
+                  requests:
+                    cpu: "1"
+                    memory: 1Gi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                volumeMounts:
+                - mountPath: /tmp/k8s-webhook-server/serving-certs
+                  name: cert
+                  readOnly: true
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: codeflare-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+              volumes:
+              - name: cert
+                secret:
+                  defaultMode: 420
+                  secretName: codeflare-operator-webhook-server-cert
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: codeflare-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - Pipelines
+  - Scaling
+  - App
+  - Jobs
+  links:
+  - name: Codeflare Operator
+    url: https://codeflare.dev/
+  maintainers:
+  - email: aasthana@redhat.com
+    name: Anish Asthana
+  - email: kpostlet@redhat.com
+    name: Kevin Postlethwait
+  - email: meyceoz@redhat.com
+    name: Mustafa Eyceoz
+  maturity: alpha
+  provider:
+    name: CodeFlare
+    url: https://github.com/project-codeflare
+  replaces: codeflare-operator.v1.13.0
+  version: 1.14.0
+  webhookdefinitions:
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: codeflare-operator-manager
+    failurePolicy: Fail
+    generateName: mappwrapper.kb.io
+    rules:
+    - apiGroups:
+      - workload.codeflare.dev
+      apiVersions:
+      - v1beta2
+      operations:
+      - CREATE
+      resources:
+      - appwrappers
+    sideEffects: None
+    targetPort: 9443
+    type: MutatingAdmissionWebhook
+    webhookPath: /mutate-workload-codeflare-dev-v1beta2-appwrapper
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: codeflare-operator-manager
+    failurePolicy: Fail
+    generateName: mraycluster.ray.openshift.ai
+    rules:
+    - apiGroups:
+      - ray.io
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - rayclusters
+    sideEffects: None
+    targetPort: 9443
+    type: MutatingAdmissionWebhook
+    webhookPath: /mutate-ray-io-v1-raycluster
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: codeflare-operator-manager
+    failurePolicy: Fail
+    generateName: vappwrapper.kb.io
+    rules:
+    - apiGroups:
+      - workload.codeflare.dev
+      apiVersions:
+      - v1beta2
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - appwrappers
+    sideEffects: None
+    targetPort: 9443
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-workload-codeflare-dev-v1beta2-appwrapper
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: codeflare-operator-manager
+    failurePolicy: Fail
+    generateName: vraycluster.ray.openshift.ai
+    rules:
+    - apiGroups:
+      - ray.io
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - rayclusters
+    sideEffects: None
+    targetPort: 9443
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-ray-io-v1-raycluster

@@ -1,0 +1,14 @@
+properties:
+  - type: olm.constraint
+    value:
+      failureMessage: Service Binding Operator is required
+      any:
+        constraints:
+          - failureMessage: Package rh-service-binding-operator is needed
+            package:
+              packageName: rh-service-binding-operator
+              versionRange: ">=1.0.0"
+          - failureMessage: Package service-binding-operator is needed
+            package:
+              packageName: service-binding-operator
+              versionRange: ">=1.0.0"

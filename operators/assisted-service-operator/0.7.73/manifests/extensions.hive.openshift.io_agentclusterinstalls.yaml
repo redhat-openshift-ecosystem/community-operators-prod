@@ -1,0 +1,586 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.6.2
+  creationTimestamp: null
+  name: agentclusterinstalls.extensions.hive.openshift.io
+spec:
+  group: extensions.hive.openshift.io
+  names:
+    kind: AgentClusterInstall
+    listKind: AgentClusterInstallList
+    plural: agentclusterinstalls
+    shortNames:
+    - aci
+    singular: agentclusterinstall
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: The name of the cluster the ACI refers to.
+      jsonPath: .spec.clusterDeploymentRef.name
+      name: Cluster
+      type: string
+    - description: State of the ACI.
+      jsonPath: .status.debugInfo.state
+      name: State
+      type: string
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: AgentClusterInstall represents a request to provision an agent
+          based cluster.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: AgentClusterInstallSpec defines the desired state of the
+              AgentClusterInstall.
+            properties:
+              apiVIP:
+                description: APIVIP is the virtual IP used to reach the OpenShift
+                  cluster's API.
+                type: string
+              apiVIPs:
+                description: APIVIPs are the virtual IPs used to reach the OpenShift
+                  cluster's API. Enter one IP address for single-stack clusters, or
+                  up to two for dual-stack clusters (at most one IP address per IP
+                  stack used). The order of stacks should be the same as order of
+                  subnets in Cluster Networks, Service Networks, and Machine Networks.
+                items:
+                  type: string
+                maxItems: 2
+                type: array
+              clusterDeploymentRef:
+                description: ClusterDeploymentRef is a reference to the ClusterDeployment
+                  associated with this AgentClusterInstall.
+                properties:
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                    type: string
+                type: object
+              clusterMetadata:
+                description: ClusterMetadata contains metadata information about the
+                  installed cluster. It should be populated once the cluster install
+                  is completed. (it can be populated sooner if desired, but Hive will
+                  not copy back to ClusterDeployment until the Installed condition
+                  goes True.
+                properties:
+                  adminKubeconfigSecretRef:
+                    description: AdminKubeconfigSecretRef references the secret containing
+                      the admin kubeconfig for this cluster.
+                    properties:
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
+                        type: string
+                    type: object
+                  adminPasswordSecretRef:
+                    description: AdminPasswordSecretRef references the secret containing
+                      the admin username/password which can be used to login to this
+                      cluster.
+                    properties:
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          TODO: Add other useful fields. apiVersion, kind, uid?'
+                        type: string
+                    type: object
+                  clusterID:
+                    description: ClusterID is a globally unique identifier for this
+                      cluster generated during installation. Used for reporting metrics
+                      among other places.
+                    type: string
+                  infraID:
+                    description: InfraID is an identifier for this cluster generated
+                      during installation and used for tagging/naming resources in
+                      cloud providers.
+                    type: string
+                required:
+                - adminKubeconfigSecretRef
+                - clusterID
+                - infraID
+                type: object
+              compute:
+                description: Compute is the configuration for the machines that comprise
+                  the compute nodes.
+                items:
+                  description: AgentMachinePool is a pool of machines to be installed.
+                  properties:
+                    hyperthreading:
+                      default: Enabled
+                      description: Hyperthreading determines the mode of hyperthreading
+                        that machines in the pool will utilize. Default is for hyperthreading
+                        to be enabled.
+                      enum:
+                      - ""
+                      - Enabled
+                      - Disabled
+                      type: string
+                    name:
+                      description: Name is the name of the machine pool. For the control
+                        plane machine pool, the name will always be "master". For
+                        the compute machine pools, the only valid name is "worker".
+                      type: string
+                  required:
+                  - name
+                  type: object
+                type: array
+              controlPlane:
+                description: ControlPlane is the configuration for the machines that
+                  comprise the control plane.
+                properties:
+                  hyperthreading:
+                    default: Enabled
+                    description: Hyperthreading determines the mode of hyperthreading
+                      that machines in the pool will utilize. Default is for hyperthreading
+                      to be enabled.
+                    enum:
+                    - ""
+                    - Enabled
+                    - Disabled
+                    type: string
+                  name:
+                    description: Name is the name of the machine pool. For the control
+                      plane machine pool, the name will always be "master". For the
+                      compute machine pools, the only valid name is "worker".
+                    type: string
+                required:
+                - name
+                type: object
+              diskEncryption:
+                description: DiskEncryption is the configuration to enable/disable
+                  disk encryption for cluster nodes.
+                properties:
+                  enableOn:
+                    default: none
+                    description: Enable/disable disk encryption on master nodes, worker
+                      nodes, or all nodes.
+                    enum:
+                    - none
+                    - all
+                    - masters
+                    - workers
+                    type: string
+                  mode:
+                    description: The disk encryption mode to use.
+                    enum:
+                    - tpmv2
+                    - tang
+                    type: string
+                  tangServers:
+                    description: JSON-formatted string containing additional information
+                      regarding tang's configuration
+                    type: string
+                type: object
+              external:
+                description: ExternalPlatformSpec represents generic infrastructure
+                  provider. Platform-specific components should be supplemented separately.
+                properties:
+                  cloudControllerManager:
+                    allOf:
+                    - enum:
+                      - ""
+                      - BareMetal
+                      - None
+                      - VSphere
+                      - Nutanix
+                      - External
+                    - enum:
+                      - ""
+                      - External
+                    default: ""
+                    description: CloudControllerManager when set to external, this
+                      property will enable an external cloud provider.
+                    type: string
+                  platformName:
+                    default: Unknown
+                    description: PlatformName holds the arbitrary string representing
+                      the infrastructure provider name, expected to be set at the
+                      installation time. This field is solely for informational and
+                      reporting purposes and is not expected to be used for decision-making.
+                    type: string
+                type: object
+              holdInstallation:
+                description: HoldInstallation will prevent installation from happening
+                  when true. Inspection and validation will proceed as usual, but
+                  once the RequirementsMet condition is true, installation will not
+                  begin until this field is set to false.
+                type: boolean
+              ignitionEndpoint:
+                description: IgnitionEndpoint stores the data of the custom ignition
+                  endpoint.
+                properties:
+                  caCertificateReference:
+                    description: CaCertificateReference is a reference to the secret
+                      containing CA certificate to be used when contacting the URL
+                      via HTTPS.
+                    properties:
+                      name:
+                        description: Name is the name of the secret containing the
+                          CA certificate.
+                        type: string
+                      namespace:
+                        description: Namespace is the namespace of the secret containing
+                          the CA certificate base64 encoded.
+                        type: string
+                    required:
+                    - name
+                    - namespace
+                    type: object
+                  url:
+                    description: Url stores the URL of the custom ignition endpoint.
+                    type: string
+                type: object
+              imageSetRef:
+                description: ImageSetRef is a reference to a ClusterImageSet. The
+                  release image specified in the ClusterImageSet will be used to install
+                  the cluster.
+                properties:
+                  name:
+                    description: Name is the name of the ClusterImageSet that this
+                      refers to
+                    type: string
+                required:
+                - name
+                type: object
+              ingressVIP:
+                description: IngressVIP is the virtual IP used for cluster ingress
+                  traffic.
+                type: string
+              ingressVIPs:
+                description: IngressVIPs are the virtual IPs used for cluster ingress
+                  traffic. Enter one IP address for single-stack clusters, or up to
+                  two for dual-stack clusters (at most one IP address per IP stack
+                  used). The order of stacks should be the same as order of subnets
+                  in Cluster Networks, Service Networks, and Machine Networks.
+                items:
+                  type: string
+                maxItems: 2
+                type: array
+              manifestsConfigMapRef:
+                description: 'ManifestsConfigMapRef is a reference to user-provided
+                  manifests to add to or replace manifests that are generated by the
+                  installer. Deprecated: this field is ignored when ManifestsConfigMapRefs
+                  is set.'
+                properties:
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                      TODO: Add other useful fields. apiVersion, kind, uid?'
+                    type: string
+                type: object
+              manifestsConfigMapRefs:
+                description: ManifestsConfigMapRefs is an array of references to user-provided
+                  manifests ConfigMaps to add to or replace manifests that are generated
+                  by the installer. Manifest names in each ConfigMap should be unique
+                  across all referenced ConfigMaps.
+                items:
+                  description: ManifestsConfigMapReference is a reference to a manifests
+                    ConfigMap
+                  properties:
+                    name:
+                      description: Name is the name of the ConfigMap that this refers
+                        to
+                      type: string
+                  required:
+                  - name
+                  type: object
+                type: array
+              mastersSchedulable:
+                description: Set to true to allow control plane nodes to be schedulable
+                type: boolean
+              networking:
+                description: Networking is the configuration for the pod network provider
+                  in the cluster.
+                properties:
+                  clusterNetwork:
+                    description: ClusterNetwork is the list of IP address pools for
+                      pods. Default is 10.128.0.0/14 and a host prefix of /23.
+                    items:
+                      description: ClusterNetworkEntry is a single IP address block
+                        for pod IP blocks. IP blocks are allocated with size 2^HostSubnetLength.
+                      properties:
+                        cidr:
+                          description: CIDR is the IP block address pool.
+                          type: string
+                        hostPrefix:
+                          description: HostPrefix is the prefix size to allocate to
+                            each node from the CIDR. For example, 24 would allocate
+                            2^8=256 adresses to each node. If this field is not used
+                            by the plugin, it can be left unset.
+                          format: int32
+                          type: integer
+                      required:
+                      - cidr
+                      type: object
+                    type: array
+                  machineNetwork:
+                    description: MachineNetwork is the list of IP address pools for
+                      machines.
+                    items:
+                      description: MachineNetworkEntry is a single IP address block
+                        for node IP blocks.
+                      properties:
+                        cidr:
+                          description: CIDR is the IP block address pool for machines
+                            within the cluster.
+                          type: string
+                      required:
+                      - cidr
+                      type: object
+                    type: array
+                  networkType:
+                    description: NetworkType is the Container Network Interface (CNI)
+                      plug-in to install The default value is OpenShiftSDN for IPv4,
+                      and OVNKubernetes for IPv6 or SNO
+                    enum:
+                    - OpenShiftSDN
+                    - OVNKubernetes
+                    type: string
+                  serviceNetwork:
+                    description: ServiceNetwork is the list of IP address pools for
+                      services. Default is 172.30.0.0/16.
+                    items:
+                      type: string
+                    type: array
+                  userManagedNetworking:
+                    description: UserManagedNetworking indicates if the networking
+                      is managed by the user. For single-node installations (none
+                      or external platform), set to true or leave empty.
+                    type: boolean
+                type: object
+              platformType:
+                description: PlatformType is the name for the specific platform upon
+                  which to perform the installation.
+                enum:
+                - ""
+                - BareMetal
+                - None
+                - VSphere
+                - Nutanix
+                - External
+                type: string
+              provisionRequirements:
+                description: ProvisionRequirements defines configuration for when
+                  the installation is ready to be launched automatically.
+                properties:
+                  controlPlaneAgents:
+                    description: ControlPlaneAgents is the number of matching approved
+                      and ready Agents with the control plane role required to launch
+                      the install. Must be either 1 or 3.
+                    type: integer
+                  workerAgents:
+                    description: WorkerAgents is the minimum number of matching approved
+                      and ready Agents with the worker role required to launch the
+                      install.
+                    minimum: 0
+                    type: integer
+                required:
+                - controlPlaneAgents
+                type: object
+              proxy:
+                description: Proxy defines the proxy settings used for the install
+                  config
+                properties:
+                  httpProxy:
+                    description: HTTPProxy is the URL of the proxy for HTTP requests.
+                    type: string
+                  httpsProxy:
+                    description: HTTPSProxy is the URL of the proxy for HTTPS requests.
+                    type: string
+                  noProxy:
+                    description: NoProxy is a comma-separated list of domains and
+                      CIDRs for which the proxy should not be used.
+                    type: string
+                type: object
+              sshPublicKey:
+                description: SSHPublicKey will be added to all cluster hosts for use
+                  in debugging.
+                type: string
+            required:
+            - clusterDeploymentRef
+            - networking
+            - provisionRequirements
+            type: object
+          status:
+            description: AgentClusterInstallStatus defines the observed state of the
+              AgentClusterInstall.
+            properties:
+              apiVIP:
+                description: APIVIP is the virtual IP used to reach the OpenShift
+                  cluster's API.
+                type: string
+              apiVIPs:
+                description: APIVIPs are the virtual IPs used to reach the OpenShift
+                  cluster's API.
+                items:
+                  type: string
+                maxItems: 2
+                type: array
+              conditions:
+                description: Conditions includes more detailed status for the cluster
+                  install.
+                items:
+                  description: ClusterInstallCondition contains details for the current
+                    condition of a cluster install.
+                  properties:
+                    lastProbeTime:
+                      description: LastProbeTime is the last time we probed the condition.
+                      format: date-time
+                      type: string
+                    lastTransitionTime:
+                      description: LastTransitionTime is the last time the condition
+                        transitioned from one status to another.
+                      format: date-time
+                      type: string
+                    message:
+                      description: Message is a human-readable message indicating
+                        details about last transition.
+                      type: string
+                    reason:
+                      description: Reason is a unique, one-word, CamelCase reason
+                        for the condition's last transition.
+                      type: string
+                    status:
+                      description: Status is the status of the condition.
+                      type: string
+                    type:
+                      description: Type is the type of the condition.
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+              connectivityMajorityGroups:
+                type: string
+              controlPlaneAgentsDiscovered:
+                description: ControlPlaneAgentsDiscovered is the number of Agents
+                  currently linked to this ClusterDeployment.
+                type: integer
+              controlPlaneAgentsReady:
+                description: ControlPlaneAgentsDiscovered is the number of Agents
+                  currently linked to this ClusterDeployment that are ready for use.
+                type: integer
+              debugInfo:
+                description: DebugInfo includes information for debugging the installation
+                  process.
+                properties:
+                  eventsURL:
+                    description: EventsURL specifies an HTTP/S URL that contains events
+                      which occurred during the cluster installation process
+                    type: string
+                  logsURL:
+                    description: LogsURL specifies a url for download controller logs
+                      tar file.
+                    type: string
+                  state:
+                    description: Current state of the AgentClusterInstall
+                    type: string
+                  stateInfo:
+                    description: Additional information pertaining to the status of
+                      the AgentClusterInstall
+                    type: string
+                type: object
+              ingressVIP:
+                description: IngressVIP is the virtual IP used for cluster ingress
+                  traffic.
+                type: string
+              ingressVIPs:
+                description: IngressVIPs are the virtual IPs used for cluster ingress
+                  traffic.
+                items:
+                  type: string
+                maxItems: 2
+                type: array
+              machineNetwork:
+                description: MachineNetwork is the list of IP address pools for machines.
+                items:
+                  description: MachineNetworkEntry is a single IP address block for
+                    node IP blocks.
+                  properties:
+                    cidr:
+                      description: CIDR is the IP block address pool for machines
+                        within the cluster.
+                      type: string
+                  required:
+                  - cidr
+                  type: object
+                type: array
+              platformType:
+                description: PlatformType is the name for the specific platform upon
+                  which to perform the installation.
+                enum:
+                - ""
+                - BareMetal
+                - None
+                - VSphere
+                - Nutanix
+                - External
+                type: string
+              progress:
+                description: Progress shows the installation progress of the cluster
+                properties:
+                  totalPercentage:
+                    description: Estimated installation progress (in percentage)
+                    format: int64
+                    type: integer
+                required:
+                - totalPercentage
+                type: object
+              userManagedNetworking:
+                description: UserManagedNetworking indicates if the networking is
+                  managed by the user.
+                type: boolean
+              validationsInfo:
+                additionalProperties:
+                  items:
+                    properties:
+                      id:
+                        type: string
+                      message:
+                        type: string
+                      status:
+                        type: string
+                    required:
+                    - id
+                    - message
+                    - status
+                    type: object
+                  type: array
+                description: ValidationsInfo is a JSON-formatted string containing
+                  the validation results for each validation id grouped by category
+                  (network, hosts-data, etc.)
+                type: object
+              workerAgentsDiscovered:
+                description: WorkerAgentsDiscovered is the number of worker Agents
+                  currently linked to this ClusterDeployment.
+                type: integer
+              workerAgentsReady:
+                description: WorkerAgentsDiscovered is the number of worker Agents
+                  currently linked to this ClusterDeployment that are ready for use.
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

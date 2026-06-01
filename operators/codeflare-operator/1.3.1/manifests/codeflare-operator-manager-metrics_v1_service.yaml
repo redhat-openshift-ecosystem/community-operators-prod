@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/name: codeflare-operator
+    app.kubernetes.io/part-of: codeflare
+  name: codeflare-operator-manager-metrics
+spec:
+  ports:
+  - name: metrics
+    port: 8080
+    protocol: TCP
+    targetPort: metrics
+  selector:
+    app.kubernetes.io/name: codeflare-operator
+    app.kubernetes.io/part-of: codeflare
+status:
+  loadBalancer: {}

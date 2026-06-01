@@ -1,0 +1,402 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "cxl.antline.com/v1",
+          "kind": "CXL",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "cxl-operator",
+              "app.kubernetes.io/instance": "cxl-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "cxl",
+              "app.kubernetes.io/part-of": "cxl-operator"
+            },
+            "name": "cxl-1"
+          },
+          "spec": null
+        }
+      ]
+    capabilities: Basic Install
+    categories: Integration & Delivery
+    containerImage: quay.io/rasen708/ncn-operator:v0.3.0
+    createdAt: "2024-07-11T03:55:14Z"
+    description: Provides the ncn extend
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0-ocp
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    repository: https://github.com/antline.com/ncn-operator
+    support: Antline
+    # console.openshift.io/plugins: '["cxl-console-plugin"]'
+  name: ncn-operator.v0.3.14
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: CXL is the Schema for the cxls API
+      displayName: CXL
+      kind: CXL
+      name: cxls.cxl.antline.com
+      version: v1
+    - description: Label is the Schema for the labels API
+      displayName: Label
+      kind: Label
+      name: labels.cxl.antline.com
+      version: v1
+  description: This operator is for ncn extend
+  displayName: ncn-operator
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - apps
+          resources:
+          - daemonsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - replicasets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+        - apiGroups:
+          - ""
+          resources:
+          - endpoints
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+        - apiGroups:
+          - ""
+          resources:
+          - nodes
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - serviceaccounts
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+        - apiGroups:
+          - ""
+          resources:
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+        - apiGroups:
+          - cxl.antline.com
+          resources:
+          - cxls
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - cxl.antline.com
+          resources:
+          - cxls/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - cxl.antline.com
+          resources:
+          - cxls/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - machineconfiguration.openshift.io
+          resources:
+          - machineconfigs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - operators.coreos.com
+          resources:
+          - clusterserviceversions
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - rbac
+          resources:
+          - clusterrolebindings
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+        - apiGroups:
+          - rbac
+          resources:
+          - clusterroles
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: cxl-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/component: manager
+          app.kubernetes.io/created-by: cxl-operator
+          app.kubernetes.io/instance: controller-manager
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: deployment
+          app.kubernetes.io/part-of: cxl-operator
+          control-plane: controller-manager
+        name: cxl-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - amd64
+                        - arm64
+                        - ppc64le
+                        - s390x
+                      - key: kubernetes.io/os
+                        operator: In
+                        values:
+                        - linux
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.14
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 5m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                command:
+                - /manager
+                env:
+                - name: OPER_PROPS
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['operatorframework.io/properties']
+                - name: OPER_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['olm.operatorNamespace']
+                image: quay.io/rasen708/ncn-operator:v0.3.14
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                startupProbe:
+                  failureThreshold: 30
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  periodSeconds: 10
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: cxl-operator-controller-manager
+              terminationGracePeriodSeconds: 30
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: cxl-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - ncn
+  - memory
+  - extend
+  links:
+  - name: NCN Operator
+    url: https://ncn-operator.domain
+  maintainers:
+  - email: jwahn@antlinesoft.com
+    name: Antline-Soft
+  maturity: alpha
+  provider:
+    name: Antline
+  replaces: ncn-operator.v0.3.2
+  version: 0.3.14

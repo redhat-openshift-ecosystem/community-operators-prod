@@ -1,0 +1,1010 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "dbaas.redhat.com/v1beta1",
+          "kind": "DBaaSConnection",
+          "metadata": {
+            "name": "dbaasconnection-example"
+          },
+          "spec": {
+            "databaseServiceID": "instance-example",
+            "databaseServiceType": "instance",
+            "inventoryRef": {
+              "name": "inventory-example",
+              "namespace": "openshift-dbaas-operator"
+            }
+          }
+        },
+        {
+          "apiVersion": "dbaas.redhat.com/v1beta1",
+          "kind": "DBaaSInstance",
+          "metadata": {
+            "name": "dbaasinstance-sample"
+          },
+          "spec": {
+            "cloudProvider": "AWS",
+            "cloudRegion": "US_EAST_1",
+            "inventoryRef": {
+              "name": "inventory-example",
+              "namespace": "openshift-dbaas-operator"
+            },
+            "name": "my-cluster-free"
+          }
+        },
+        {
+          "apiVersion": "dbaas.redhat.com/v1beta1",
+          "kind": "DBaaSInventory",
+          "metadata": {
+            "name": "inventory-example"
+          },
+          "spec": {
+            "credentialsRef": {
+              "name": "dbaas-vendor-credentials"
+            },
+            "providerRef": {
+              "name": "provider-example-registration"
+            }
+          }
+        },
+        {
+          "apiVersion": "dbaas.redhat.com/v1beta1",
+          "kind": "DBaaSPolicy",
+          "metadata": {
+            "name": "dbaaspolicy-sample"
+          },
+          "spec": {
+            "disableProvisions": false
+          }
+        },
+        {
+          "apiVersion": "dbaas.redhat.com/v1beta1",
+          "kind": "DBaaSProvider",
+          "metadata": {
+            "labels": {
+              "related-to": "dbaas-operator",
+              "type": "dbaas-provider-registration"
+            },
+            "name": "provider-example-registration"
+          },
+          "spec": {
+            "allowsFreeTrial": true,
+            "connectionKind": "ProviderConnection",
+            "credentialFields": [
+              {
+                "displayName": "ProviderAPIKeyD",
+                "helpText": "This is the API Key for the example provider to show on UI",
+                "key": "APIKey",
+                "required": true,
+                "type": "maskedstring"
+              }
+            ],
+            "externalProvisionDescription": "Follow the guide to start a free Provider Serverless (beta) cluster",
+            "externalProvisionURL": "https://www.exmample.com/docs/provider/quickstart.html",
+            "groupVersion": "dbaas.redhat.com/v1beta1",
+            "instanceKind": "ProviderInstance",
+            "inventoryKind": "ProviderInventory",
+            "provider": {
+              "displayDescription": "This is an example for providers on how to implement their operator to integrate with DBaaS.",
+              "displayName": "DBaaS Provider Example ",
+              "icon": {
+                "base64data": "SGVsbG8sIHdvcmxkLg==",
+                "mediatype": "image/png"
+              },
+              "name": "Provider Example"
+            },
+            "provisioningParameters": {
+              "cloudProvider": {
+                "conditionalData": [
+                  {
+                    "defaultValue": "GCP",
+                    "dependencies": [
+                      {
+                        "field": "plan",
+                        "value": "FREETRIAL"
+                      }
+                    ],
+                    "options": [
+                      {
+                        "displayValue": "Google Cloud Platform",
+                        "value": "GCP"
+                      }
+                    ]
+                  },
+                  {
+                    "defaultValue": "AWS",
+                    "dependencies": [
+                      {
+                        "field": "plan",
+                        "value": "SERVERLESS"
+                      }
+                    ],
+                    "options": [
+                      {
+                        "displayValue": "Amazon Web Services",
+                        "value": "AWS"
+                      },
+                      {
+                        "displayValue": "Google Cloud Platform",
+                        "value": "GCP"
+                      }
+                    ]
+                  },
+                  {
+                    "defaultValue": "AWS",
+                    "dependencies": [
+                      {
+                        "field": "plan",
+                        "value": "DEDICATED"
+                      }
+                    ],
+                    "options": [
+                      {
+                        "displayValue": "Amazon Web Services",
+                        "value": "AWS"
+                      },
+                      {
+                        "displayValue": "Google Cloud Platform",
+                        "value": "GCP"
+                      }
+                    ]
+                  }
+                ],
+                "displayName": "Cloud Provider"
+              },
+              "dedicatedLocationLabel": {
+                "displayName": "Select regions \u0026 nodes",
+                "helpText": "Select the geographical region where you want the database instance to run, and set the number of nodes you want running in this dedicated cluster."
+              },
+              "hardwareLabel": {
+                "displayName": "Hardware per node",
+                "helpText": "Select the compute and storage requirements for this database instance."
+              },
+              "machineType": {
+                "conditionalData": [
+                  {
+                    "defaultValue": "m5.large",
+                    "dependencies": [
+                      {
+                        "field": "plan",
+                        "value": "DEDICATED"
+                      },
+                      {
+                        "field": "cloudProvider",
+                        "value": "AWS"
+                      }
+                    ],
+                    "options": [
+                      {
+                        "displayValue": "2 vCPU, 8 GiB RAM",
+                        "value": "m5.large"
+                      },
+                      {
+                        "displayValue": "4 vCPU, 16 GiB RAM",
+                        "value": "m5.xlarge"
+                      },
+                      {
+                        "displayValue": "8 vCPU, 32 GiB RAM",
+                        "value": "m5.2xlarge"
+                      },
+                      {
+                        "displayValue": "16 vCPU, 64 GiB RAM",
+                        "value": "m5.4xlarge"
+                      },
+                      {
+                        "displayValue": "32 vCPU, 128 GiB RAM",
+                        "value": "m5.8xlarge"
+                      }
+                    ]
+                  },
+                  {
+                    "defaultValue": "n1-standard-2",
+                    "dependencies": [
+                      {
+                        "field": "plan",
+                        "value": "DEDICATED"
+                      },
+                      {
+                        "field": "cloudProvider",
+                        "value": "GCP"
+                      }
+                    ],
+                    "options": [
+                      {
+                        "displayValue": "2 vCPU, 7.5 GiB RAM",
+                        "value": "n1-standard-2"
+                      },
+                      {
+                        "displayValue": "4 vCPU, 15 GiB RAM",
+                        "value": "n1-standard-4"
+                      },
+                      {
+                        "displayValue": "8 vCPU, 30 GiB RAM",
+                        "value": "n1-standard-8"
+                      },
+                      {
+                        "displayValue": "16 vCPU, 60 GiB RAM",
+                        "value": "n1-standard-16"
+                      },
+                      {
+                        "displayValue": "32 vCPU, 120 GiB RAM",
+                        "value": "n1-standard-32"
+                      }
+                    ]
+                  }
+                ],
+                "displayName": "Compute"
+              },
+              "name": {
+                "displayName": "Cluster name"
+              },
+              "nodes": {
+                "displayName": "nodes"
+              },
+              "plan": {
+                "conditionalData": [
+                  {
+                    "defaultValue": "SERVERLESS",
+                    "options": [
+                      {
+                        "displayValue": "Free trial",
+                        "value": "FREETRIAL"
+                      },
+                      {
+                        "displayValue": "Serverless",
+                        "value": "SERVERLESS"
+                      },
+                      {
+                        "displayValue": "Dedicated",
+                        "value": "DEDICATED"
+                      }
+                    ]
+                  }
+                ],
+                "displayName": "Hosting plan"
+              },
+              "planLabel": {
+                "displayName": "Select a plan"
+              },
+              "regions": {
+                "displayName": "us-west-2"
+              },
+              "serverlessLocationLabel": {
+                "displayName": "Select regions",
+                "helpText": "Select the geographical region where you want the database instance to run."
+              },
+              "spendLimit": {
+                "conditionalData": [
+                  {
+                    "defaultValue": "0",
+                    "dependencies": [
+                      {
+                        "field": "plan",
+                        "value": "SERVERLESS"
+                      }
+                    ]
+                  }
+                ],
+                "displayName": "Spend limit"
+              },
+              "spendLimitLabel": {
+                "displayName": "Spend limit",
+                "helpText": "Set a spending limit on resources for this database instance."
+              },
+              "storageGib": {
+                "conditionalData": [
+                  {
+                    "defaultValue": "15",
+                    "dependencies": [
+                      {
+                        "field": "plan",
+                        "value": "DEDICATED"
+                      },
+                      {
+                        "field": "cloudProvider",
+                        "value": "AWS"
+                      }
+                    ],
+                    "options": [
+                      {
+                        "displayValue": "15 GiB",
+                        "value": "15"
+                      },
+                      {
+                        "displayValue": "35 GiB",
+                        "value": "35"
+                      },
+                      {
+                        "displayValue": "75 GiB",
+                        "value": "75"
+                      },
+                      {
+                        "displayValue": "150 GiB",
+                        "value": "150"
+                      },
+                      {
+                        "displayValue": "300 GiB",
+                        "value": "300"
+                      },
+                      {
+                        "displayValue": "600 GiB",
+                        "value": "600"
+                      }
+                    ]
+                  },
+                  {
+                    "defaultValue": "15",
+                    "dependencies": [
+                      {
+                        "field": "plan",
+                        "value": "DEDICATED"
+                      },
+                      {
+                        "field": "cloudProvider",
+                        "value": "GCP"
+                      }
+                    ],
+                    "options": [
+                      {
+                        "displayValue": "15 GiB",
+                        "value": "15"
+                      },
+                      {
+                        "displayValue": "35 GiB",
+                        "value": "35"
+                      },
+                      {
+                        "displayValue": "75 GiB",
+                        "value": "75"
+                      },
+                      {
+                        "displayValue": "150 GiB",
+                        "value": "150"
+                      },
+                      {
+                        "displayValue": "300 GiB",
+                        "value": "300"
+                      },
+                      {
+                        "displayValue": "600 GiB",
+                        "value": "600"
+                      }
+                    ]
+                  }
+                ],
+                "displayName": "Storage"
+              }
+            }
+          }
+        }
+      ]
+    capabilities: Seamless Upgrades
+    categories: Database
+    containerImage: quay.io/ecosystem-appeng/dbaas-operator:v0.5.0
+    description: Discover & connect with database instances hosted on 3rd-party ISV
+      cloud platforms.
+    operatorframework.io/suggested-namespace: openshift-dbaas-operator
+    operators.operatorframework.io/builder: operator-sdk-v1.22.2
+    operators.operatorframework.io/internal-objects: '["dbaasconnections.dbaas.redhat.com","dbaasproviders.dbaas.redhat.com","dbaasplatforms.dbaas.redhat.com","dbaasinstances.dbaas.redhat.com"]'
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+    repository: https://github.com/RHEcosystemAppEng/dbaas-operator
+    support: rhoda-requests@redhat.com
+  name: dbaas-operator.v0.5.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: DBaaSConnection
+      name: dbaasconnections.dbaas.redhat.com
+      version: v1alpha1
+    - description: DBaaSConnection defines the schema for the DBaaSConnection API.
+      displayName: DBaaSConnection
+      kind: DBaaSConnection
+      name: dbaasconnections.dbaas.redhat.com
+      version: v1beta1
+    - kind: DBaaSInstance
+      name: dbaasinstances.dbaas.redhat.com
+      version: v1alpha1
+    - description: DBaaSInstance defines the schema for the DBaaSInstance API.
+      displayName: DBaaSInstance
+      kind: DBaaSInstance
+      name: dbaasinstances.dbaas.redhat.com
+      version: v1beta1
+    - kind: DBaaSInventory
+      name: dbaasinventories.dbaas.redhat.com
+      version: v1alpha1
+    - description: DBaaSInventory defines the schema for the DBaaSInventory API. Inventory
+        objects must be created in a valid namespace, determined by the existence
+        of a DBaaSPolicy object.
+      displayName: Provider Account
+      kind: DBaaSInventory
+      name: dbaasinventories.dbaas.redhat.com
+      version: v1beta1
+    - kind: DBaaSPlatform
+      name: dbaasplatforms.dbaas.redhat.com
+      version: v1alpha1
+    - description: DBaaSPlatform defines the schema for the DBaaSPlatform API.
+      displayName: DBaaSPlatform
+      kind: DBaaSPlatform
+      name: dbaasplatforms.dbaas.redhat.com
+      version: v1beta1
+    - kind: DBaaSPolicy
+      name: dbaaspolicies.dbaas.redhat.com
+      version: v1alpha1
+    - description: DBaaSPolicy enables administrative capabilities within a namespace,
+        and sets a default inventory policy. Policy defaults can be overridden on
+        a per-inventory basis.
+      displayName: Provider Account Policy
+      kind: DBaaSPolicy
+      name: dbaaspolicies.dbaas.redhat.com
+      version: v1beta1
+    - kind: DBaaSProvider
+      name: dbaasproviders.dbaas.redhat.com
+      version: v1alpha1
+    - description: DBaaSProvider defines the schema for the DBaaSProvider API.
+      displayName: DBaaSProvider
+      kind: DBaaSProvider
+      name: dbaasproviders.dbaas.redhat.com
+      version: v1beta1
+  description: |
+    The OpenShift Database Access Operator enables OpenShift users to discover & connect with database instances
+    hosted on 3rd-party ISV cloud platforms such as CrunchyData Bridge & CockroachCloud.
+
+    ## Feedback & Support
+
+    Please contact us at [rhoda-requests@redhat.com](mailto:rhoda-requests@redhat.com)
+
+    For more information on how to use our service, please refer to our [Quick Starts](quickstart?keyword=database).
+  displayName: OpenShift Database Access Operator
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - secrets
+          verbs:
+          - create
+          - get
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - get
+          - patch
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - validatingwebhookconfigurations
+          verbs:
+          - delete
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - apiextensions.k8s.io
+          resources:
+          - customresourcedefinitions
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - daemonsets
+          - deployments
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - create
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - clusterversions
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - consoles
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - infrastructures
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - console.openshift.io
+          resources:
+          - consoleplugins
+          - consolequickstarts
+          verbs:
+          - create
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - resourcequotas
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - resourcequotas/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - ""
+          resources:
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - dbaas.redhat.com
+          resources:
+          - '*'
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - dbaas.redhat.com
+          resources:
+          - '*/finalizers'
+          verbs:
+          - update
+        - apiGroups:
+          - dbaas.redhat.com
+          resources:
+          - '*/status'
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - monitoring.rhobs
+          resources:
+          - monitoringstacks
+          - servicemonitors
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - operator.openshift.io
+          resources:
+          - consoles
+          verbs:
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - operators.coreos.com
+          resources:
+          - catalogsources
+          - operatorgroups
+          verbs:
+          - create
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - operators.coreos.com
+          resources:
+          - clusterserviceversions
+          verbs:
+          - delete
+          - get
+          - update
+        - apiGroups:
+          - operators.coreos.com
+          resources:
+          - clusterserviceversions/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - operators.coreos.com
+          resources:
+          - subscriptions
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: dbaas-operator-controller-manager
+      deployments:
+      - label:
+          control-plane: controller-manager
+        name: dbaas-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+              type: dbaas-operator
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                control-plane: controller-manager
+                type: dbaas-operator
+            spec:
+              containers:
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=0.0.0.0:8080
+                - --leader-elect
+                command:
+                - /manager
+                env:
+                - name: RELATED_IMAGE_DBAAS_DYNAMIC_PLUGIN
+                  value: quay.io/ecosystem-appeng/dbaas-dynamic-plugin:0.5.0
+                - name: CSV_VERSION_DBAAS_DYNAMIC_PLUGIN
+                  value: dbaas-dynamic-plugin:0.5.0
+                - name: RELATED_IMAGE_CRUNCHY_BRIDGE_CATALOG
+                  value: registry.developers.crunchydata.com/crunchydata/crunchy-bridge-operator-catalog:v0.0.6
+                - name: CSV_VERSION_CRUNCHY_BRIDGE
+                  value: crunchy-bridge-operator.v0.0.6
+                - name: RELATED_IMAGE_COCKROACHDB_CATALOG
+                  value: gcr.io/cockroach-shared/ccapi-k8s-operator-catalog:v0.0.5
+                - name: CSV_VERSION_COCKROACHDB
+                  value: ccapi-k8s-operator.v0.0.5
+                - name: RELATED_IMAGE_RDS_PROVIDER_CATALOG
+                  value: quay.io/ecosystem-appeng/rds-dbaas-operator-catalog:v0.4.0
+                - name: CSV_VERSION_RDS_PROVIDER
+                  value: rds-dbaas-operator.v0.4.0
+                - name: INSTALL_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                image: quay.io/ecosystem-appeng/dbaas-operator:v0.5.0
+                imagePullPolicy: Always
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                ports:
+                - containerPort: 9443
+                  name: webhook-server
+                  protocol: TCP
+                - containerPort: 8080
+                  name: metrics
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 20
+                  periodSeconds: 20
+                resources:
+                  limits:
+                    cpu: 200m
+                    memory: 1500Mi
+                  requests:
+                    cpu: 100m
+                    memory: 100Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  readOnlyRootFilesystem: true
+                  runAsNonRoot: true
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=10
+                image: quay.io/openshift/origin-kube-rbac-proxy:4.10.0
+                livenessProbe:
+                  initialDelaySeconds: 5
+                  periodSeconds: 20
+                  tcpSocket:
+                    port: 8080
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                readinessProbe:
+                  initialDelaySeconds: 8
+                  periodSeconds: 20
+                  tcpSocket:
+                    port: 8080
+                resources:
+                  limits:
+                    cpu: 100m
+                    memory: 200Mi
+                  requests:
+                    cpu: 10m
+                    memory: 50Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  readOnlyRootFilesystem: true
+                  runAsNonRoot: true
+              serviceAccountName: dbaas-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: dbaas-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - rhoda
+  - oda
+  - dbaas
+  - database
+  - db
+  - data
+  - access
+  - crunchy
+  - bridge
+  - cockroach
+  - cockroachdb
+  - cloud
+  - ack
+  - amazon
+  - rds
+  - relational
+  links:
+  - name: GitHub
+    url: https://github.com/RHEcosystemAppEng/dbaas-operator
+  maintainers:
+  - email: ecosystem-appeng@redhat.com
+    name: Red Hat Ecosystem App Engineering
+  maturity: stable
+  minKubeVersion: 1.23.0
+  provider:
+    name: OpenShift Database Access
+  relatedImages:
+  - image: quay.io/ecosystem-appeng/dbaas-dynamic-plugin:0.5.0
+    name: dbaas-dynamic-plugin
+  - image: registry.developers.crunchydata.com/crunchydata/crunchy-bridge-operator-catalog:v0.0.6
+    name: crunchy-bridge-catalog
+  - image: gcr.io/cockroach-shared/ccapi-k8s-operator-catalog:v0.0.5
+    name: cockroachdb-catalog
+  - image: quay.io/ecosystem-appeng/rds-dbaas-operator-catalog:v0.4.0
+    name: rds-provider-catalog
+  version: 0.5.0
+  webhookdefinitions:
+  - admissionReviewVersions:
+    - v1alpha1
+    - v1beta1
+    containerPort: 443
+    conversionCRDs:
+    - dbaasconnections.dbaas.redhat.com
+    deploymentName: dbaas-operator-controller-manager
+    generateName: cdbaasconnections.kb.io
+    sideEffects: None
+    targetPort: 9443
+    type: ConversionWebhook
+    webhookPath: /convert
+  - admissionReviewVersions:
+    - v1alpha1
+    - v1beta1
+    containerPort: 443
+    conversionCRDs:
+    - dbaasinstances.dbaas.redhat.com
+    deploymentName: dbaas-operator-controller-manager
+    generateName: cdbaasinstances.kb.io
+    sideEffects: None
+    targetPort: 9443
+    type: ConversionWebhook
+    webhookPath: /convert
+  - admissionReviewVersions:
+    - v1alpha1
+    - v1beta1
+    containerPort: 443
+    conversionCRDs:
+    - dbaasinventories.dbaas.redhat.com
+    deploymentName: dbaas-operator-controller-manager
+    generateName: cdbaasinventories.kb.io
+    sideEffects: None
+    targetPort: 9443
+    type: ConversionWebhook
+    webhookPath: /convert
+  - admissionReviewVersions:
+    - v1alpha1
+    - v1beta1
+    containerPort: 443
+    conversionCRDs:
+    - dbaaspolicies.dbaas.redhat.com
+    deploymentName: dbaas-operator-controller-manager
+    generateName: cdbaaspolicies.kb.io
+    sideEffects: None
+    targetPort: 9443
+    type: ConversionWebhook
+    webhookPath: /convert
+  - admissionReviewVersions:
+    - v1alpha1
+    - v1beta1
+    containerPort: 443
+    conversionCRDs:
+    - dbaasproviders.dbaas.redhat.com
+    deploymentName: dbaas-operator-controller-manager
+    generateName: cdbaasproviders.kb.io
+    sideEffects: None
+    targetPort: 9443
+    type: ConversionWebhook
+    webhookPath: /convert
+  - admissionReviewVersions:
+    - v1beta1
+    containerPort: 443
+    deploymentName: dbaas-operator-controller-manager
+    failurePolicy: Fail
+    generateName: vdbaasconnection.kb.io
+    rules:
+    - apiGroups:
+      - dbaas.redhat.com
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - dbaasconnections
+    sideEffects: None
+    targetPort: 9443
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-dbaas-redhat-com-v1beta1-dbaasconnection
+  - admissionReviewVersions:
+    - v1beta1
+    containerPort: 443
+    deploymentName: dbaas-operator-controller-manager
+    failurePolicy: Fail
+    generateName: vdbaasinventory.kb.io
+    rules:
+    - apiGroups:
+      - dbaas.redhat.com
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - dbaasinventories
+    sideEffects: None
+    targetPort: 9443
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-dbaas-redhat-com-v1beta1-dbaasinventory
+  - admissionReviewVersions:
+    - v1beta1
+    containerPort: 443
+    deploymentName: dbaas-operator-controller-manager
+    failurePolicy: Fail
+    generateName: vdbaaspolicy.kb.io
+    rules:
+    - apiGroups:
+      - dbaas.redhat.com
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - dbaaspolicies
+    sideEffects: None
+    targetPort: 9443
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-dbaas-redhat-com-v1beta1-dbaaspolicy

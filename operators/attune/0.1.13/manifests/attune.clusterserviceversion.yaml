@@ -44,20 +44,13 @@ metadata:
       ]
     categories: "Application Runtime,Monitoring"
     capabilities: Auto Pilot
-    containerImage: ghcr.io/attune-io/attune@sha256:143df78c8d5aa4da769725e239b3964c253a78032def08f18346b6f9ab2e564e
+    containerImage: ghcr.io/attune-io/attune@sha256:d27c05693393c21949ea34402f744d9390ed688e1f8eded62a5aca8c90367907
     createdAt: "2026-06-02T00:00:00Z"
     support: attune-io
     repository: https://github.com/attune-io/attune
     description: Safe, in-place Kubernetes pod resource right-sizing using real Prometheus metrics. A modern VPA replacement.
     operators.operatorframework.io/builder: operator-sdk-v1.39.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
-    features.operators.openshift.io/fips-compliant: "true"
-    features.operators.openshift.io/proxy-aware: "false"
-    features.operators.openshift.io/tls-profiles: "false"
-    features.operators.openshift.io/token-auth-aws: "false"
-    features.operators.openshift.io/token-auth-gcp: "false"
-    features.operators.openshift.io/token-auth-azure: "false"
-    features.operators.openshift.io/disconnected: "false"
 spec:
   displayName: Attune
   description: |
@@ -332,7 +325,7 @@ spec:
                     type: RuntimeDefault
                 containers:
                   - name: manager
-                    image: ghcr.io/attune-io/attune@sha256:143df78c8d5aa4da769725e239b3964c253a78032def08f18346b6f9ab2e564e
+                    image: ghcr.io/attune-io/attune@sha256:d27c05693393c21949ea34402f744d9390ed688e1f8eded62a5aca8c90367907
                     imagePullPolicy: IfNotPresent
                     args:
                       - --leader-elect
@@ -370,6 +363,8 @@ spec:
                         drop:
                           - ALL
                       readOnlyRootFilesystem: true
+                      runAsUser: 65532
+                      runAsGroup: 65532
                       seccompProfile:
                         type: RuntimeDefault
 
@@ -400,4 +395,4 @@ spec:
 
   relatedImages:
     - name: attune
-      image: ghcr.io/attune-io/attune@sha256:143df78c8d5aa4da769725e239b3964c253a78032def08f18346b6f9ab2e564e
+      image: ghcr.io/attune-io/attune@sha256:d27c05693393c21949ea34402f744d9390ed688e1f8eded62a5aca8c90367907

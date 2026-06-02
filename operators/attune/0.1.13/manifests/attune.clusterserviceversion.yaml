@@ -51,6 +51,13 @@ metadata:
     description: Safe, in-place Kubernetes pod resource right-sizing using real Prometheus metrics. A modern VPA replacement.
     operators.operatorframework.io/builder: operator-sdk-v1.39.0
     operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/disconnected: "false"
 spec:
   displayName: Attune
   description: |
@@ -363,8 +370,6 @@ spec:
                         drop:
                           - ALL
                       readOnlyRootFilesystem: true
-                      runAsUser: 65532
-                      runAsGroup: 65532
                       seccompProfile:
                         type: RuntimeDefault
 

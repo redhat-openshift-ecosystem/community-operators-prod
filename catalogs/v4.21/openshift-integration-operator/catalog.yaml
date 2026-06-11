@@ -1,0 +1,191 @@
+---
+defaultChannel: alpha
+name: openshift-integration-operator
+schema: olm.package
+---
+entries:
+- name: openshift-integration-operator.v0.4.0
+name: alpha
+package: openshift-integration-operator
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/openshift-integration-operator:0.4.0
+name: openshift-integration-operator.v0.4.0
+package: openshift-integration-operator
+properties:
+- type: olm.gvk
+  value:
+    group: platform.io
+    kind: IntegrationFlow
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: openshift-integration-operator
+    version: 0.4.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "platform.io/v1alpha1",
+            "kind": "IntegrationFlow",
+            "metadata": {
+              "name": "sample-camel-route"
+            },
+            "spec": {
+              "engine": "CAMEL",
+              "integrationType": "CAMEL_ROUTE",
+              "gitRepository": "https://gitea.example.com/user1/sample-camel-worker.git",
+              "branch": "main",
+              "targeting": {
+                "strategy": "explicit",
+                "clusters": ["local"]
+              },
+              "kaotoDesign": "- route:\n    id: sample-route\n    from:\n      uri: \"timer:tick\"\n      parameters:\n        period: 5000\n      steps:\n        - log:\n            message: \"Hello from IntegrationFlow\"\n"
+            }
+          },
+          {
+            "apiVersion": "platform.io/v1alpha1",
+            "kind": "IntegrationFlow",
+            "metadata": {
+              "name": "sample-ephemeral"
+            },
+            "spec": {
+              "engine": "CAMEL",
+              "integrationType": "CAMEL_ROUTE",
+              "deploymentMode": "EPHEMERAL",
+              "kaotoDesign": "- route:\n    id: quick-try\n    from:\n      uri: \"timer:tick\"\n      parameters:\n        period: 10000\n      steps:\n        - log:\n            message: \"Ephemeral quick-try flow\"\n",
+              "ephemeral": {
+                "ttlSeconds": 3600
+              }
+            }
+          },
+          {
+            "apiVersion": "platform.io/v1alpha1",
+            "kind": "IntegrationFlow",
+            "metadata": {
+              "name": "sample-sonataflow"
+            },
+            "spec": {
+              "engine": "SONATAFLOW",
+              "integrationType": "SONATAFLOW",
+              "gitRepository": "https://gitea.example.com/user1/sample-sonataflow.git",
+              "branch": "main",
+              "targeting": {
+                "strategy": "explicit",
+                "clusters": ["local"]
+              },
+              "kaotoDesign": "id: greeting\nversion: '1.0'\nspecVersion: '0.8'\nname: Greeting Workflow\nstart: GreetPerson\nstates:\n  - name: GreetPerson\n    type: operation\n    actions:\n      - name: greetAction\n        functionRef:\n          refName: greetFunction\n          arguments:\n            name: .name\n    end: true\nfunctions:\n  - name: greetFunction\n    operation: sysout\n    type: custom\n"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: Integration & Delivery
+      containerImage: quay.io/maximilianopizarro/openshift-integration-operator:v0.4.0
+      createdAt: "2026-06-08T18:00:00Z"
+      description: Real-Time Integration & Orchestration Platform for OpenShift — Apache Camel + SonataFlow with visual Kaoto designer, GitOps, MCP/AI integration, and OpenTelemetry observability
+      operatorframework.io/suggested-namespace: openshift-integration
+      operators.operatorframework.io/builder: operator-sdk-v1.40.0
+      operators.operatorframework.io/project_layout: quarkus.javaoperatorsdk.io/v1-alpha
+      repository: https://github.com/maximilianoPizarro/openshift-integration-operator
+      support: Community
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: IntegrationFlow defines an integration workflow using Apache Camel
+          or SonataFlow engine with visual Kaoto design, GitOps deployment via Tekton
+          and ArgoCD, ephemeral Quick Try mode, and OpenTelemetry observability.
+        displayName: Integration Flow
+        kind: IntegrationFlow
+        name: integrationflows.platform.io
+        version: v1alpha1
+    description: |
+      ## OpenShift Integration Operator
+
+      Real-Time Integration & Orchestration Platform for OpenShift that brings
+      **Apache Camel** and **SonataFlow** workflows together with a visual
+      **Kaoto** designer, **GitOps** deployment (Tekton + ArgoCD), **MCP/AI**
+      integration, and **OpenTelemetry** observability.
+
+      ### Features
+
+      * **Single CRD** — `IntegrationFlow` manages the full lifecycle of
+        integration workflows across engines and deployment modes
+      * **Five integration types** — Camel Route, Kamelet, Pipe, Test,
+        and SonataFlow
+      * **Ephemeral Quick Try** — deploy flows instantly without Git using
+        domain-specific worker images with configurable TTL
+      * **GitOps pipeline** — automated scaffolding, Tekton builds, and
+        ArgoCD multi-cluster deployment
+      * **Visual design** — embedded Kaoto designer for drag-and-drop
+        flow creation
+      * **OpenShift Console plugin** — integrated dashboard for flow
+        management, live logs, and telemetry
+      * **MCP Bridge** — AI tool discovery and invocation for integration
+        flows
+      * **Resilience** — declarative retry policies and circuit breaker
+        configuration
+      * **Observability** — OpenTelemetry tracing/metrics and
+        PrometheusRule auto-generation
+
+      ### Prerequisites
+
+      * OpenShift 4.19+
+      * Red Hat OpenShift Pipelines (Tekton)
+      * Red Hat OpenShift GitOps (ArgoCD)
+      * Camel K Operator (optional, for Kamelet/Pipe types)
+      * OpenShift Serverless Logic (optional, for SonataFlow types)
+
+      ### Getting Started
+
+      1. Install the operator from OperatorHub
+      2. Create an IntegrationFlow CR with your Camel or SonataFlow design
+      3. The operator scaffolds, builds, and deploys your integration automatically
+      4. Monitor via the OpenShift Console plugin or `oc get integrationflows`
+    displayName: OpenShift Integration Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - integration
+    - camel
+    - apache-camel
+    - sonataflow
+    - kaoto
+    - workflow
+    - gitops
+    - openshift
+    - tekton
+    - argocd
+    - mcp
+    - opentelemetry
+    links:
+    - name: Documentation
+      url: https://maximilianopizarro.github.io/openshift-integration-operator/
+    - name: Source Code
+      url: https://github.com/maximilianoPizarro/openshift-integration-operator
+    - name: Helm Chart
+      url: https://maximilianopizarro.github.io/openshift-integration-operator/
+    maintainers:
+    - email: maximiliano.pizarro.5@gmail.com
+      name: Maximiliano Pizarro
+    maturity: alpha
+    minKubeVersion: 1.32.0
+    provider:
+      name: maximilianoPizarro
+      url: https://github.com/maximilianoPizarro
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/openshift-integration-operator:0.4.0
+  name: ""
+- image: quay.io/maximilianopizarro/openshift-integration-operator:v0.4.0
+  name: ""
+- image: quay.io/maximilianopizarro/integration-console-plugin:v0.4.0
+  name: ""
+schema: olm.bundle

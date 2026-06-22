@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: project-onboarding-operator
+  name: project-onboarding-operator-allow-webhook-traffic
+spec:
+  ingress:
+  - ports:
+    - port: 9443
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: project-onboarding-operator
+      control-plane: controller-manager
+  policyTypes:
+  - Ingress

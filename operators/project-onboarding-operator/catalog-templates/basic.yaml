@@ -1,11 +1,14 @@
 ---
 schema: olm.template.basic
 entries:
-  - schema: olm.package
-    name: project-onboarding-operator
-    defaultChannel: stable
-  - schema: olm.channel
-    package: project-onboarding-operator
-    name: stable
-    entries:
-      - name: project-onboarding-operator.v0.0.51
+- schema: olm.package
+  name: project-onboarding-operator
+  defaultChannel: stable
+- schema: olm.channel
+  package: project-onboarding-operator
+  name: stable
+  entries:
+  - name: project-onboarding-operator.v0.0.51
+- schema: olm.bundle
+  image: 
+    quay.io/community-operator-pipeline-prod/project-onboarding-operator:0.0.51

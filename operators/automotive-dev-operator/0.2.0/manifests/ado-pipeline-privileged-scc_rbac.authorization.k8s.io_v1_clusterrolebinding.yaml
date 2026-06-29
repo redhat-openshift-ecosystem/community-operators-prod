@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  creationTimestamp: null
+  name: ado-pipeline-privileged-scc
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ado-scc-privileged-role
+subjects:
+- kind: ServiceAccount
+  name: ado-operator
+  namespace: automotive-dev-operator-system
+- kind: ServiceAccount
+  name: pipeline
+  namespace: system

@@ -7,6 +7,8 @@ name: apicurio-registry-3
 schema: olm.package
 ---
 entries:
+- name: apicurio-registry-3.v3.2.6
+  replaces: apicurio-registry-3.v3.2.5
 - name: apicurio-registry-3.v3.2.5
   replaces: apicurio-registry-3.v3.2.4
 - name: apicurio-registry-3.v3.2.4
@@ -2558,6 +2560,145 @@ relatedImages:
 - image: quay.io/apicurio/apicurio-registry-3-operator:3.2.5
   name: ""
 - image: quay.io/community-operator-pipeline-prod/apicurio-registry-3@sha256:45fa004f1ed941f93500bf2efa7f46ff06af5c7183026a4459fae540f7876198
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/apicurio-registry-3@sha256:e8668748f443004f4aceef8abb3bd5260bed5d1f6135a8cd054c799481e6f953
+name: apicurio-registry-3.v3.2.6
+package: apicurio-registry-3
+properties:
+- type: olm.gvk
+  value:
+    group: registry.apicur.io
+    kind: ApicurioRegistry3
+    version: v1
+- type: olm.package
+  value:
+    packageName: apicurio-registry-3
+    version: 3.2.6
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "registry.apicur.io/v1",
+            "kind": "ApicurioRegistry3",
+            "metadata": {
+              "name": "simple"
+            },
+            "spec": {
+              "app": {
+                "ingress": {
+                  "host": "simple-app.apps.cluster.example"
+                }
+              },
+              "ui": {
+                "ingress": {
+                  "host": "simple-ui.apps.cluster.example"
+                }
+              }
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: Streaming & Messaging
+      certified: "false"
+      containerImage: quay.io/apicurio/apicurio-registry-3-operator:3.2.6
+      createdAt: "2026-07-03T09:26:52Z"
+      description: Deploy and manage Apicurio Registry 3 on Kubernetes.
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "false"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operators.openshift.io/infrastructure-features: '[]'
+      operators.openshift.io/valid-subscription: '[]'
+      operators.operatorframework.io/builder: operator-sdk-v1.37.0
+      operators.operatorframework.io/project_layout: unknown
+      repository: https://github.com/Apicurio/apicurio-registry/tree/main/operator
+      support: Apicurio
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: ApicurioRegistry3 represents an instance of Apicurio Registry
+          version 3.
+        displayName: Apicurio Registry 3
+        kind: ApicurioRegistry3
+        name: apicurioregistries3.registry.apicur.io
+        version: v1
+    description: |
+      ## Apicurio Registry 3
+
+      Apicurio Registry stores and retrieves API designs and event schemas,
+      and gives you control of their evolution.
+
+      **Features**
+      - Supports: Apache Avro, AsyncAPI, GraphQL, JSON Schema, Kafka Connect Schema, OpenAPI, Protobuf
+      - Allows you manage event schemas and API designs using the Apicurio Registry web console, REST API, Maven plug-in, or Java client
+      - Includes Serializers and Deserializers for Kafka client integration
+      - Configurable rules to control schema validity and evolution (compatibility)
+      - Storage options: Kafka, PostgreSQL, MySQL, SQL Server, in-memory
+      - Compatible with Confluent APIs
+      - Runs on a lightweight Quarkus platform
+
+      ## Apicurio Registry 3 Operator
+
+      Provides a quick and easy way to deploy and manage Apicurio Registry 3 on Kubernetes.
+
+      **Features**
+      - Supports installation and configuration of Apicurio Registry 3
+      - Perform a rolling upgrade of Apicurio Registry 3
+
+      ## Prerequisites
+
+      This operator does not deploy storage for Apicurio Registry 3. Therefore, some storage options require that the chosen persistence service is already set up.
+
+      ## License
+
+      Apicurio Registry 3 and Apicurio Registry 3 Operator are licensed under the [Apache 2.0 license](https://github.com/Apicurio/apicurio-registry/blob/main/LICENSE)
+    displayName: Apicurio Registry 3
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - integration
+    - streaming
+    - messaging
+    - api
+    - schemas
+    - registry
+    - apicurio
+    - apicurio-registry
+    links:
+    - name: Website
+      url: https://www.apicur.io/
+    - name: GitHub
+      url: https://github.com/Apicurio/apicurio-registry/
+    - name: Issues
+      url: https://github.com/Apicurio/apicurio-registry/issues
+    maintainers:
+    - email: apicurio@lists.jboss.org
+      name: Apicurio
+    maturity: alpha
+    minKubeVersion: 1.25.0
+    provider:
+      name: Apicurio
+relatedImages:
+- image: quay.io/apicurio/apicurio-registry-3-operator:3.2.6
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/apicurio-registry-3@sha256:e8668748f443004f4aceef8abb3bd5260bed5d1f6135a8cd054c799481e6f953
   name: ""
 schema: olm.bundle
 ---

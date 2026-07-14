@@ -1,0 +1,170 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  creationTimestamp: null
+  name: imagereseals.automotive.sdv.cloud.redhat.com
+spec:
+  group: automotive.sdv.cloud.redhat.com
+  names:
+    kind: ImageReseal
+    listKind: ImageResealList
+    plural: imagereseals
+    singular: imagereseal
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .spec.operation
+      name: Operation
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          ImageReseal is the Schema for the imagereseals API.
+          It triggers an AIB sealed operation (prepare-reseal, reseal, extract-for-signing, inject-signed) on a disk image.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ImageResealSpec defines the desired state of ImageReseal
+            properties:
+              aibExtraArgs:
+                description: AIBExtraArgs are extra arguments to pass to AIB
+                items:
+                  type: string
+                type: array
+              aibImage:
+                description: AIBImage is the automotive-image-builder container image
+                  to use
+                type: string
+              architecture:
+                description: |-
+                  Architecture overrides the target architecture for the builder image (e.g., "amd64", "arm64").
+                  If empty, auto-detected from the node running the task.
+                type: string
+              builderImage:
+                description: |-
+                  BuilderImage is the osbuild builder container image to use (needed for prepare-reseal and reseal).
+                  If empty, a default is computed from architecture and the internal registry.
+                type: string
+              inputRef:
+                description: InputRef is the OCI reference to the input disk image
+                type: string
+              keyPasswordSecretRef:
+                description: |-
+                  KeyPasswordSecretRef is the name of a secret containing the password for an encrypted key.
+                  The secret must have a data key named "password". Optional.
+                type: string
+              keySecretRef:
+                description: |-
+                  KeySecretRef is the name of a secret containing the sealing key.
+                  The secret must have a data key named "private-key" with the PEM-encoded key.
+                  Optional for prepare-reseal and reseal: if not set, aib may use an ephemeral key.
+                type: string
+              operation:
+                description: Operation is the AIB sealed operation when running a
+                  single stage (ignored if Stages is set).
+                enum:
+                - prepare-reseal
+                - reseal
+                - extract-for-signing
+                - inject-signed
+                type: string
+              outputRef:
+                description: OutputRef is the OCI reference where to push the result
+                  (optional for extract-for-signing)
+                type: string
+              secretRef:
+                description: |-
+                  SecretRef is the name of the secret containing registry credentials
+                  (REGISTRY_URL, REGISTRY_USERNAME, REGISTRY_PASSWORD)
+                type: string
+              signedRef:
+                description: SignedRef is the OCI reference to signed artifacts; required
+                  when operation is inject-signed
+                type: string
+              stages:
+                description: |-
+                  Stages is an ordered list of operations to run as a pipeline. If set, Operation is ignored.
+                  Example: [prepare-reseal, extract-for-signing, inject-signed, reseal]
+                items:
+                  type: string
+                minItems: 1
+                type: array
+                x-kubernetes-list-type: atomic
+              storageClass:
+                description: StorageClass for the workspace (optional)
+                type: string
+            required:
+            - inputRef
+            type: object
+          status:
+            description: ImageResealStatus defines the observed state of ImageReseal
+            properties:
+              completionTime:
+                description: CompletionTime is when the sealed operation completed
+                format: date-time
+                type: string
+              message:
+                description: Message provides additional details about the current
+                  phase
+                type: string
+              outputRef:
+                description: OutputRef is the OCI reference where the result was pushed
+                  (after completion)
+                type: string
+              phase:
+                description: Phase represents the current phase of the sealed operation
+                enum:
+                - Pending
+                - Running
+                - Completed
+                - Failed
+                type: string
+              pipelineRunName:
+                description: PipelineRunName is the name of the Tekton PipelineRun
+                  (multi-stage runs)
+                type: string
+              startTime:
+                description: StartTime is when the sealed operation started
+                format: date-time
+                type: string
+              taskRunName:
+                description: TaskRunName is the name of the Tekton TaskRun (single-stage
+                  runs)
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

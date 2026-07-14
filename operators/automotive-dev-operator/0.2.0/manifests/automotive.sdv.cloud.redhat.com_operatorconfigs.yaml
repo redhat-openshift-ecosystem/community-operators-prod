@@ -1,0 +1,1360 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  creationTimestamp: null
+  name: operatorconfigs.automotive.sdv.cloud.redhat.com
+spec:
+  group: automotive.sdv.cloud.redhat.com
+  names:
+    kind: OperatorConfig
+    listKind: OperatorConfigList
+    plural: operatorconfigs
+    singular: operatorconfig
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.osBuilds.enabled
+      name: OS Builds
+      type: boolean
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: OperatorConfig is the Schema for the operatorconfigs API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: OperatorConfigSpec defines the desired state of OperatorConfig
+            properties:
+              buildAPI:
+                description: BuildAPI defines configuration for the Build API server
+                properties:
+                  authentication:
+                    description: Authentication configuration for the Build API server.
+                    properties:
+                      clientId:
+                        description: OIDC client ID for caib CLI.
+                        type: string
+                      internal:
+                        description: Internal authentication configuration.
+                        properties:
+                          prefix:
+                            default: 'internal:'
+                            description: Prefix to add to the subject claim of issued
+                              tokens.
+                            type: string
+                        type: object
+                      jwt:
+                        description: JWT authentication configuration for OIDC providers.
+                        items:
+                          description: |-
+                            JWTAuthenticatorConfig configures a single external JWT/OIDC authenticator.
+                            It mirrors apiserverv1beta1.JWTAuthenticator but replaces the issuer with
+                            JWTIssuerConfig to support Kubernetes-native CA references.
+                          properties:
+                            claimMappings:
+                              description: ClaimMappings maps OIDC claims to Kubernetes
+                                user attributes.
+                              properties:
+                                extra:
+                                  description: |-
+                                    extra represents an option for the extra attribute.
+                                    expression must produce a string or string array value.
+                                    If the value is empty, the extra mapping will not be present.
+
+                                    hard-coded extra key/value
+                                    - key: "foo"
+                                      valueExpression: "'bar'"
+                                    This will result in an extra attribute - foo: ["bar"]
+
+                                    hard-coded key, value copying claim value
+                                    - key: "foo"
+                                      valueExpression: "claims.some_claim"
+                                    This will result in an extra attribute - foo: [value of some_claim]
+
+                                    hard-coded key, value derived from claim value
+                                    - key: "admin"
+                                      valueExpression: '(has(claims.is_admin) && claims.is_admin) ? "true":""'
+                                    This will result in:
+                                     - if is_admin claim is present and true, extra attribute - admin: ["true"]
+                                     - if is_admin claim is present and false or is_admin claim is not present, no extra attribute will be added
+                                  items:
+                                    description: ExtraMapping provides the configuration
+                                      for a single extra mapping.
+                                    properties:
+                                      key:
+                                        description: |-
+                                          key is a string to use as the extra attribute key.
+                                          key must be a domain-prefix path (e.g. example.org/foo). All characters before the first "/" must be a valid
+                                          subdomain as defined by RFC 1123. All characters trailing the first "/" must
+                                          be valid HTTP Path characters as defined by RFC 3986.
+                                          key must be lowercase.
+                                          Required to be unique.
+                                        type: string
+                                      valueExpression:
+                                        description: |-
+                                          valueExpression is a CEL expression to extract extra attribute value.
+                                          valueExpression must produce a string or string array value.
+                                          "", [], and null values are treated as the extra mapping not being present.
+                                          Empty string values contained within a string array are filtered out.
+
+                                          CEL expressions have access to the contents of the token claims, organized into CEL variable:
+                                          - 'claims' is a map of claim names to claim values.
+                                            For example, a variable named 'sub' can be accessed as 'claims.sub'.
+                                            Nested claims can be accessed using dot notation, e.g. 'claims.foo.bar'.
+
+                                          Documentation on CEL: https://kubernetes.io/docs/reference/using-api/cel/
+                                        type: string
+                                    required:
+                                    - key
+                                    - valueExpression
+                                    type: object
+                                  type: array
+                                groups:
+                                  description: |-
+                                    groups represents an option for the groups attribute.
+                                    The claim's value must be a string or string array claim.
+                                    If groups.claim is set, the prefix must be specified (and can be the empty string).
+                                    If groups.expression is set, the expression must produce a string or string array value.
+                                     "", [], and null values are treated as the group mapping not being present.
+                                  properties:
+                                    claim:
+                                      description: |-
+                                        claim is the JWT claim to use.
+                                        Mutually exclusive with expression.
+                                      type: string
+                                    expression:
+                                      description: |-
+                                        expression represents the expression which will be evaluated by CEL.
+
+                                        CEL expressions have access to the contents of the token claims, organized into CEL variable:
+                                        - 'claims' is a map of claim names to claim values.
+                                          For example, a variable named 'sub' can be accessed as 'claims.sub'.
+                                          Nested claims can be accessed using dot notation, e.g. 'claims.foo.bar'.
+
+                                        Documentation on CEL: https://kubernetes.io/docs/reference/using-api/cel/
+
+                                        Mutually exclusive with claim and prefix.
+                                      type: string
+                                    prefix:
+                                      description: |-
+                                        prefix is prepended to claim's value to prevent clashes with existing names.
+                                        prefix needs to be set if claim is set and can be the empty string.
+                                        Mutually exclusive with expression.
+                                      type: string
+                                  type: object
+                                uid:
+                                  description: |-
+                                    uid represents an option for the uid attribute.
+                                    Claim must be a singular string claim.
+                                    If uid.expression is set, the expression must produce a string value.
+                                  properties:
+                                    claim:
+                                      description: |-
+                                        claim is the JWT claim to use.
+                                        Either claim or expression must be set.
+                                        Mutually exclusive with expression.
+                                      type: string
+                                    expression:
+                                      description: |-
+                                        expression represents the expression which will be evaluated by CEL.
+
+                                        CEL expressions have access to the contents of the token claims, organized into CEL variable:
+                                        - 'claims' is a map of claim names to claim values.
+                                          For example, a variable named 'sub' can be accessed as 'claims.sub'.
+                                          Nested claims can be accessed using dot notation, e.g. 'claims.foo.bar'.
+
+                                        Documentation on CEL: https://kubernetes.io/docs/reference/using-api/cel/
+
+                                        Mutually exclusive with claim.
+                                      type: string
+                                  type: object
+                                username:
+                                  description: |-
+                                    username represents an option for the username attribute.
+                                    The claim's value must be a singular string.
+                                    Same as the --oidc-username-claim and --oidc-username-prefix flags.
+                                    If username.expression is set, the expression must produce a string value.
+                                    If username.expression uses 'claims.email', then 'claims.email_verified' must be used in
+                                    username.expression or extra[*].valueExpression or claimValidationRules[*].expression.
+                                    An example claim validation rule expression that matches the validation automatically
+                                    applied when username.claim is set to 'email' is 'claims.?email_verified.orValue(true) == true'. By explicitly comparing
+                                    the value to true, we let type-checking see the result will be a boolean, and to make sure a non-boolean email_verified
+                                    claim will be caught at runtime.
+
+                                    In the flag based approach, the --oidc-username-claim and --oidc-username-prefix are optional. If --oidc-username-claim is not set,
+                                    the default value is "sub". For the authentication config, there is no defaulting for claim or prefix. The claim and prefix must be set explicitly.
+                                    For claim, if --oidc-username-claim was not set with legacy flag approach, configure username.claim="sub" in the authentication config.
+                                    For prefix:
+                                        (1) --oidc-username-prefix="-", no prefix was added to the username. For the same behavior using authentication config,
+                                            set username.prefix=""
+                                        (2) --oidc-username-prefix="" and  --oidc-username-claim != "email", prefix was "<value of --oidc-issuer-url>#". For the same
+                                            behavior using authentication config, set username.prefix="<value of issuer.url>#"
+                                        (3) --oidc-username-prefix="<value>". For the same behavior using authentication config, set username.prefix="<value>"
+                                  properties:
+                                    claim:
+                                      description: |-
+                                        claim is the JWT claim to use.
+                                        Mutually exclusive with expression.
+                                      type: string
+                                    expression:
+                                      description: |-
+                                        expression represents the expression which will be evaluated by CEL.
+
+                                        CEL expressions have access to the contents of the token claims, organized into CEL variable:
+                                        - 'claims' is a map of claim names to claim values.
+                                          For example, a variable named 'sub' can be accessed as 'claims.sub'.
+                                          Nested claims can be accessed using dot notation, e.g. 'claims.foo.bar'.
+
+                                        Documentation on CEL: https://kubernetes.io/docs/reference/using-api/cel/
+
+                                        Mutually exclusive with claim and prefix.
+                                      type: string
+                                    prefix:
+                                      description: |-
+                                        prefix is prepended to claim's value to prevent clashes with existing names.
+                                        prefix needs to be set if claim is set and can be the empty string.
+                                        Mutually exclusive with expression.
+                                      type: string
+                                  type: object
+                              required:
+                              - username
+                              type: object
+                            claimValidationRules:
+                              description: ClaimValidationRules are additional rules
+                                applied to incoming JWT claims.
+                              items:
+                                description: ClaimValidationRule provides the configuration
+                                  for a single claim validation rule.
+                                properties:
+                                  claim:
+                                    description: |-
+                                      claim is the name of a required claim.
+                                      Same as --oidc-required-claim flag.
+                                      Only string claim keys are supported.
+                                      Mutually exclusive with expression and message.
+                                    type: string
+                                  expression:
+                                    description: |-
+                                      expression represents the expression which will be evaluated by CEL.
+                                      Must produce a boolean.
+
+                                      CEL expressions have access to the contents of the token claims, organized into CEL variable:
+                                      - 'claims' is a map of claim names to claim values.
+                                        For example, a variable named 'sub' can be accessed as 'claims.sub'.
+                                        Nested claims can be accessed using dot notation, e.g. 'claims.foo.bar'.
+                                      Must return true for the validation to pass.
+
+                                      Documentation on CEL: https://kubernetes.io/docs/reference/using-api/cel/
+
+                                      Mutually exclusive with claim and requiredValue.
+                                    type: string
+                                  message:
+                                    description: |-
+                                      message customizes the returned error message when expression returns false.
+                                      message is a literal string.
+                                      Mutually exclusive with claim and requiredValue.
+                                    type: string
+                                  requiredValue:
+                                    description: |-
+                                      requiredValue is the value of a required claim.
+                                      Same as --oidc-required-claim flag.
+                                      Only string claim values are supported.
+                                      If claim is set and requiredValue is not set, the claim must be present with a value set to the empty string.
+                                      Mutually exclusive with expression and message.
+                                    type: string
+                                type: object
+                              type: array
+                            issuer:
+                              description: Issuer configures the OIDC provider.
+                              properties:
+                                audienceMatchPolicy:
+                                  description: AudienceMatchPolicy controls how audiences
+                                    are matched.
+                                  type: string
+                                audiences:
+                                  description: Audiences is the set of acceptable
+                                    JWT audiences.
+                                  items:
+                                    type: string
+                                  minItems: 1
+                                  type: array
+                                certificateAuthority:
+                                  description: |-
+                                    CertificateAuthority is an inline PEM-encoded CA certificate used to verify
+                                    the OIDC provider's TLS certificate.
+                                  type: string
+                                certificateAuthorityConfigMap:
+                                  description: |-
+                                    CertificateAuthorityConfigMap references a Kubernetes ConfigMap containing the
+                                    PEM-encoded CA certificate. The build API watches the ConfigMap for changes so
+                                    CA rotations are picked up immediately without restarting the server.
+                                  properties:
+                                    key:
+                                      description: Key within the ConfigMap whose
+                                        value is the PEM-encoded CA certificate.
+                                      type: string
+                                    name:
+                                      description: Name of the ConfigMap.
+                                      type: string
+                                    namespace:
+                                      description: Namespace of the ConfigMap. If
+                                        omitted, the operator's namespace is used.
+                                      type: string
+                                  required:
+                                  - key
+                                  - name
+                                  type: object
+                                certificateAuthoritySecret:
+                                  description: |-
+                                    CertificateAuthoritySecret references a Kubernetes Secret containing the
+                                    PEM-encoded CA certificate. The build API watches the Secret for changes so
+                                    CA rotations are picked up immediately without restarting the server.
+                                  properties:
+                                    key:
+                                      description: Key within the Secret whose value
+                                        is the PEM-encoded CA certificate.
+                                      type: string
+                                    name:
+                                      description: Name of the Secret.
+                                      type: string
+                                    namespace:
+                                      description: Namespace of the Secret. If omitted,
+                                        the operator's namespace is used.
+                                      type: string
+                                  required:
+                                  - key
+                                  - name
+                                  type: object
+                                discoveryURL:
+                                  description: DiscoveryURL overrides the OIDC discovery
+                                    endpoint when it differs from URL.
+                                  type: string
+                                egressSelectorType:
+                                  description: |-
+                                    EgressSelectorType specifies which egress selector should be used for
+                                    OIDC-related network traffic (discovery, JWKS, distributed claims, etc).
+                                    Valid values are "controlplane" and "cluster".
+                                  type: string
+                                url:
+                                  description: URL is the base URL of the OIDC provider.
+                                  type: string
+                              required:
+                              - audiences
+                              - url
+                              type: object
+                              x-kubernetes-validations:
+                              - message: at most one of certificateAuthority, certificateAuthoritySecret,
+                                  or certificateAuthorityConfigMap may be set
+                                rule: '[has(self.certificateAuthority), has(self.certificateAuthoritySecret),
+                                  has(self.certificateAuthorityConfigMap)].filter(x,
+                                  x).size() <= 1'
+                            userValidationRules:
+                              description: UserValidationRules are additional rules
+                                applied to the authenticated user.
+                              items:
+                                description: UserValidationRule provides the configuration
+                                  for a single user info validation rule.
+                                properties:
+                                  expression:
+                                    description: |-
+                                      expression represents the expression which will be evaluated by CEL.
+                                      Must return true for the validation to pass.
+
+                                      CEL expressions have access to the contents of UserInfo, organized into CEL variable:
+                                      - 'user' - authentication.k8s.io/v1, Kind=UserInfo object
+                                         Refer to https://github.com/kubernetes/api/blob/release-1.28/authentication/v1/types.go#L105-L122 for the definition.
+                                         API documentation: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#userinfo-v1-authentication-k8s-io
+
+                                      Documentation on CEL: https://kubernetes.io/docs/reference/using-api/cel/
+                                    type: string
+                                  message:
+                                    description: |-
+                                      message customizes the returned error message when rule returns false.
+                                      message is a literal string.
+                                    type: string
+                                required:
+                                - expression
+                                type: object
+                              type: array
+                          required:
+                          - claimMappings
+                          - issuer
+                          type: object
+                        type: array
+                    type: object
+                  clientTokenExpiryDays:
+                    description: |-
+                      ClientTokenExpiryDays is the number of days before client tokens expire
+                      Default: 30
+                    format: int32
+                    type: integer
+                  maxLogStreamDurationMinutes:
+                    description: |-
+                      MaxLogStreamDurationMinutes is the maximum duration for log streaming in minutes
+                      Default: 120 (2 hours)
+                    format: int32
+                    type: integer
+                  maxTotalUploadSize:
+                    description: |-
+                      MaxTotalUploadSize is the maximum total upload size per request in bytes
+                      Default: 2147483648 (2GB)
+                    format: int64
+                    type: integer
+                  maxUploadFileSize:
+                    description: |-
+                      MaxUploadFileSize is the maximum size for individual uploaded files in bytes
+                      Default: 1073741824 (1GB)
+                    format: int64
+                    type: integer
+                  resources:
+                    description: Resources defines resource requirements for Build
+                      API components
+                    properties:
+                      buildAPI:
+                        description: BuildAPI defines resource requirements for the
+                          Build API container
+                        properties:
+                          claims:
+                            description: |-
+                              Claims lists the names of resources, defined in spec.resourceClaims,
+                              that are used by this container.
+
+                              This field depends on the
+                              DynamicResourceAllocation feature gate.
+
+                              This field is immutable. It can only be set for containers.
+                            items:
+                              description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                              properties:
+                                name:
+                                  description: |-
+                                    Name must match the name of one entry in pod.spec.resourceClaims of
+                                    the Pod where this field is used. It makes that resource available
+                                    inside a container.
+                                  type: string
+                                request:
+                                  description: |-
+                                    Request is the name chosen for a request in the referenced claim.
+                                    If empty, everything from the claim is made available, otherwise
+                                    only the result of this request.
+                                  type: string
+                              required:
+                              - name
+                              type: object
+                            type: array
+                            x-kubernetes-list-map-keys:
+                            - name
+                            x-kubernetes-list-type: map
+                          limits:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            description: |-
+                              Limits describes the maximum amount of compute resources allowed.
+                              More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                            type: object
+                          requests:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            description: |-
+                              Requests describes the minimum amount of compute resources required.
+                              If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                              otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                              More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                            type: object
+                        type: object
+                      buildController:
+                        description: BuildController defines resource requirements
+                          for the build controller container
+                        properties:
+                          claims:
+                            description: |-
+                              Claims lists the names of resources, defined in spec.resourceClaims,
+                              that are used by this container.
+
+                              This field depends on the
+                              DynamicResourceAllocation feature gate.
+
+                              This field is immutable. It can only be set for containers.
+                            items:
+                              description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                              properties:
+                                name:
+                                  description: |-
+                                    Name must match the name of one entry in pod.spec.resourceClaims of
+                                    the Pod where this field is used. It makes that resource available
+                                    inside a container.
+                                  type: string
+                                request:
+                                  description: |-
+                                    Request is the name chosen for a request in the referenced claim.
+                                    If empty, everything from the claim is made available, otherwise
+                                    only the result of this request.
+                                  type: string
+                              required:
+                              - name
+                              type: object
+                            type: array
+                            x-kubernetes-list-map-keys:
+                            - name
+                            x-kubernetes-list-type: map
+                          limits:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            description: |-
+                              Limits describes the maximum amount of compute resources allowed.
+                              More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                            type: object
+                          requests:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            description: |-
+                              Requests describes the minimum amount of compute resources required.
+                              If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                              otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                              More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                            type: object
+                        type: object
+                      oauthProxy:
+                        description: OAuthProxy defines resource requirements for
+                          the OAuth proxy sidecar
+                        properties:
+                          claims:
+                            description: |-
+                              Claims lists the names of resources, defined in spec.resourceClaims,
+                              that are used by this container.
+
+                              This field depends on the
+                              DynamicResourceAllocation feature gate.
+
+                              This field is immutable. It can only be set for containers.
+                            items:
+                              description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                              properties:
+                                name:
+                                  description: |-
+                                    Name must match the name of one entry in pod.spec.resourceClaims of
+                                    the Pod where this field is used. It makes that resource available
+                                    inside a container.
+                                  type: string
+                                request:
+                                  description: |-
+                                    Request is the name chosen for a request in the referenced claim.
+                                    If empty, everything from the claim is made available, otherwise
+                                    only the result of this request.
+                                  type: string
+                              required:
+                              - name
+                              type: object
+                            type: array
+                            x-kubernetes-list-map-keys:
+                            - name
+                            x-kubernetes-list-type: map
+                          limits:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            description: |-
+                              Limits describes the maximum amount of compute resources allowed.
+                              More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                            type: object
+                          requests:
+                            additionalProperties:
+                              anyOf:
+                              - type: integer
+                              - type: string
+                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              x-kubernetes-int-or-string: true
+                            description: |-
+                              Requests describes the minimum amount of compute resources required.
+                              If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                              otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                              More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                            type: object
+                        type: object
+                    type: object
+                type: object
+              containerBuilds:
+                description: ContainerBuilds defines configuration for container build
+                  operations
+                properties:
+                  defaultBuildTTL:
+                    description: |-
+                      DefaultBuildTTL is the default time-to-live for container builds.
+                      After this duration past completion, a build transitions to Expired
+                      and its BuildRun is cleaned up. Uses Go duration format (e.g. "24h").
+                      Set to "0" to disable expiry by default.
+                    type: string
+                  uploadTimeoutMinutes:
+                    default: 10
+                    description: |-
+                      UploadTimeoutMinutes is the maximum time in minutes to wait for source uploads
+                      before failing the build. Increase this for large build contexts.
+                    format: int32
+                    minimum: 1
+                    type: integer
+                type: object
+              featureGates:
+                additionalProperties:
+                  type: boolean
+                description: |-
+                  FeatureGates allows enabling or disabling specific operator features.
+                  Each key is a feature name, and the boolean value enables (true) or disables (false) it.
+                  Alpha features default to disabled, Beta to enabled, GA features are always enabled.
+                  Unknown feature names are ignored.
+                type: object
+              images:
+                description: Images defines container image references used by the
+                  operator
+                properties:
+                  automotiveImageBuilder:
+                    description: AutomotiveImageBuilder is the container image for
+                      automotive-image-builder
+                    type: string
+                  oauthProxy:
+                    description: OAuthProxy is the OAuth proxy sidecar image for OpenShift
+                      deployments
+                    type: string
+                  operator:
+                    description: Operator is the operator container image (overridden
+                      by OPERATOR_IMAGE env var when set)
+                    type: string
+                  yqHelper:
+                    description: YQHelper is the yq helper image used in Tekton task
+                      steps
+                    type: string
+                type: object
+              jumpstarter:
+                description: Jumpstarter defines configuration for Jumpstarter device
+                  flashing integration
+                properties:
+                  defaultLeaseDuration:
+                    description: |-
+                      DefaultLeaseDuration is the cluster-wide default lease duration in HH:MM:SS format
+                      Can be overridden per-ImageBuild via FlashSpec.LeaseDuration
+                      Default: "03:00:00"
+                    type: string
+                  defaultLeaseTags:
+                    description: |-
+                      DefaultLeaseTags are key=value tags applied to all Jumpstarter leases created by the operator
+                      Format: comma-separated key=value pairs (e.g. "platform=caib,env=prod")
+                    type: string
+                  image:
+                    default: quay.io/jumpstarter-dev/jumpstarter:latest
+                    description: Image is the container image for Jumpstarter CLI
+                      operations
+                    type: string
+                  namespace:
+                    description: Namespace is the OpenShift namespace where Jumpstarter
+                      is installed
+                    type: string
+                  targetMappings:
+                    additionalProperties:
+                      description: JumpstarterTargetMapping defines the Jumpstarter
+                        configuration for a specific build target
+                      properties:
+                        flashCmd:
+                          description: |-
+                            FlashCmd is the command template for flashing the device
+                            Example: "j storage flash ${IMAGE}"
+                          type: string
+                        selector:
+                          description: |-
+                            Selector is the label selector for matching Jumpstarter exporters
+                            Example: "board-type=j784s4evm"
+                          type: string
+                      required:
+                      - selector
+                      type: object
+                    description: TargetMappings maps build targets to Jumpstarter
+                      exporter configurations
+                    type: object
+                type: object
+              monitoring:
+                description: Monitoring defines configuration for Prometheus metrics
+                  collection
+                properties:
+                  enabled:
+                    default: false
+                    description: Enabled determines if a ServiceMonitor should be
+                      deployed for Prometheus scraping
+                    type: boolean
+                  interval:
+                    description: |-
+                      Interval defines the Prometheus scrape interval
+                      Default: "30s"
+                    pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                    type: string
+                required:
+                - enabled
+                type: object
+              osBuilds:
+                description: OSBuilds defines the configuration for OS build operations
+                properties:
+                  buildTimeoutMinutes:
+                    description: |-
+                      BuildTimeoutMinutes is the timeout for build-image pipeline tasks in minutes
+                      Default: 90
+                    format: int32
+                    type: integer
+                  certificates:
+                    description: Certificates defines trusted certificate configuration
+                      for build tasks.
+                    properties:
+                      trustedCABundle:
+                        description: TrustedCABundle references a Secret or ConfigMap
+                          mounted into build tasks.
+                        properties:
+                          kind:
+                            description: Kind indicates the source kind for trusted
+                              CA bundle.
+                            enum:
+                            - ConfigMap
+                            - Secret
+                            type: string
+                          name:
+                            description: Name is the name of the Secret or ConfigMap.
+                            type: string
+                        required:
+                        - kind
+                        - name
+                        type: object
+                    type: object
+                  clusterRegistryRoute:
+                    description: |-
+                      ClusterRegistryRoute is the external route for the cluster's internal image registry
+                      Required for bootc builds to allow nested containers to pull builder images
+                      Example: "default-route-openshift-image-registry.apps.mycluster.example.com"
+                    type: string
+                  defaultBuildTTL:
+                    description: |-
+                      DefaultBuildTTL is the default time-to-live for builds (all phases, including in-progress).
+                      Builds are automatically deleted after this duration. Uses Go duration format (e.g. "24h", "72h").
+                      Set to "0" to disable expiry by default.
+                      Default: "24h"
+                    type: string
+                  enabled:
+                    default: true
+                    description: Enabled determines if Tekton tasks for OS builds
+                      should be deployed
+                    type: boolean
+                  flashTimeoutMinutes:
+                    description: |-
+                      FlashTimeoutMinutes is the timeout for flash-image pipeline tasks in minutes
+                      Default: 240 (4 hours)
+                    format: int32
+                    type: integer
+                  insecureRegistry:
+                    description: |-
+                      InsecureRegistry skips TLS certificate verification for OCI registry operations
+                      such as artifact pushes via oras. Required when the target registry uses a
+                      self-signed certificate (e.g., CRC/OpenShift internal registry, local Kind
+                      registry with generated certs).
+                    type: boolean
+                  maxBuildTTL:
+                    description: |-
+                      MaxBuildTTL is the maximum TTL that users can request for individual builds.
+                      Build requests specifying a TTL greater than this value are rejected.
+                      Set to "0" for no maximum. Uses Go duration format (e.g. "168h" for 1 week).
+                    type: string
+                  memoryVolumeSize:
+                    description: |-
+                      MemoryVolumeSize specifies the size limit for memory-backed volumes
+                      Only used when UseMemoryVolumes is true
+                      Example: "2Gi"
+                    type: string
+                  nodeSelector:
+                    additionalProperties:
+                      type: string
+                    description: |-
+                      NodeSelector specifies node labels that build pods must match for scheduling
+                      These labels are added to the pod template used by Tekton PipelineRuns
+                      Example: {"dedicated": "builds", "disktype": "ssd"}
+                    type: object
+                  pvcSize:
+                    description: |-
+                      PVCSize specifies the size for persistent volume claims created for build workspaces
+                      Default: "8Gi"
+                    type: string
+                  registryTokenLifetimeSeconds:
+                    description: |-
+                      RegistryTokenLifetimeSeconds is the lifetime in seconds for service account tokens
+                      used for internal registry authentication during builds.
+                      Default: 14400 (4 hours)
+                    format: int64
+                    minimum: 1
+                    type: integer
+                  runtimeClassName:
+                    description: |-
+                      RuntimeClassName specifies the runtime class to use for the build pod
+                      More info: https://kubernetes.io/docs/concepts/containers/runtime-class/
+                    type: string
+                  storageClass:
+                    description: |-
+                      StorageClass specifies the storage class for build PVCs
+                      If empty, the cluster default storage class is used
+                    type: string
+                  taskBundleCosignKeyRef:
+                    description: |-
+                      TaskBundleCosignKeyRef references a ConfigMap key containing the cosign public key (PEM-encoded)
+                      used to verify Tekton Bundle signatures.
+                      Required when TaskBundleVerify is true.
+                    properties:
+                      key:
+                        description: The key to select.
+                        type: string
+                      name:
+                        default: ""
+                        description: |-
+                          Name of the referent.
+                          This field is effectively required, but due to backwards compatibility is
+                          allowed to be empty. Instances of this type with an empty value here are
+                          almost certainly wrong.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        type: string
+                      optional:
+                        description: Specify whether the ConfigMap or its key must
+                          be defined
+                        type: boolean
+                    required:
+                    - key
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  taskBundleRef:
+                    description: |-
+                      TaskBundleRef is the OCI reference to a signed Tekton Bundle containing task definitions.
+                      When set, builds created with SecureBuild=true will resolve tasks from this bundle
+                      instead of the cluster-installed tasks. The bundle should be signed with cosign
+                      and contain the same tasks as the operator deploys.
+                      Example: "quay.io/rh-sdv-cloud/automotive-dev-tekton-tasks:v0.1.0@sha256:abc123..."
+                    type: string
+                  taskBundleVerify:
+                    description: |-
+                      TaskBundleVerify enables cosign signature verification for Tekton Bundles.
+                      When true, all bundle refs (from OperatorConfig or user-provided --task-bundle-ref)
+                      must be signed with the key in TaskBundleCosignKeyRef.
+                    type: boolean
+                  tolerations:
+                    description: |-
+                      Tolerations specifies tolerations to be added to build pods
+                      Enables scheduling on tainted nodes for dedicated/exclusive access
+                      Example: [{"key": "automotive.sdv.cloud.redhat.com/dedicated", "operator": "Equal",
+                                "value": "builds", "effect": "NoSchedule"}]
+                    items:
+                      description: |-
+                        The pod this Toleration is attached to tolerates any taint that matches
+                        the triple <key,value,effect> using the matching operator <operator>.
+                      properties:
+                        effect:
+                          description: |-
+                            Effect indicates the taint effect to match. Empty means match all taint effects.
+                            When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
+                          type: string
+                        key:
+                          description: |-
+                            Key is the taint key that the toleration applies to. Empty means match all taint keys.
+                            If the key is empty, operator must be Exists; this combination means to match all values and all keys.
+                          type: string
+                        operator:
+                          description: |-
+                            Operator represents a key's relationship to the value.
+                            Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
+                            Exists is equivalent to wildcard for value, so that a pod can
+                            tolerate all taints of a particular category.
+                            Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
+                          type: string
+                        tolerationSeconds:
+                          description: |-
+                            TolerationSeconds represents the period of time the toleration (which must be
+                            of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
+                            it is not set, which means tolerate the taint forever (do not evict). Zero and
+                            negative values will be treated as 0 (evict immediately) by the system.
+                          format: int64
+                          type: integer
+                        value:
+                          description: |-
+                            Value is the taint value the toleration matches to.
+                            If the operator is Exists, the value should be empty, otherwise just a regular string.
+                          type: string
+                      type: object
+                    type: array
+                  uploadTimeoutMinutes:
+                    description: |-
+                      UploadTimeoutMinutes is the maximum time in minutes to wait for file uploads before failing the build
+                      Default: 30
+                    format: int32
+                    type: integer
+                  useMemoryVolumes:
+                    description: |-
+                      UseMemoryVolumes determines whether to use memory-backed volumes for build operations
+                      When true, all emptyDir volumes (build-dir, run-dir, container-storage, etc.) use tmpfs
+                      Default: false (disk-backed)
+                    type: boolean
+                  usePVCScratchVolumes:
+                    description: |-
+                      UsePVCScratchVolumes moves build scratch directories (build cache, output, container storage)
+                      from node-local emptyDir volumes onto the shared workspace PVC.
+                      This prevents builds from consuming node ephemeral storage, avoiding node disk exhaustion
+                      when running multiple concurrent builds. Requires a larger PVC size (see pvcSize).
+                      Default: true
+                    type: boolean
+                required:
+                - enabled
+                type: object
+                x-kubernetes-validations:
+                - message: taskBundleCosignKeyRef is required when taskBundleVerify
+                    is true
+                  rule: '!has(self.taskBundleVerify) || !self.taskBundleVerify ||
+                    has(self.taskBundleCosignKeyRef)'
+              tracing:
+                description: Tracing defines configuration for OpenTelemetry distributed
+                  tracing
+                properties:
+                  enabled:
+                    default: false
+                    description: Enabled determines if the operator should export
+                      trace spans
+                    type: boolean
+                  endpoint:
+                    description: |-
+                      Endpoint is the OTLP gRPC collector endpoint (e.g. "otel-collector.namespace.svc:4317").
+                      Falls back to OTEL_EXPORTER_OTLP_ENDPOINT env var when empty.
+                    type: string
+                  insecure:
+                    default: true
+                    description: |-
+                      Insecure disables TLS for the OTLP gRPC connection.
+                      Default: true (plaintext, appropriate for in-cluster collectors).
+                      Set to false when connecting to external/managed tracing backends that require TLS.
+                    type: boolean
+                  samplingRatio:
+                    description: |-
+                      SamplingRatio controls the fraction of traces sampled, as a string representation
+                      of a decimal between "0" and "1" (e.g. "0.1" for 10%, "1" for 100%).
+                      Default: "1" (sample everything).
+                    pattern: ^(0(\.\d+)?|1(\.0+)?)$
+                    type: string
+                required:
+                - enabled
+                type: object
+              workspaces:
+                description: Workspaces defines configuration for developer workspaces
+                properties:
+                  allowedImages:
+                    description: |-
+                      AllowedImages restricts which container images users may run in workspaces.
+                      Supports exact matches and prefix globs (e.g., "quay.io/my-org/*").
+                      When empty, only the configured toolchain image is allowed.
+                      The toolchain image is always implicitly permitted.
+                    items:
+                      type: string
+                    type: array
+                  autoPauseTimeoutMinutes:
+                    description: |-
+                      AutoPauseTimeoutMinutes is the cluster-wide default idle timeout in minutes before
+                      a workspace is automatically paused. Overridden per-workspace via spec.autoPauseTimeoutMinutes.
+                      Must be > 0. To disable auto-pause for a specific workspace, set its
+                      spec.autoPauseTimeoutMinutes to 0.
+                      Default: 30
+                    format: int32
+                    type: integer
+                  buildCacheSize:
+                    description: 'BuildCacheSize is the size of the PVC created for
+                      build cache persistence (default: "20Gi")'
+                    type: string
+                  defaultArchitecture:
+                    description: DefaultArchitecture is the default target architecture
+                      for workspaces
+                    type: string
+                  imageCosignKeyRef:
+                    description: |-
+                      ImageCosignKeyRef references a ConfigMap key containing the cosign public key
+                      (PEM-encoded) used to verify workspace image signatures.
+                      Required when ImageVerify is true.
+                    properties:
+                      key:
+                        description: The key to select.
+                        type: string
+                      name:
+                        default: ""
+                        description: |-
+                          Name of the referent.
+                          This field is effectively required, but due to backwards compatibility is
+                          allowed to be empty. Instances of this type with an empty value here are
+                          almost certainly wrong.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        type: string
+                      optional:
+                        description: Specify whether the ConfigMap or its key must
+                          be defined
+                        type: boolean
+                    required:
+                    - key
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  imagePullSecrets:
+                    description: ImagePullSecrets is a list of secret references for
+                      pulling private workspace images
+                    items:
+                      description: |-
+                        LocalObjectReference contains enough information to let you locate the
+                        referenced object inside the same namespace.
+                      properties:
+                        name:
+                          default: ""
+                          description: |-
+                            Name of the referent.
+                            This field is effectively required, but due to backwards compatibility is
+                            allowed to be empty. Instances of this type with an empty value here are
+                            almost certainly wrong.
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
+                  imageVerify:
+                    description: |-
+                      ImageVerify enables cosign signature verification for workspace images.
+                      When true, images must be signed with the key in ImageCosignKeyRef.
+                    type: boolean
+                  maxResources:
+                    description: MaxResources defines the maximum CPU and memory that
+                      users can request for workspace containers
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                  nodeSelector:
+                    additionalProperties:
+                      type: string
+                    description: NodeSelector specifies node labels that workspace
+                      pods must match for scheduling
+                    type: object
+                  pvcSize:
+                    description: PVCSize is the size for persistent volume claims
+                      created for workspace storage
+                    type: string
+                  resources:
+                    description: Resources defines the default CPU and memory requests/limits
+                      for workspace containers
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                  storageClass:
+                    description: |-
+                      StorageClass specifies the storage class for workspace PVCs
+                      If empty, the cluster default storage class is used
+                    type: string
+                  tmpfsBuildDir:
+                    description: |-
+                      TmpfsBuildDir allows users to mount a tmpfs-backed emptyDir at /tmp/build in workspace pods
+                      When enabled, users can opt-in per workspace via --tmpfs on create
+                    type: boolean
+                  tolerations:
+                    description: Tolerations specifies tolerations to be added to
+                      workspace pods
+                    items:
+                      description: |-
+                        The pod this Toleration is attached to tolerates any taint that matches
+                        the triple <key,value,effect> using the matching operator <operator>.
+                      properties:
+                        effect:
+                          description: |-
+                            Effect indicates the taint effect to match. Empty means match all taint effects.
+                            When specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.
+                          type: string
+                        key:
+                          description: |-
+                            Key is the taint key that the toleration applies to. Empty means match all taint keys.
+                            If the key is empty, operator must be Exists; this combination means to match all values and all keys.
+                          type: string
+                        operator:
+                          description: |-
+                            Operator represents a key's relationship to the value.
+                            Valid operators are Exists, Equal, Lt, and Gt. Defaults to Equal.
+                            Exists is equivalent to wildcard for value, so that a pod can
+                            tolerate all taints of a particular category.
+                            Lt and Gt perform numeric comparisons (requires feature gate TaintTolerationComparisonOperators).
+                          type: string
+                        tolerationSeconds:
+                          description: |-
+                            TolerationSeconds represents the period of time the toleration (which must be
+                            of effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,
+                            it is not set, which means tolerate the taint forever (do not evict). Zero and
+                            negative values will be treated as 0 (evict immediately) by the system.
+                          format: int64
+                          type: integer
+                        value:
+                          description: |-
+                            Value is the taint value the toleration matches to.
+                            If the operator is Exists, the value should be empty, otherwise just a regular string.
+                          type: string
+                      type: object
+                    type: array
+                  toolchainImage:
+                    description: ToolchainImage is the container image for workspace
+                      toolchains
+                    type: string
+                type: object
+                x-kubernetes-validations:
+                - message: imageCosignKeyRef is required when imageVerify is true
+                  rule: '!has(self.imageVerify) || !self.imageVerify || has(self.imageCosignKeyRef)'
+            type: object
+          status:
+            description: OperatorConfigStatus defines the observed state of OperatorConfig
+            properties:
+              conditions:
+                description: Conditions represent the latest available observations
+                  of the OperatorConfig's state
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              jumpstarterAvailable:
+                description: JumpstarterAvailable indicates if Jumpstarter is available
+                  (explicitly configured or local CRDs detected)
+                type: boolean
+              message:
+                description: Message provides detail about the current phase
+                type: string
+              monitoringEnabled:
+                description: MonitoringEnabled indicates if the ServiceMonitor is
+                  currently deployed
+                type: boolean
+              observedGeneration:
+                description: ObservedGeneration is the most recent generation observed
+                  by the controller.
+                format: int64
+                type: integer
+              osBuildsDeployed:
+                description: OSBuildsDeployed indicates if the OS Builds Tekton tasks
+                  are currently deployed
+                type: boolean
+              phase:
+                description: Phase represents the current phase (Ready, Reconciling,
+                  Failed)
+                type: string
+              tracingEnabled:
+                description: TracingEnabled indicates if tracing is configured and
+                  active
+                type: boolean
+              userNamespacesSupported:
+                description: |-
+                  UserNamespacesSupported indicates if the cluster supports user namespaces in pods
+                  (SCC userNamespaceLevel field). When false, workspace pods use privileged mode.
+                type: boolean
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

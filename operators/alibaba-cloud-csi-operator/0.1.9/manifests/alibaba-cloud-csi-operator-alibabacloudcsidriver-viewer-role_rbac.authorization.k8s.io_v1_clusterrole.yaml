@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: alibaba-cloud-csi-operator
+  name: alibaba-cloud-csi-operator-alibabacloudcsidriver-viewer-role
+rules:
+- apiGroups:
+  - csi.alibabacloud.com
+  resources:
+  - alibabacloudcsidrivers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - csi.alibabacloud.com
+  resources:
+  - alibabacloudcsidrivers/status
+  verbs:
+  - get

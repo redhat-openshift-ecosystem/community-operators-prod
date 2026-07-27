@@ -1,0 +1,30 @@
+apiVersion: console.openshift.io/v1
+kind: ConsolePlugin
+metadata:
+  name: file-integrity-console-plugin
+  labels:
+    app: file-integrity-console-plugin
+    app.kubernetes.io/name: file-integrity-console-plugin
+    app.kubernetes.io/instance: file-integrity-console-plugin
+    app.kubernetes.io/part-of: file-integrity-console-plugin
+    app.kubernetes.io/version: 0.1.0
+spec:
+  displayName: File Integrity
+  i18n:
+    loadType: Preload
+  backend:
+    type: Service
+    service:
+      name: file-integrity-console-plugin
+      namespace: openshift-file-integrity
+      port: 9443
+      basePath: /
+  proxy:
+    - alias: fio-backend
+      authorization: UserToken
+      endpoint:
+        type: Service
+        service:
+          name: file-integrity-console-plugin
+          namespace: openshift-file-integrity
+          port: 9443

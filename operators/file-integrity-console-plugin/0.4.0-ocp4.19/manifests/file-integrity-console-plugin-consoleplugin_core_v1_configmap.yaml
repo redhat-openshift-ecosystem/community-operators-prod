@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: file-integrity-console-plugin-consoleplugin
+  labels:
+    app: file-integrity-console-plugin
+    app.kubernetes.io/name: file-integrity-console-plugin
+    app.kubernetes.io/instance: file-integrity-console-plugin
+    app.kubernetes.io/part-of: file-integrity-console-plugin
+    app.kubernetes.io/version: 0.4.0-ocp4.19
+data:
+  consoleplugin.yaml: |
+    apiVersion: console.openshift.io/v1
+    kind: ConsolePlugin
+    metadata:
+      name: file-integrity-console-plugin
+      labels:
+        app: file-integrity-console-plugin
+        app.kubernetes.io/name: file-integrity-console-plugin
+        app.kubernetes.io/instance: file-integrity-console-plugin
+        app.kubernetes.io/part-of: file-integrity-console-plugin
+        app.kubernetes.io/version: "0.4.0-ocp4.19"
+    spec:
+      displayName: File Integrity
+      i18n:
+        loadType: Preload
+      backend:
+        type: Service
+        service:
+          name: file-integrity-console-plugin
+          namespace: file-integrity-console-plugin
+          port: 9443
+          basePath: /
+      proxy:
+        # authorization: UserToken makes the console forward the logged-in user's
+        # token to us. Without it the backend would see no credentials and reject
+        # every request — by design, it never falls back to its own identity.
+        #
+        # Declared even when backend.features.fileRetrieve is off. The switch that
+        # matters is --enable-file-retrieve on the backend, which answers 501 and
+        # asks for no cluster credentials at all; dropping the proxy instead would
+        # make the console answer 404, which the UI can only report as "no scan pod
+        # found on this node" — the wrong reason.
+        - alias: fio-backend
+          authorization: UserToken
+          endpoint:
+            type: Service
+            service:
+              name: file-integrity-console-plugin
+              namespace: file-integrity-console-plugin
+              port: 9443

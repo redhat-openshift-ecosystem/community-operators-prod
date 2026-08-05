@@ -1,0 +1,308 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/os.linux: supported
+  annotations:
+    capabilities: Basic Install
+    categories: Security,Monitoring
+    repository: https://github.com/amedeos/file-integrity-console-plugin
+    support: https://github.com/amedeos/file-integrity-console-plugin/issues
+    description: >-
+      Node-by-node view of Red Hat File Integrity Operator (AIDE) scan results in the OpenShift
+      console.
+    console.openshift.io/plugins: '["file-integrity-console-plugin"]'
+    operatorframework.io/suggested-namespace: file-integrity-console-plugin
+    containerImage: quay.io/asalvati/file-integrity-console-plugin:0.4.1
+    createdAt: '2026-08-05T13:53:20Z'
+    alm-examples: '[]'
+  name: file-integrity-console-plugin.v0.4.1
+spec:
+  displayName: File Integrity Console Plugin
+  description: |
+    A console plugin for the [File Integrity Operator][fio]: a node-by-node view
+    of AIDE scan results, with the failing files parsed out of the operator's
+    result ConfigMaps instead of read as raw log text.
+
+    It adds a **Compute → File Integrity** entry to the administrator
+    perspective, visible only on clusters where the `FileIntegrity` CRD exists.
+
+    ## What it shows
+
+    * **Overview** — every `FileIntegrityNodeStatus` in the cluster, its phase,
+      and the count of files added, changed and removed.
+    * **Node report** — the AIDE report for one node, parsed into a filterable
+      table, with the attribute differences for each changed file. Both the AIDE
+      0.16 (`CONTENTEX`) and 0.18 (`CONTENT_EX`) report grammars are read, and a
+      report the operator truncated is labelled as truncated rather than shown
+      as though it were complete.
+    * **Re-initialise** — per node or cluster-wide, behind a confirmation that
+      spells out that the current baseline is discarded.
+    * **History** — over 24 hours, 7 days or 30 days: when a node was reporting
+      changes, how many nodes were failing over time, and how many baseline
+      re-initialisations happened, separating the ones a person asked for from
+      the operator's own. It needs the operator's metrics to be collected; see
+      below.
+
+    ## How it talks to the cluster
+
+    **The request-serving path has no authority of its own.** Everything the
+    backend does against the API server on behalf of a browsing user it does
+    with that user's token, resolving the caller with `SelfSubjectReview` and
+    checking rights with `SelfSubjectAccessReview`. A request arriving without a
+    bearer token is rejected; it is never served with the plugin's own
+    credentials.
+
+    Its ServiceAccount holds **no namespaced rule at all**. Cluster-wide it
+    holds **two, and they are about installing rather than about data**: it may
+    create a `ConsolePlugin`, and it may read and update the one named after
+    itself. That is how the plugin registers with the console, which it does at
+    startup rather than through a shipped manifest — an OLM bundle cannot state
+    the namespace it will be installed into, so the pod reads its own and fills
+    it in. Neither rule reaches anything belonging to anyone.
+
+    ## Reading files from nodes
+
+    One feature reads the current contents of a file from a node, so a reported
+    change can be looked at. It reads as though it grants something, and it does
+    not: the read runs as the browsing user, is refused unless they hold
+    `pods/exec` in the scan namespace, and is recorded against their name in the
+    API server's audit log. A deny list — refusing keys, certificates, shadow
+    files and the static pod resources — is checked before the caller is even
+    authenticated, so probing it costs nothing and is attributed to no session.
+
+    It can be switched off, and then the endpoint answers `501` and the backend
+    builds no Kubernetes client at all. Set `PLUGIN_ENABLE_FILE_RETRIEVE` to
+    `false` through the Subscription to do that.
+
+    ## Before you install
+
+    * **Install the [File Integrity Operator][fio] first.** This plugin displays
+      what that operator produces and scans nothing itself. On a cluster with no
+      `FileIntegrity` CRD the navigation entry stays hidden.
+    * **It installs into its own namespace,** `file-integrity-console-plugin`,
+      which the form offers by default and creates for you. It does not need to
+      sit beside the File Integrity Operator: it reads that operator's objects
+      through the browsing user's token, and where to look for them is a setting
+      of its own. Any other namespace works too — the plugin reads the one it
+      was installed into and registers with the console accordingly.
+    * **Label the operator's namespace if you want the history panels.** They
+      read the File Integrity Operator's own metrics through the console's
+      Prometheus proxy, and on a fresh cluster nobody collects them: the
+      operator ships a `ServiceMonitor`, but its namespace carries no
+      `openshift.io/cluster-monitoring` label, so Prometheus never scrapes it.
+      The panels say so rather than drawing an empty chart. The remedy is a
+      cluster administrator's, and this plugin holds no permission anywhere
+      near that label:
+
+      ```
+      oc label namespace openshift-file-integrity openshift.io/cluster-monitoring=true
+      ```
+
+      History begins when collection begins — labelling the namespace does not
+      recover the past. Everything else works without it.
+    * **Enable the plugin when the form asks.** OperatorHub defaults the *Console
+      plugin* choice to **Disabled** for any catalogue it does not trust, which
+      includes the community one. Left that way, the operator runs and no menu
+      entry appears. To enable it after the fact:
+
+      ```
+      oc patch console.operator.openshift.io cluster --type=json \
+        -p '[{"op":"add","path":"/spec/plugins/-","value":"file-integrity-console-plugin"}]'
+      ```
+
+    Uninstalling leaves the cluster-scoped `ConsolePlugin` behind, because a
+    bundle cannot ship the Job that would remove it. Delete it by hand:
+    `oc delete consoleplugin file-integrity-console-plugin`.
+
+    [fio]: https://github.com/openshift/file-integrity-operator
+  keywords:
+    - file integrity
+    - aide
+    - security
+    - compliance
+    - console plugin
+  maturity: alpha
+  provider:
+    name: amedeos
+    url: https://github.com/amedeos/file-integrity-console-plugin
+  maintainers:
+    - name: amedeos
+      email: cops.capable425@passmail.net
+  links:
+    - name: Source
+      url: https://github.com/amedeos/file-integrity-console-plugin
+    - name: Documentation
+      url: https://github.com/amedeos/file-integrity-console-plugin#readme
+    - name: File Integrity Operator
+      url: https://github.com/openshift/file-integrity-operator
+  installModes:
+    - type: OwnNamespace
+      supported: true
+    - type: SingleNamespace
+      supported: false
+    - type: MultiNamespace
+      supported: false
+    - type: AllNamespaces
+      supported: false
+  customresourcedefinitions: {}
+  version: 0.4.1
+  minKubeVersion: 1.35.0
+  replaces: file-integrity-console-plugin.v0.4.0
+  icon:
+    - base64data: >-
+        PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4IiByb2xlPSJpbWciCiAgICAgYXJpYS1sYWJlbD0iRmlsZSBJbnRlZ3JpdHkgQ29uc29sZSBQbHVnaW4iPgogIDx0aXRsZT5GaWxlIEludGVncml0eSBDb25zb2xlIFBsdWdpbjwvdGl0bGU+CiAgPCEtLQogICAgQSBmaWxlIHdob3NlIGNvcm5lciBpcyBmb2xkZWQsIHdpdGggYSBjaGVjayBpbnNpZGUgYSBzaGllbGQ6IHRoZSBvcGVyYXRvcgogICAgcmVwb3J0cywgZmlsZSBieSBmaWxlLCB3aGV0aGVyIHdoYXQgaXMgb24gYSBub2RlIHN0aWxsIG1hdGNoZXMgdGhlIGJhc2VsaW5lLgogICAgRGVsaWJlcmF0ZWx5IG5vdCBSZWQgSGF0J3MgcGFsZXR0ZSBvciBtYXJrcyDigJQgdGhpcyBpcyBhIHRoaXJkLXBhcnR5IHBsdWdpbgogICAgZm9yIHRoZWlyIG9wZXJhdG9yLCBub3Qgc29tZXRoaW5nIHB1Ymxpc2hlZCBieSB0aGVtLgogIC0tPgogIDxyZWN0IHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiByeD0iMjAiIGZpbGw9IiMxYjI3MzMiLz4KICA8cGF0aCBkPSJNMzYgMjZoMzVsMjEgMjF2NTVhNSA1IDAgMCAxLTUgNUgzNmE1IDUgMCAwIDEtNS01VjMxYTUgNSAwIDAgMSA1LTV6IgogICAgICAgIGZpbGw9IiNlOGVkZjIiLz4KICA8cGF0aCBkPSJNNzEgMjZsMjEgMjFINzZhNSA1IDAgMCAxLTUtNXoiIGZpbGw9IiNhN2I2YzQiLz4KICA8cGF0aCBkPSJNNjQgNTVsMTkgN3YxNmMwIDExLTggMjAtMTkgMjQtMTEtNC0xOS0xMy0xOS0yNFY2MnoiIGZpbGw9IiMyYjlhZjMiLz4KICA8cGF0aCBkPSJNNTUgNzlsNyA3IDE1LTE1IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iNyIKICAgICAgICBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==
+      mediatype: image/svg+xml
+  install:
+    strategy: deployment
+    spec:
+      permissions:
+        - serviceAccountName: file-integrity-console-plugin
+          rules: []
+      clusterPermissions:
+        - serviceAccountName: file-integrity-console-plugin
+          rules:
+            - apiGroups:
+                - console.openshift.io
+              resources:
+                - consoleplugins
+              verbs:
+                - create
+            - apiGroups:
+                - console.openshift.io
+              resources:
+                - consoleplugins
+              resourceNames:
+                - file-integrity-console-plugin
+              verbs:
+                - get
+                - update
+                - patch
+      deployments:
+        - name: file-integrity-console-plugin
+          label:
+            app: file-integrity-console-plugin
+            app.kubernetes.io/name: file-integrity-console-plugin
+            app.kubernetes.io/instance: file-integrity-console-plugin
+            app.kubernetes.io/part-of: file-integrity-console-plugin
+            app.kubernetes.io/version: 0.4.1
+          spec:
+            replicas: 2
+            selector:
+              matchLabels:
+                app: file-integrity-console-plugin
+                app.kubernetes.io/name: file-integrity-console-plugin
+                app.kubernetes.io/instance: file-integrity-console-plugin
+                app.kubernetes.io/part-of: file-integrity-console-plugin
+            template:
+              metadata:
+                labels:
+                  app: file-integrity-console-plugin
+                  app.kubernetes.io/name: file-integrity-console-plugin
+                  app.kubernetes.io/instance: file-integrity-console-plugin
+                  app.kubernetes.io/part-of: file-integrity-console-plugin
+                  app.kubernetes.io/version: 0.4.1
+                annotations:
+                  checksum/policy: 42ba610a86d150941363115a6aad91c30c4d108039d4f16ca498999e39039a06
+                  checksum/consoleplugin: c0935b00b1663a781d041343d39cc9d84b355e47841a15f4b2ed67a5b4730b1f
+              spec:
+                serviceAccountName: file-integrity-console-plugin
+                initContainers:
+                  - name: register-console-plugin
+                    image: quay.io/asalvati/file-integrity-console-plugin:0.4.1
+                    imagePullPolicy: IfNotPresent
+                    args:
+                      - ensure-consoleplugin
+                    env:
+                      - name: PLUGIN_POD_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                      readOnlyRootFilesystem: true
+                    resources:
+                      limits:
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 50Mi
+                    volumeMounts:
+                      - name: consoleplugin
+                        readOnly: true
+                        mountPath: /etc/file-integrity-plugin
+                containers:
+                  - name: file-integrity-console-plugin
+                    image: quay.io/asalvati/file-integrity-console-plugin:0.4.1
+                    args:
+                      - '--listen=:9443'
+                      - '--tls-cert-file=/var/cert/tls.crt'
+                      - '--tls-key-file=/var/cert/tls.key'
+                      - '--static-dir=/opt/app-root/web'
+                    env:
+                      - name: PLUGIN_FIO_NAMESPACE
+                        value: openshift-file-integrity
+                      - name: PLUGIN_MAX_FILE_BYTES
+                        value: '1048576'
+                      - name: PLUGIN_ENABLE_FILE_RETRIEVE
+                        value: 'true'
+                    ports:
+                      - containerPort: 9443
+                        protocol: TCP
+                    imagePullPolicy: IfNotPresent
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                      readOnlyRootFilesystem: true
+                    resources:
+                      limits:
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 50Mi
+                    readinessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 9443
+                        scheme: HTTPS
+                      initialDelaySeconds: 2
+                      periodSeconds: 10
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 9443
+                        scheme: HTTPS
+                      initialDelaySeconds: 10
+                      periodSeconds: 30
+                    volumeMounts:
+                      - name: plugin-cert
+                        readOnly: true
+                        mountPath: /var/cert
+                volumes:
+                  - name: plugin-cert
+                    secret:
+                      secretName: file-integrity-console-plugin-cert
+                      defaultMode: 420
+                  - name: consoleplugin
+                    configMap:
+                      name: file-integrity-console-plugin-consoleplugin
+                restartPolicy: Always
+                dnsPolicy: ClusterFirst
+                securityContext:
+                  runAsNonRoot: true
+                  seccompProfile:
+                    type: RuntimeDefault
+            strategy:
+              type: RollingUpdate
+              rollingUpdate:
+                maxUnavailable: 25%
+                maxSurge: 25%
+  relatedImages:
+    - name: plugin
+      image: quay.io/asalvati/file-integrity-console-plugin:0.4.1

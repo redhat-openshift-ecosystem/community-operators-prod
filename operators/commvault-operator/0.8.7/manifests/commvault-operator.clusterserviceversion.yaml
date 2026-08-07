@@ -29,7 +29,7 @@ metadata:
     categories: "Monitoring"
     capabilities: Basic Install
     certified: "false"
-    containerImage: quay.io/rdikkar/commvault:operator-0.8.6
+    containerImage: quay.io/rdikkar/commvault:operator-0.8.7
     createdAt: "2025-01-01T00:00:00Z"
     support: Commvault
     repository: https://github.com/rohithnair2022/ocp-plugin
@@ -183,11 +183,11 @@ spec:
                 terminationGracePeriodSeconds: 10
                 containers:
                   - name: manager
-                    image: quay.io/rdikkar/commvault:operator-0.8.6
+                    image: quay.io/rdikkar/commvault:operator-0.8.7
                     imagePullPolicy: IfNotPresent
                     env:
                       - name: GATEWAY_IMAGE
-                        value: quay.io/rdikkar/commvault:gateway-0.8.6
+                        value: quay.io/rdikkar/commvault:gateway-0.8.7
                       - name: OPERATOR_NAMESPACE
                         valueFrom:
                           fieldRef:
@@ -254,7 +254,7 @@ spec:
                 terminationGracePeriodSeconds: 10
                 containers:
                   - name: console-plugin
-                    image: quay.io/rdikkar/commvault:plugin-0.8.6
+                    image: quay.io/rdikkar/commvault:plugin-0.8.7
                     imagePullPolicy: IfNotPresent
                     env:
                       - name: COMMVAULT_NAMESPACE
@@ -343,8 +343,8 @@ spec:
               - urn:alm:descriptor:io.kubernetes.conditions
   relatedImages:
     - name: operator
-      image: quay.io/rdikkar/commvault:operator-0.8.6
+      image: quay.io/rdikkar/commvault:operator-0.8.7
     - name: gateway
-      image: quay.io/rdikkar/commvault:gateway-0.8.6
+      image: quay.io/rdikkar/commvault:gateway-0.8.7
     - name: console-plugin
-      image: quay.io/rdikkar/commvault:plugin-0.8.6
+      image: quay.io/rdikkar/commvault:plugin-0.8.7

@@ -86,7 +86,7 @@ spec:
 
     ### Getting Started
 
-    1. Install the operator from OperatorHub into the `commvault` namespace
+    1. In OperatorHub, select **All namespaces on the cluster** and choose the namespace where the operator will run
     2. Navigate to **Commvault** in the OpenShift console navigation
     3. Follow the setup wizard -- enter your Command Center URL and access token
     4. The operator deploys the gateway automatically; data appears in the console when the gateway is ready
@@ -249,7 +249,7 @@ spec:
                 terminationGracePeriodSeconds: 10
                 containers:
                   - name: console-plugin
-                    image: quay.io/rdikkar/commvault@sha256:c74c00003aaeedaf221d40c0759609d0746ca66ef99c092165710c6b8fc53b4a
+                    image: quay.io/rdikkar/commvault@sha256:1669a603519203490e93e6bfe357300307656263af529a6c560deaaa60b02118
                     imagePullPolicy: IfNotPresent
                     env:
                       - name: COMMVAULT_NAMESPACE
@@ -342,4 +342,4 @@ spec:
     - name: gateway
       image: quay.io/rdikkar/commvault@sha256:fa4c324d4d0ef6a3b38213275db50ec33030c80edccdf7dc46bc87c6a870a7fb
     - name: console-plugin
-      image: quay.io/rdikkar/commvault@sha256:c74c00003aaeedaf221d40c0759609d0746ca66ef99c092165710c6b8fc53b4a
+      image: quay.io/rdikkar/commvault@sha256:1669a603519203490e93e6bfe357300307656263af529a6c560deaaa60b02118

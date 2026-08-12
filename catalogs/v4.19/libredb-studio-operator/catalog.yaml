@@ -1,0 +1,129 @@
+---
+defaultChannel: alpha
+name: libredb-studio-operator
+schema: olm.package
+---
+entries:
+- name: libredb-studio-operator.v0.9.59
+name: alpha
+package: libredb-studio-operator
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/libredb-studio-operator:0.9.59
+name: libredb-studio-operator.v0.9.59
+package: libredb-studio-operator
+properties:
+- type: olm.gvk
+  value:
+    group: studio.libredb.org
+    kind: LibreDBStudio
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: libredb-studio-operator
+    version: 0.9.59
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "studio.libredb.org/v1alpha1",
+            "kind": "LibreDBStudio",
+            "metadata": {
+              "name": "libredbstudio-sample"
+            },
+            "spec": {
+              "persistence": {
+                "enabled": true,
+                "size": "1Gi"
+              },
+              "replicaCount": 1
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: Database, Developer Tools
+      containerImage: ghcr.io/libredb/libredb-studio-operator:0.9.59
+      createdAt: "2026-07-20T09:40:28Z"
+      description: Open-source web-based SQL IDE for PostgreSQL, MySQL, Oracle, SQL
+        Server, SQLite, MongoDB and Redis, with AI-powered query assistance.
+      operators.operatorframework.io/builder: operator-sdk-v1.42.3
+      operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+      repository: https://github.com/libredb/libredb-studio
+      support: LibreDB
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: A LibreDB Studio instance managed by the operator. The spec mirrors
+          the Helm chart values; every field left unset falls back to the chart defaults.
+        displayName: LibreDB Studio
+        kind: LibreDBStudio
+        name: libredbstudios.studio.libredb.org
+        version: v1alpha1
+    description: |
+      LibreDB Studio is an open-source, web-based SQL IDE. Query PostgreSQL,
+      MySQL, Oracle, SQL Server, SQLite, MongoDB and Redis from the browser —
+      with AI-powered query assistance (natural-language-to-SQL, explain, fix),
+      an ERD viewer, schema diff and a data profiler. No desktop client required.
+
+      This Helm-based operator installs and manages LibreDB Studio through the
+      `LibreDBStudio` custom resource, which exposes the full Helm chart
+      configuration. With no credentials provided, the instance starts in
+      zero-config bootstrap mode: a JWT secret is generated automatically and a
+      first-run admin account is created. For production, switch
+      `config.authBootstrap` to `"off"` and supply an existing Secret.
+
+      ### Usage
+
+      Create a `LibreDBStudio` resource; every field left unset falls back to
+      the chart defaults. See the sample on this page for a minimal start.
+    displayName: LibreDB Studio
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - sql
+    - database
+    - ide
+    - sql-editor
+    - postgresql
+    - mysql
+    - mongodb
+    - redis
+    - oracle
+    - sql-server
+    - sqlite
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Website
+      url: https://libredb.org
+    - name: Source Code
+      url: https://github.com/libredb/libredb-studio
+    - name: Helm Chart
+      url: https://libredb.org/libredb-studio/
+    maintainers:
+    - email: yusuf.gundogdu@sekoya.tech
+      name: Yusuf Gündoğdu
+    - email: cevheri.bozoglan@sekoya.tech
+      name: Mehmet Cevheri Bozoğlan
+    maturity: alpha
+    minKubeVersion: 1.26.0
+    provider:
+      name: LibreDB
+      url: https://libredb.org
+relatedImages:
+- image: ghcr.io/libredb/libredb-studio-operator:0.9.59
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/libredb-studio-operator:0.9.59
+  name: ""
+schema: olm.bundle

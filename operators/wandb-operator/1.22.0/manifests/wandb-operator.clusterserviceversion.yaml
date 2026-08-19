@@ -227,8 +227,22 @@ spec:
           - list
           - watch
         - apiGroups:
+          - policy
+          resources:
+          - poddisruptionbudgets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
           - rbac.authorization.k8s.io
           resources:
+          - clusterrolebindings
+          - clusterroles
           - rolebindings
           - roles
           verbs:
@@ -236,6 +250,7 @@ spec:
           - delete
           - get
           - list
+          - patch
           - update
           - watch
         - nonResourceURLs:
@@ -276,6 +291,12 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: spec.serviceAccountName
+                - name: HELM_CACHE_HOME
+                  value: /tmp/helm/cache
+                - name: HELM_CONFIG_HOME
+                  value: /tmp/helm/config
+                - name: HELM_DATA_HOME
+                  value: /tmp/helm/data
                 image: quay.io/wandb_tools/wandb-k8s-operator:1.22.0
                 livenessProbe:
                   httpGet:

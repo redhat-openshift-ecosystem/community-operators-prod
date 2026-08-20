@@ -8,6 +8,8 @@ schema: olm.package
 ---
 entries:
 - name: openstack-lightspeed-operator.v0.0.1
+- name: openstack-lightspeed-operator.v0.0.2
+  replaces: openstack-lightspeed-operator.v0.0.1
 name: alpha
 package: openstack-lightspeed-operator
 schema: olm.channel
@@ -155,4 +157,248 @@ relatedImages:
   name: openstack-lightspeed-image-url-default
 - image: quay.io/openstack-lightspeed/rag-content@sha256:c9a2625fbed1924afe8350ae4d6dd2b57adfe5014fef5ee925b3bdfb8c562f1d
   name: openstack_lightspeed_image_url_default
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/openstack-lightspeed-operator:0.0.2
+name: openstack-lightspeed-operator.v0.0.2
+package: openstack-lightspeed-operator
+properties:
+- type: olm.gvk
+  value:
+    group: lightspeed.openstack.org
+    kind: OpenStackLightspeed
+    version: v1beta1
+- type: olm.package
+  value:
+    packageName: openstack-lightspeed-operator
+    version: 0.0.2
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "lightspeed.openstack.org/v1beta1",
+            "kind": "OpenStackLightspeed",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "openstack-lightspeed-operator"
+              },
+              "name": "openstacklightspeed-sample"
+            },
+            "spec": {
+              "llmCredentials": "openstack-lightspeed-apitoken",
+              "llmEndpoint": "http://llm_provider:11434/v1",
+              "llmEndpointType": "openai",
+              "modelName": "llama3.1:8b",
+              "tlsCACertBundle": "openstack-lightspeed-certs"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: AI/Machine Learning
+      containerImage: quay.io/openstack-lightspeed/operator@sha256:6f7296b3f03ea1063167e65813f105a830d9f27b9f538d7c12238a0296823986
+      createdAt: "2026-08-11T10:01:26Z"
+      description: AI-powered virtual assistant for Red Hat OpenStack Services on
+        OpenShift
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/suggested-namespace: openstack-lightspeed
+      operators.operatorframework.io/builder: operator-sdk-v1.38.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/openstack-k8s-operators/lightspeed-operator
+      support: Community
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: OpenStackLightspeed is the Schema for the openstacklightspeeds
+          API
+        displayName: Open Stack Lightspeed
+        kind: OpenStackLightspeed
+        name: openstacklightspeeds.lightspeed.openstack.org
+        resources:
+        - kind: ClusterServiceVersion
+          name: ""
+          version: v1alpha1
+        - kind: InstallPlan
+          name: ""
+          version: v1alpha1
+        - kind: Subscription
+          name: ""
+          version: v1alpha1
+        - kind: NetworkPolicy
+          name: lightspeed-app-server
+          version: v1
+        - kind: Service
+          name: lightspeed-app-server
+          version: v1
+        - kind: ServiceAccount
+          name: lightspeed-app-server
+          version: v1
+        - kind: ClusterRole
+          name: lightspeed-app-server-sar-role
+          version: v1
+        - kind: ClusterRoleBinding
+          name: lightspeed-app-server-sar-role-binding
+          version: v1
+        - kind: Secret
+          name: lightspeed-postgres-bootstrap
+          version: v1
+        - kind: Secret
+          name: lightspeed-postgres-certs
+          version: v1
+        - kind: ConfigMap
+          name: lightspeed-postgres-conf
+          version: v1
+        - kind: Secret
+          name: lightspeed-postgres-secret
+          version: v1
+        - kind: Deployment
+          name: lightspeed-postgres-server
+          version: v1
+        - kind: NetworkPolicy
+          name: lightspeed-postgres-server
+          version: v1
+        - kind: Service
+          name: lightspeed-postgres-server
+          version: v1
+        - kind: ConfigMap
+          name: lightspeed-stack-config
+          version: v1
+        - kind: Deployment
+          name: lightspeed-stack-deployment
+          version: v1
+        - kind: Secret
+          name: lightspeed-tls
+          version: v1
+        - kind: ConfigMap
+          name: llama-stack-config
+          version: v1
+        - kind: ConfigMap
+          name: mcp-config
+          version: v1
+        - kind: Secret
+          name: metrics-reader-token
+          version: v1
+        - kind: PersistentVolumeClaim
+          name: openstack-lightspeed-database
+          version: v1
+        specDescriptors:
+        - description: |-
+            Secret name containing API token for the LLMEndpoint. The secret must contain
+            a field named "apitoken" which holds the token value.
+          displayName: LLM Credentials Secret
+          path: llmCredentials
+        - description: URL pointing to the LLM
+          displayName: LLM Endpoint
+          path: llmEndpoint
+        - description: Type of the provider serving the LLM
+          displayName: Provider Type
+          path: llmEndpointType
+        - description: 'Log level for the dataverse exporter sidecar container. Supports
+            standard Python log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL.'
+          displayName: Dataverse Exporter Log Level
+          path: logging.dataverseExporterLogLevel
+        - description: 'Log level for the lightspeed-service-api container. Supports
+            standard Python log levels: DEBUG, INFO, WARNING, ERROR, CRITICAL.'
+          displayName: Lightspeed Stack Log Level
+          path: logging.lightspeedStackLogLevel
+        - description: Log level configuration for the OGX/llama-stack container.
+            Supports standard levels (INFO, DEBUG) or fine-grained control using format
+            "component=level,component=level" (e.g., "core=debug,providers=info").
+          displayName: OGX Log Level
+          path: logging.ogxLogLevel
+        - description: Log level for the PostgreSQL container. When set to DEBUG,
+            enables logging of all SQL statements (log_statement = all).
+          displayName: PostgreSQL Log Level
+          path: logging.postgresLogLevel
+        - description: Name of the model to use at the API endpoint provided in LLMEndpoint
+          displayName: Model Name
+          path: modelName
+        - description: Configmap name containing a CA Certificates bundle
+          displayName: TLS CA Certificate Bundle
+          path: tlsCACertBundle
+        version: v1beta1
+    description: |-
+      OpenStack Lightspeed is a generative AI-based virtual assistant for Red Hat OpenStack Services on OpenShift (RHOSO) users which integrates into the OpenShift Lightspeed.
+
+      OpenStack Lightspeed can answer natural-language questions about Red Hat OpenStack Services on OpenShift (RHOSO). It can assist users in troubleshooting issues, providing configuration guidance, and offering best practices for managing their OpenStack environments on OpenShift.
+
+      To set up the OpenStack Lightspeed Operator, you will need a Large Language Model (LLM). You can run one yourself with Red Hat Enterprise Linux AI (RHELAI) or Red Hat OpenShift AI (RHOAI), or you can use a model from a SaaS provider such as OpenAI.
+    displayName: OpenStack Lightspeed (Community)
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+    keywords:
+    - ai
+    - assistant
+    - openstack
+    - llm
+    links:
+    - name: OpenStack Lightspeed Operator
+      url: https://github.com/openstack-k8s-operators/lightspeed-operator
+    maintainers:
+    - email: lmartins@redhat.com
+      name: Lucas Alvares Gomes
+    - email: geguileo@redhat.com
+      name: Gorka Eguileor
+    - email: lpiwowar@redhat.com
+      name: Lukas Piwowarski
+    maturity: alpha
+    minKubeVersion: 1.31.0
+    provider:
+      name: Red Hat
+      url: https://github.com/openstack-k8s-operators/lightspeed-operator
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/openstack-lightspeed-operator:0.0.2
+  name: ""
+- image: quay.io/lightspeed-core/lightspeed-stack@sha256:b8de9b9507bbf2c667c833751987e0385ea30a5c9276c4832f70e3de105c91eb
+  name: lcore-image-url-default
+- image: quay.io/lightspeed-core/lightspeed-stack@sha256:b8de9b9507bbf2c667c833751987e0385ea30a5c9276c4832f70e3de105c91eb
+  name: lcore_image_url_default
+- image: quay.io/lightspeed-core/lightspeed-to-dataverse-exporter@sha256:21224633b25d8d1da0989932071f080dd28bcf7ca2afe1e867693169ffa1f0e1
+  name: exporter_image_url_default
+- image: quay.io/lightspeed-core/lightspeed-to-dataverse-exporter@sha256:21224633b25d8d1da0989932071f080dd28bcf7ca2afe1e867693169ffa1f0e1
+  name: exporter-image-url-default
+- image: quay.io/openstack-lightspeed/lightspeed-mcps@sha256:5c3964a0cf791582788b6d4c383c68355b00ee1dcf60e5f5d853ffbd62a8d543
+  name: mcp_server_image_url_default
+- image: quay.io/openstack-lightspeed/lightspeed-mcps@sha256:5c3964a0cf791582788b6d4c383c68355b00ee1dcf60e5f5d853ffbd62a8d543
+  name: mcp-server-image-url-default
+- image: quay.io/openstack-lightspeed/operator@sha256:6f7296b3f03ea1063167e65813f105a830d9f27b9f538d7c12238a0296823986
+  name: manager
+- image: quay.io/openstack-lightspeed/rag-content@sha256:cafc62d003bd90c32fa9ed20b981eaedf223d56446541dc221778555b1df1406
+  name: openstack-lightspeed-image-url-default
+- image: quay.io/openstack-lightspeed/rag-content@sha256:cafc62d003bd90c32fa9ed20b981eaedf223d56446541dc221778555b1df1406
+  name: openstack_lightspeed_image_url_default
+- image: registry.redhat.io/offline-knowledge-portal/rhokp-rhel9@sha256:edcecf2665cb2dbd1a77d7bd228b5864124b2a585504895684bfb85215815e1b
+  name: okp-image-url-default
+- image: registry.redhat.io/offline-knowledge-portal/rhokp-rhel9@sha256:edcecf2665cb2dbd1a77d7bd228b5864124b2a585504895684bfb85215815e1b
+  name: okp_image_url_default
+- image: registry.redhat.io/openshift-lightspeed/lightspeed-console-plugin-pf5-rhel9@sha256:4866c666e4aec02d6e9e93f43845da602b4ea97626b8fc42edfe664d84c5c7af
+  name: console-pf5-image-url-default
+- image: registry.redhat.io/openshift-lightspeed/lightspeed-console-plugin-pf5-rhel9@sha256:4866c666e4aec02d6e9e93f43845da602b4ea97626b8fc42edfe664d84c5c7af
+  name: console_pf5_image_url_default
+- image: registry.redhat.io/openshift-lightspeed/lightspeed-console-plugin-rhel9@sha256:97730cfd3d8cd526cea5ada957daa9247287830e911da8dca098ef81d072583f
+  name: console-image-url-default
+- image: registry.redhat.io/openshift-lightspeed/lightspeed-console-plugin-rhel9@sha256:97730cfd3d8cd526cea5ada957daa9247287830e911da8dca098ef81d072583f
+  name: console_image_url_default
+- image: registry.redhat.io/rhel9/postgresql-16@sha256:e9a9876e2655647ed6fa5de78e18277eb3954ab8ee985a0cfda16e259a765a44
+  name: postgres_image_url_default
+- image: registry.redhat.io/rhel9/postgresql-16@sha256:e9a9876e2655647ed6fa5de78e18277eb3954ab8ee985a0cfda16e259a765a44
+  name: postgres-image-url-default
 schema: olm.bundle

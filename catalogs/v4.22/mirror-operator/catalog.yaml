@@ -9,6 +9,8 @@ entries:
   replaces: mirror-operator.v0.1.0
 - name: mirror-operator.v0.1.2
   replaces: mirror-operator.v0.1.1
+- name: mirror-operator.v0.1.3
+  replaces: mirror-operator.v0.1.2
 name: alpha
 package: mirror-operator
 schema: olm.channel
@@ -1192,5 +1194,399 @@ relatedImages:
 - image: quay.io/community-operator-pipeline-prod/mirror-operator:0.1.2
   name: ""
 - image: quay.io/mathianasj/mirror-operator:v0.1.2
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/mirror-operator:0.1.3
+name: mirror-operator.v0.1.3
+package: mirror-operator
+properties:
+- type: olm.gvk
+  value:
+    group: mirror.mirror.mathianasj.github.com
+    kind: ClusterBootstrap
+    version: v1
+- type: olm.gvk
+  value:
+    group: mirror.mirror.mathianasj.github.com
+    kind: CollectionPipeline
+    version: v1
+- type: olm.gvk
+  value:
+    group: mirror.mirror.mathianasj.github.com
+    kind: DisconnectedPlatform
+    version: v1
+- type: olm.gvk
+  value:
+    group: mirror.mirror.mathianasj.github.com
+    kind: MirrorImport
+    version: v1
+- type: olm.gvk
+  value:
+    group: mirror.mirror.mathianasj.github.com
+    kind: MirrorRelease
+    version: v1
+- type: olm.package
+  value:
+    packageName: mirror-operator
+    version: 0.1.3
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+            "kind": "ClusterBootstrap",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "mirror-operator"
+              },
+              "name": "production-cluster-01"
+            },
+            "spec": {
+              "compute": {
+                "replicas": 3
+              },
+              "controlPlane": {
+                "replicas": 3
+              },
+              "installConfig": {
+                "name": "cluster-install-config"
+              },
+              "mirrorRegistry": "quay.internal:8443/mirror",
+              "platform": "vsphere",
+              "pullSecret": {
+                "name": "mirror-pull-secret"
+              },
+              "version": "v2026.05.26.001-manual"
+            }
+          },
+          {
+            "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+            "kind": "CollectionPipeline",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "mirror-operator"
+              },
+              "name": "collection-v4-17"
+            },
+            "spec": {
+              "imageSetConfig": "kind: ImageSetConfiguration\napiVersion: mirror.openshift.io/v1alpha2\nstorageConfig:\n  local:\n    path: /workspace/output\nmirror:\n  platform:\n    channels:\n      - name: stable-4.17\n        type: ocp\n  operators:\n    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.17\n      full: true\n  additionalImages:\n    - name: registry.redhat.io/openshift4/ose-cli:v4.17\n",
+              "signing": {
+                "keySecretRef": {
+                  "name": "cosign-signing-key"
+                },
+                "passwordSecretRef": {
+                  "name": "cosign-signing-key"
+                }
+              },
+              "storage": {
+                "output": {
+                  "filename": "release-v4.17.tar",
+                  "pvc": "mirror-bundles"
+                }
+              },
+              "timeout": "12h",
+              "triggerType": "manual"
+            }
+          },
+          {
+            "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+            "kind": "CollectionPipeline",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "mirror-operator"
+              },
+              "name": "collection-v4-17-incremental"
+            },
+            "spec": {
+              "baseVersion": "v2026.05.26.001-manual",
+              "imageSetConfig": "kind: ImageSetConfiguration\napiVersion: mirror.openshift.io/v1alpha2\nstorageConfig:\n  local:\n    path: /workspace/output\nmirror:\n  platform:\n    channels:\n      - name: stable-4.17\n        type: ocp\n",
+              "incremental": true,
+              "signing": {
+                "keySecretRef": {
+                  "name": "cosign-signing-key"
+                },
+                "passwordSecretRef": {
+                  "name": "cosign-signing-key"
+                }
+              },
+              "storage": {
+                "output": {
+                  "filename": "release-v4.17.tar",
+                  "pvc": "mirror-bundles"
+                }
+              },
+              "triggerType": "manual"
+            }
+          },
+          {
+            "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+            "kind": "CollectionPipeline",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "mirror-operator"
+              },
+              "name": "collection-v4-17-update"
+            },
+            "spec": {
+              "imageSetConfig": "kind: ImageSetConfiguration\napiVersion: mirror.openshift.io/v1alpha2\nstorageConfig:\n  local:\n    path: /workspace/output\nmirror:\n  platform:\n    channels:\n      - name: stable-4.17\n        type: ocp\n        minVersion: 4.17.5  # Updated from parent's baseline\n        maxVersion: 4.17.10\n  operators:\n    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.17\n      packages:\n        - name: advanced-cluster-management\n        - name: openshift-gitops-operator  # New operator added\n  additionalImages:\n    - name: registry.redhat.io/openshift4/ose-cli:v4.17\n",
+              "parentPipeline": "collection-v4-17",
+              "signing": {
+                "keySecretRef": {
+                  "name": "cosign-signing-key"
+                },
+                "passwordSecretRef": {
+                  "name": "cosign-signing-key"
+                }
+              },
+              "storage": {
+                "output": {
+                  "filename": "release-v4.17-update.tar",
+                  "pvc": "mirror-bundles"
+                }
+              },
+              "timeout": "12h",
+              "triggerType": "manual"
+            }
+          },
+          {
+            "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+            "kind": "DisconnectedPlatform",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "mirror-operator"
+              },
+              "name": "disconnected-platform"
+            },
+            "spec": {
+              "architect": {
+                "backendImage": "quay.io/mathianasj/openshift-airgap-architect-backend:9fa8f29be04be2c87b35abbba921def9021c3b80",
+                "enabled": true,
+                "frontendImage": "quay.io/mathianasj/openshift-airgap-architect-frontend:9fa8f29be04be2c87b35abbba921def9021c3b80"
+              },
+              "connected": {
+                "artifactStorage": {
+                  "size": "200Gi"
+                },
+                "collectionSchedule": "0 2 * * 0",
+                "mirrorRegistry": "quay.example.com/mirror",
+                "operators": {
+                  "openshiftPipelines": {},
+                  "rhtas": {},
+                  "rhtpa": {}
+                },
+                "rhtas": {
+                  "oidc": {
+                    "managed": {
+                      "enabled": true,
+                      "realm": "trusted-artifact-signer"
+                    }
+                  }
+                },
+                "rhtpa": {
+                  "database": {
+                    "host": "postgres.example.com",
+                    "name": "rhtpa",
+                    "password": "change-me",
+                    "username": "rhtpa"
+                  },
+                  "storage": {
+                    "size": "200Gi",
+                    "type": "local"
+                  }
+                },
+                "triggerTypes": [
+                  "scheduled",
+                  "manual"
+                ]
+              },
+              "mode": "connected"
+            }
+          },
+          {
+            "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+            "kind": "DisconnectedPlatform",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "mirror-operator"
+              },
+              "name": "disconnected-platform-airgapped"
+            },
+            "spec": {
+              "airgapped": {
+                "acm": {
+                  "enabled": true,
+                  "multiClusterHub": {
+                    "imagePullSecret": {
+                      "name": "pull-secret"
+                    }
+                  },
+                  "subscription": {
+                    "catalogSource": "cs-redhat-operator-index",
+                    "channel": "release-2.12"
+                  }
+                },
+                "bootstrapEnabled": true,
+                "importPath": "/mnt/physical-media",
+                "importScanSchedule": "*/30 * * * *",
+                "managementCluster": true,
+                "quay": {
+                  "enabled": true,
+                  "organizationName": "mirror",
+                  "storage": {
+                    "size": "500Gi"
+                  }
+                },
+                "rhtas": {
+                  "trustedRootKeys": {
+                    "name": "rhtas-trusted-root"
+                  }
+                }
+              },
+              "architect": {
+                "backendImage": "quay.io/mathianasj/openshift-airgap-architect-backend:df56c591ae4f12ce8c297695b69f6c264c5f257b",
+                "enabled": true,
+                "frontendImage": "quay.io/mathianasj/openshift-airgap-architect-frontend:df56c591ae4f12ce8c297695b69f6c264c5f257b",
+                "replicas": 1,
+                "route": {
+                  "tls": {
+                    "termination": "edge"
+                  }
+                }
+              },
+              "mode": "airgapped"
+            }
+          },
+          {
+            "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+            "kind": "MirrorImport",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "mirror-operator"
+              },
+              "name": "mirrorimport-sample"
+            },
+            "spec": {
+              "bundle": {
+                "filename": "release-v4.17.tar",
+                "pvc": "imported-bundles"
+              },
+              "collectionVersion": "v2026.05.26.001-manual",
+              "imageSetConfig": "kind: ImageSetConfiguration\napiVersion: mirror.openshift.io/v2alpha1\nmirror:\n  operators:\n  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.17\n",
+              "publish": {
+                "catalogSource": true,
+                "imageContentSourcePolicy": true
+              },
+              "targetRegistry": {
+                "url": "https://quay.airgap.local"
+              },
+              "verify": {
+                "enterpriseContractPolicy": {
+                  "configMapRef": {
+                    "name": "ec-policy"
+                  }
+                },
+                "publicKeySecretRef": {
+                  "name": "cosign-public-key"
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+            "kind": "MirrorRelease",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "mirror-operator"
+              },
+              "name": "release-v4-17-pvc"
+            },
+            "spec": {
+              "imageSetConfig": "kind: ImageSetConfiguration\napiVersion: mirror.openshift.io/v1alpha2\nstorageConfig:\n  local:\n    path: /workspace/output\nmirror:\n  platform:\n    channels:\n      - name: stable-4.17\n        type: ocp\n  operators:\n    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.17\n      full: true\n  additionalImages:\n    - name: registry.redhat.io/openshift4/ose-cli:v4.17\n",
+              "output": {
+                "filename": "release-v4.17.tar",
+                "pvc": "mirror-bundles"
+              }
+            }
+          }
+        ]
+      capabilities: Basic Install
+      containerImage: quay.io/mathianasj/mirror-operator:latest
+      createdAt: "2026-08-28T02:44:15Z"
+      operatorframework.io/suggested-namespace: mirror-operator-system
+      operators.operatorframework.io/builder: operator-sdk-v1.39.2
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - displayName: Cluster Bootstrap
+        kind: ClusterBootstrap
+        name: clusterbootstraps.mirror.mirror.mathianasj.github.com
+        version: v1
+      - displayName: Collection Pipeline
+        kind: CollectionPipeline
+        name: collectionpipelines.mirror.mirror.mathianasj.github.com
+        version: v1
+      - description: DisconnectedPlatform is the top-level orchestrator for managing
+          disconnected OpenShift environments
+        displayName: Disconnected Platform
+        kind: DisconnectedPlatform
+        name: disconnectedplatforms.mirror.mirror.mathianasj.github.com
+        version: v1
+      - displayName: Mirror Import
+        kind: MirrorImport
+        name: mirrorimports.mirror.mirror.mathianasj.github.com
+        version: v1
+      - displayName: Mirror Release
+        kind: MirrorRelease
+        name: mirrorreleases.mirror.mirror.mathianasj.github.com
+        version: v1
+    description: |
+      **Automatic. Systematic. Silvermatic.**
+
+      The Silvermatic manages the disconnected OpenShift lifecycle — so you don't have to. It provides four CRDs: DisconnectedPlatform (top-level orchestrator), CollectionPipeline (builds oc-mirror v2 bundles via Tekton), MirrorImport (imports bundles into airgapped registries), and ClusterBootstrap (bootstraps new clusters). The operator supports supply chain security via Syft SBOM generation, Cosign signing/verification, and Tekton Chains attestations.
+    displayName: The Silvermatic
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+    keywords:
+    - silvermatic
+    - mirror-operator
+    - disconnected
+    - oc-mirror
+    - airgap
+    - openshift
+    - sneakernet
+    links:
+    - name: Mirror Operator
+      url: https://github.com/mathianasj/mirror-operator
+    maintainers:
+    - email: mathianasj@users.noreply.github.com
+      name: Operator Maintainers
+    maturity: alpha
+    minKubeVersion: 1.30.0
+    provider:
+      name: Joshua Mathianas
+      url: https://github.com/mathianasj
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/mirror-operator:0.1.3
+  name: ""
+- image: quay.io/mathianasj/mirror-operator:v0.1.3
   name: ""
 schema: olm.bundle

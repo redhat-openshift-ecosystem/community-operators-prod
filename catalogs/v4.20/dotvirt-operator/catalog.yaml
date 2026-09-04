@@ -83,11 +83,13 @@ entries:
 - name: dotvirt-operator.v0.0.29
 - name: dotvirt-operator.v0.0.32
 - name: dotvirt-operator.v0.0.35
+- name: dotvirt-operator.v0.0.36
   skips:
   - dotvirt-operator.v0.0.27
   - dotvirt-operator.v0.0.28
   - dotvirt-operator.v0.0.29
   - dotvirt-operator.v0.0.32
+  - dotvirt-operator.v0.0.35
 name: stable-v0
 package: dotvirt-operator
 schema: olm.channel
@@ -1379,5 +1381,272 @@ relatedImages:
 - image: quay.io/epheo/dotvirt-operator@sha256:33910c99985d9822446a81071cf528a5d55f941ceaf90dbf60507d7802998f8f
   name: manager
 - image: quay.io/epheo/dotvirt@sha256:dae925e4f2acf12df92f78f8ece35a657a29597fceb8e16eb840beba8bcc308a
+  name: dotvirt
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/dotvirt-operator:0.0.36
+name: dotvirt-operator.v0.0.36
+package: dotvirt-operator
+properties:
+- type: olm.gvk
+  value:
+    group: dotvirt.io
+    kind: Dotvirt
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: dotvirt-operator
+    version: 0.0.36
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "dotvirt.io/v1alpha1",
+            "kind": "Dotvirt",
+            "metadata": {
+              "name": "dotvirt",
+              "namespace": "dotvirt"
+            },
+            "spec": {
+              "forge": {
+                "managed": true
+              },
+              "ingress": {
+                "type": "auto"
+              },
+              "metrics": {
+                "url": "https://thanos-querier.openshift-monitoring.svc.cluster.local:9091"
+              }
+            }
+          }
+        ]
+      capabilities: Seamless Upgrades
+      categories: Developer Tools, Modernization & Migration
+      containerImage: quay.io/epheo/dotvirt-operator@sha256:72d240459ebb6afe36a208198462332013a0974d1c8e57d2b8203cd3fe02b4b8
+      createdAt: "2026-09-04T14:30:44Z"
+      description: Installs dotvirt, a GitOps web console for KubeVirt with a point-and-click
+        workflow familiar to virtualization admins, plus its platform/tenant tier.
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/initialization-resource: |-
+        {
+          "apiVersion": "dotvirt.io/v1alpha1",
+          "kind": "Dotvirt",
+          "metadata": {
+            "name": "dotvirt",
+            "namespace": "dotvirt-operator"
+          },
+          "spec": {
+            "forge": {
+              "managed": true
+            },
+            "ingress": {
+              "type": "auto"
+            },
+            "metrics": {
+              "url": "https://thanos-querier.openshift-monitoring.svc.cluster.local:9091"
+            }
+          }
+        }
+      operatorframework.io/suggested-namespace: dotvirt-operator
+      operators.operatorframework.io/builder: operator-sdk-v1.42.2
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/epheo/dotvirt
+      support: https://github.com/epheo/dotvirt/issues
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: 'A dotvirt install: the workload and Route/Ingress, RBAC, the
+          ArgoCD AppProject tier and ApplicationSet, the platform git repo, and (optionally)
+          a self-hosted Forgejo.'
+        displayName: dotvirt
+        kind: Dotvirt
+        name: dotvirts.dotvirt.io
+        resources:
+        - kind: Deployment
+          name: ""
+          version: v1
+        - kind: Service
+          name: ""
+          version: v1
+        - kind: Route
+          name: ""
+          version: v1
+        specDescriptors:
+        - description: dotvirt app image to deploy. Defaults to the operator's pinned
+            digest, so an operator upgrade rolls the app; set only to override.
+          displayName: App Image
+          path: image
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - description: 'Git forge holding the platform repo: its URL and platform
+            repo, the credentials secret, and whether the operator self-hosts a Forgejo.'
+          displayName: Forge
+          path: forge
+        - description: 'The ArgoCD (OpenShift GitOps) instance dotvirt drives: its
+            namespace and application-controller service account.'
+          displayName: ArgoCD
+          path: argocd
+        - description: How the UI is exposed (a Route on OpenShift or an Ingress on
+            vanilla Kubernetes) and at which host.
+          displayName: Ingress
+          path: ingress
+        - description: Prometheus/Thanos query API backing the Performance tab.
+          displayName: Metrics
+          path: metrics
+        - description: Add "Sign in with OpenShift" beside the token login. The operator
+            publishes the OAuthClient to apply in status.ssoOAuthClient.
+          displayName: OpenShift SSO
+          path: auth.openShiftSSO
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        statusDescriptors:
+        - displayName: Phase
+          path: phase
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - displayName: Console URL
+          path: consoleURL
+          x-descriptors:
+          - urn:alm:descriptor:org.w3:link
+        - displayName: Forge URL
+          path: forgeURL
+          x-descriptors:
+          - urn:alm:descriptor:org.w3:link
+        - displayName: SSO OAuthClient (apply to finish SSO)
+          path: ssoOAuthClient
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - displayName: Forge Admin (reveal bootstrap password)
+          path: forgeAdminHint
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - displayName: Conditions
+          path: conditions
+          x-descriptors:
+          - urn:alm:descriptor:io.kubernetes.conditions
+        version: v1alpha1
+    description: |
+      dotvirt is a web console for KubeVirt with a point-and-click workflow
+      familiar to virtualization admins, built the GitOps way: every project is a git
+      repository of VM manifests, every change ships as a pull request, and
+      ArgoCD applies what merges. dotvirt itself owns nothing: requests run under
+      your own Kubernetes token, and nothing reaches the cluster except through a
+      merged PR.
+
+      ### Get started
+
+      1. Install the operator. The console then offers to create a `Dotvirt`
+         resource; the defaults work as-is on OpenShift.
+      2. Wait for the `Available` condition, then open `status.consoleURL`.
+      3. Sign in with a Kubernetes token (`oc whoami -t`), or set
+         `auth.openShiftSSO: true` and click "Finish SSO setup" once as a
+         cluster admin.
+
+      Every TLS hop is verified out of the box: the operator wires the cluster's
+      ingress and service CAs through the whole stack.
+
+      ### What you get
+
+      - VM inventory and detail views with live power, migrate, and snapshot
+        actions
+      - Every change staged as a reviewable pull request
+      - Per-object GitOps drift and sync status, with one-click resync
+      - Host capacity and balance with DRS-style predictive and automatic
+        rebalancing
+      - Network segments (UDN/CUDN), distributed firewall, and topology views
+      - VM template library, storage, events, issues, and Prometheus-backed
+        metrics
+
+      ### Bring existing VMs under GitOps
+
+      Label a namespace `dotvirt.io/project=<name>`, then use "Attach repo" and
+      "Adopt into git" in the console: running VMs and networks become one
+      reviewable PR. The same flow recovers a project whose repo was lost or
+      whose forge moved; the Changes panel warns before any merge could prune
+      something still running.
+
+      ### Configuration
+
+      The defaults derive everything on OpenShift. Set only what you need:
+
+      - `forge.managed: true` runs an evaluation Forgejo; for production point
+        `forge.url` and `forge.credentialsSecret` at your own Forgejo/Gitea
+      - `ingress.host` pins the console hostname (required on vanilla Kubernetes)
+      - `auth.openShiftSSO` adds "Sign in with OpenShift"
+      - `metrics.url` points the Performance tab at a Prometheus/Thanos API
+
+      Status reports the rest: `consoleURL`, `forgeURL`, `forgeAdminHint` (the
+      command that reveals the managed forge's admin password), `ssoOAuthClient`,
+      and one condition per install step, so `kubectl describe dotvirt` explains
+      a stuck install.
+
+      ### Prerequisites
+
+      - ArgoCD (OpenShift GitOps or community) and KubeVirt: required; the
+        operator waits for them and reports what is missing
+      - OVN-Kubernetes, NMState, CDI: optional; unlock the networking tier and
+        image upload
+
+      ### Uninstalling
+
+      Uninstalling the operator changes nothing: the install and your workloads
+      keep running, and a reinstall picks the `Dotvirt` resource back up.
+      Deleting the `Dotvirt` resource removes the install (console, forge, Argo
+      wiring), never your VMs; the managed forge's git data survives on its
+      PersistentVolumeClaim. A finished SSO leaves its admin-created
+      `OAuthClient` behind: `kubectl delete oauthclient <name>` when retiring
+      for good.
+    displayName: dotvirt operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - kubevirt
+    - gitops
+    - argocd
+    - virtualization
+    - openshift
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Source
+      url: https://github.com/epheo/dotvirt
+    - name: Documentation
+      url: https://github.com/epheo/dotvirt/blob/main/README.md
+    - name: Operator
+      url: https://github.com/epheo/dotvirt/blob/main/operator/README.md
+    maintainers:
+    - email: github@epheo.eu
+      name: epheo
+    maturity: alpha
+    minKubeVersion: 1.30.0
+    provider:
+      name: epheo
+relatedImages:
+- image: codeberg.org/forgejo/forgejo:11-rootless@sha256:5135f11de848bea6d59c0a96688e90c361380ba102bdc08dbd5aa52cca2b179b
+  name: forgejo
+- image: quay.io/community-operator-pipeline-prod/dotvirt-operator:0.0.36
+  name: ""
+- image: quay.io/epheo/dotvirt-operator@sha256:72d240459ebb6afe36a208198462332013a0974d1c8e57d2b8203cd3fe02b4b8
+  name: dotvirt-operator-72d240459ebb6afe36a208198462332013a0974d1c8e57d2b8203cd3fe02b4b8-annotation
+- image: quay.io/epheo/dotvirt-operator@sha256:72d240459ebb6afe36a208198462332013a0974d1c8e57d2b8203cd3fe02b4b8
+  name: manager
+- image: quay.io/epheo/dotvirt@sha256:8aae700cbb961a3acfe64b1699ae9a6244cbde80670b8fadcad25bed18db64d0
   name: dotvirt
 schema: olm.bundle

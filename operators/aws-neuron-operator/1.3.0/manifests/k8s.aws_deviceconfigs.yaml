@@ -1,0 +1,292 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.16.5
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: aws-neuron
+    app.kubernetes.io/name: aws-neuron
+    app.kubernetes.io/part-of: aws-neuron
+  name: deviceconfigs.k8s.aws
+spec:
+  group: k8s.aws
+  names:
+    kind: DeviceConfig
+    listKind: DeviceConfigList
+    plural: deviceconfigs
+    shortNames:
+    - awslabsdc
+    singular: deviceconfig
+  scope: Namespaced
+  versions:
+  - name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: DeviceConfig describes how to enable awslabs GPU device
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DeviceConfigSpec describes how the AMD GPU operator should
+              enable AMD GPU device for customer's use.
+            properties:
+              customSchedulerImage:
+                description: custom scheduler image
+                type: string
+              deviceClasses:
+                description: |-
+                  DeviceClasses lists DeviceClass resources to manage.
+                  When set, the operator creates DeviceClasses using these definitions.
+                  When empty, a default DeviceClass "neuron.aws.com" is created.
+                items:
+                  description: DeviceClassSpec defines a DeviceClass managed by the
+                    operator on behalf of a DeviceConfig.
+                  properties:
+                    config:
+                      description: Config defines per-device configuration passed
+                        to the DRA driver.
+                      items:
+                        description: DeviceClassConfiguration is used in DeviceClass.
+                        properties:
+                          opaque:
+                            description: Opaque provides driver-specific configuration
+                              parameters.
+                            properties:
+                              driver:
+                                description: |-
+                                  Driver is used to determine which kubelet plugin needs
+                                  to be passed these configuration parameters.
+
+                                  An admission policy provided by the driver developer could use this
+                                  to decide whether it needs to validate them.
+
+                                  Must be a DNS subdomain and should end with a DNS domain owned by the
+                                  vendor of the driver. It should use only lower case characters.
+                                type: string
+                              parameters:
+                                description: |-
+                                  Parameters can contain arbitrary data. It is the responsibility of
+                                  the driver developer to handle validation and versioning. Typically this
+                                  includes self-identification and a version ("kind" + "apiVersion" for
+                                  Kubernetes types), with conversion between different versions.
+
+                                  The length of the raw data must be smaller or equal to 10 Ki.
+                                type: object
+                                x-kubernetes-preserve-unknown-fields: true
+                            required:
+                            - driver
+                            - parameters
+                            type: object
+                        type: object
+                      maxItems: 32
+                      type: array
+                    name:
+                      description: Name is the cluster-scoped DeviceClass metadata.name.
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
+                    selectors:
+                      description: Selectors restrict which devices satisfy this class.
+                      items:
+                        description: DeviceSelector must have exactly one field set.
+                        properties:
+                          cel:
+                            description: CEL contains a CEL expression for selecting
+                              a device.
+                            properties:
+                              expression:
+                                description: |-
+                                  Expression is a CEL expression which evaluates a single device. It
+                                  must evaluate to true when the device under consideration satisfies
+                                  the desired criteria, and false when it does not. Any other result
+                                  is an error and causes allocation of devices to abort.
+
+                                  The expression's input is an object named "device", which carries
+                                  the following properties:
+                                   - driver (string): the name of the driver which defines this device.
+                                   - attributes (map[string]object): the device's attributes, grouped by prefix
+                                     (e.g. device.attributes["dra.example.com"] evaluates to an object with all
+                                     of the attributes which were prefixed by "dra.example.com".
+                                   - capacity (map[string]object): the device's capacities, grouped by prefix.
+                                   - allowMultipleAllocations (bool): the allowMultipleAllocations property of the device
+                                     (v1.34+ with the DRAConsumableCapacity feature enabled).
+
+                                  Example: Consider a device with driver="dra.example.com", which exposes
+                                  two attributes named "model" and "ext.example.com/family" and which
+                                  exposes one capacity named "modules". This input to this expression
+                                  would have the following fields:
+
+                                      device.driver
+                                      device.attributes["dra.example.com"].model
+                                      device.attributes["ext.example.com"].family
+                                      device.capacity["dra.example.com"].modules
+
+                                  The device.driver field can be used to check for a specific driver,
+                                  either as a high-level precondition (i.e. you only want to consider
+                                  devices from this driver) or as part of a multi-clause expression
+                                  that is meant to consider devices from different drivers.
+
+                                  The value type of each attribute is defined by the device
+                                  definition, and users who write these expressions must consult the
+                                  documentation for their specific drivers. The value type of each
+                                  capacity is Quantity.
+
+                                  If an unknown prefix is used as a lookup in either device.attributes
+                                  or device.capacity, an empty map will be returned. Any reference to
+                                  an unknown field will cause an evaluation error and allocation to
+                                  abort.
+
+                                  A robust expression should check for the existence of attributes
+                                  before referencing them.
+
+                                  For ease of use, the cel.bind() function is enabled, and can be used
+                                  to simplify expressions that access multiple attributes with the
+                                  same domain. For example:
+
+                                      cel.bind(dra, device.attributes["dra.example.com"], dra.someBool && dra.anotherBool)
+
+                                  The length of the expression must be smaller or equal to 10 Ki. The
+                                  cost of evaluating it is also limited based on the estimated number
+                                  of logical steps.
+                                type: string
+                            required:
+                            - expression
+                            type: object
+                        type: object
+                      maxItems: 32
+                      type: array
+                  required:
+                  - name
+                  type: object
+                type: array
+              devicePluginImage:
+                description: device plugin image
+                type: string
+              draDriverImage:
+                description: |-
+                  DRA driver image. Mutually exclusive with devicePluginImage,
+                  customSchedulerImage, and schedulerExtensionImage.
+                type: string
+              driverVersion:
+                description: defines the Version of the neuron drivers. used for rolling
+                  upgrade
+                type: string
+              driversImage:
+                description: defines image that includes drivers
+                type: string
+              imageRepoSecret:
+                description: pull secrets used for pull/setting images used by operator
+                properties:
+                  name:
+                    default: ""
+                    description: |-
+                      Name of the referent.
+                      This field is effectively required, but due to backwards compatibility is
+                      allowed to be empty. Instances of this type with an empty value here are
+                      almost certainly wrong.
+                      More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                    type: string
+                type: object
+                x-kubernetes-map-type: atomic
+              nodeMetricsImage:
+                description: node metrics image
+                type: string
+              schedulerExtensionImage:
+                description: scheduler extension image
+                type: string
+              selector:
+                additionalProperties:
+                  type: string
+                description: Selector describes on which nodes the GPU Operator should
+                  enable the GPU device.
+                type: object
+              useInTreeDrivers:
+                description: if the in-tree driver should be used instead of OOT drivers
+                type: boolean
+            required:
+            - nodeMetricsImage
+            type: object
+            x-kubernetes-validations:
+            - message: draDriverImage is mutually exclusive with devicePluginImage,
+                customSchedulerImage, and schedulerExtensionImage
+              rule: '!((has(self.draDriverImage) && size(self.draDriverImage) > 0)
+                && ((has(self.devicePluginImage) && size(self.devicePluginImage) >
+                0) || (has(self.customSchedulerImage) && size(self.customSchedulerImage)
+                > 0) || (has(self.schedulerExtensionImage) && size(self.schedulerExtensionImage)
+                > 0)))'
+            - message: devicePluginImage, customSchedulerImage, and schedulerExtensionImage
+                must all be set together
+              rule: '(has(self.devicePluginImage) && size(self.devicePluginImage)
+                > 0 || has(self.customSchedulerImage) && size(self.customSchedulerImage)
+                > 0 || has(self.schedulerExtensionImage) && size(self.schedulerExtensionImage)
+                > 0) ? (has(self.devicePluginImage) && size(self.devicePluginImage)
+                > 0 && has(self.customSchedulerImage) && size(self.customSchedulerImage)
+                > 0 && has(self.schedulerExtensionImage) && size(self.schedulerExtensionImage)
+                > 0) : true'
+          status:
+            description: ModuleStatus defines the observed state of Module.
+            properties:
+              devicePlugin:
+                description: DevicePlugin contains the status of the Device Plugin
+                  deployment
+                properties:
+                  availableNumber:
+                    description: number of the actually deployed and running pods
+                    format: int32
+                    type: integer
+                  desiredNumber:
+                    description: number of the pods that should be deployed for daemonset
+                    format: int32
+                    type: integer
+                  nodesMatchingSelectorNumber:
+                    description: number of nodes that are targeted by the DeviceConfig
+                      selector
+                    format: int32
+                    type: integer
+                type: object
+              driver:
+                description: Driver contains the status of the Drivers deployment
+                properties:
+                  availableNumber:
+                    description: number of the actually deployed and running pods
+                    format: int32
+                    type: integer
+                  desiredNumber:
+                    description: number of the pods that should be deployed for daemonset
+                    format: int32
+                    type: integer
+                  nodesMatchingSelectorNumber:
+                    description: number of nodes that are targeted by the DeviceConfig
+                      selector
+                    format: int32
+                    type: integer
+                type: object
+            required:
+            - driver
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

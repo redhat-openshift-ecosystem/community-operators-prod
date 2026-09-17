@@ -1,0 +1,29 @@
+apiVersion: v1
+data:
+  neuron-monitor.conf: |
+    {
+      "period": "1s",
+      "neuron_runtimes": [
+        {
+          "tag_filter": ".*",
+          "metrics": [
+            { "type": "neuroncore_counters" },
+            { "type": "memory_used" },
+            { "type": "neuron_runtime_vcpu_usage" },
+            { "type": "execution_stats" }
+          ]
+        }
+      ],
+      "system_metrics": [
+        { "type": "vcpu_usage" },
+        { "type": "memory_info" },
+        { "period": "2s", "type": "neuron_hw_counters" }
+      ]
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: aws-neuron
+    app.kubernetes.io/name: aws-neuron
+    app.kubernetes.io/part-of: aws-neuron
+  name: awslabs-gpu-operator-node-metrics-configmap

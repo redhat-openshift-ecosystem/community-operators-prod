@@ -1,0 +1,969 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+          "kind": "ClusterBootstrap",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "mirror-operator"
+            },
+            "name": "production-cluster-01"
+          },
+          "spec": {
+            "compute": {
+              "replicas": 3
+            },
+            "controlPlane": {
+              "replicas": 3
+            },
+            "installConfig": {
+              "name": "cluster-install-config"
+            },
+            "mirrorRegistry": "quay.internal:8443/mirror",
+            "platform": "vsphere",
+            "pullSecret": {
+              "name": "mirror-pull-secret"
+            },
+            "version": "v2026.05.26.001-manual"
+          }
+        },
+        {
+          "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+          "kind": "CollectionPipeline",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "mirror-operator"
+            },
+            "name": "collection-v4-17"
+          },
+          "spec": {
+            "imageSetConfig": "kind: ImageSetConfiguration\napiVersion: mirror.openshift.io/v1alpha2\nstorageConfig:\n  local:\n    path: /workspace/output\nmirror:\n  platform:\n    channels:\n      - name: stable-4.17\n        type: ocp\n  operators:\n    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.17\n      full: true\n  additionalImages:\n    - name: registry.redhat.io/openshift4/ose-cli:v4.17\n",
+            "signing": {
+              "keySecretRef": {
+                "name": "cosign-signing-key"
+              },
+              "passwordSecretRef": {
+                "name": "cosign-signing-key"
+              }
+            },
+            "storage": {
+              "output": {
+                "filename": "release-v4.17.tar",
+                "pvc": "mirror-bundles"
+              }
+            },
+            "timeout": "12h",
+            "triggerType": "manual"
+          }
+        },
+        {
+          "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+          "kind": "CollectionPipeline",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "mirror-operator"
+            },
+            "name": "collection-v4-17-incremental"
+          },
+          "spec": {
+            "baseVersion": "v2026.05.26.001-manual",
+            "imageSetConfig": "kind: ImageSetConfiguration\napiVersion: mirror.openshift.io/v1alpha2\nstorageConfig:\n  local:\n    path: /workspace/output\nmirror:\n  platform:\n    channels:\n      - name: stable-4.17\n        type: ocp\n",
+            "incremental": true,
+            "signing": {
+              "keySecretRef": {
+                "name": "cosign-signing-key"
+              },
+              "passwordSecretRef": {
+                "name": "cosign-signing-key"
+              }
+            },
+            "storage": {
+              "output": {
+                "filename": "release-v4.17.tar",
+                "pvc": "mirror-bundles"
+              }
+            },
+            "triggerType": "manual"
+          }
+        },
+        {
+          "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+          "kind": "CollectionPipeline",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "mirror-operator"
+            },
+            "name": "collection-v4-17-update"
+          },
+          "spec": {
+            "imageSetConfig": "kind: ImageSetConfiguration\napiVersion: mirror.openshift.io/v1alpha2\nstorageConfig:\n  local:\n    path: /workspace/output\nmirror:\n  platform:\n    channels:\n      - name: stable-4.17\n        type: ocp\n        minVersion: 4.17.5  # Updated from parent's baseline\n        maxVersion: 4.17.10\n  operators:\n    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.17\n      packages:\n        - name: advanced-cluster-management\n        - name: openshift-gitops-operator  # New operator added\n  additionalImages:\n    - name: registry.redhat.io/openshift4/ose-cli:v4.17\n",
+            "parentPipeline": "collection-v4-17",
+            "signing": {
+              "keySecretRef": {
+                "name": "cosign-signing-key"
+              },
+              "passwordSecretRef": {
+                "name": "cosign-signing-key"
+              }
+            },
+            "storage": {
+              "output": {
+                "filename": "release-v4.17-update.tar",
+                "pvc": "mirror-bundles"
+              }
+            },
+            "timeout": "12h",
+            "triggerType": "manual"
+          }
+        },
+        {
+          "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+          "kind": "DisconnectedPlatform",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "mirror-operator"
+            },
+            "name": "disconnected-platform"
+          },
+          "spec": {
+            "architect": {
+              "backendImage": "quay.io/mathianasj/openshift-airgap-architect-backend:9fa8f29be04be2c87b35abbba921def9021c3b80",
+              "enabled": true,
+              "frontendImage": "quay.io/mathianasj/openshift-airgap-architect-frontend:9fa8f29be04be2c87b35abbba921def9021c3b80"
+            },
+            "connected": {
+              "artifactStorage": {
+                "size": "200Gi"
+              },
+              "collectionSchedule": "0 2 * * 0",
+              "mirrorRegistry": "quay.example.com/mirror",
+              "operators": {
+                "openshiftPipelines": {},
+                "rhtas": {},
+                "rhtpa": {}
+              },
+              "rhtas": {
+                "oidc": {
+                  "managed": {
+                    "enabled": true,
+                    "realm": "trusted-artifact-signer"
+                  }
+                }
+              },
+              "rhtpa": {
+                "database": {
+                  "host": "postgres.example.com",
+                  "name": "rhtpa",
+                  "password": "change-me",
+                  "username": "rhtpa"
+                },
+                "storage": {
+                  "size": "200Gi",
+                  "type": "local"
+                }
+              },
+              "triggerTypes": [
+                "scheduled",
+                "manual"
+              ]
+            },
+            "mode": "connected"
+          }
+        },
+        {
+          "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+          "kind": "DisconnectedPlatform",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "mirror-operator"
+            },
+            "name": "disconnected-platform-airgapped"
+          },
+          "spec": {
+            "airgapped": {
+              "acm": {
+                "enabled": true,
+                "multiClusterHub": {
+                  "imagePullSecret": {
+                    "name": "pull-secret"
+                  }
+                },
+                "subscription": {
+                  "catalogSource": "cs-redhat-operator-index",
+                  "channel": "release-2.12"
+                }
+              },
+              "bootstrapEnabled": true,
+              "importPath": "/mnt/physical-media",
+              "importScanSchedule": "*/30 * * * *",
+              "managementCluster": true,
+              "quay": {
+                "enabled": true,
+                "organizationName": "mirror",
+                "storage": {
+                  "size": "500Gi"
+                }
+              },
+              "rhtas": {
+                "trustedRootKeys": {
+                  "name": "rhtas-trusted-root"
+                }
+              }
+            },
+            "architect": {
+              "backendImage": "quay.io/mathianasj/openshift-airgap-architect-backend:df56c591ae4f12ce8c297695b69f6c264c5f257b",
+              "enabled": true,
+              "frontendImage": "quay.io/mathianasj/openshift-airgap-architect-frontend:df56c591ae4f12ce8c297695b69f6c264c5f257b",
+              "replicas": 1,
+              "route": {
+                "tls": {
+                  "termination": "edge"
+                }
+              }
+            },
+            "mode": "airgapped"
+          }
+        },
+        {
+          "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+          "kind": "MirrorImport",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "mirror-operator"
+            },
+            "name": "mirrorimport-sample"
+          },
+          "spec": {
+            "bundle": {
+              "filename": "release-v4.17.tar",
+              "pvc": "imported-bundles"
+            },
+            "collectionVersion": "v2026.05.26.001-manual",
+            "imageSetConfig": "kind: ImageSetConfiguration\napiVersion: mirror.openshift.io/v2alpha1\nmirror:\n  operators:\n  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.17\n",
+            "publish": {
+              "catalogSource": true,
+              "imageContentSourcePolicy": true
+            },
+            "targetRegistry": {
+              "url": "https://quay.airgap.local"
+            },
+            "verify": {
+              "enterpriseContractPolicy": {
+                "configMapRef": {
+                  "name": "ec-policy"
+                }
+              },
+              "publicKeySecretRef": {
+                "name": "cosign-public-key"
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "mirror.mirror.mathianasj.github.com/v1",
+          "kind": "MirrorRelease",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "mirror-operator"
+            },
+            "name": "release-v4-17-pvc"
+          },
+          "spec": {
+            "imageSetConfig": "kind: ImageSetConfiguration\napiVersion: mirror.openshift.io/v1alpha2\nstorageConfig:\n  local:\n    path: /workspace/output\nmirror:\n  platform:\n    channels:\n      - name: stable-4.17\n        type: ocp\n  operators:\n    - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.17\n      full: true\n  additionalImages:\n    - name: registry.redhat.io/openshift4/ose-cli:v4.17\n",
+            "output": {
+              "filename": "release-v4.17.tar",
+              "pvc": "mirror-bundles"
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    containerImage: quay.io/mathianasj/mirror-operator:latest
+    createdAt: "2026-08-28T02:44:15Z"
+    operatorframework.io/suggested-namespace: mirror-operator-system
+    operators.operatorframework.io/builder: operator-sdk-v1.39.2
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+  name: mirror-operator.v0.1.3
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - displayName: Cluster Bootstrap
+      kind: ClusterBootstrap
+      name: clusterbootstraps.mirror.mirror.mathianasj.github.com
+      version: v1
+    - displayName: Collection Pipeline
+      kind: CollectionPipeline
+      name: collectionpipelines.mirror.mirror.mathianasj.github.com
+      version: v1
+    - description: DisconnectedPlatform is the top-level orchestrator for managing
+        disconnected OpenShift environments
+      displayName: Disconnected Platform
+      kind: DisconnectedPlatform
+      name: disconnectedplatforms.mirror.mirror.mathianasj.github.com
+      version: v1
+    - displayName: Mirror Import
+      kind: MirrorImport
+      name: mirrorimports.mirror.mirror.mathianasj.github.com
+      version: v1
+    - displayName: Mirror Release
+      kind: MirrorRelease
+      name: mirrorreleases.mirror.mirror.mathianasj.github.com
+      version: v1
+  description: |
+    **Automatic. Systematic. Silvermatic.**
+
+    The Silvermatic manages the disconnected OpenShift lifecycle — so you don't have to. It provides four CRDs: DisconnectedPlatform (top-level orchestrator), CollectionPipeline (builds oc-mirror v2 bundles via Tekton), MirrorImport (imports bundles into airgapped registries), and ClusterBootstrap (bootstraps new clusters). The operator supports supply chain security via Syft SBOM generation, Cosign signing/verification, and Tekton Chains attestations.
+  displayName: The Silvermatic
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - persistentvolumes
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - delete
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - agent-install.openshift.io
+          resources:
+          - agentserviceconfigs
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - agent-install.openshift.io
+          resources:
+          - infraenvs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - batch
+          resources:
+          - cronjobs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - batch
+          resources:
+          - jobs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - cert-manager.io
+          resources:
+          - certificates
+          - issuers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - cert-manager.io
+          resources:
+          - clusterissuers
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - clusterimagepolicies
+          - clusterversions
+          - infrastructures
+          - ingresses
+          - proxies
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - imagecontentsourcepolicies
+          - imagedigestmirrorsets
+          - imagetagmirrorsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - console.openshift.io
+          resources:
+          - consoleplugins
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - persistentvolumeclaims
+          - serviceaccounts
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - create
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods/exec
+          verbs:
+          - create
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - hive.openshift.io
+          resources:
+          - clusterimagesets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - k8s.keycloak.org
+          resources:
+          - keycloakrealmimports
+          - keycloaks
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - machineconfiguration.openshift.io
+          resources:
+          - machineconfigs
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - metal3.io
+          resources:
+          - provisionings
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - mirror.mirror.mathianasj.github.com
+          resources:
+          - clusterbootstraps
+          - collectionpipelines
+          - disconnectedplatforms
+          - mirrorimports
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - mirror.mirror.mathianasj.github.com
+          resources:
+          - clusterbootstraps/finalizers
+          - collectionpipelines/finalizers
+          - disconnectedplatforms/finalizers
+          - mirrorimports/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - mirror.mirror.mathianasj.github.com
+          resources:
+          - clusterbootstraps/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - mirror.mirror.mathianasj.github.com
+          resources:
+          - collectionpipelines/status
+          - disconnectedplatforms/status
+          - mirrorimports/status
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingresses
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - oauth.openshift.io
+          resources:
+          - oauthclients
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - objectbucket.io
+          resources:
+          - objectbucketclaims
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - operator.open-cluster-management.io
+          resources:
+          - multiclusterhubs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - operator.open-cluster-management.io
+          resources:
+          - multiclusterhubs/status
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - operator.openshift.io
+          resources:
+          - consoles
+          - ingresscontrollers
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - operators.coreos.com
+          resources:
+          - catalogsources
+          - operatorgroups
+          - subscriptions
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - operators.coreos.com
+          resources:
+          - clusterserviceversions
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - packages.operators.coreos.com
+          resources:
+          - packagemanifests
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - quay.redhat.com
+          resources:
+          - quayregistries
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          - clusterroles
+          - rolebindings
+          - roles
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rhtas.redhat.com
+          resources:
+          - securesigns
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rhtas.redhat.com
+          resources:
+          - securesigns/status
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rhtas.redhat.com
+          resources:
+          - tufs
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - rhtpa.io
+          resources:
+          - trustedprofileanalyzers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes/custom-host
+          verbs:
+          - create
+          - patch
+          - update
+        - apiGroups:
+          - tekton.dev
+          resources:
+          - pipelineruns
+          - pipelines
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - tekton.dev
+          resources:
+          - pipelineruns/status
+          - taskruns/status
+          verbs:
+          - get
+        - apiGroups:
+          - tekton.dev
+          resources:
+          - taskruns
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - updateservice.operator.openshift.io
+          resources:
+          - updateservices
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: mirror-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: mirror-operator
+          control-plane: controller-manager
+        name: mirror-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --metrics-bind-address=:8443
+                - --leader-elect
+                - --health-probe-bind-address=:8081
+                command:
+                - /manager
+                image: quay.io/mathianasj/mirror-operator:v0.1.3
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 10m
+                    memory: 256Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: mirror-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: mirror-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: true
+    type: MultiNamespace
+  - supported: false
+    type: AllNamespaces
+  keywords:
+  - silvermatic
+  - mirror-operator
+  - disconnected
+  - oc-mirror
+  - airgap
+  - openshift
+  - sneakernet
+  links:
+  - name: Mirror Operator
+    url: https://github.com/mathianasj/mirror-operator
+  maintainers:
+  - email: mathianasj@users.noreply.github.com
+    name: Operator Maintainers
+  maturity: alpha
+  minKubeVersion: 1.30.0
+  provider:
+    name: Joshua Mathianas
+    url: https://github.com/mathianasj
+  version: 0.1.3

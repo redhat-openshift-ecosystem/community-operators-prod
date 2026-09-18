@@ -7,8 +7,8 @@ metadata:
     capabilities: Basic Install
     categories: Monitoring,Integration & Delivery
     com.redhat.openshift.versions: v4.19-v4.20
-    containerImage: quay.io/krkn-chaos/krkn-operator-acm:v1.0.4
-    createdAt: "2026-09-18T07:34:15Z"
+    containerImage: quay.io/krkn-chaos/krkn-operator-acm:v1.0.5
+    createdAt: "2026-09-18T09:00:46Z"
     description: ACM integration for the Krkn chaos engineering platform.
     operators.operatorframework.io/builder: operator-sdk-v1.41.1
     operators.operatorframework.io/project_layout: unknown
@@ -18,7 +18,7 @@ metadata:
     operatorframework.io/arch.amd64: supported
     operatorframework.io/arch.arm64: supported
     operatorframework.io/os.linux: supported
-  name: krkn-operator-acm.v1.0.4
+  name: krkn-operator-acm.v1.0.5
 spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
@@ -202,7 +202,7 @@ spec:
                         valueFrom:
                           fieldRef:
                             fieldPath: spec.serviceAccountName
-                    image: quay.io/krkn-chaos/krkn-operator-acm:v1.0.4
+                    image: quay.io/krkn-chaos/krkn-operator-acm:v1.0.5
                     imagePullPolicy: Always
                     livenessProbe:
                       httpGet:
@@ -298,7 +298,7 @@ spec:
   minKubeVersion: 1.19.0
   provider:
     name: krkn-chaos
-  version: 1.0.4
+  version: 1.0.5
   icon:
     - base64data: |-
         iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAIAAADwf7zUAAAAAXNSR0IArs4c6QAAAJ5lWElmTU0A
@@ -8794,4 +8794,4 @@ spec:
       mediatype: image/png
   relatedImages:
     - name: krkn-operator-acm
-      image: quay.io/krkn-chaos/krkn-operator-acm:v1.0.4
+      image: quay.io/krkn-chaos/krkn-operator-acm:v1.0.5

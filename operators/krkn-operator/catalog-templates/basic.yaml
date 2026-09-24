@@ -1,13 +1,18 @@
 ---
 schema: olm.template.basic
 entries:
-  - defaultChannel: stable-ocp
-    name: krkn-operator
-    schema: olm.package
-  - entries:
-      - name: krkn-operator.v1.0.5
-    name: stable-ocp
-    package: krkn-operator
-    schema: olm.channel
-  - image: quay.io/community-operator-pipeline-prod/krkn-operator@sha256:fc6369969f3ac7ebeaecdce411aaef06b7c846613e215c80d4023371aad5bd6c
-    schema: olm.bundle
+- defaultChannel: stable-ocp
+  name: krkn-operator
+  schema: olm.package
+- entries:
+  - name: krkn-operator.v1.0.5
+  - name: krkn-operator.v1.0.6
+    replaces: krkn-operator.v1.0.5
+  name: stable-ocp
+  package: krkn-operator
+  schema: olm.channel
+- image: 
+    quay.io/community-operator-pipeline-prod/krkn-operator@sha256:fc6369969f3ac7ebeaecdce411aaef06b7c846613e215c80d4023371aad5bd6c
+  schema: olm.bundle
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/krkn-operator:1.0.6

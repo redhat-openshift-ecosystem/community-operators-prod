@@ -1,0 +1,123 @@
+---
+defaultChannel: stable-acm
+name: krkn-operator-acm
+schema: olm.package
+---
+entries:
+- name: krkn-operator-acm.v1.0.5
+name: stable-acm
+package: krkn-operator-acm
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/krkn-operator-acm@sha256:b1c6947b5d06d737478f5c25b95aef8e48a822ab74d2fd5f7cff1d5797be0b96
+name: krkn-operator-acm.v1.0.5
+package: krkn-operator-acm
+properties:
+- type: olm.gvk.required
+  value:
+    group: krkn.krkn-chaos.dev
+    kind: KrknOperatorTargetProvider
+    version: v1alpha1
+- type: olm.gvk.required
+  value:
+    group: krkn.krkn-chaos.dev
+    kind: KrknOperatorTargetProviderConfig
+    version: v1alpha1
+- type: olm.gvk.required
+  value:
+    group: krkn.krkn-chaos.dev
+    kind: KrknTargetRequest
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: krkn-operator-acm
+    version: 1.0.5
+- type: olm.package.required
+  value:
+    packageName: krkn-operator
+    versionRange: '>=1.0.1'
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: '[]'
+      capabilities: Basic Install
+      categories: Monitoring,Integration & Delivery
+      com.redhat.openshift.versions: v4.19-v4.20
+      containerImage: quay.io/krkn-chaos/krkn-operator-acm:v1.0.5
+      createdAt: "2026-09-18T09:00:46Z"
+      description: ACM integration for the Krkn chaos engineering platform.
+      operators.operatorframework.io/builder: operator-sdk-v1.41.1
+      operators.operatorframework.io/project_layout: unknown
+      repository: https://github.com/krkn-chaos/krkn-operator-acm
+      support: krkn-chaos
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      required:
+      - description: Target request shared with the Krkn Operator.
+        displayName: Krkn Target Request
+        kind: KrknTargetRequest
+        name: krkntargetrequests.krkn.krkn-chaos.dev
+        version: v1alpha1
+      - description: Provider registration shared with the Krkn Operator.
+        displayName: Krkn Operator Target Provider
+        kind: KrknOperatorTargetProvider
+        name: krknoperatortargetproviders.krkn.krkn-chaos.dev
+        version: v1alpha1
+      - description: Provider configuration shared with the Krkn Operator.
+        displayName: Krkn Operator Target Provider Config
+        kind: KrknOperatorTargetProviderConfig
+        name: krknoperatortargetproviderconfigs.krkn.krkn-chaos.dev
+        version: v1alpha1
+    description: |
+      Krkn Operator ACM provides optional integration with both upstream Open
+      Cluster Management (OCM) and Red Hat Advanced Cluster Management (ACM).
+      It discovers managed clusters and publishes target data for the Krkn
+      Operator.
+
+      Tested upstream OCM versions are 1.1.0, 1.2.0, and 1.3.1. Tested Red Hat
+      ACM versions are 2.14, 2.15, and 2.16. For upstream OCM, the Managed
+      ServiceAccount add-on must be installed and available on the OCM hub before
+      enabling this integration. Follow the OCM Managed ServiceAccount
+      installation guide linked below.
+
+      Install the Krkn Operator package first, or install this package through
+      the same catalog and let OLM satisfy its dependency automatically.
+    displayName: Krkn Operator ACM
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+    keywords:
+    - chaos engineering
+    - Open Cluster Management
+    - Advanced Cluster Management
+    - multi-cluster
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Krkn documentation
+      url: https://krkn-chaos.dev/docs/krkn-operator/compatibility/
+    - name: OCM Managed ServiceAccount installation
+      url: https://open-cluster-management.io/docs/getting-started/integration/managed-serviceaccount/
+    - name: Krkn Operator ACM source code
+      url: https://github.com/krkn-chaos/krkn-operator-acm
+    maintainers:
+    - email: krkn-chaos@redhat.com
+      name: krkn-chaos
+    maturity: alpha
+    minKubeVersion: 1.19.0
+    provider:
+      name: krkn-chaos
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/krkn-operator-acm@sha256:b1c6947b5d06d737478f5c25b95aef8e48a822ab74d2fd5f7cff1d5797be0b96
+  name: ""
+- image: quay.io/krkn-chaos/krkn-operator-acm:v1.0.5
+  name: krkn-operator-acm
+schema: olm.bundle

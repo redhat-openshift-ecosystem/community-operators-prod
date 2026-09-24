@@ -1,0 +1,13 @@
+---
+schema: olm.template.basic
+entries:
+  - defaultChannel: stable-acm
+    name: krkn-operator-acm
+    schema: olm.package
+  - entries:
+      - name: krkn-operator-acm.v1.0.5
+    name: stable-acm
+    package: krkn-operator-acm
+    schema: olm.channel
+  - image: quay.io/community-operator-pipeline-prod/krkn-operator-acm@sha256:b1c6947b5d06d737478f5c25b95aef8e48a822ab74d2fd5f7cff1d5797be0b96
+    schema: olm.bundle

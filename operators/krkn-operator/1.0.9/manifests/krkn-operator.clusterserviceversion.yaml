@@ -1,11 +1,740 @@
 ---
-schema: olm.template.basic
-entries:
-  - defaultChannel: stable-ocp
-    name: krkn-operator
-    schema: olm.package
-    icon:
-      base64data: |-
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |
+      [
+        {
+          "apiVersion": "krkn.krkn-chaos.dev/v1alpha1",
+          "kind": "KrknFileType",
+          "metadata": {
+            "name": "configuration"
+          },
+          "spec": {
+            "name": "configuration",
+            "color": "#4A90E2"
+          }
+        },
+        {
+          "apiVersion": "krkn.krkn-chaos.dev/v1alpha1",
+          "kind": "KrknGraphRun",
+          "metadata": {
+            "name": "example-graph-run"
+          },
+          "spec": {
+            "graph": {
+              "node-1": {
+                "name": "pod-delete"
+              }
+            },
+            "targetRequestId": "example-target-request",
+            "targetClusters": {
+              "krkn-operator": [
+                "cluster-1"
+              ]
+            }
+          }
+        },
+        {
+          "apiVersion": "krkn.krkn-chaos.dev/v1alpha1",
+          "kind": "KrknOperatorTarget",
+          "metadata": {
+            "name": "example-target"
+          },
+          "spec": {
+            "uuid": "example-target",
+            "clusterName": "cluster-1",
+            "clusterAPIURL": "https://api.example.invalid:6443",
+            "secretType": "kubeconfig",
+            "secretUUID": "example-kubeconfig"
+          }
+        },
+        {
+          "apiVersion": "krkn.krkn-chaos.dev/v1alpha1",
+          "kind": "KrknOperatorTargetProvider",
+          "metadata": {
+            "name": "krkn-operator"
+          },
+          "spec": {
+            "operator-name": "krkn-operator",
+            "active": true
+          }
+        },
+        {
+          "apiVersion": "krkn.krkn-chaos.dev/v1alpha1",
+          "kind": "KrknOperatorTargetProviderConfig",
+          "metadata": {
+            "name": "example-provider-config"
+          },
+          "spec": {
+            "uuid": "example-provider-config"
+          }
+        },
+        {
+          "apiVersion": "krkn.krkn-chaos.dev/v1alpha1",
+          "kind": "KrknScenarioRun",
+          "metadata": {
+            "name": "example-scenario-run"
+          },
+          "spec": {
+            "targetRequestId": "example-target-request",
+            "targetClusters": {
+              "krkn-operator": [
+                "cluster-1"
+              ]
+            },
+            "scenarioImage": "quay.io/krkn-chaos/krkn-hub:pod-delete",
+            "scenarioName": "pod-delete"
+          }
+        },
+        {
+          "apiVersion": "krkn.krkn-chaos.dev/v1alpha1",
+          "kind": "KrknTargetRequest",
+          "metadata": {
+            "name": "example-target-request"
+          },
+          "spec": {
+            "uuid": "example-target-request"
+          }
+        },
+        {
+          "apiVersion": "krkn.krkn-chaos.dev/v1alpha1",
+          "kind": "KrknUserGroup",
+          "metadata": {
+            "name": "platform-engineers"
+          },
+          "spec": {
+            "name": "platform-engineers",
+            "description": "Platform engineering team",
+            "clusterPermissions": {
+              "https://api.example.invalid:6443": {
+                "actions": [
+                  "view",
+                  "run"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "krkn.krkn-chaos.dev/v1alpha1",
+          "kind": "KrknUser",
+          "metadata": {
+            "name": "admin-example",
+            "labels": {
+              "krkn.krkn-chaos.dev/user-account": "true",
+              "krkn.krkn-chaos.dev/role": "admin"
+            }
+          },
+          "spec": {
+            "userId": "admin@example.invalid",
+            "name": "Example",
+            "surname": "Administrator",
+            "role": "admin",
+            "passwordSecretRef": "example-password"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: Monitoring,Storage
+    containerImage: quay.io/krkn-chaos/krkn-operator:v1.0.9@sha256:b113bfd5953b0f8de99431136d3fc9804dfa3f146a759287f6dcae94bfa1630b
+    createdAt: "2026-09-25T16:17:36Z"
+    description: Krkn chaos engineering platform for Kubernetes, OpenShift, OCM, and ACM.
+    operators.operatorframework.io/builder: operator-sdk-v1.41.1
+    operators.operatorframework.io/project_layout: unknown
+    repository: https://github.com/krkn-chaos/krkn-operator
+    support: krkn-chaos
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.arm64: supported
+    operatorframework.io/os.linux: supported
+  name: krkn-operator.v1.0.9
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - kind: KrknFileType
+        name: krknfiletypes.krkn.krkn-chaos.dev
+        version: v1alpha1
+        description: |-
+          KrknFileType is the Schema for the krknfiletypes API.
+          It defines metadata for file categories used in the ConfigMap-based file management system.
+
+          File types are automatically created when first used in a file, allowing for
+          GitHub-style label management where types can be created on-the-fly or reused.
+
+          Each file can have only one type, enforced at the API level.
+          Types cannot be deleted if files are still using them (enforced by the API handler).
+      - kind: KrknGraphRun
+        name: krkngraphruns.krkn.krkn-chaos.dev
+        version: v1alpha1
+        description: KrknGraphRun is the Schema for the krkngraphruns API
+      - kind: KrknOperatorTargetProviderConfig
+        name: krknoperatortargetproviderconfigs.krkn.krkn-chaos.dev
+        version: v1alpha1
+        description: KrknOperatorTargetProviderConfig is the Schema for the krknoperatortargetproviderconfigs API.
+      - kind: KrknOperatorTargetProvider
+        name: krknoperatortargetproviders.krkn.krkn-chaos.dev
+        version: v1alpha1
+        description: KrknOperatorTargetProvider is the Schema for the krknoperatortargetproviders API.
+      - kind: KrknOperatorTarget
+        name: krknoperatortargets.krkn.krkn-chaos.dev
+        version: v1alpha1
+        description: KrknOperatorTarget is the Schema for the krknoperatortargets API.
+      - kind: KrknScenarioRun
+        name: krknscenarioruns.krkn.krkn-chaos.dev
+        version: v1alpha1
+        description: KrknScenarioRun is the Schema for the krknscenrarioruns API
+      - kind: KrknTargetRequest
+        name: krkntargetrequests.krkn.krkn-chaos.dev
+        version: v1alpha1
+        description: KrknTargetRequest is the Schema for the krkntargetrequests API.
+      - kind: KrknUserGroup
+        name: krknusergroups.krkn.krkn-chaos.dev
+        version: v1alpha1
+        description: |-
+          KrknUserGroup is the Schema for the krknusergroups API.
+          It defines cluster-level access control for groups of users.
+
+          Users are associated with groups via labels on their KrknUser CR:
+            - group.krkn.krkn-chaos.dev/<group-name>: "true"
+
+          Permissions are aggregated across all groups a user belongs to (union).
+          Admin users bypass all group-based access controls.
+      - kind: KrknUser
+        name: krknusers.krkn.krkn-chaos.dev
+        version: v1alpha1
+        description: |-
+          KrknUser is the Schema for the krknusers API.
+          It represents an authentication entity for the krkn-operator REST APIs.
+
+          The KrknUser CRD must be labeled with:
+            - krkn.krkn-chaos.dev/user-account: "true"
+            - krkn.krkn-chaos.dev/role: <user|admin>
+  description: |
+    Krkn provides centralized chaos engineering and resiliency testing for
+    Kubernetes, OpenShift, Open Cluster Management, and Advanced Cluster Management.
+
+    The optional ACM integration has been tested with ACM 2.14, 2.15, and 2.16,
+    and with OCM 1.1.0, 1.2.0, and 1.3.1. Kubernetes and OpenShift compatibility
+    details are maintained in the compatibility documentation.
+
+    IMPORTANT: The installation creates the console Service, but does not create
+    an Ingress or an OpenShift Route. To access the console, expose the
+    krkn-operator-console Service manually according to your cluster's ingress,
+    gateway, TLS, and network configuration.
+  displayName: Krkn Operator
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - nodes
+                - namespaces
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - krkn.krkn-chaos.dev
+              resources:
+                - krknfiletypes
+                - krkngraphruns
+                - krknoperatortargetproviderconfigs
+                - krknoperatortargetproviders
+                - krknoperatortargets
+                - krkntargetrequests
+                - krknscenarioruns
+                - krknusergroups
+                - krknusers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - krkn.krkn-chaos.dev
+              resources:
+                - krknfiletypes/status
+                - krkngraphruns/status
+                - krknoperatortargetproviderconfigs/status
+                - krknoperatortargetproviders/status
+                - krknoperatortargets/status
+                - krkntargetrequests/status
+                - krknscenarioruns/status
+                - krknusergroups/status
+                - krknusers/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - krkn.krkn-chaos.dev
+              resources:
+                - krknfiletypes/finalizers
+                - krkngraphruns/finalizers
+                - krknoperatortargetproviderconfigs/finalizers
+                - krknoperatortargetproviders/finalizers
+                - krknoperatortargets/finalizers
+                - krkntargetrequests/finalizers
+                - krknscenarioruns/finalizers
+                - krknusergroups/finalizers
+                - krknusers/finalizers
+              verbs:
+                - update
+          serviceAccountName: krkn-operator
+        - serviceAccountName: krkn-operator
+          rules:
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - clusterroles
+              verbs:
+                - create
+                - get
+                - list
+                - watch
+        - serviceAccountName: krkn-operator
+          rules:
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - clusterrolebindings
+              verbs:
+                - create
+                - get
+                - list
+                - watch
+        - serviceAccountName: krkn-operator
+          rules:
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - clusterroles
+              resourceNames:
+                - krkn-operator-scenario-runner
+              verbs:
+                - bind
+                - escalate
+        - serviceAccountName: krkn-operator
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - nodes
+              verbs:
+                - get
+                - list
+                - watch
+                - patch
+                - update
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods/log
+                - pods/exec
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - get
+                - list
+                - watch
+        - serviceAccountName: krkn-operator
+          rules:
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - clusterroles
+              resourceNames:
+                - system:openshift:scc:anyuid
+              verbs:
+                - bind
+      deployments:
+        - label:
+            app.kubernetes.io/component: console
+            app.kubernetes.io/instance: krkn-operator
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: krkn-operator
+            app.kubernetes.io/version: v1.0.0-beta
+            helm.sh/chart: krkn-operator-0.1.0
+          name: krkn-operator-console
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app.kubernetes.io/component: console
+                app.kubernetes.io/instance: krkn-operator
+                app.kubernetes.io/name: krkn-operator
+            strategy: {}
+            template:
+              metadata:
+                labels:
+                  app.kubernetes.io/component: console
+                  app.kubernetes.io/instance: krkn-operator
+                  app.kubernetes.io/name: krkn-operator
+              spec:
+                containers:
+                  - image: krkn-chaos.docker.scarf.sh/krkn-chaos/krkn-operator-console:v1.0.0@sha256:acf2e3e7d07dc9324f057ee7db2b55f910739cb607e13a852bb45b23f149cad6
+                    imagePullPolicy: Always
+                    livenessProbe:
+                      failureThreshold: 3
+                      httpGet:
+                        path: /
+                        port: 8080
+                        scheme: HTTP
+                      initialDelaySeconds: 10
+                      periodSeconds: 30
+                      successThreshold: 1
+                      timeoutSeconds: 3
+                    name: console
+                    ports:
+                      - containerPort: 8080
+                        name: http
+                        protocol: TCP
+                    readinessProbe:
+                      failureThreshold: 3
+                      httpGet:
+                        path: /
+                        port: 8080
+                        scheme: HTTP
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                      successThreshold: 1
+                      timeoutSeconds: 3
+                    resources:
+                      limits:
+                        cpu: 200m
+                        memory: 256Mi
+                      requests:
+                        cpu: 50m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                    volumeMounts:
+                      - mountPath: /etc/nginx/nginx.conf
+                        name: nginx-config
+                        readOnly: true
+                        subPath: nginx.conf
+                securityContext:
+                  runAsNonRoot: true
+                  seccompProfile:
+                    type: RuntimeDefault
+                volumes:
+                  - configMap:
+                      name: krkn-operator-console-nginx
+                    name: nginx-config
+        - label:
+            app.kubernetes.io/component: operator
+            app.kubernetes.io/instance: krkn-operator
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: krkn-operator
+            app.kubernetes.io/version: v1.0.0-beta
+            control-plane: controller-manager
+            helm.sh/chart: krkn-operator-0.1.0
+          name: krkn-operator-operator
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app.kubernetes.io/component: operator
+                app.kubernetes.io/instance: krkn-operator
+                app.kubernetes.io/name: krkn-operator
+                control-plane: controller-manager
+            strategy: {}
+            template:
+              metadata:
+                labels:
+                  app.kubernetes.io/component: operator
+                  app.kubernetes.io/instance: krkn-operator
+                  app.kubernetes.io/name: krkn-operator
+                  control-plane: controller-manager
+              spec:
+                containers:
+                  - args:
+                      - --leader-elect
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=:8443
+                      - --metrics-secure=true
+                      - --api-port=8080
+                      - --grpc-server-address=localhost:50051
+                    command:
+                      - /manager
+                    env:
+                      - name: POD_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+                      - name: JWT_SECRET
+                        valueFrom:
+                          secretKeyRef:
+                            key: jwt-secret
+                            name: krkn-operator-jwt
+                      - name: JWT_EXPIRY_HOURS
+                        value: "24"
+                    image: quay.io/krkn-chaos/krkn-operator:v1.0.9@sha256:b113bfd5953b0f8de99431136d3fc9804dfa3f146a759287f6dcae94bfa1630b
+                    imagePullPolicy: Always
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 8080
+                        name: http
+                        protocol: TCP
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                      - containerPort: 8081
+                        name: health
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 512Mi
+                      requests:
+                        cpu: 100m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                  - image: quay.io/krkn-chaos/krkn-operator-data-provider:v1.0.9@sha256:6e43e1ed8b0d3933d3e0368b9872ea79b9ef259e44bbc82ff6ff889160517b30
+                    imagePullPolicy: Always
+                    livenessProbe:
+                      initialDelaySeconds: 10
+                      periodSeconds: 10
+                      tcpSocket:
+                        port: grpc
+                    name: data-provider
+                    ports:
+                      - containerPort: 50051
+                        name: grpc
+                        protocol: TCP
+                    readinessProbe:
+                      initialDelaySeconds: 5
+                      periodSeconds: 5
+                      tcpSocket:
+                        port: grpc
+                    resources:
+                      limits:
+                        cpu: 200m
+                        memory: 256Mi
+                      requests:
+                        cpu: 50m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                initContainers:
+                  - args:
+                      - --bootstrap-resources
+                    command:
+                      - /manager
+                    env:
+                      - name: POD_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+                      - name: KRKN_OLM_OPENSHIFT
+                        value: "true"
+                    image: quay.io/krkn-chaos/krkn-operator:v1.0.9@sha256:b113bfd5953b0f8de99431136d3fc9804dfa3f146a759287f6dcae94bfa1630b
+                    imagePullPolicy: Always
+                    name: olm-bootstrap-resources
+                    resources: {}
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                securityContext:
+                  runAsNonRoot: true
+                  seccompProfile:
+                    type: RuntimeDefault
+                serviceAccountName: krkn-operator
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods/log
+              verbs:
+                - get
+            - apiGroups:
+                - krkn.krkn-chaos.dev
+              resources:
+                - krknfiletypes
+                - krkngraphruns
+                - krknoperatortargetproviderconfigs
+                - krknoperatortargetproviders
+                - krknoperatortargets
+                - krkntargetrequests
+                - krknscenarioruns
+                - krknusergroups
+                - krknusers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - krkn.krkn-chaos.dev
+              resources:
+                - krknfiletypes/status
+                - krkngraphruns/status
+                - krknoperatortargetproviderconfigs/status
+                - krknoperatortargetproviders/status
+                - krknoperatortargets/status
+                - krkntargetrequests/status
+                - krknscenarioruns/status
+                - krknusergroups/status
+                - krknusers/status
+              verbs:
+                - get
+                - patch
+                - update
+          serviceAccountName: krkn-operator
+        - serviceAccountName: krkn-operator
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - get
+                - list
+                - watch
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+  keywords:
+    - chaos engineering
+    - resiliency
+    - kubernetes
+    - openshift
+    - open cluster management
+  links:
+    - name: Krkn documentation
+      url: https://krkn-chaos.github.io/krkn-operator/
+    - name: Krkn source code
+      url: https://github.com/krkn-chaos/krkn-operator
+    - name: Compatibility matrix
+      url: https://krkn-chaos.dev/docs/krkn-operator/compatibility/
+  maintainers:
+    - email: krkn-chaos@redhat.com
+      name: krkn-chaos
+  maturity: alpha
+  minKubeVersion: 1.19.0
+  provider:
+    name: krkn-chaos
+  version: 1.0.9
+  relatedImages:
+    - name: krkn-operator
+      image: quay.io/krkn-chaos/krkn-operator:v1.0.9@sha256:b113bfd5953b0f8de99431136d3fc9804dfa3f146a759287f6dcae94bfa1630b
+    - name: krkn-operator-data-provider
+      image: quay.io/krkn-chaos/krkn-operator-data-provider:v1.0.9@sha256:6e43e1ed8b0d3933d3e0368b9872ea79b9ef259e44bbc82ff6ff889160517b30
+    - name: krkn-operator-console
+      image: krkn-chaos.docker.scarf.sh/krkn-chaos/krkn-operator-console:v1.0.0@sha256:acf2e3e7d07dc9324f057ee7db2b55f910739cb607e13a852bb45b23f149cad6
+  icon:
+    - base64data: |-
         iVBORw0KGgoAAAANSUhEUgAAAV4AAAFeCAYAAADNK3caAAAABmJLR0QA/wD/AP+gvaeTAAAACXBI
         WXMAAC4jAAAuIwF4pT92AAB2oklEQVR42u2deZgcZbX/P29V79PTs08myWSf7JAFCAn7rihuIAIu
         gHrVq1d/6vUqKuq9et0Ad66KCyi4oiCiKCqLsi9hSQIkZCNkT2bfp/d6f3+81UnPpHump7t6etJ5
@@ -542,14 +1271,3 @@ entries:
         NBqNRqPRaDQajUaj0Wg0Go1Go9FoNBqNRqPRaDQajUaj0Wg0Go1Go9FoNBqNRqPRaDQajUaj0Wg0
         Go1Gozna+P/83VbnwO6U+wAAAABJRU5ErkJggg==
       mediatype: image/png
-  - entries:
-      - name: krkn-operator.v1.0.5
-      - name: krkn-operator.v1.0.6
-        replaces: krkn-operator.v1.0.5
-    name: stable-ocp
-    package: krkn-operator
-    schema: olm.channel
-  - image: quay.io/community-operator-pipeline-prod/krkn-operator@sha256:fc6369969f3ac7ebeaecdce411aaef06b7c846613e215c80d4023371aad5bd6c
-    schema: olm.bundle
-  - schema: olm.bundle
-    image: quay.io/community-operator-pipeline-prod/krkn-operator:1.0.6

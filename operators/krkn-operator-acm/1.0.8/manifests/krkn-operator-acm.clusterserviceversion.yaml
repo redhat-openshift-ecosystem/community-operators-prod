@@ -1,11 +1,306 @@
 ---
-schema: olm.template.basic
-entries:
-  - defaultChannel: stable-acm
-    name: krkn-operator-acm
-    schema: olm.package
-    icon:
-      base64data: |-
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+    categories: Monitoring,Integration & Delivery
+    com.redhat.openshift.versions: v4.19-v4.22
+    containerImage: quay.io/krkn-chaos/krkn-operator-acm:v1.0.8
+    createdAt: "2026-09-28T09:00:38Z"
+    description: ACM integration for the Krkn chaos engineering platform.
+    operators.operatorframework.io/builder: operator-sdk-v1.41.1
+    operators.operatorframework.io/project_layout: unknown
+    repository: https://github.com/krkn-chaos/krkn-operator-acm
+    support: krkn-chaos
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.arm64: supported
+    operatorframework.io/os.linux: supported
+  name: krkn-operator-acm.v1.0.8
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    required:
+      - description: Target request shared with the Krkn Operator.
+        displayName: Krkn Target Request
+        kind: KrknTargetRequest
+        name: krkntargetrequests.krkn.krkn-chaos.dev
+        version: v1alpha1
+      - description: Provider registration shared with the Krkn Operator.
+        displayName: Krkn Operator Target Provider
+        kind: KrknOperatorTargetProvider
+        name: krknoperatortargetproviders.krkn.krkn-chaos.dev
+        version: v1alpha1
+      - description: Provider configuration shared with the Krkn Operator.
+        displayName: Krkn Operator Target Provider Config
+        kind: KrknOperatorTargetProviderConfig
+        name: krknoperatortargetproviderconfigs.krkn.krkn-chaos.dev
+        version: v1alpha1
+  description: |
+    Krkn Operator ACM provides optional integration with both upstream Open
+    Cluster Management (OCM) and Red Hat Advanced Cluster Management (ACM).
+    It discovers managed clusters and publishes target data for the Krkn
+    Operator.
+
+    Tested upstream OCM versions are 1.1.0, 1.2.0, and 1.3.1. Tested Red Hat
+    ACM versions are 2.14, 2.15, and 2.16. For upstream OCM, the Managed
+    ServiceAccount add-on must be installed and available on the OCM hub before
+    enabling this integration. Follow the OCM Managed ServiceAccount
+    installation guide linked below.
+
+    Install the Krkn Operator package first, or install this package through
+    the same catalog and let OLM satisfy its dependency automatically.
+  displayName: Krkn Operator ACM
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+                - namespaces
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - get
+                - list
+            - apiGroups:
+                - cluster.open-cluster-management.io
+              resources:
+                - managedclusters
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - krkn.krkn-chaos.dev
+              resources:
+                - krknoperatortargetproviderconfigs
+              verbs:
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - krkn.krkn-chaos.dev
+              resources:
+                - krknoperatortargetproviderconfigs/status
+                - krknoperatortargetproviders/status
+                - krkntargetrequests/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - krkn.krkn-chaos.dev
+              resources:
+                - krknoperatortargetproviders
+                - krkntargetrequests
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - krkn.krkn-chaos.dev
+              resources:
+                - krkntargetrequests/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - proxy.open-cluster-management.io
+              resources:
+                - managedproxyconfigurations
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - work.open-cluster-management.io
+              resources:
+                - manifestworks
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: krkn-operator-acm-controller-manager
+      deployments:
+        - label:
+            app.kubernetes.io/managed-by: kustomize
+            app.kubernetes.io/name: krkn-operator-acm
+            control-plane: controller-manager
+          name: krkn-operator-acm-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app.kubernetes.io/name: krkn-operator-acm
+                control-plane: controller-manager
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  app.kubernetes.io/name: krkn-operator-acm
+                  control-plane: controller-manager
+              spec:
+                containers:
+                  - args:
+                      - --metrics-bind-address=:8443
+                      - --leader-elect
+                      - --health-probe-bind-address=:8081
+                    command:
+                      - /manager
+                    env:
+                      - name: POD_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+                      - name: SERVICE_ACCOUNT_NAME
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: spec.serviceAccountName
+                    image: quay.io/krkn-chaos/krkn-operator-acm:v1.0.8
+                    imagePullPolicy: Always
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 10m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                securityContext:
+                  runAsNonRoot: true
+                  seccompProfile:
+                    type: RuntimeDefault
+                serviceAccountName: krkn-operator-acm-controller-manager
+                terminationGracePeriodSeconds: 10
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: krkn-operator-acm-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+  keywords:
+    - chaos engineering
+    - Open Cluster Management
+    - Advanced Cluster Management
+    - multi-cluster
+  links:
+    - name: Krkn documentation
+      url: https://krkn-chaos.dev/docs/krkn-operator/compatibility/
+    - name: OCM Managed ServiceAccount installation
+      url: https://open-cluster-management.io/docs/getting-started/integration/managed-serviceaccount/
+    - name: Krkn Operator ACM source code
+      url: https://github.com/krkn-chaos/krkn-operator-acm
+  maintainers:
+    - email: krkn-chaos@redhat.com
+      name: krkn-chaos
+  maturity: alpha
+  minKubeVersion: 1.19.0
+  provider:
+    name: krkn-chaos
+  version: 1.0.8
+  icon:
+    - base64data: |-
         iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAIAAADwf7zUAAAAAXNSR0IArs4c6QAAAJ5lWElmTU0A
         KgAAAAgAAwESAAMAAAABAAEAAAExAAIAAAAHAAAAModpAAQAAAABAAAAOgAAAABQaWNhc2EAAAAF
         kAAABwAAAAQwMjIwoAEAAwAAAAEAAQAAoAIABAAAAAEAAAQAoAMABAAAAAEAAAQApCAAAgAAACEA
@@ -8497,14 +8792,6 @@ entries:
         z3v+ZfEJlRvimfX3KiQnlD4v+fOSE9Jz1dKZArRqFkEfCEAAAhCAAAQgAAEILJDA3wEyXCEc8Ylr
         vgAAAABJRU5ErkJggg==
       mediatype: image/png
-  - entries:
-      - name: krkn-operator-acm.v1.0.5
-      - name: krkn-operator-acm.v1.0.6
-        replaces: krkn-operator-acm.v1.0.5
-    name: stable-acm
-    package: krkn-operator-acm
-    schema: olm.channel
-  - image: quay.io/community-operator-pipeline-prod/krkn-operator-acm@sha256:b1c6947b5d06d737478f5c25b95aef8e48a822ab74d2fd5f7cff1d5797be0b96
-    schema: olm.bundle
-  - schema: olm.bundle
-    image: quay.io/community-operator-pipeline-prod/krkn-operator-acm:1.0.6
+  relatedImages:
+    - name: krkn-operator-acm
+      image: quay.io/krkn-chaos/krkn-operator-acm:v1.0.8

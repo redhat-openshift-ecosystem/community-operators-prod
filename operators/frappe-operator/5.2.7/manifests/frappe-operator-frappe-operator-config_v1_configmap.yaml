@@ -1,0 +1,27 @@
+apiVersion: v1
+data:
+  defaultClusterIssuer: ""
+  defaultDomainSuffix: .myplatform.com
+  defaultFrappeImage: ghcr.io/vyogotech/erpnext-for-operator:version-16
+  defaultMariaDBImage: docker.io/library/mariadb:10.6
+  defaultNginxImage: docker.io/library/nginx:1.25-alpine
+  defaultPostgresImage: docker.io/library/postgres:15-alpine
+  defaultRedisImage: docker.io/library/redis:7-alpine
+  enforceHTTPS: "false"
+  fpmCliPath: /usr/local/bin/fpm
+  fpmRepositories: |
+    [
+      {
+        "name": "vyogo-official",
+        "url": "https://fpm.vyogo.tech",
+        "priority": 100
+      }
+    ]
+  gitEnabled: "false"
+  ingressControllerNamespace: ingress-nginx
+  ingressControllerService: ingress-nginx-controller
+  maxConcurrentReconciles: "5"
+  maxConcurrentSiteReconciles: "10"
+kind: ConfigMap
+metadata:
+  name: frappe-operator-frappe-operator-config

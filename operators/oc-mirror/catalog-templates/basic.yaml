@@ -1,0 +1,13 @@
+---
+schema: olm.template.basic
+entries:
+- schema: olm.package
+  name: oc-mirror
+  defaultChannel: alpha
+- schema: olm.channel
+  name: alpha
+  package: oc-mirror
+  entries:
+  - name: oc-mirror.v0.1.6
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/oc-mirror:0.1.6

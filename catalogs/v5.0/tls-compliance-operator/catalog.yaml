@@ -1,0 +1,121 @@
+---
+defaultChannel: stable
+name: tls-compliance-operator
+schema: olm.package
+---
+entries:
+- name: tls-compliance-operator.v1.1.16
+name: stable
+package: tls-compliance-operator
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/tls-compliance-operator:1.1.16
+name: tls-compliance-operator.v1.1.16
+package: tls-compliance-operator
+properties:
+- type: olm.gvk
+  value:
+    group: security.telco.openshift.io
+    kind: TLSComplianceReport
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: security.telco.openshift.io
+    kind: TLSComplianceTarget
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: tls-compliance-operator
+    version: 1.1.16
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "security.telco.openshift.io/v1alpha1",
+            "kind": "TLSComplianceReport",
+            "metadata": {
+              "name": "example-service-443-abc12345"
+            },
+            "spec": {
+              "host": "example-service.default",
+              "port": 443,
+              "sourceKind": "Service",
+              "sourceName": "example-service",
+              "sourceNamespace": "default"
+            }
+          },
+          {
+            "apiVersion": "security.telco.openshift.io/v1alpha1",
+            "kind": "TLSComplianceTarget",
+            "metadata": {
+              "name": "external-api-check"
+            },
+            "spec": {
+              "host": "api.example.com"
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Security
+      containerImage: quay.io/bapalm/tls-compliance-operator:v1.1.16
+      createdAt: "2026-10-05T17:26:58Z"
+      description: Continuously discovers TLS endpoints and reports their protocol,
+        certificate, and compliance status.
+      operators.operatorframework.io/builder: operator-sdk-v1.42.3
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/sebrandon1/tls-compliance-operator
+      support: Brandon Palm
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Observed TLS protocol, cipher, certificate, and compliance data
+          for a discovered endpoint.
+        displayName: TLS Compliance Report
+        kind: TLSComplianceReport
+        name: tlscompliancereports.security.telco.openshift.io
+        version: v1alpha1
+      - description: A user-defined host and port for TLS compliance scanning.
+        displayName: TLS Compliance Target
+        kind: TLSComplianceTarget
+        name: tlscompliancetargets.security.telco.openshift.io
+        version: v1alpha1
+    description: |
+      The TLS Compliance Operator continuously monitors TLS endpoints across a Kubernetes or OpenShift cluster.
+      It discovers Services, Ingresses, Pods, optional OpenShift Routes, and installed Gateway API resources,
+      then creates TLSComplianceReport resources with protocol support, cipher strength, certificate health,
+      and post-quantum readiness details. TLSComplianceTarget resources add arbitrary host and port scans.
+
+      The operator needs cluster-wide read access to discover endpoints and write access to its report resources.
+      Route and Gateway API monitoring is enabled only when those APIs are installed. The operator supports
+      Kubernetes 1.28 and later and OpenShift 4.x.
+    displayName: TLS Compliance Operator
+    installModes:
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - TLS
+    - security
+    - compliance
+    - certificates
+    - post-quantum
+    links:
+    - name: Source Code
+      url: https://github.com/sebrandon1/tls-compliance-operator
+    - name: Documentation
+      url: https://github.com/sebrandon1/tls-compliance-operator/tree/main/docs
+    - name: Issue Tracker
+      url: https://github.com/sebrandon1/tls-compliance-operator/issues
+    maintainers:
+    - email: bpalm@redhat.com
+      name: Brandon Palm
+    minKubeVersion: 1.28.0
+    provider:
+      name: Brandon Palm
+relatedImages:
+- image: quay.io/bapalm/tls-compliance-operator:v1.1.16
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/tls-compliance-operator:1.1.16
+  name: ""
+schema: olm.bundle

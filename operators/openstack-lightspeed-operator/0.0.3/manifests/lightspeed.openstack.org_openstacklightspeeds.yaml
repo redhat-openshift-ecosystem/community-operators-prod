@@ -1,0 +1,771 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  creationTimestamp: null
+  name: openstacklightspeeds.lightspeed.openstack.org
+spec:
+  group: lightspeed.openstack.org
+  names:
+    kind: OpenStackLightspeed
+    listKind: OpenStackLightspeedList
+    plural: openstacklightspeeds
+    singular: openstacklightspeed
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - description: Status
+      jsonPath: .status.conditions[0].status
+      name: Status
+      type: string
+    - description: Message
+      jsonPath: .status.conditions[0].message
+      name: Message
+      type: string
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: OpenStackLightspeed is the Schema for the openstacklightspeeds
+          API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: OpenStackLightspeedSpec defines the desired state of OpenStackLightspeed
+            properties:
+              console:
+                default: {}
+                description: Console configures the lightspeed console plugin.
+                properties:
+                  containerImage:
+                    description: ContainerImage overrides the console plugin container
+                      image. When unset, the operator default is used.
+                    type: string
+                  resources:
+                    default:
+                      limits:
+                        cpu: 200m
+                        memory: 256Mi
+                      requests:
+                        cpu: 50m
+                        memory: 64Mi
+                    description: |-
+                      Resources sets compute resources for the lightspeed-console-plugin
+                      container and its init container.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This is an alpha field and requires enabling the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                type: object
+              database:
+                default: {}
+                description: |-
+                  Database configures persistent storage for PostgreSQL data.
+                  A PersistentVolumeClaim is always created and mounted; when Database
+                  is omitted, the default size is used and the cluster's default
+                  StorageClass applies.
+                properties:
+                  class:
+                    description: |-
+                      StorageClass name for the PersistentVolumeClaim. If omitted, the cluster's
+                      default StorageClass is used.
+                    type: string
+                  containerImage:
+                    description: ContainerImage overrides the PostgreSQL container
+                      image. When unset, the operator default is used.
+                    type: string
+                  logLevel:
+                    default: INFO
+                    description: Log level for the PostgreSQL container. When set
+                      to DEBUG, enables logging of all SQL statements (log_statement
+                      = all).
+                    enum:
+                    - DEBUG
+                    - INFO
+                    type: string
+                  resources:
+                    default:
+                      limits:
+                        cpu: 500m
+                        memory: 2Gi
+                      requests:
+                        cpu: 30m
+                        memory: 300Mi
+                    description: Rarources sets compute resources for the PostgreSQL
+                      container.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This is an alpha field and requires enabling the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                  size:
+                    anyOf:
+                    - type: integer
+                    - type: string
+                    description: Size of the PersistentVolumeClaim for PostgreSQL
+                      data. Defaults to 1Gi.
+                    pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                    x-kubernetes-int-or-string: true
+                type: object
+              dataverseExporter:
+                default: {}
+                description: DataverseExporter configures the dataverse exporter sidecar
+                  (feedback, transcripts, logging).
+                properties:
+                  containerImage:
+                    description: ContainerImage overrides the dataverse exporter sidecar
+                      container image. When unset, the operator default is used.
+                    type: string
+                  feedback:
+                    description: Feedback configures user feedback collection.
+                    properties:
+                      enabled:
+                        default: true
+                        description: Enable feedback collection.
+                        type: boolean
+                    type: object
+                  logLevel:
+                    default: INFO
+                    description: 'Log level for the dataverse exporter sidecar container.
+                      Supports standard Python log levels: DEBUG, INFO, WARNING, ERROR,
+                      CRITICAL.'
+                    enum:
+                    - DEBUG
+                    - INFO
+                    - WARNING
+                    - ERROR
+                    - CRITICAL
+                    type: string
+                  transcripts:
+                    description: Transcripts configures conversation transcript collection.
+                    properties:
+                      enabled:
+                        description: Enable conversation transcripts collection.
+                        type: boolean
+                    type: object
+                type: object
+              defaultModel:
+                description: DefaultModel is the model alias selected by default for
+                  inference.
+                minLength: 1
+                type: string
+              dev:
+                description: |-
+                  Dev contains developer/experimental configuration.
+                  This section is not part of the stable API and may change at any time without backward compatibility.
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              lcore:
+                default: {}
+                description: LCore configures the lightspeed-service-api container.
+                properties:
+                  containerImage:
+                    description: ContainerImage overrides the lightspeed-service-api
+                      container image. When unset, the operator default is used.
+                    type: string
+                  logLevel:
+                    default: INFO
+                    description: 'Log level for the lightspeed-service-api container.
+                      Supports standard Python log levels: DEBUG, INFO, WARNING, ERROR,
+                      CRITICAL.'
+                    enum:
+                    - DEBUG
+                    - INFO
+                    - WARNING
+                    - ERROR
+                    - CRITICAL
+                    type: string
+                  resources:
+                    default:
+                      limits:
+                        cpu: "1"
+                        memory: 2Gi
+                      requests:
+                        cpu: 250m
+                        memory: 512Mi
+                    description: |-
+                      Resources sets compute resources for the lightspeed-service-api
+                      container in the lightspeed-stack deployment.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This is an alpha field and requires enabling the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                type: object
+              models:
+                description: Models configures available LLM models.
+                items:
+                  description: OpenStackLightspeedModelSpec defines one selectable
+                    LLM model.
+                  properties:
+                    llmAPIVersion:
+                      description: LLM API version for LLM providers that require
+                        it (e.g., Microsoft Azure OpenAI).
+                      type: string
+                    llmCredentials:
+                      description: |-
+                        Secret name containing API token for the LLM endpoint.
+                        The secret must contain a field named "apitoken" which holds the token value.
+                      type: string
+                    llmDeploymentName:
+                      description: Deployment name for LLM providers that require
+                        it (e.g., Microsoft Azure OpenAI).
+                      type: string
+                    llmEndpoint:
+                      description: URL pointing to the LLM endpoint.
+                      pattern: ^https?://.+
+                      type: string
+                    llmEndpointType:
+                      description: Type of the provider serving the LLM.
+                      enum:
+                      - azure_openai
+                      - openai
+                      - watsonx
+                      - rhoai_vllm
+                      - rhelai_vllm
+                      - gemini
+                      type: string
+                    llmProjectID:
+                      description: Project ID for LLM providers that require it (e.g.,
+                        WatsonX).
+                      type: string
+                    maxTokensForResponse:
+                      description: MaxTokensForResponse defines the maximum number
+                        of tokens to be used for response generation.
+                      minimum: 1
+                      type: integer
+                    modelName:
+                      description: Model name to use at the API endpoint provided
+                        in llmEndpoint.
+                      type: string
+                    name:
+                      description: Name is the Kubernetes-style alias for this configured
+                        model.
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                      type: string
+                  required:
+                  - llmCredentials
+                  - llmEndpoint
+                  - llmEndpointType
+                  - modelName
+                  - name
+                  type: object
+                minItems: 1
+                type: array
+                x-kubernetes-list-map-keys:
+                - name
+                x-kubernetes-list-type: map
+              ogx:
+                default: {}
+                description: OGX configures the OGX container.
+                properties:
+                  containerImage:
+                    description: ContainerImage overrides the OGX container image.
+                      When unset, the operator default is used.
+                    type: string
+                  logLevel:
+                    default: all=info
+                    description: Log level configuration for the OGX container. Supports
+                      standard levels (INFO, DEBUG) or fine-grained control using
+                      format "component=level,component=level" (e.g., "core=debug,providers=info").
+                    pattern: ^\w+(?:=\w+)?(?:,\w+(?:=\w+)?)*$
+                    type: string
+                  resources:
+                    default:
+                      limits:
+                        cpu: "2"
+                        memory: 8Gi
+                      requests:
+                        cpu: 500m
+                        memory: 2Gi
+                    description: |-
+                      Resources sets compute resources for the OGX container
+                      in the lightspeed-stack deployment.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This is an alpha field and requires enabling the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                type: object
+              okp:
+                default: {}
+                description: OKP configures the Offline Knowledge Portal (OKP) RAG
+                  source.
+                properties:
+                  accessKey:
+                    description: |-
+                      AccessKey is the name of the Secret containing the access key for the OKP server.
+                      The secret must contain a key named "access_key".
+                      An access key can be obtained from https://access.redhat.com/offline/access
+                    type: string
+                  containerImage:
+                    description: ContainerImage overrides the OKP container image.
+                      When unset, the operator default is used.
+                    type: string
+                  offline:
+                    default: true
+                    description: |-
+                      Offline controls how source URLs are resolved.
+                      When true, uses parent_id (offline/Mimir-style).
+                      When false, uses reference_url (online).
+                    type: boolean
+                  resources:
+                    default:
+                      limits:
+                        cpu: "2"
+                        memory: 4Gi
+                      requests:
+                        cpu: 500m
+                        memory: 2Gi
+                    description: Resources sets compute resources for the Offline
+                      Knowledge Portal container.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This is an alpha field and requires enabling the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                type: object
+              quotas:
+                description: |-
+                  Quotas configures quota enforcement (limiters, scheduler, token history) for lightspeed-stack.
+                  When omitted or Limiters is empty, quota enforcement is disabled.
+                properties:
+                  enableTokenHistory:
+                    default: false
+                    description: EnableTokenHistory enables the token_usage table
+                      for per-user/model/provider accounting.
+                    type: boolean
+                  limiters:
+                    description: |-
+                      Limiters configures the quota limiters enforced by lightspeed-stack.
+                      When empty, quota enforcement is disabled.
+                    items:
+                      description: QuotaLimiterSpec defines a single quota limiter
+                        enforced by lightspeed-stack.
+                      properties:
+                        initialQuota:
+                          description: InitialQuota is the number of tokens granted
+                            when the limiter resets.
+                          minimum: 0
+                          type: integer
+                        name:
+                          description: Name is a human-readable identifier for the
+                            limiter.
+                          type: string
+                        period:
+                          description: Period is the quota reset interval, expressed
+                            as an interval literal (e.g. "1 hour", "30 seconds", "1
+                            day", "1 hour 30 minutes").
+                          pattern: ^[1-9]\d*\s+(second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months)(\s+[1-9]\d*\s+(second|seconds|minute|minutes|hour|hours|day|days|week|weeks|month|months))*$
+                          type: string
+                        quotaIncrease:
+                          description: QuotaIncrease is the number of tokens added
+                            by the scheduler for this limiter.
+                          minimum: 0
+                          type: integer
+                        type:
+                          description: 'Type of the limiter: userLimiter enforces
+                            quota per user, clusterLimiter enforces quota across the
+                            whole cluster.'
+                          enum:
+                          - userLimiter
+                          - clusterLimiter
+                          type: string
+                      required:
+                      - initialQuota
+                      - name
+                      - period
+                      - quotaIncrease
+                      - type
+                      type: object
+                    type: array
+                  scheduler:
+                    description: Scheduler configures the background quota reset/increase
+                      scheduler.
+                    properties:
+                      databaseReconnectionCount:
+                        default: 10
+                        description: DatabaseReconnectionCount is the number of times
+                          the scheduler retries connecting to the database.
+                        minimum: 1
+                        type: integer
+                      databaseReconnectionDelay:
+                        default: 1
+                        description: DatabaseReconnectionDelay is the delay, in seconds,
+                          between database reconnection attempts.
+                        minimum: 1
+                        type: integer
+                      period:
+                        default: 5
+                        description: Period is the interval, in seconds, at which
+                          the scheduler checks limiters for reset/increase.
+                        minimum: 1
+                        type: integer
+                    type: object
+                type: object
+              rag:
+                description: RAG configures the RAG vector database init container.
+                properties:
+                  containerImage:
+                    description: ContainerImage overrides the RAG init-container image.
+                      When unset, the operator default is used.
+                    type: string
+                type: object
+              tlsCACertBundle:
+                description: |-
+                  Name of a ConfigMap containing additional CA certificates to merge into
+                  the shared trust bundle used by application components, including model connections.
+                type: string
+            required:
+            - defaultModel
+            - models
+            type: object
+          status:
+            description: OpenStackLightspeedStatus defines the observed state of OpenStackLightspeed
+            properties:
+              applicationCredentialSecret:
+                description: |-
+                  ApplicationCredentialSecret is the name of the current AC secret in the
+                  OpenStack namespace. Tracked for rotation detection.
+                type: string
+              conditions:
+                description: Conditions
+                items:
+                  description: Condition defines an observation of a API resource
+                    operational state.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        Last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed. If that is not known, then using the time when
+                        the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A human readable message indicating details about
+                        the transition.
+                      type: string
+                    reason:
+                      description: The reason for the condition's last transition
+                        in CamelCase.
+                      type: string
+                    severity:
+                      description: |-
+                        Severity provides a classification of Reason code, so the current situation is immediately
+                        understandable and could act accordingly.
+                        It is meant for situations where Status=False and it should be indicated if it is just
+                        informational, warning (next reconciliation might fix it) or an error (e.g. DB create issue
+                        and no actions to automatically resolve the issue can/should be done).
+                        For conditions where Status=Unknown or Status=True the Severity should be SeverityNone.
+                      type: string
+                    status:
+                      description: Status of the condition, one of True, False, Unknown.
+                      type: string
+                    type:
+                      description: Type of condition in CamelCase.
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - status
+                  - type
+                  type: object
+                type: array
+              observedGeneration:
+                description: ObservedGeneration - the most recent generation observed
+                  for this object.
+                format: int64
+                type: integer
+              openStackReady:
+                description: |-
+                  OpenStackReady indicates whether an OpenStackControlPlane was detected and
+                  is ready. When true, the OpenStack MCP tools are included in lightspeed-stack config.
+                type: boolean
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

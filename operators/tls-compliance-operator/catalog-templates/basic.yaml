@@ -1,0 +1,13 @@
+---
+schema: olm.template.basic
+entries:
+- schema: olm.package
+  name: tls-compliance-operator
+  defaultChannel: stable
+- schema: olm.channel
+  package: tls-compliance-operator
+  name: stable
+  entries:
+  - name: tls-compliance-operator.v1.1.16
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/tls-compliance-operator:1.1.16

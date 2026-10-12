@@ -5,6 +5,8 @@ schema: olm.package
 ---
 entries:
 - name: oc-mirror.v0.1.6
+- name: oc-mirror.v0.1.7
+  replaces: oc-mirror.v0.1.6
 name: alpha
 package: oc-mirror
 schema: olm.channel
@@ -276,5 +278,275 @@ relatedImages:
 - image: ghcr.io/mariusbertram/oc-mirror-operator-worker@sha256:4d85900f4ddca9a6a0e25c6a4460935d8c01c6216ca2fb279c44fe5df917da6a
   name: oc-mirror-operator-worker-4d85900f4ddca9a6a0e25c6a4460935d8c01c6216ca2fb279c44fe5df917da6a-annotation
 - image: quay.io/community-operator-pipeline-prod/oc-mirror:0.1.6
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/oc-mirror:0.1.7
+name: oc-mirror.v0.1.7
+package: oc-mirror
+properties:
+- type: olm.gvk
+  value:
+    group: mirror.openshift.io
+    kind: ImageSet
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: mirror.openshift.io
+    kind: MirrorExport
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: mirror.openshift.io
+    kind: MirrorTarget
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: oc-mirror
+    version: 0.1.7
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "mirror.openshift.io/v1alpha1",
+            "kind": "ImageSet",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "oc-mirror"
+              },
+              "name": "imageset-sample"
+            },
+            "spec": {
+              "mirror": {
+                "operators": [
+                  {
+                    "catalog": "\u003cregistry\u003e/redhat/redhat-operator-index:v4.14",
+                    "packages": [
+                      {
+                        "name": "web-terminal"
+                      },
+                      {
+                        "channels": [
+                          {
+                            "name": "stable-v1"
+                          }
+                        ],
+                        "name": "cert-manager"
+                      }
+                    ]
+                  }
+                ],
+                "platform": {
+                  "architectures": [
+                    "amd64"
+                  ],
+                  "channels": [
+                    {
+                      "maxVersion": "4.14.35",
+                      "minVersion": "4.14.30",
+                      "name": "stable-4.14",
+                      "shortestPath": true
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "mirror.openshift.io/v1alpha1",
+            "kind": "MirrorExport",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "oc-mirror"
+              },
+              "name": "mirrorexport-sample"
+            },
+            "spec": {
+              "destination": {
+                "registry": "registry.example.com/mirror"
+              },
+              "mirror": {
+                "operators": [
+                  {
+                    "catalog": "\u003cregistry\u003e/redhat/redhat-operator-index:v4.14",
+                    "packages": [
+                      {
+                        "name": "web-terminal"
+                      }
+                    ]
+                  }
+                ],
+                "platform": {
+                  "architectures": [
+                    "amd64"
+                  ],
+                  "channels": [
+                    {
+                      "maxVersion": "4.14.35",
+                      "minVersion": "4.14.30",
+                      "name": "stable-4.14",
+                      "shortestPath": true
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "apiVersion": "mirror.openshift.io/v1alpha1",
+            "kind": "MirrorTarget",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "oc-mirror"
+              },
+              "name": "mirrortarget-sample"
+            },
+            "spec": {
+              "authSecret": "registry-credentials",
+              "imageSets": [
+                "imageset-sample"
+              ],
+              "insecure": false,
+              "registry": "registry.example.com/mirror"
+            }
+          }
+        ]
+      capabilities: Basic Install
+      categories: OpenShift Optional, Integration & Delivery
+      com.redhat.openshift.versions: v4.18-v4.22
+      containerImage: ghcr.io/mariusbertram/oc-mirror-operator-controller@sha256:47a842697f2a796b20b7ae550a1967fcb8ef0bd559c693dc4cfc6cb7cbd1da5a
+      createdAt: "2026-10-10T20:35:44Z"
+      description: Mirrors OpenShift releases, operator catalogs, Helm charts and
+        additional images into private registries behind air-gapped or restricted
+        networks, with declarative ImageSets, drift healing and generated IDMS/ITMS
+        resources.
+      oc-mirror-manager-image: ghcr.io/mariusbertram/oc-mirror-operator-manager@sha256:07fd1d085da5a7dda4aad21ee196f68da9dbbcccecc8642d43f30b641c72fc7b
+      oc-mirror-worker-image: ghcr.io/mariusbertram/oc-mirror-operator-worker@sha256:1e5e1e70918e03d667bfcff7e85ced9a1bcc34576df122038baea812fe44696d
+      operatorframework.io/suggested-namespace: oc-mirror-operator
+      operators.operatorframework.io/builder: operator-sdk-v1.42.3
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/mariusbertram/oc-mirror-operator
+      support: Marius Bertram
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: |
+          An ImageSet describes the desired content (release channels, operator
+          catalogs, additional images) to mirror to one or more MirrorTargets.
+        displayName: Image Set
+        kind: ImageSet
+        name: imagesets.mirror.openshift.io
+        version: v1alpha1
+      - description: |
+          A MirrorExport defines a one-shot export of selected release, operator,
+          and additional image content to an external registry.
+        displayName: Mirror Export
+        kind: MirrorExport
+        name: mirrorexports.mirror.openshift.io
+        version: v1alpha1
+      - description: |
+          A MirrorTarget defines a destination registry for one or more ImageSets.
+          It owns the manager Deployment that orchestrates per-image worker pods
+          and exposes aggregated mirroring progress (Total/Mirrored/Pending/Failed).
+        displayName: Mirror Target
+        kind: MirrorTarget
+        name: mirrortargets.mirror.openshift.io
+        version: v1alpha1
+    description: |
+      The oc-mirror operator brings the functionality of the upstream `oc-mirror`
+      plugin to Kubernetes/OpenShift as a fully declarative, in-cluster operator.
+
+      ## Features
+
+      - **Declarative content selection** via `ImageSet` CRs (release channels,
+        operator catalogs, additional images, helm charts).
+      - **Per-target mirroring** via `MirrorTarget` CRs that aggregate one or
+        more ImageSets into a destination registry.
+      - **Live progress aggregation**: TOTAL/MIRRORED/PENDING/FAILED columns on
+        `oc get mirrortarget`.
+      - **Filtered FBC catalog images** built in-cluster from upstream operator
+        indexes.
+      - **Live skip of obsolete images** when ImageSets are reduced while a
+        mirror run is in flight.
+      - **Resource server** that publishes IDMS/ITMS/CatalogSource/ClusterCatalog
+        manifests once an ImageSet is Ready.
+
+      See https://github.com/mariusbertram/oc-mirror-operator for the full
+      architecture, security model, and deployment guide.
+    displayName: oc-mirror Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - mirror
+    - ocp
+    - images
+    - operator
+    - catalog
+    - disconnected
+    links:
+    - name: Source Code
+      url: https://github.com/mariusbertram/oc-mirror-operator
+    - name: Documentation
+      url: https://github.com/mariusbertram/oc-mirror-operator/blob/main/README.md
+    maintainers:
+    - email: marius@brtrm.de
+      name: Marius Bertram
+    maturity: alpha
+    minKubeVersion: 1.22.0
+    provider:
+      name: Marius Bertram
+      url: github.com/mariusbertram/oc-mirror-operator
+relatedImages:
+- image: ghcr.io/mariusbertram/oc-mirror-operator-controller@sha256:47a842697f2a796b20b7ae550a1967fcb8ef0bd559c693dc4cfc6cb7cbd1da5a
+  name: oc-mirror-operator-controller-47a842697f2a796b20b7ae550a1967fcb8ef0bd559c693dc4cfc6cb7cbd1da5a-annotation
+- image: ghcr.io/mariusbertram/oc-mirror-operator-controller@sha256:47a842697f2a796b20b7ae550a1967fcb8ef0bd559c693dc4cfc6cb7cbd1da5a
+  name: manager
+- image: ghcr.io/mariusbertram/oc-mirror-operator-manager@sha256:07fd1d085da5a7dda4aad21ee196f68da9dbbcccecc8642d43f30b641c72fc7b
+  name: oc-mirror-operator-manager-07fd1d085da5a7dda4aad21ee196f68da9dbbcccecc8642d43f30b641c72fc7b-annotation
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:43bfe8a3cd9b2dfaaad643d7358a963242cb27c2df3f694594a9fb1c07027084
+  name: oc-mirror-operator-plugin-43bfe8a3cd9b2dfaaad643d7358a963242cb27c2df3f694594a9fb1c07027084-annotation
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:43bfe8a3cd9b2dfaaad643d7358a963242cb27c2df3f694594a9fb1c07027084
+  name: plugin-4-20
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:43bfe8a3cd9b2dfaaad643d7358a963242cb27c2df3f694594a9fb1c07027084
+  name: plugin_4_20
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:4f46228343147b22bf147085fef014397c309699e123a73051944fc65c9e2371
+  name: plugin_4_21
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:4f46228343147b22bf147085fef014397c309699e123a73051944fc65c9e2371
+  name: oc-mirror-operator-plugin-4f46228343147b22bf147085fef014397c309699e123a73051944fc65c9e2371-annotation
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:4f46228343147b22bf147085fef014397c309699e123a73051944fc65c9e2371
+  name: plugin-4-21
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:51eb6e385906027cef4b1a5fc4b58b353aac493fd3ceea4357153fa6ec4bb0d3
+  name: plugin-4-22
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:51eb6e385906027cef4b1a5fc4b58b353aac493fd3ceea4357153fa6ec4bb0d3
+  name: plugin_4_22
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:51eb6e385906027cef4b1a5fc4b58b353aac493fd3ceea4357153fa6ec4bb0d3
+  name: oc-mirror-operator-plugin-51eb6e385906027cef4b1a5fc4b58b353aac493fd3ceea4357153fa6ec4bb0d3-annotation
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:9977c7a3184f60fa7e64eb1d5610ca2fd1759594eadec6452d5e4a2009eee7c4
+  name: plugin-4-19
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:9977c7a3184f60fa7e64eb1d5610ca2fd1759594eadec6452d5e4a2009eee7c4
+  name: plugin_4_19
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:9977c7a3184f60fa7e64eb1d5610ca2fd1759594eadec6452d5e4a2009eee7c4
+  name: oc-mirror-operator-plugin-9977c7a3184f60fa7e64eb1d5610ca2fd1759594eadec6452d5e4a2009eee7c4-annotation
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:a9623c82e6b45e864efddaaad60a10ab1fe9e7fcf9fa802f8c8481b8cd522c82
+  name: plugin_4_18
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:a9623c82e6b45e864efddaaad60a10ab1fe9e7fcf9fa802f8c8481b8cd522c82
+  name: plugin-4-18
+- image: ghcr.io/mariusbertram/oc-mirror-operator-plugin@sha256:a9623c82e6b45e864efddaaad60a10ab1fe9e7fcf9fa802f8c8481b8cd522c82
+  name: oc-mirror-operator-plugin-a9623c82e6b45e864efddaaad60a10ab1fe9e7fcf9fa802f8c8481b8cd522c82-annotation
+- image: ghcr.io/mariusbertram/oc-mirror-operator-worker@sha256:1e5e1e70918e03d667bfcff7e85ced9a1bcc34576df122038baea812fe44696d
+  name: oc-mirror-operator-worker-1e5e1e70918e03d667bfcff7e85ced9a1bcc34576df122038baea812fe44696d-annotation
+- image: quay.io/community-operator-pipeline-prod/oc-mirror:0.1.7
   name: ""
 schema: olm.bundle

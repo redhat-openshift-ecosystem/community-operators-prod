@@ -1,0 +1,1080 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  creationTimestamp: null
+  name: projectonboardings.onboarding.stderr.at
+spec:
+  group: onboarding.stderr.at
+  names:
+    kind: ProjectOnboarding
+    listKind: ProjectOnboardingList
+    plural: projectonboardings
+    shortNames:
+    - pob
+    singular: projectonboarding
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: ProjectOnboarding is a cluster-scoped schema for project onboarding
+          API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: |-
+              ProjectOnboardingSpec defines the desired state of ProjectOnboarding.
+              The CR is cluster-scoped; spec.namespaces[].name is the tenant Namespace to provision.
+              See docs/api-design.md.
+            properties:
+              gitOps:
+                description: GitOps configures tenant-level Argo CD defaults for AppProject
+                  provisioning.
+                properties:
+                  allowedOIDCGroups:
+                    description: AllowedOIDCGroups are default OIDC groups for AppProject
+                      RBAC roles.
+                    items:
+                      type: string
+                    type: array
+                  allowedSourceNamespaces:
+                    description: AllowedSourceNamespaces restricts where Applications
+                      may be defined from.
+                    items:
+                      type: string
+                    type: array
+                  allowedSourceRepos:
+                    description: AllowedSourceRepos restricts Application source repositories
+                      when not overridden per project.
+                    items:
+                      type: string
+                    type: array
+                  applicationNamespace:
+                    description: |-
+                      ApplicationNamespace is a legacy CR-level fallback when applicationGitOpsNamespace
+                      is unset on a namespace entry. Prefer spec.namespaces[].applicationGitOpsNamespace.
+                    maxLength: 253
+                    type: string
+                  destinations:
+                    description: Destinations lists allowed Argo CD destination clusters
+                      (maps to global.envs + allowed_envs).
+                    items:
+                      description: GitOpsDestinationSpec names a destination cluster
+                        for AppProject.spec.destinations.
+                      properties:
+                        name:
+                          description: Name is the Argo CD cluster secret name (e.g.
+                            in-cluster).
+                          type: string
+                        server:
+                          description: Server is the Kubernetes API URL (e.g. https://kubernetes.default.svc).
+                          type: string
+                      required:
+                      - name
+                      - server
+                      type: object
+                    type: array
+                type: object
+              namespaces:
+                description: Namespaces lists tenant namespaces and their onboarding
+                  configuration.
+                items:
+                  description: NamespaceSpec describes one onboarded namespace and
+                    its dependent resources.
+                  properties:
+                    additionalSettings:
+                      description: AdditionalSettings configures pod security, OpenShift
+                        monitoring, and custom namespace labels.
+                      properties:
+                        additionalLabels:
+                          description: |-
+                            AdditionalLabels lists custom key/value labels applied to the tenant Namespace.
+                            Operator-managed labels (onboarding, pod security, monitoring, project size, etc.) win on conflicts.
+                          items:
+                            description: NamespaceLabel is one key/value label applied
+                              to the tenant Namespace.
+                            properties:
+                              key:
+                                description: Key is the Kubernetes label key.
+                                minLength: 1
+                                type: string
+                              value:
+                                description: Value is the label value.
+                                type: string
+                            required:
+                            - key
+                            type: object
+                          type: array
+                          x-kubernetes-list-map-keys:
+                          - key
+                          x-kubernetes-list-type: map
+                        enableClusterMonitoring:
+                          default: true
+                          description: |-
+                            EnableClusterMonitoring sets openshift.io/user-monitoring on the tenant namespace
+                            so the user-workload Prometheus stack can scrape workloads in this project.
+                            Opt-out: defaults to true; set false to explicitly opt out (label value "false").
+                          type: boolean
+                        podSecurityAudit:
+                          description: |-
+                            PodSecurityAudit sets the pod-security.kubernetes.io/audit label.
+                            Records profile violations in the Kubernetes audit log without blocking or warning.
+                            Uses the same profile levels as podSecurityEnforce.
+                          enum:
+                          - privileged
+                          - baseline
+                          - restricted
+                          type: string
+                        podSecurityEnforce:
+                          description: |-
+                            PodSecurityEnforce sets the pod-security.kubernetes.io/enforce label (Pod Security Admission).
+                            Blocks pods that violate the selected profile from being admitted.
+                            privileged: unrestricted; baseline: prevents privileged workloads and host namespaces;
+                            restricted: requires non-root, dropped capabilities, and strict volume types.
+                          enum:
+                          - privileged
+                          - baseline
+                          - restricted
+                          type: string
+                        podSecurityWarn:
+                          description: |-
+                            PodSecurityWarn sets the pod-security.kubernetes.io/warn label.
+                            Admits pods but returns a warning to the user when the profile is violated.
+                            Uses the same profile levels as podSecurityEnforce.
+                          enum:
+                          - privileged
+                          - baseline
+                          - restricted
+                          type: string
+                      type: object
+                    annotations:
+                      additionalProperties:
+                        type: string
+                      description: Annotations are additional annotations applied
+                        to the Namespace resource.
+                      type: object
+                    applicationGitOpsNamespace:
+                      description: |-
+                        ApplicationGitOpsNamespace is the namespace of the application-scoped Argo CD instance
+                        for this tenant (Helm: application_gitops_namespace). AppProjects for this entry are
+                        created there. Each namespace entry can target a different Argo CD instance.
+                      maxLength: 253
+                      type: string
+                    argoCDProjects:
+                      description: ArgoCDProjects creates Argo CD AppProject resources
+                        for GitOps RBAC.
+                      items:
+                        description: ArgoCDProjectSpec configures one Argo CD AppProject
+                          for a tenant namespace.
+                        properties:
+                          description:
+                            description: Description is shown in Argo CD UI.
+                            type: string
+                          destinations:
+                            description: Destinations overrides GitOpsSpec.destinations
+                              for this project.
+                            items:
+                              description: GitOpsDestinationSpec names a destination
+                                cluster for AppProject.spec.destinations.
+                              properties:
+                                name:
+                                  description: Name is the Argo CD cluster secret
+                                    name (e.g. in-cluster).
+                                  type: string
+                                server:
+                                  description: Server is the Kubernetes API URL (e.g.
+                                    https://kubernetes.default.svc).
+                                  type: string
+                              required:
+                              - name
+                              - server
+                              type: object
+                            type: array
+                          enabled:
+                            default: false
+                            description: Enabled controls whether the operator creates
+                              this AppProject. Opt-in; defaults to false.
+                            type: boolean
+                          name:
+                            description: Name is the AppProject metadata.name in the
+                              Argo CD namespace.
+                            pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                            type: string
+                          oidcGroups:
+                            description: OIDCGroups overrides GitOpsSpec.allowedOIDCGroups
+                              for all roles in this project.
+                            items:
+                              type: string
+                            type: array
+                          roles:
+                            description: Roles defines AppProject.spec.roles (RBAC
+                              policies).
+                            items:
+                              description: ArgoCDRoleSpec maps to one AppProject.spec.roles
+                                entry.
+                              properties:
+                                description:
+                                  type: string
+                                fullAccess:
+                                  description: FullAccess grants all application and
+                                    repository actions on the project.
+                                  type: boolean
+                                name:
+                                  type: string
+                                oidcGroups:
+                                  description: OIDCGroups overrides project-level
+                                    OIDC groups for this role.
+                                  items:
+                                    type: string
+                                  type: array
+                                policies:
+                                  description: Policies are granular Casbin policies
+                                    when fullAccess is false.
+                                  items:
+                                    description: ArgoCDPolicySpec is one Casbin policy
+                                      line component.
+                                    properties:
+                                      action:
+                                        description: Action is e.g. get, create, sync,
+                                          delete.
+                                        type: string
+                                      appProjectName:
+                                        description: 'AppProjectName overrides the
+                                          Casbin proj: prefix for this policy. When
+                                          unset, the tenant namespace name is used.'
+                                        type: string
+                                      object:
+                                        description: Object is the application path
+                                          within the project (default "*").
+                                        type: string
+                                      permission:
+                                        description: Permission is allow or deny.
+                                        type: string
+                                      resource:
+                                        description: Resource is usually "applications"
+                                          or "repositories".
+                                        type: string
+                                    required:
+                                    - action
+                                    type: object
+                                  type: array
+                              required:
+                              - name
+                              type: object
+                            type: array
+                          sourceNamespaces:
+                            description: SourceNamespaces overrides GitOpsSpec.allowedSourceNamespaces
+                              for this project.
+                            items:
+                              type: string
+                            type: array
+                          sourceRepos:
+                            description: SourceRepos overrides GitOpsSpec.allowedSourceRepos
+                              for this project.
+                            items:
+                              type: string
+                            type: array
+                        required:
+                        - name
+                        type: object
+                      type: array
+                    defaultPolicies:
+                      description: DefaultPolicies configures the standard OpenShift
+                        network policy set.
+                      properties:
+                        allowFromIngress:
+                          description: AllowFromIngress permits ingress from the OpenShift
+                            router namespace (public Routes).
+                          type: boolean
+                        allowFromMonitoring:
+                          description: AllowFromMonitoring permits ingress from the
+                            openshift-monitoring namespace (platform Prometheus).
+                          type: boolean
+                        allowFromSameNamespace:
+                          description: AllowFromSameNamespace permits pod-to-pod ingress
+                            within the tenant namespace.
+                          type: boolean
+                        allowKubeAPIServer:
+                          description: AllowKubeAPIServer permits ingress from the
+                            kube-apiserver operator (control plane health/metrics).
+                          type: boolean
+                        allowToDNS:
+                          description: AllowToDNS permits egress to openshift-dns
+                            on ports 53 and 5353 (TCP/UDP).
+                          type: boolean
+                        denyAllEgress:
+                          description: DenyAllEgress adds a deny-all egress policy
+                            (use together with explicit egress allows).
+                          type: boolean
+                        denyAllIngress:
+                          description: DenyAllIngress adds a deny-all ingress policy
+                            (use together with explicit ingress allows).
+                          type: boolean
+                      type: object
+                    egressIPs:
+                      description: EgressIPs configures an OpenShift OVN EgressIP
+                        for the namespace.
+                      properties:
+                        enabled:
+                          default: false
+                          description: Enabled controls whether an EgressIP is created.
+                            Defaults to false (opt-in).
+                          type: boolean
+                        ips:
+                          items:
+                            type: string
+                          minItems: 1
+                          type: array
+                      type: object
+                    enabled:
+                      default: true
+                      description: |-
+                        Reconciliation Enabled controls whether the operator reconciles this namespace entry.
+                        When false, the operator freezes the tenant namespace and managed resources (no updates, no teardown).
+                        Use offboard to remove managed resources and delete the tenant namespace.
+                      type: boolean
+                    labels:
+                      additionalProperties:
+                        type: string
+                      description: Labels are additional labels applied to the Namespace
+                        resource.
+                      type: object
+                    limitRanges:
+                      description: LimitRanges configures a namespace LimitRange.
+                      properties:
+                        container:
+                          description: Container sets LimitRange defaults, default
+                            requests, and min/max for containers.
+                          properties:
+                            default:
+                              description: Default sets default CPU and memory limits
+                                applied to containers without limits.
+                              properties:
+                                cpu:
+                                  description: CPU quantity (e.g. 4, 500m).
+                                  type: string
+                                memory:
+                                  description: Memory quantity (e.g. 4Gi, 500Mi).
+                                  type: string
+                              type: object
+                            defaultRequest:
+                              description: DefaultRequest sets default CPU and memory
+                                requests applied to containers without requests.
+                              properties:
+                                cpu:
+                                  description: CPU quantity (e.g. 4, 500m).
+                                  type: string
+                                memory:
+                                  description: Memory quantity (e.g. 4Gi, 500Mi).
+                                  type: string
+                              type: object
+                            max:
+                              description: Max sets maximum CPU and memory per container.
+                              properties:
+                                cpu:
+                                  description: CPU quantity (e.g. 4, 500m).
+                                  type: string
+                                memory:
+                                  description: Memory quantity (e.g. 4Gi, 500Mi).
+                                  type: string
+                              type: object
+                            min:
+                              description: Min sets minimum CPU and memory per container.
+                              properties:
+                                cpu:
+                                  description: CPU quantity (e.g. 4, 500m).
+                                  type: string
+                                memory:
+                                  description: Memory quantity (e.g. 4Gi, 500Mi).
+                                  type: string
+                              type: object
+                          type: object
+                        enabled:
+                          description: Enabled turns LimitRange reconciliation on
+                            or off for this namespace entry.
+                          type: boolean
+                        pod:
+                          description: Pod sets LimitRange constraints for Pod-type
+                            limits (sum of containers in a pod).
+                          properties:
+                            max:
+                              description: Max sets maximum CPU and memory for a pod
+                                (sum of its containers).
+                              properties:
+                                cpu:
+                                  description: CPU quantity (e.g. 4, 500m).
+                                  type: string
+                                memory:
+                                  description: Memory quantity (e.g. 4Gi, 500Mi).
+                                  type: string
+                              type: object
+                            min:
+                              description: Min sets minimum CPU and memory for a pod
+                                (sum of its containers).
+                              properties:
+                                cpu:
+                                  description: CPU quantity (e.g. 4, 500m).
+                                  type: string
+                                memory:
+                                  description: Memory quantity (e.g. 4Gi, 500Mi).
+                                  type: string
+                              type: object
+                          type: object
+                        pvc:
+                          description: PVC sets min/max storage bounds for PersistentVolumeClaim-type
+                            limits.
+                          properties:
+                            max:
+                              description: Max sets maximum storage for PVC-type limits.
+                              properties:
+                                storage:
+                                  description: Storage quantity (e.g. 1Gi, 20Gi).
+                                  type: string
+                              type: object
+                            min:
+                              description: Min sets minimum storage for PVC-type limits.
+                              properties:
+                                storage:
+                                  description: Storage quantity (e.g. 1Gi, 20Gi).
+                                  type: string
+                              type: object
+                          type: object
+                      type: object
+                    localAdminGroup:
+                      description: LocalAdminGroup creates an OpenShift Group and
+                        RoleBinding for namespace admins.
+                      properties:
+                        clusterRole:
+                          description: |-
+                            ClusterRole is the ClusterRole bound in the tenant namespace (e.g. admin, edit).
+                            Defaults to admin at reconcile time when omitted.
+                          type: string
+                        enabled:
+                          default: false
+                          description: Enabled controls whether the operator creates
+                            the Group and RoleBinding. Opt-in; defaults to false.
+                          type: boolean
+                        groupName:
+                          description: GroupName is the OpenShift Group name. Defaults
+                            to <namespace>-admins when omitted.
+                          type: string
+                        users:
+                          description: Users lists OpenShift user names added to the
+                            Group. Required when enabled.
+                          items:
+                            type: string
+                          type: array
+                      type: object
+                    name:
+                      description: Name is the Kubernetes namespace name to create
+                        or reconcile.
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                      type: string
+                    networkPolicies:
+                      description: NetworkPolicies defines additional custom NetworkPolicy
+                        resources.
+                      items:
+                        description: CustomNetworkPolicySpec defines one additional
+                          NetworkPolicy.
+                        properties:
+                          active:
+                            default: true
+                            type: boolean
+                          egressRules:
+                            items:
+                              description: NetworkPolicyRuleSpec defines ingress or
+                                egress peers and ports.
+                              properties:
+                                ports:
+                                  items:
+                                    properties:
+                                      port:
+                                        format: int32
+                                        type: integer
+                                      protocol:
+                                        type: string
+                                    type: object
+                                  type: array
+                                selectors:
+                                  items:
+                                    description: NetworkPolicyPeerSpec is a simplified
+                                      NetworkPolicy peer definition.
+                                    properties:
+                                      ipBlock:
+                                        properties:
+                                          cidr:
+                                            type: string
+                                          except:
+                                            items:
+                                              type: string
+                                            type: array
+                                        required:
+                                        - cidr
+                                        type: object
+                                      namespaceSelector:
+                                        description: |-
+                                          A label selector is a label query over a set of resources. The result of matchLabels and
+                                          matchExpressions are ANDed. An empty label selector matches all objects. A null
+                                          label selector matches no objects.
+                                        properties:
+                                          matchExpressions:
+                                            description: matchExpressions is a list
+                                              of label selector requirements. The
+                                              requirements are ANDed.
+                                            items:
+                                              description: |-
+                                                A label selector requirement is a selector that contains values, a key, and an operator that
+                                                relates the key and values.
+                                              properties:
+                                                key:
+                                                  description: key is the label key
+                                                    that the selector applies to.
+                                                  type: string
+                                                operator:
+                                                  description: |-
+                                                    operator represents a key's relationship to a set of values.
+                                                    Valid operators are In, NotIn, Exists and DoesNotExist.
+                                                  type: string
+                                                values:
+                                                  description: |-
+                                                    values is an array of string values. If the operator is In or NotIn,
+                                                    the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                                    the values array must be empty. This array is replaced during a strategic
+                                                    merge patch.
+                                                  items:
+                                                    type: string
+                                                  type: array
+                                                  x-kubernetes-list-type: atomic
+                                              required:
+                                              - key
+                                              - operator
+                                              type: object
+                                            type: array
+                                            x-kubernetes-list-type: atomic
+                                          matchLabels:
+                                            additionalProperties:
+                                              type: string
+                                            description: |-
+                                              matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                                              map is equivalent to an element of matchExpressions, whose key field is "key", the
+                                              operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                            type: object
+                                        type: object
+                                        x-kubernetes-map-type: atomic
+                                      podSelector:
+                                        description: |-
+                                          A label selector is a label query over a set of resources. The result of matchLabels and
+                                          matchExpressions are ANDed. An empty label selector matches all objects. A null
+                                          label selector matches no objects.
+                                        properties:
+                                          matchExpressions:
+                                            description: matchExpressions is a list
+                                              of label selector requirements. The
+                                              requirements are ANDed.
+                                            items:
+                                              description: |-
+                                                A label selector requirement is a selector that contains values, a key, and an operator that
+                                                relates the key and values.
+                                              properties:
+                                                key:
+                                                  description: key is the label key
+                                                    that the selector applies to.
+                                                  type: string
+                                                operator:
+                                                  description: |-
+                                                    operator represents a key's relationship to a set of values.
+                                                    Valid operators are In, NotIn, Exists and DoesNotExist.
+                                                  type: string
+                                                values:
+                                                  description: |-
+                                                    values is an array of string values. If the operator is In or NotIn,
+                                                    the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                                    the values array must be empty. This array is replaced during a strategic
+                                                    merge patch.
+                                                  items:
+                                                    type: string
+                                                  type: array
+                                                  x-kubernetes-list-type: atomic
+                                              required:
+                                              - key
+                                              - operator
+                                              type: object
+                                            type: array
+                                            x-kubernetes-list-type: atomic
+                                          matchLabels:
+                                            additionalProperties:
+                                              type: string
+                                            description: |-
+                                              matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                                              map is equivalent to an element of matchExpressions, whose key field is "key", the
+                                              operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                            type: object
+                                        type: object
+                                        x-kubernetes-map-type: atomic
+                                    type: object
+                                  type: array
+                              type: object
+                            type: array
+                          ingressRules:
+                            items:
+                              description: NetworkPolicyRuleSpec defines ingress or
+                                egress peers and ports.
+                              properties:
+                                ports:
+                                  items:
+                                    properties:
+                                      port:
+                                        format: int32
+                                        type: integer
+                                      protocol:
+                                        type: string
+                                    type: object
+                                  type: array
+                                selectors:
+                                  items:
+                                    description: NetworkPolicyPeerSpec is a simplified
+                                      NetworkPolicy peer definition.
+                                    properties:
+                                      ipBlock:
+                                        properties:
+                                          cidr:
+                                            type: string
+                                          except:
+                                            items:
+                                              type: string
+                                            type: array
+                                        required:
+                                        - cidr
+                                        type: object
+                                      namespaceSelector:
+                                        description: |-
+                                          A label selector is a label query over a set of resources. The result of matchLabels and
+                                          matchExpressions are ANDed. An empty label selector matches all objects. A null
+                                          label selector matches no objects.
+                                        properties:
+                                          matchExpressions:
+                                            description: matchExpressions is a list
+                                              of label selector requirements. The
+                                              requirements are ANDed.
+                                            items:
+                                              description: |-
+                                                A label selector requirement is a selector that contains values, a key, and an operator that
+                                                relates the key and values.
+                                              properties:
+                                                key:
+                                                  description: key is the label key
+                                                    that the selector applies to.
+                                                  type: string
+                                                operator:
+                                                  description: |-
+                                                    operator represents a key's relationship to a set of values.
+                                                    Valid operators are In, NotIn, Exists and DoesNotExist.
+                                                  type: string
+                                                values:
+                                                  description: |-
+                                                    values is an array of string values. If the operator is In or NotIn,
+                                                    the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                                    the values array must be empty. This array is replaced during a strategic
+                                                    merge patch.
+                                                  items:
+                                                    type: string
+                                                  type: array
+                                                  x-kubernetes-list-type: atomic
+                                              required:
+                                              - key
+                                              - operator
+                                              type: object
+                                            type: array
+                                            x-kubernetes-list-type: atomic
+                                          matchLabels:
+                                            additionalProperties:
+                                              type: string
+                                            description: |-
+                                              matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                                              map is equivalent to an element of matchExpressions, whose key field is "key", the
+                                              operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                            type: object
+                                        type: object
+                                        x-kubernetes-map-type: atomic
+                                      podSelector:
+                                        description: |-
+                                          A label selector is a label query over a set of resources. The result of matchLabels and
+                                          matchExpressions are ANDed. An empty label selector matches all objects. A null
+                                          label selector matches no objects.
+                                        properties:
+                                          matchExpressions:
+                                            description: matchExpressions is a list
+                                              of label selector requirements. The
+                                              requirements are ANDed.
+                                            items:
+                                              description: |-
+                                                A label selector requirement is a selector that contains values, a key, and an operator that
+                                                relates the key and values.
+                                              properties:
+                                                key:
+                                                  description: key is the label key
+                                                    that the selector applies to.
+                                                  type: string
+                                                operator:
+                                                  description: |-
+                                                    operator represents a key's relationship to a set of values.
+                                                    Valid operators are In, NotIn, Exists and DoesNotExist.
+                                                  type: string
+                                                values:
+                                                  description: |-
+                                                    values is an array of string values. If the operator is In or NotIn,
+                                                    the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                                    the values array must be empty. This array is replaced during a strategic
+                                                    merge patch.
+                                                  items:
+                                                    type: string
+                                                  type: array
+                                                  x-kubernetes-list-type: atomic
+                                              required:
+                                              - key
+                                              - operator
+                                              type: object
+                                            type: array
+                                            x-kubernetes-list-type: atomic
+                                          matchLabels:
+                                            additionalProperties:
+                                              type: string
+                                            description: |-
+                                              matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                                              map is equivalent to an element of matchExpressions, whose key field is "key", the
+                                              operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                            type: object
+                                        type: object
+                                        x-kubernetes-map-type: atomic
+                                    type: object
+                                  type: array
+                              type: object
+                            type: array
+                          name:
+                            type: string
+                          podSelector:
+                            description: |-
+                              A label selector is a label query over a set of resources. The result of matchLabels and
+                              matchExpressions are ANDed. An empty label selector matches all objects. A null
+                              label selector matches no objects.
+                            properties:
+                              matchExpressions:
+                                description: matchExpressions is a list of label selector
+                                  requirements. The requirements are ANDed.
+                                items:
+                                  description: |-
+                                    A label selector requirement is a selector that contains values, a key, and an operator that
+                                    relates the key and values.
+                                  properties:
+                                    key:
+                                      description: key is the label key that the selector
+                                        applies to.
+                                      type: string
+                                    operator:
+                                      description: |-
+                                        operator represents a key's relationship to a set of values.
+                                        Valid operators are In, NotIn, Exists and DoesNotExist.
+                                      type: string
+                                    values:
+                                      description: |-
+                                        values is an array of string values. If the operator is In or NotIn,
+                                        the values array must be non-empty. If the operator is Exists or DoesNotExist,
+                                        the values array must be empty. This array is replaced during a strategic
+                                        merge patch.
+                                      items:
+                                        type: string
+                                      type: array
+                                      x-kubernetes-list-type: atomic
+                                  required:
+                                  - key
+                                  - operator
+                                  type: object
+                                type: array
+                                x-kubernetes-list-type: atomic
+                              matchLabels:
+                                additionalProperties:
+                                  type: string
+                                description: |-
+                                  matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
+                                  map is equivalent to an element of matchExpressions, whose key field is "key", the
+                                  operator is "In", and the values array contains only "value". The requirements are ANDed.
+                                type: object
+                            type: object
+                            x-kubernetes-map-type: atomic
+                        required:
+                        - name
+                        type: object
+                      type: array
+                    offboard:
+                      default: false
+                      description: |-
+                        Offboard removes operator-managed resources for this namespace entry and deletes the tenant
+                        namespace (including all workloads still inside it). Defaults to false (opt-in). Independent
+                        of reconciliation enabled; when true, cleanup runs even if reconciliation is disabled.
+                        Deleting the ProjectOnboarding CR is blocked until every managed tenant namespace is either
+                        offboarded (offboard=true) or removed manually from the cluster.
+                      type: boolean
+                    overwriteTshirt:
+                      description: |-
+                        OverwriteTshirt merges resourceQuotas and limitRanges from this entry onto
+                        the referenced TShirtSize when projectSize is set. Required for inline quota/limit
+                        fields to override the catalogue. Fields set here win; unset fields use the T-shirt.
+                        Ignored when projectSize is empty.
+                      type: boolean
+                    projectSize:
+                      description: |-
+                        ProjectSize references a cluster-scoped TShirtSize by name (metadata.name).
+                        Quota and limit range values are taken from that TShirtSize. Inline
+                        resourceQuotas/limitRanges on this entry are ignored unless overwriteTshirt is true.
+                        Also sets label namespace-size on the tenant Namespace.
+                      maxLength: 63
+                      type: string
+                    resourceQuotas:
+                      description: ResourceQuotas configures a namespace ResourceQuota.
+                      properties:
+                        configMaps:
+                          description: ConfigMaps is the maximum number of ConfigMaps.
+                          format: int32
+                          type: integer
+                        cpu:
+                          description: CPU is the total CPU quota for all pods (e.g.
+                            "4" or "4000m").
+                          type: string
+                        enabled:
+                          description: Enabled turns ResourceQuota reconciliation
+                            on or off for this namespace entry.
+                          type: boolean
+                        ephemeralStorage:
+                          description: EphemeralStorage is the total ephemeral storage
+                            quota for all pods (e.g. "4Gi"). Lower-case suffixes (gi,
+                            mi) are normalized automatically.
+                          type: string
+                        limits:
+                          description: Limits sets cluster-wide limits.* ResourceQuota
+                            keys.
+                          properties:
+                            cpu:
+                              description: CPU is the limits.cpu quota (e.g. "4").
+                              type: string
+                            ephemeralStorage:
+                              description: EphemeralStorage is the limits.ephemeral-storage
+                                quota (e.g. "4Mi"). Lower-case suffixes are normalized
+                                automatically.
+                              type: string
+                            memory:
+                              description: Memory is the limits.memory quota (e.g.
+                                "4Gi"). Lower-case suffixes are normalized automatically.
+                              type: string
+                          type: object
+                        memory:
+                          description: Memory is the total memory quota for all pods
+                            (e.g. "4Gi").
+                          type: string
+                        persistentVolumeClaims:
+                          description: PersistentVolumeClaims is the maximum number
+                            of PersistentVolumeClaims.
+                          format: int32
+                          type: integer
+                        pods:
+                          description: Pods is the maximum number of pods in the namespace.
+                          format: int32
+                          type: integer
+                        replicationControllers:
+                          description: ReplicationControllers is the maximum number
+                            of ReplicationControllers.
+                          format: int32
+                          type: integer
+                        requests:
+                          description: Requests sets cluster-wide requests.* ResourceQuota
+                            keys.
+                          properties:
+                            cpu:
+                              description: CPU is the requests.cpu quota (e.g. "1").
+                              type: string
+                            ephemeralStorage:
+                              description: EphemeralStorage is the requests.ephemeral-storage
+                                quota (e.g. "2Gi").
+                              type: string
+                            memory:
+                              description: Memory is the requests.memory quota (e.g.
+                                "2Gi").
+                              type: string
+                            storage:
+                              description: Storage is the requests.storage quota (e.g.
+                                "50Gi").
+                              type: string
+                          type: object
+                        resourceQuotas:
+                          description: ResourceQuotas is the maximum number of ResourceQuota
+                            objects in the namespace.
+                          format: int32
+                          type: integer
+                        secrets:
+                          description: Secrets is the maximum number of Secrets.
+                          format: int32
+                          type: integer
+                        services:
+                          description: Services is the maximum number of Services.
+                          format: int32
+                          type: integer
+                        storageClasses:
+                          description: StorageClasses lists StorageClass quota keys
+                            and values for ResourceQuota hard limits.
+                          items:
+                            description: StorageClassQuota is one StorageClass-related
+                              ResourceQuota hard limit key/value pair.
+                            properties:
+                              key:
+                                description: Key is the ResourceQuota hard limit name,
+                                  e.g. bronze.storageclass.storage.k8s.io/requests.storage.
+                                minLength: 1
+                                type: string
+                              value:
+                                description: Value is the quota value (e.g. 10Gi or
+                                  10).
+                                type: string
+                            required:
+                            - key
+                            type: object
+                          type: array
+                          x-kubernetes-list-map-keys:
+                          - key
+                          x-kubernetes-list-type: map
+                      type: object
+                  required:
+                  - name
+                  type: object
+                  x-kubernetes-validations:
+                  - message: egressIPs.ips must contain at least one IP when egressIPs
+                      is enabled
+                    rule: '!has(self.egressIPs) || !has(self.egressIPs.enabled) ||
+                      !self.egressIPs.enabled || (has(self.egressIPs.ips) && self.egressIPs.ips.size()
+                      > 0)'
+                  - message: localAdminGroup.users must be set when localAdminGroup
+                      is enabled
+                    rule: '!has(self.localAdminGroup) || !has(self.localAdminGroup.enabled)
+                      || !self.localAdminGroup.enabled || (has(self.localAdminGroup.users)
+                      && self.localAdminGroup.users.size() > 0)'
+                  - message: projectSize must be a valid DNS-1123 label when set
+                    rule: '!has(self.projectSize) || self.projectSize.size() == 0
+                      || self.projectSize.matches(''^[a-z0-9]([-a-z0-9]*[a-z0-9])?$'')'
+                maxItems: 64
+                minItems: 1
+                type: array
+            required:
+            - namespaces
+            type: object
+          status:
+            description: ProjectOnboardingStatus defines the observed state of ProjectOnboarding.
+            properties:
+              conditions:
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              namespaces:
+                items:
+                  description: NamespaceStatus reports reconciliation state for one
+                    target namespace.
+                  properties:
+                    message:
+                      type: string
+                    name:
+                      type: string
+                    ready:
+                      type: boolean
+                  type: object
+                type: array
+              observedGeneration:
+                format: int64
+                type: integer
+              phase:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

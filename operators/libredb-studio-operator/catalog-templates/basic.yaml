@@ -1,0 +1,48 @@
+---
+schema: olm.template.basic
+entries:
+- schema: olm.package
+  name: libredb-studio-operator
+  defaultChannel: alpha
+- schema: olm.channel
+  package: libredb-studio-operator
+  name: alpha
+  entries:
+  - name: libredb-studio-operator.v0.9.59
+  - name: libredb-studio-operator.v0.14.1
+    replaces: libredb-studio-operator.v0.9.59
+  - name: libredb-studio-operator.v0.15.0
+    replaces: libredb-studio-operator.v0.14.1
+  - name: libredb-studio-operator.v0.16.0
+    replaces: libredb-studio-operator.v0.15.0
+  - name: libredb-studio-operator.v0.16.1
+    replaces: libredb-studio-operator.v0.16.0
+  - name: libredb-studio-operator.v0.17.0
+    replaces: libredb-studio-operator.v0.16.1
+  - name: libredb-studio-operator.v0.18.0
+    replaces: libredb-studio-operator.v0.17.0
+  - name: libredb-studio-operator.v0.18.1
+    replaces: libredb-studio-operator.v0.18.0
+  - name: libredb-studio-operator.v1.0.0
+    replaces: libredb-studio-operator.v0.18.1
+    skips:
+    - libredb-studio-operator.v0.18.2
+    - libredb-studio-operator.v0.18.3
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/libredb-studio-operator:0.9.59
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/libredb-studio-operator:0.14.1
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/libredb-studio-operator:0.15.0
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/libredb-studio-operator:0.16.0
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/libredb-studio-operator:0.16.1
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/libredb-studio-operator:0.17.0
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/libredb-studio-operator:0.18.0
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/libredb-studio-operator:0.18.1
+- schema: olm.bundle
+  image: quay.io/community-operator-pipeline-prod/libredb-studio-operator:1.0.0

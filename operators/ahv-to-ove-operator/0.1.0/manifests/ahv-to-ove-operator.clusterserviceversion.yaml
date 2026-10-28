@@ -1,0 +1,312 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  name: ahv-to-ove-operator.v0.1.0
+  namespace: placeholder
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "migration.lightwell.co.jp/v1alpha1",
+          "kind": "AHVMigration",
+          "metadata": {
+            "name": "my-migration",
+            "namespace": "ahv-to-ove-operator-system"
+          },
+          "spec": {
+            "source": {
+              "endpoint": "https://prism-central.example.com:9440",
+              "secretRef": { "name": "prism-credentials" },
+              "insecure": false,
+              "warmMigration": true,
+              "pauseBeforeCutover": false
+            },
+            "vms": [
+              { "name": "my-vm-on-ahv", "targetName": "my-vm-on-ove" }
+            ],
+            "networkMappings": [
+              { "source": "VLAN_100", "target": "ovs-bridge" }
+            ],
+            "storageMappings": [
+              {
+                "source": "",
+                "targetStorageClass": "ocs-storagecluster-ceph-rbd",
+                "accessMode": "ReadWriteMany",
+                "volumeMode": "Block"
+              }
+            ],
+            "targetNamespace": "default"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: OpenShift Optional
+    containerImage: ghcr.io/lightwell-tech/ahv-to-ove-operator@sha256:eac30bc7107fcdd3c99e52dd352b13d2212ff1c0b10e8ef4e48a9ce632b0264c
+    createdAt: "2026-07-15T00:00:00Z"
+    description: Migrate VMs from Nutanix AHV (Prism Central) to OpenShift Virtualization
+    operatorframework.io/suggested-namespace: ahv-to-ove-operator-system
+    support: LightWell Co., Ltd.
+    repository: https://github.com/lightwell-tech/ahv-to-ove-operator
+spec:
+  displayName: AHV to OVE Migration Operator
+  description: |
+    ## Overview
+
+    The **AHV to OVE Migration Operator** automates the migration of virtual machines
+    from **Nutanix AHV** (managed by Prism Central) to **OpenShift Virtualization** (KubeVirt).
+
+    ## Features
+
+    - **Warm Migration**: Copy disks while the source VM remains running, minimizing downtime
+    - **CBT Delta Sync** (opt-in): Changed Region Tracking so the warm cutover transfers only
+      the changed blocks instead of a full re-copy. Because Prism's image download has no HTTP
+      Range support, the changed blocks are read over NFS from the snapshot container.
+      See `docs/warm-migration-cbt-spec.md`. Requires the prerequisites listed below.
+    - **Shutdown Migration**: Power off the source VM before copying for maximum data consistency
+    - **GuestPrep / SSH**: SSH into the source VM before migration to inject virtio drivers
+      into the initramfs — prevents boot failures on hypervisor change
+    - **Console Plugin** (optional, not bundled in v0.1.x): an OpenShift Console UI is available
+      separately in the source repo (`console-plugin/`) and can be installed manually. The operator
+      is fully usable without it via the form generated from this CSV, or plain YAML
+    - **Cutover Control**: Optional `pauseBeforeCutover` flag to manually approve the
+      final VM switchover from the Console
+
+    ## Migration Modes
+
+    | Mode | Description | Use Case |
+    |------|-------------|----------|
+    | Warm | Disk copied while VM runs; brief downtime at cutover | Production VMs |
+    | Shutdown | VM stopped before copy; higher data consistency | Non-critical VMs |
+    | GuestPrep/ssh | SSH virtio driver injection before any copy | VMs lacking virtio in initramfs |
+
+    ## Prerequisites
+
+    - OpenShift 4.13+ with OpenShift Virtualization (KubeVirt) installed
+    - CDI (Containerized Data Importer) installed
+    - Nutanix Prism Central v3 API accessible from the cluster
+    - A `Secret` with Prism Central credentials (`user` / `password` keys)
+
+    **Additional prerequisites for CBT Delta Sync** (only when `source.cbt.enabled: true`):
+
+    - A `ahv-delta-sync` ServiceAccount in the target namespace with the `hostmount-anyuid`
+      SCC (the delta Job mounts the snapshot container as an `nfs` volume, which `anyuid`
+      does not permit): `oc adm policy add-scc-to-user hostmount-anyuid -z ahv-delta-sync -n <ns>`
+    - The snapshot's Nutanix storage container must allow the OpenShift node subnet in its
+      NFS Filesystem Whitelist (this is a Nutanix-side setting and cannot be automated by the
+      operator). See `config/rbac/delta-sync-sa.yaml` and `docs/warm-migration-cbt-spec.md`.
+
+    ## Quick Start
+
+    1. Create a credentials Secret:
+    ```yaml
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: prism-credentials
+      namespace: ahv-to-ove-operator-system
+    stringData:
+      user: admin
+      password: your-prism-password
+    ```
+
+    2. Create an AHVMigration resource and the operator handles the rest.
+
+  keywords:
+    - migration
+    - nutanix
+    - ahv
+    - openshift-virtualization
+    - kubevirt
+    - vm-migration
+
+  maintainers:
+    - name: LightWell Co., Ltd.
+      email: info@lightwell.co.jp
+
+  provider:
+    name: LightWell Co., Ltd.
+    url: https://www.lightwell.co.jp
+
+  links:
+    - name: GitHub Repository
+      url: https://github.com/lightwell-tech/ahv-to-ove-operator
+    - name: Documentation
+      url: https://github.com/lightwell-tech/ahv-to-ove-operator/blob/main/README.md
+
+  version: 0.1.0
+  minKubeVersion: "1.26.0"
+
+  icon:
+    - base64data: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjggMTI4IiB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCI+CiAgPHJlY3Qgd2lkdGg9IjEyOCIgaGVpZ2h0PSIxMjgiIHJ4PSIyNCIgZmlsbD0iIzBiMWYzYSIvPgogIDxyZWN0IHg9IjIwIiB5PSI0NiIgd2lkdGg9IjMwIiBoZWlnaHQ9IjM2IiByeD0iNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNWI5YmQ1IiBzdHJva2Utd2lkdGg9IjQiLz4KICA8cmVjdCB4PSI3OCIgeT0iNDYiIHdpZHRoPSIzMCIgaGVpZ2h0PSIzNiIgcng9IjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzM4YjQ4YiIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgPHBhdGggZD0iTTUyIDY0IGgyMCIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik02NiA1NSBsMTAgOSAtMTAgOSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxjaXJjbGUgY3g9IjM1IiBjeT0iNjQiIHI9IjQuNSIgZmlsbD0iIzViOWJkNSIvPgogIDxjaXJjbGUgY3g9IjkzIiBjeT0iNjQiIHI9IjQuNSIgZmlsbD0iIzM4YjQ4YiIvPgo8L3N2Zz4K
+      mediatype: image/svg+xml
+
+  maturity: alpha
+
+  customresourcedefinitions:
+    owned:
+      - name: ahvmigrations.migration.lightwell.co.jp
+        version: v1alpha1
+        kind: AHVMigration
+        displayName: AHV Migration
+        description: Represents a VM migration job from Nutanix AHV to OpenShift Virtualization
+        specDescriptors:
+          - path: source.endpoint
+            displayName: Prism Central Endpoint
+            description: HTTPS URL of the Nutanix Prism Central API
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:text
+          - path: source.secretRef.name
+            displayName: Credentials Secret
+            description: Name of the Secret containing Prism Central credentials (user/password)
+            x-descriptors:
+              - urn:alm:descriptor:io.kubernetes:Secret
+          - path: source.warmMigration
+            displayName: Warm Migration
+            description: Copy disks while the source VM is still running
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+          - path: source.shutdownBeforeMigration
+            displayName: Shutdown Before Migration
+            description: Power off the source VM before copying disks
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+          - path: source.pauseBeforeCutover
+            displayName: Pause Before Cutover
+            description: Wait for manual approval before final VM switchover
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+          - path: vms
+            displayName: Virtual Machines
+            description: List of VMs to migrate
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:arrayFieldGroup:vms
+          - path: targetNamespace
+            displayName: Target Namespace
+            description: Namespace where migrated VMs will be created
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:text
+        statusDescriptors:
+          - path: phase
+            displayName: Phase
+            description: Current phase of the migration
+            x-descriptors:
+              - urn:alm:descriptor:io.kubernetes.phase
+          - path: completedVMs
+            displayName: Completed VMs
+            description: Number of VMs that have been successfully migrated
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:podCount
+          - path: startTime
+            displayName: Start Time
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:text
+          - path: completionTime
+            displayName: Completion Time
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:text
+
+  install:
+    strategy: deployment
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups: ["migration.lightwell.co.jp"]
+              resources: ["ahvmigrations"]
+              verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+            - apiGroups: ["migration.lightwell.co.jp"]
+              resources: ["ahvmigrations/status"]
+              verbs: ["get", "update", "patch"]
+            - apiGroups: ["migration.lightwell.co.jp"]
+              resources: ["ahvmigrations/finalizers"]
+              verbs: ["update"]
+            - apiGroups: ["cdi.kubevirt.io"]
+              resources: ["datavolumes"]
+              verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+            - apiGroups: ["kubevirt.io"]
+              resources: ["virtualmachines"]
+              verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+            - apiGroups: [""]
+              resources: ["secrets"]
+              verbs: ["get", "list", "watch", "create", "update", "patch"]
+            - apiGroups: ["batch"]
+              resources: ["jobs"]
+              verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+            - apiGroups: [""]
+              resources: ["configmaps"]
+              verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+            - apiGroups: [""]
+              resources: ["events"]
+              verbs: ["create", "patch"]
+            - apiGroups: [""]
+              resources: ["services"]
+              verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+            - apiGroups: ["apps"]
+              resources: ["deployments"]
+              verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+            - apiGroups: ["coordination.k8s.io"]
+              resources: ["leases"]
+              verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+          serviceAccountName: ahv-to-ove-operator-controller-manager
+      deployments:
+        - name: ahv-to-ove-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                control-plane: controller-manager
+            strategy: {}
+            template:
+              metadata:
+                labels:
+                  control-plane: controller-manager
+              spec:
+                serviceAccountName: ahv-to-ove-operator-controller-manager
+                securityContext:
+                  runAsNonRoot: true
+                containers:
+                  - name: manager
+                    image: ghcr.io/lightwell-tech/ahv-to-ove-operator@sha256:eac30bc7107fcdd3c99e52dd352b13d2212ff1c0b10e8ef4e48a9ce632b0264c
+                    args:
+                      - --leader-elect
+                    env:
+                      - name: OPERATOR_IMAGE
+                        value: ghcr.io/lightwell-tech/ahv-to-ove-operator@sha256:eac30bc7107fcdd3c99e52dd352b13d2212ff1c0b10e8ef4e48a9ce632b0264c
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                terminationGracePeriodSeconds: 10
+
+  relatedImages:
+    - name: manager
+      image: ghcr.io/lightwell-tech/ahv-to-ove-operator@sha256:eac30bc7107fcdd3c99e52dd352b13d2212ff1c0b10e8ef4e48a9ce632b0264c
+
+  installModes:
+    - type: OwnNamespace
+      supported: true
+    - type: SingleNamespace
+      supported: false
+    - type: MultiNamespace
+      supported: false
+    - type: AllNamespaces
+      supported: true

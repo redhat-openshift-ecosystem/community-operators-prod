@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  creationTimestamp: null
+  name: group-sync-operator-metrics-reader
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: group-sync-operator-metrics-reader
+subjects:
+- kind: ServiceAccount
+  name: group-sync-operator-controller-manager-metrics
+  namespace: group-sync-operator

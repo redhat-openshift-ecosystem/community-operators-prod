@@ -1,0 +1,271 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  creationTimestamp: null
+  name: images.automotive.sdv.cloud.redhat.com
+spec:
+  group: automotive.sdv.cloud.redhat.com
+  names:
+    kind: Image
+    listKind: ImageList
+    plural: images
+    singular: image
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.distro
+      name: Distro
+      type: string
+    - jsonPath: .spec.architecture
+      name: Architecture
+      type: string
+    - jsonPath: .spec.exportFormat
+      name: Format
+      type: string
+    - jsonPath: .spec.location.type
+      name: Location Type
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .spec.version
+      name: Version
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Image is the Schema for the images API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ImageSpec defines the desired state of Image
+            properties:
+              architecture:
+                description: Architecture specifies the target architecture
+                type: string
+              description:
+                description: Description provides a human-readable description of
+                  the image
+                type: string
+              distro:
+                description: Distro specifies the distribution
+                type: string
+              exportFormat:
+                description: ExportFormat specifies the output format
+                type: string
+              location:
+                description: Location defines where the image is stored
+                properties:
+                  registry:
+                    description: Registry contains configuration for container registry
+                      storage
+                    properties:
+                      digest:
+                        description: Digest is the content-addressable digest of the
+                          image
+                        type: string
+                      secretRef:
+                        description: SecretRef is the name of the secret containing
+                          registry credentials
+                        type: string
+                      url:
+                        description: URL is the full URL to the image in the registry
+                          (e.g., "quay.io/myorg/myimage:tag")
+                        type: string
+                    required:
+                    - url
+                    type: object
+                  type:
+                    default: registry
+                    description: Type specifies the storage type
+                    enum:
+                    - registry
+                    type: string
+                required:
+                - type
+                type: object
+              metadata:
+                description: Metadata contains additional information about the image
+                properties:
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    description: Annotations are key-value pairs for additional annotations
+                    type: object
+                  buildDate:
+                    description: BuildDate is when the image was built
+                    format: date-time
+                    type: string
+                  createdBy:
+                    description: CreatedBy identifies who or what created this image
+                    type: string
+                  labels:
+                    additionalProperties:
+                      type: string
+                    description: Labels are key-value pairs for additional metadata
+                    type: object
+                  sourceImageBuild:
+                    description: SourceImageBuild references the ImageBuild that created
+                      this image
+                    type: string
+                type: object
+              mode:
+                description: Mode specifies the build mode
+                type: string
+              size:
+                description: Size specifies the image size information
+                properties:
+                  compressedBytes:
+                    description: CompressedBytes is the size of the compressed image
+                      in bytes
+                    format: int64
+                    type: integer
+                  uncompressedBytes:
+                    description: UncompressedBytes is the size of the uncompressed
+                      image in bytes
+                    format: int64
+                    type: integer
+                  virtualBytes:
+                    description: VirtualBytes is the virtual disk size for disk images
+                    format: int64
+                    type: integer
+                type: object
+              tags:
+                description: Tags are labels that can be used to categorize and search
+                  images
+                items:
+                  type: string
+                type: array
+              target:
+                description: Target specifies the build target
+                type: string
+              version:
+                description: Version specifies the version of this image
+                type: string
+            required:
+            - architecture
+            - distro
+            - exportFormat
+            - location
+            - target
+            type: object
+          status:
+            description: ImageStatus defines the observed state of Image
+            properties:
+              accessCount:
+                description: AccessCount tracks how many times this image has been
+                  accessed/downloaded
+                format: int64
+                type: integer
+              conditions:
+                description: Conditions represent the latest available observations
+                  of the image's state
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              lastAccessed:
+                description: LastAccessed is when the image was last accessed
+                format: date-time
+                type: string
+              lastVerified:
+                description: LastVerified is when the image location was last verified
+                  to be accessible
+                format: date-time
+                type: string
+              message:
+                description: Message provides more detail about the current phase
+                type: string
+              observedGeneration:
+                description: ObservedGeneration is the most recent generation observed
+                  by the controller.
+                format: int64
+                type: integer
+              phase:
+                description: Phase represents the current phase of the image (Available,
+                  Unavailable, Verifying)
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

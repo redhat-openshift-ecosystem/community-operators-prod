@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.openshift.io/serving-cert-secret-name: file-integrity-console-plugin-cert
+  name: file-integrity-console-plugin
+  labels:
+    app: file-integrity-console-plugin
+    app.kubernetes.io/name: file-integrity-console-plugin
+    app.kubernetes.io/instance: file-integrity-console-plugin
+    app.kubernetes.io/part-of: file-integrity-console-plugin
+    app.kubernetes.io/version: 0.3.1
+spec:
+  ports:
+    - name: 9443-tcp
+      protocol: TCP
+      port: 9443
+      targetPort: 9443
+  selector:
+    app: file-integrity-console-plugin
+    app.kubernetes.io/name: file-integrity-console-plugin
+    app.kubernetes.io/instance: file-integrity-console-plugin
+    app.kubernetes.io/part-of: file-integrity-console-plugin
+  type: ClusterIP
+  sessionAffinity: None

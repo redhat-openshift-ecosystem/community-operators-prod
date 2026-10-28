@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: ado-scc-privileged-role
+rules:
+- apiGroups:
+  - security.openshift.io
+  resourceNames:
+  - privileged
+  - nested-container
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - use

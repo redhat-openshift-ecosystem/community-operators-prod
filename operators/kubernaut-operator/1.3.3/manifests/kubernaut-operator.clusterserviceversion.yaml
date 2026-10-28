@@ -1,0 +1,463 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "kubernaut.ai/v1alpha1",
+          "kind": "Kubernaut",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "kubernaut-operator"
+            },
+            "name": "kubernaut",
+            "namespace": "kubernaut-system"
+          },
+          "spec": {
+            "aiAnalysis": {
+              "policy": {
+                "configMapName": "aianalysis-policies"
+              }
+            },
+            "gateway": {
+              "route": {
+                "enabled": true
+              }
+            },
+            "kubernautAgent": {
+              "llm": {
+                "credentialsSecretName": "llm-credentials",
+                "model": "claude-sonnet-4-6",
+                "provider": "vertex_ai",
+                "sdkConfigMapName": "kubernaut-agent-sdk-config"
+              }
+            },
+            "monitoring": {
+              "enabled": true
+            },
+            "postgresql": {
+              "host": "postgresql.kubernaut-system.svc.cluster.local",
+              "port": 5432,
+              "secretName": "postgresql-secret"
+            },
+            "signalProcessing": {
+              "policy": {
+                "configMapName": "signalprocessing-policy"
+              }
+            },
+            "valkey": {
+              "host": "valkey.kubernaut-system.svc.cluster.local",
+              "port": 6379,
+              "secretName": "valkey-secret"
+            }
+          }
+        }
+      ]
+    capabilities: Full Lifecycle
+    categories: AI/Machine Learning,Monitoring
+    com.redhat.openshift.versions: v4.18
+    containerImage: quay.io/kubernaut-ai/kubernaut-operator@sha256:adf03a90fba1527dd0caa99ba09a15c7b553c5b562bfc1f471a904eb090ca24c
+    createdAt: "2026-04-26T23:38:00Z"
+    description: Automated Kubernetes remediation powered by AI — detects issues,
+      analyzes root causes, and executes verified fixes.
+    documentation: https://jordigilh.github.io/kubernaut-docs/latest/
+    features.operators.openshift.io/cnf: "false"
+    features.operators.openshift.io/cni: "false"
+    features.operators.openshift.io/csi: "false"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "false"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "true"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/suggested-namespace: kubernaut-system
+    operators.operatorframework.io/builder: operator-sdk-v1.42.2
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    repository: https://github.com/jordigilh/kubernaut-operator
+    support: jgil@redhat.com
+  name: kubernaut-operator.v1.3.3
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: |-
+        Kubernaut is the Schema for the kubernauts API.
+        It declares a single Kubernaut deployment within the namespace it is created in.
+      displayName: Kubernaut
+      kind: Kubernaut
+      name: kubernauts.kubernaut.ai
+      version: v1alpha1
+  description: |
+    ## Kubernaut Operator for OpenShift
+
+    The Kubernaut Operator deploys and manages the **Kubernaut AIOps Remediation Platform**
+    on OpenShift Container Platform (OCP) 4.18+.
+
+    Kubernaut automatically detects Kubernetes issues via AlertManager signals, performs
+    AI-powered root cause analysis, selects and executes remediation workflows, and
+    verifies effectiveness — all with policy-governed approval gates.
+
+    ### Features
+
+    - **Single CR deployment**: one `Kubernaut` custom resource deploys all 10 services
+    - **BYO infrastructure**: bring your own PostgreSQL and Valkey/Redis
+    - **OCP-native**: auto-wires Prometheus, AlertManager, service-ca TLS, and Routes
+    - **Policy-governed**: Rego policies control signal classification and AI analysis approval
+    - **LLM-powered analysis**: integrates with OpenAI, Anthropic, and other LLM providers
+    - **Full lifecycle management**: automated DB migrations, OCP service-CA TLS integration, RBAC provisioning
+    - **Ansible integration**: optional AWX/AAP for Ansible-based remediation workflows
+
+    ### Prerequisites
+
+    - OpenShift Container Platform 4.18+ (Kubernetes 1.31+)
+    - PostgreSQL database with credentials in a Secret
+    - Valkey/Redis with credentials in a Secret
+    - LLM API credentials (e.g., OpenAI API key) in a Secret
+    - Rego policy ConfigMaps for AI analysis and signal processing
+
+    ### Getting Started
+
+    1. Create the required BYO secrets (PostgreSQL, Valkey, LLM credentials)
+    2. Create Rego policy ConfigMaps
+    3. Apply a `Kubernaut` CR — see the sample in the operator bundle
+  displayName: Kubernaut Operator
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - namespaces
+          - secrets
+          - serviceaccounts
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - mutatingwebhookconfigurations
+          - validatingwebhookconfigurations
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apiextensions.k8s.io
+          resources:
+          - customresourcedefinitions
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - update
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - apiservers
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - batch
+          resources:
+          - jobs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - kubernaut.ai
+          resources:
+          - kubernauts
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - kubernaut.ai
+          resources:
+          - kubernauts/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - kubernaut.ai
+          resources:
+          - kubernauts/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - policy
+          resources:
+          - poddisruptionbudgets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          - clusterroles
+          - rolebindings
+          - roles
+          verbs:
+          - bind
+          - create
+          - delete
+          - escalate
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: kubernaut-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: kubernaut-operator
+          control-plane: controller-manager
+        name: kubernaut-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: kubernaut-operator
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                app.kubernetes.io/name: kubernaut-operator
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --metrics-bind-address=:8443
+                - --leader-elect
+                - --health-probe-bind-address=:8081
+                command:
+                - /manager
+                env:
+                - name: RELATED_IMAGE_GATEWAY
+                  value: quay.io/kubernaut-ai/gateway:1.3.2
+                - name: RELATED_IMAGE_DATA_STORAGE
+                  value: quay.io/kubernaut-ai/datastorage:1.3.2
+                - name: RELATED_IMAGE_AIANALYSIS
+                  value: quay.io/kubernaut-ai/aianalysis:1.3.2
+                - name: RELATED_IMAGE_SIGNALPROCESSING
+                  value: quay.io/kubernaut-ai/signalprocessing:1.3.2
+                - name: RELATED_IMAGE_REMEDIATIONORCHESTRATOR
+                  value: quay.io/kubernaut-ai/remediationorchestrator:1.3.2
+                - name: RELATED_IMAGE_WORKFLOWEXECUTION
+                  value: quay.io/kubernaut-ai/workflowexecution:1.3.2
+                - name: RELATED_IMAGE_EFFECTIVENESSMONITOR
+                  value: quay.io/kubernaut-ai/effectivenessmonitor:1.3.2
+                - name: RELATED_IMAGE_NOTIFICATION
+                  value: quay.io/kubernaut-ai/notification:1.3.2
+                - name: RELATED_IMAGE_KUBERNAUT_AGENT
+                  value: quay.io/kubernaut-ai/kubernautagent:1.3.2
+                - name: RELATED_IMAGE_AUTHWEBHOOK
+                  value: quay.io/kubernaut-ai/authwebhook:1.3.2
+                - name: RELATED_IMAGE_DB_MIGRATE
+                  value: quay.io/kubernaut-ai/db-migrate:1.3.2
+                image: quay.io/kubernaut-ai/kubernaut-operator@sha256:adf03a90fba1527dd0caa99ba09a15c7b553c5b562bfc1f471a904eb090ca24c
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 10m
+                    memory: 128Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  readOnlyRootFilesystem: true
+              securityContext:
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+              serviceAccountName: kubernaut-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: kubernaut-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: false
+    type: AllNamespaces
+  keywords:
+  - kubernaut
+  - remediation
+  - ai
+  - openshift
+  - kubernetes
+  - alertmanager
+  - sre
+  - aiops
+  links:
+  - name: Documentation
+    url: https://jordigilh.github.io/kubernaut-docs/latest/
+  - name: Kubernaut
+    url: https://github.com/jordigilh/kubernaut
+  - name: Kubernaut Operator
+    url: https://github.com/jordigilh/kubernaut-operator
+  maintainers:
+  - email: jgil@redhat.com
+    name: Jordi Gil
+  maturity: alpha
+  minKubeVersion: 1.31.0
+  provider:
+    name: Kubernaut AI
+    url: https://github.com/jordigilh/kubernaut
+  relatedImages:
+  - image: quay.io/kubernaut-ai/gateway@sha256:428da6f304ddf4813916884ea82b326041590ff9c4bc6b76a7b24a8f97dc7287
+    name: gateway
+  - image: quay.io/kubernaut-ai/datastorage@sha256:1c9b865d4eaef05ea87c339eaf41fde4c6213816b195cb5fc9ea03788903013e
+    name: data-storage
+  - image: quay.io/kubernaut-ai/aianalysis@sha256:b908326271741b903557605188f6303dfb966f32dab4c494127183b7b24d44db
+    name: aianalysis
+  - image: quay.io/kubernaut-ai/signalprocessing@sha256:bd1c8dbeb186a2ec0c3e8aab9178bd11877a0a89b4f1bb4a1db3fde614589de5
+    name: signalprocessing
+  - image: quay.io/kubernaut-ai/remediationorchestrator@sha256:0f630935d0382a6093f0d7192cc65827d3b1a615b78a51725494296c11328355
+    name: remediationorchestrator
+  - image: quay.io/kubernaut-ai/workflowexecution@sha256:545d3c406ff7167f93400a93a2ca6a13b1cd9f45b004c048aec050968d4d10b1
+    name: workflowexecution
+  - image: quay.io/kubernaut-ai/effectivenessmonitor@sha256:7f8a505ac2587b954d8f9f3de5adf0b4119d4dd4375f66923f30c0eb691a1717
+    name: effectivenessmonitor
+  - image: quay.io/kubernaut-ai/notification@sha256:7fb5d3fa890f0e9bc7bf5f682a4d066e12e4b620b041ea991743b533b40585a5
+    name: notification
+  - image: quay.io/kubernaut-ai/kubernautagent@sha256:ac811a1d1c07b2567a04df1e0e2a2eaf7f3b6d40dd8a648ef255d3c22ecf0bdc
+    name: kubernaut-agent
+  - image: quay.io/kubernaut-ai/authwebhook@sha256:9de8ef5a47b1e6eeed758cffbff2ded11f19ab757789a8e7b981b2e2b2f2f047
+    name: authwebhook
+  - image: quay.io/kubernaut-ai/db-migrate@sha256:99f65904b158132ffad21009736a45d5a4ba5c4ebece90938272e771eb4fcffe
+    name: db-migrate
+  - image: quay.io/kubernaut-ai/kubernaut-operator@sha256:adf03a90fba1527dd0caa99ba09a15c7b553c5b562bfc1f471a904eb090ca24c
+    name: kubernaut-operator
+  version: 1.3.3

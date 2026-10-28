@@ -1,0 +1,356 @@
+---
+defaultChannel: alpha
+name: nfs-provisioner-operator
+schema: olm.package
+---
+entries:
+- name: nfs-provisioner-operator.v0.0.8
+- name: nfs-provisioner-operator.v0.0.9
+  replaces: nfs-provisioner-operator.v0.0.8
+name: alpha
+package: nfs-provisioner-operator
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/nfs-provisioner-operator@sha256:d7ef0fa3b5a1a6094b6fd60c6197a52cb14766865b3549806de100bb3522821a
+name: nfs-provisioner-operator.v0.0.8
+package: nfs-provisioner-operator
+properties:
+- type: olm.gvk
+  value:
+    group: cache.jhouse.com
+    kind: NFSProvisioner
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: nfs-provisioner-operator
+    version: 0.0.8
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "cache.jhouse.com/v1alpha1",
+            "kind": "NFSProvisioner",
+            "metadata": {
+              "name": "nfsprovisioner-sample"
+            },
+            "spec": {
+              "nfsImageConfiguration": {
+                "image": "k8s.gcr.io/sig-storage/nfs-provisioner@sha256:e943bb77c7df05ebdc8c7888b2db289b13bf9f012d6a3a5a74f14d4d5743d439",
+                "imagePullPolicy": "IfNotPresent"
+              },
+              "scForNFS": "nfs",
+              "scForNFSPvc": "local-sc",
+              "storageSize": "1G"
+            }
+          }
+        ]
+      capabilities: Seamless Upgrades
+      categories: Storage
+      certified: "false"
+      containerImage: quay.io/jooholee/nfs-provisioner-operator@sha256:d9c013967421ec72644a588a155975bf856a856f1ef38ba71dfea306fdb47acd
+      createdAt: "2025-08-08T20:23:50Z"
+      description: Create and manage NFS Server and Provisioner
+      operators.operatorframework.io/builder: operator-sdk-v1.41.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/jooho/nfs-provisioner-operator
+      support: NFS
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: NFSProvisioner is the Schema for the nfsprovisioners API
+        displayName: NFS Provisioner App
+        kind: NFSProvisioner
+        name: nfsprovisioners.cache.jhouse.com
+        resources:
+        - kind: Role
+          name: leader-locking-nfs-provisioner
+          version: v1
+        - kind: RoleBinding
+          name: leader-locking-nfs-provisioner
+          version: v1
+        - kind: StorageClass
+          name: nfs
+          version: v1
+        - kind: Deployment
+          name: nfs-provisioner
+          version: v1
+        - kind: SecurityContextConstraints
+          name: nfs-provisioner
+          version: v1
+        - kind: Service
+          name: nfs-provisioner
+          version: v1
+        - kind: ServiceAccount
+          name: nfs-provisioner
+          version: v1
+        - kind: ClusterRole
+          name: nfs-provisioner-runner
+          version: v1
+        - kind: ClusterRoleBinding
+          name: nfs-provisioner-runner
+          version: v1
+        - kind: PersistentVolumeClaim
+          name: nfs-server
+          version: v1
+        specDescriptors:
+        - description: HostPathDir is the direcotry where NFS server will use.
+          displayName: HostPath directory
+          path: hostPathDir
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:string
+          - urn:alm:descriptor:io.kubernetes:custom
+        - description: Set nfs provisioner operator image
+          displayName: NFS Provisioner Image
+          path: nfsImageConfiguration.image
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - description: Image PullPolicy is for nfs provisioner operator image.
+          displayName: Pull Policy
+          path: nfsImageConfiguration.imagePullPolicy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:imagePullPolicy
+        - description: NFS server will be running on a specific node by NodeSeletor
+          displayName: Node Selector
+          path: nodeSelector
+        - description: |-
+            PVC Name is the PVC resource that already created for NFS server.
+            Do not set StorageClass name with this param. Then, operator will fail to deploy NFS Server.
+          displayName: PVC Name
+          path: pvc
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:string
+          - urn:alm:descriptor:io.kubernetes:custom
+        - description: StorageClass Name for NFS Provisioner is the StorageClass name
+            that NFS Provisioner will use. Default value is `nfs`
+          displayName: StorageClass Name for NFS Provisioner
+          path: scForNFS
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:string
+          - urn:alm:descriptor:io.kubernetes:custom
+        - description: |-
+            StorageClass Name for NFS server will provide a PVC for NFS server.
+            Do not set PVC name with this param. Then, operator will fail to deploy NFS Server
+          displayName: StorageClass Name for NFS server
+          path: scForNFSPvc
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:string
+          - urn:alm:descriptor:io.kubernetes:custom
+        - description: |-
+            StorageSize is the PVC size for NFS server.
+            By default, it sets 10G.
+          displayName: Storage Size
+          path: storageSize
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:string
+          - urn:alm:descriptor:io.kubernetes:custom
+        version: v1alpha1
+    description: "This operator deploy NFS server with local storage and also provide
+      provisioner for storageClass.\n### Core Capabilities\n* **NFS Server:** Deployed\n*
+      **NFS Provisioner:** Help customers to create PV using StorageClass\n* **StorageClass:**
+      Dynamically create PV for requested PVC\n### NFS Provisioner Operator Features\n*
+      NFS Server can use localStorage PVC or HostPath on the node\n### Must-Gather
+      \n> isv-cli must-gather --image=quay.io/jooholee/nfs-provisioner-operator-must-gather:0.0.1\n"
+    displayName: NFS Provisioner Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - nfs
+    - storage
+    links:
+    - name: Nfs Provisioner Operator
+      url: https://github.com/jooho/nfs-provisioner-operator
+    maintainers:
+    - email: ljhiyh@gmail.com
+      name: Jooho
+    maturity: alpha
+    provider:
+      name: Jooho Lee
+      url: https://github.com/jooho/nfs-provisioner-operator
+relatedImages:
+- image: gcr.io/kubebuilder/kube-rbac-proxy@sha256:e10d1d982dd653db74ca87a1d1ad017bc5ef1aeb651bdea089debf16485b080b
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/nfs-provisioner-operator@sha256:d7ef0fa3b5a1a6094b6fd60c6197a52cb14766865b3549806de100bb3522821a
+  name: ""
+- image: quay.io/jooholee/nfs-provisioner-operator@sha256:d9c013967421ec72644a588a155975bf856a856f1ef38ba71dfea306fdb47acd
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/nfs-provisioner-operator@sha256:ab7ba62dd2ad7d9bdfba881ade8d8f3a1f5dd03135c02d6cb305767cdafaf7e4
+name: nfs-provisioner-operator.v0.0.9
+package: nfs-provisioner-operator
+properties:
+- type: olm.gvk
+  value:
+    group: cache.jhouse.com
+    kind: NFSProvisioner
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: nfs-provisioner-operator
+    version: 0.0.9
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "cache.jhouse.com/v1alpha1",
+            "kind": "NFSProvisioner",
+            "metadata": {
+              "name": "nfsprovisioner-sample"
+            },
+            "spec": {
+              "nfsImageConfiguration": {
+                "image": "k8s.gcr.io/sig-storage/nfs-provisioner@sha256:e943bb77c7df05ebdc8c7888b2db289b13bf9f012d6a3a5a74f14d4d5743d439",
+                "imagePullPolicy": "IfNotPresent"
+              },
+              "scForNFS": "nfs",
+              "scForNFSPvc": "local-sc",
+              "storageSize": "1G"
+            }
+          }
+        ]
+      capabilities: Seamless Upgrades
+      categories: Storage
+      certified: "false"
+      containerImage: quay.io/jooholee/nfs-provisioner-operator:0.0.9
+      createdAt: "2025-08-08T20:23:50Z"
+      description: Create and manage NFS Server and Provisioner
+      operators.operatorframework.io/builder: operator-sdk-v1.41.1
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/jooho/nfs-provisioner-operator
+      support: NFS
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: NFSProvisioner is the Schema for the nfsprovisioners API
+        displayName: NFS Provisioner App
+        kind: NFSProvisioner
+        name: nfsprovisioners.cache.jhouse.com
+        resources:
+        - kind: Role
+          name: leader-locking-nfs-provisioner
+          version: v1
+        - kind: RoleBinding
+          name: leader-locking-nfs-provisioner
+          version: v1
+        - kind: StorageClass
+          name: nfs
+          version: v1
+        - kind: Deployment
+          name: nfs-provisioner
+          version: v1
+        - kind: SecurityContextConstraints
+          name: nfs-provisioner
+          version: v1
+        - kind: Service
+          name: nfs-provisioner
+          version: v1
+        - kind: ServiceAccount
+          name: nfs-provisioner
+          version: v1
+        - kind: ClusterRole
+          name: nfs-provisioner-runner
+          version: v1
+        - kind: ClusterRoleBinding
+          name: nfs-provisioner-runner
+          version: v1
+        - kind: PersistentVolumeClaim
+          name: nfs-server
+          version: v1
+        specDescriptors:
+        - description: HostPathDir is the direcotry where NFS server will use.
+          displayName: HostPath directory
+          path: hostPathDir
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:string
+          - urn:alm:descriptor:io.kubernetes:custom
+        - description: Set nfs provisioner operator image
+          displayName: NFS Provisioner Image
+          path: nfsImageConfiguration.image
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:text
+        - description: Image PullPolicy is for nfs provisioner operator image.
+          displayName: Pull Policy
+          path: nfsImageConfiguration.imagePullPolicy
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:imagePullPolicy
+        - description: NFS server will be running on a specific node by NodeSeletor
+          displayName: Node Selector
+          path: nodeSelector
+        - description: |-
+            PVC Name is the PVC resource that already created for NFS server.
+            Do not set StorageClass name with this param. Then, operator will fail to deploy NFS Server.
+          displayName: PVC Name
+          path: pvc
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:string
+          - urn:alm:descriptor:io.kubernetes:custom
+        - description: StorageClass Name for NFS Provisioner is the StorageClass name
+            that NFS Provisioner will use. Default value is `nfs`
+          displayName: StorageClass Name for NFS Provisioner
+          path: scForNFS
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:string
+          - urn:alm:descriptor:io.kubernetes:custom
+        - description: |-
+            StorageClass Name for NFS server will provide a PVC for NFS server.
+            Do not set PVC name with this param. Then, operator will fail to deploy NFS Server
+          displayName: StorageClass Name for NFS server
+          path: scForNFSPvc
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:string
+          - urn:alm:descriptor:io.kubernetes:custom
+        - description: |-
+            StorageSize is the PVC size for NFS server.
+            By default, it sets 10G.
+          displayName: Storage Size
+          path: storageSize
+          x-descriptors:
+          - urn:alm:descriptor:com.tectonic.ui:string
+          - urn:alm:descriptor:io.kubernetes:custom
+        version: v1alpha1
+    description: "This operator deploy NFS server with local storage and also provide
+      provisioner for storageClass.\n### Core Capabilities\n* **NFS Server:** Deployed\n*
+      **NFS Provisioner:** Help customers to create PV using StorageClass\n* **StorageClass:**
+      Dynamically create PV for requested PVC\n### NFS Provisioner Operator Features\n*
+      NFS Server can use localStorage PVC or HostPath on the node\n### Must-Gather
+      \n> isv-cli must-gather --image=quay.io/jooholee/nfs-provisioner-operator-must-gather:0.0.1\n"
+    displayName: NFS Provisioner Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - nfs
+    - storage
+    links:
+    - name: Nfs Provisioner Operator
+      url: https://github.com/jooho/nfs-provisioner-operator
+    maintainers:
+    - email: ljhiyh@gmail.com
+      name: Jooho
+    maturity: alpha
+    provider:
+      name: Jooho Lee
+      url: https://github.com/jooho/nfs-provisioner-operator
+relatedImages:
+- image: quay.io/community-operator-pipeline-prod/nfs-provisioner-operator@sha256:ab7ba62dd2ad7d9bdfba881ade8d8f3a1f5dd03135c02d6cb305767cdafaf7e4
+  name: ""
+- image: quay.io/jooholee/nfs-provisioner-operator:0.0.9
+  name: ""
+schema: olm.bundle

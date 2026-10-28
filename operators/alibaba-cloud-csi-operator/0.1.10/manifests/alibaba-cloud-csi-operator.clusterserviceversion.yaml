@@ -1,0 +1,525 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "csi.alibabacloud.com/v1alpha1",
+          "kind": "AlibabaCloudCSIDriver",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "alibaba-cloud-csi-operator"
+            },
+            "name": "cluster",
+            "namespace": "kube-system"
+          },
+          "spec": {
+            "auth": {
+              "ramToken": "v2"
+            },
+            "controller": {
+              "nodeSelector": {
+                "node-role.kubernetes.io/master": ""
+              },
+              "replicas": 2,
+              "tolerations": [
+                {
+                  "effect": "NoSchedule",
+                  "key": "node-role.kubernetes.io/master"
+                }
+              ]
+            },
+            "disk": {
+              "defaultStorageClass": true,
+              "enabled": true,
+              "storageClasses": [
+                {
+                  "allowVolumeExpansion": true,
+                  "name": "alicloud-disk-efficiency",
+                  "reclaimPolicy": "Delete",
+                  "type": "cloud_efficiency"
+                },
+                {
+                  "allowVolumeExpansion": true,
+                  "name": "alicloud-disk-essd",
+                  "reclaimPolicy": "Delete",
+                  "type": "cloud_essd"
+                }
+              ]
+            },
+            "imageTag": "v1.35.3",
+            "nas": {
+              "enabled": false
+            },
+            "oss": {
+              "enabled": false
+            }
+          }
+        }
+      ]
+    capabilities: Seamless Upgrades
+    categories: Storage
+    certified: "false"
+    com.redhat.openshift.versions: v4.21-v4.22
+    containerImage: quay.io/samzhu/alibaba-cloud-csi-operator@sha256:03a18eaf0af5f90a260f23f18c2d61270a2ffebe19cfc5e8b866f5b12cfe0636
+    createdAt: "2026-07-15T00:00:00Z"
+    repository: https://github.com/SammZhu/alibaba-cloud-csi-operator
+    description: Installs and manages Alibaba Cloud CSI drivers (Disk/NAS/OSS) on
+      OpenShift External Platform clusters using RAM Role instance principal authentication.
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "false"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/suggested-namespace: kube-system
+    operators.operatorframework.io/builder: operator-sdk-v1.42.2
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    support: Sam Choo
+  name: alibaba-cloud-csi-operator.v0.1.10
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: AlibabaCloudCSIDriver manages the lifecycle of Alibaba Cloud CSI
+        driver components (Disk, NAS, OSS) on an OpenShift cluster.
+      displayName: Alibaba Cloud CSI Driver
+      kind: AlibabaCloudCSIDriver
+      name: alibabacloudcsidrivers.csi.alibabacloud.com
+      version: v1alpha1
+  description: |
+    ## Overview
+
+    The Alibaba Cloud CSI Operator installs and manages the
+    [alibaba-cloud-csi-driver](https://github.com/kubernetes-sigs/alibaba-cloud-csi-driver)
+    on OpenShift clusters running in **External Platform** mode.
+
+    When OpenShift runs in External Platform mode, no cloud-provider CSI driver is
+    installed automatically. This operator fills that gap by deploying and reconciling
+    all CSI components declaratively through a single `AlibabaCloudCSIDriver` CR.
+
+    ## Features
+
+    - **Disk (EBS / cloud disk)** — block storage, ReadWriteOnce (Phase 1)
+    - **NAS file storage** — shared file storage, ReadWriteMany (Phase 2)
+    - **OSS object storage** — object-mount storage (Phase 3)
+    - **RAM Role authentication** — uses ECS instance metadata (IMDSv2), no AK/SK required
+    - **Privileged admission (platform-adaptive)** — on OpenShift, binds the privileged SCC to the CSI node DaemonSet's ServiceAccount; on vanilla Kubernetes (no SCC API), labels the operator namespace for privileged Pod Security Admission instead
+    - **StorageClass management** — creates and annotates default StorageClasses
+
+    ## Prerequisites
+
+    - OpenShift 4.x in External Platform mode
+    - ECS nodes with RAM Role bound (disk-related IAM policies attached)
+    - OLM installed (included in all OpenShift clusters)
+
+    ## Usage
+
+    After installing the operator, create the singleton `AlibabaCloudCSIDriver` CR:
+
+    ```yaml
+    apiVersion: csi.alibabacloud.com/v1alpha1
+    kind: AlibabaCloudCSIDriver
+    metadata:
+      name: cluster
+      namespace: kube-system
+    spec:
+      disk:
+        enabled: true
+        defaultStorageClass: true
+        storageClasses:
+          - name: alicloud-disk-essd
+            type: cloud_essd
+            virtDefault: true   # default StorageClass for OpenShift Virtualization
+          - name: alicloud-disk-efficiency
+            type: cloud_efficiency
+        snapshot:
+          enabled: true         # requires snapshot.storage.k8s.io CRDs
+        storageProfile:
+          patch: true           # patch CDI StorageProfile for OKV DataVolume support
+          cloneStrategy: csi-clone
+      nas:
+        enabled: true           # required for VM live migration (ReadWriteMany)
+        storageClasses:
+          - name: alicloud-nas-standard
+            storageType: standard
+            mountProtocol: nfs
+            virtDefault: true
+        storageProfile:
+          patch: true
+          cloneStrategy: csi-clone
+      imageTag: v1.35.3
+      auth:
+        ramToken: v2
+      controller:
+        replicas: 2
+        nodeSelector:
+          node-role.kubernetes.io/master: ""
+    ```
+  displayName: Alibaba Cloud CSI Operator
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          - nodes
+          - persistentvolumeclaims
+          - pods
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - persistentvolumes
+          - serviceaccounts
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - daemonsets
+          - deployments
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - cdi.kubevirt.io
+          resources:
+          - storageprofiles
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - csi.alibabacloud.com
+          resources:
+          - alibabacloudcsidrivers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - csi.alibabacloud.com
+          resources:
+          - alibabacloudcsidrivers/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - csi.alibabacloud.com
+          resources:
+          - alibabacloudcsidrivers/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          - clusterroles
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        - apiGroups:
+          - snapshot.storage.k8s.io
+          resources:
+          - volumesnapshotclasses
+          - volumesnapshotcontents
+          - volumesnapshots
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - snapshot.storage.k8s.io
+          resources:
+          - volumesnapshotcontents/status
+          - volumesnapshots/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - storage.k8s.io
+          resources:
+          - csidrivers
+          - storageclasses
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - storage.k8s.io
+          resources:
+          - csinodes
+          - volumeattachments
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - storage.k8s.io
+          resources:
+          - volumeattachments/status
+          verbs:
+          - patch
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: alibaba-cloud-csi-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: alibaba-cloud-csi-operator
+          control-plane: controller-manager
+        name: alibaba-cloud-csi-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: alibaba-cloud-csi-operator
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                app.kubernetes.io/name: alibaba-cloud-csi-operator
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --metrics-bind-address=:8443
+                - --leader-elect
+                - --health-probe-bind-address=:8081
+                command:
+                - /manager
+                env:
+                - name: RELATED_IMAGE_CSI_PROVISIONER
+                  value: registry.k8s.io/sig-storage/csi-provisioner@sha256:d078dc174323407e8cc6f0f9abd4efaac5db27838f1564d0253d5e3233e3f17f
+                - name: RELATED_IMAGE_CSI_ATTACHER
+                  value: registry.k8s.io/sig-storage/csi-attacher@sha256:4eb73137b66381b7b5dfd4d21d460f4b4095347ab6ed4626e0199c29d8d021af
+                - name: RELATED_IMAGE_CSI_RESIZER
+                  value: registry.k8s.io/sig-storage/csi-resizer@sha256:2e2b44393539d744a55b9370b346e8ebd95a77573064f3f9a8caf18c22f4d0d0
+                - name: RELATED_IMAGE_CSI_SNAPSHOTTER
+                  value: registry.k8s.io/sig-storage/csi-snapshotter@sha256:93fbf54dd67f586428ea339743160e1a5110c058afde3c2e824f11fbc6efae53
+                - name: RELATED_IMAGE_CSI_NODE_DRIVER_REGISTRAR
+                  value: registry.k8s.io/sig-storage/csi-node-driver-registrar@sha256:f6717ce72a2615c7fbc746b4068f788e78579c54c43b8716e5ce650d97af2df1
+                - name: RELATED_IMAGE_LIVENESSPROBE
+                  value: registry.k8s.io/sig-storage/livenessprobe@sha256:4dc0b87ccd69f9865b89234d8555d3a614ab0a16ed94a3016ffd27f8106132ce
+                image: quay.io/samzhu/alibaba-cloud-csi-operator@sha256:03a18eaf0af5f90a260f23f18c2d61270a2ffebe19cfc5e8b866f5b12cfe0636
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  readOnlyRootFilesystem: true
+              securityContext:
+                runAsGroup: 65532
+                runAsNonRoot: true
+                runAsUser: 65532
+                seccompProfile:
+                  type: RuntimeDefault
+              serviceAccountName: alibaba-cloud-csi-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: alibaba-cloud-csi-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - storage
+  - csi
+  - alibaba-cloud
+  - openshift
+  - disk
+  - nas
+  - oss
+  links:
+  - name: Documentation
+    url: https://github.com/SammZhu/alibaba-cloud-csi-operator/blob/main/docs/QUICKSTART.md
+  - name: Source Code
+    url: https://github.com/SammZhu/alibaba-cloud-csi-operator
+  - name: Support / Report an Issue
+    url: https://github.com/SammZhu/alibaba-cloud-csi-operator/issues
+  - name: Upstream CSI Driver
+    url: https://github.com/kubernetes-sigs/alibaba-cloud-csi-driver
+  maintainers:
+  - email: zhuhe+csi-operator@msn.com
+    name: Sam Choo
+  maturity: alpha
+  minKubeVersion: 1.28.0
+  provider:
+    name: Sam Choo
+    url: https://github.com/SammZhu
+  relatedImages:
+  - image: quay.io/samzhu/alibaba-cloud-csi-operator@sha256:03a18eaf0af5f90a260f23f18c2d61270a2ffebe19cfc5e8b866f5b12cfe0636
+    name: manager
+  - image: registry.k8s.io/sig-storage/csi-provisioner@sha256:d078dc174323407e8cc6f0f9abd4efaac5db27838f1564d0253d5e3233e3f17f
+    name: csi-provisioner
+  - image: registry.k8s.io/sig-storage/csi-attacher@sha256:4eb73137b66381b7b5dfd4d21d460f4b4095347ab6ed4626e0199c29d8d021af
+    name: csi-attacher
+  - image: registry.k8s.io/sig-storage/csi-resizer@sha256:2e2b44393539d744a55b9370b346e8ebd95a77573064f3f9a8caf18c22f4d0d0
+    name: csi-resizer
+  - image: registry.k8s.io/sig-storage/csi-snapshotter@sha256:93fbf54dd67f586428ea339743160e1a5110c058afde3c2e824f11fbc6efae53
+    name: csi-snapshotter
+  - image: registry.k8s.io/sig-storage/csi-node-driver-registrar@sha256:f6717ce72a2615c7fbc746b4068f788e78579c54c43b8716e5ce650d97af2df1
+    name: csi-node-driver-registrar
+  - image: registry.k8s.io/sig-storage/livenessprobe@sha256:4dc0b87ccd69f9865b89234d8555d3a614ab0a16ed94a3016ffd27f8106132ce
+    name: livenessprobe
+  replaces: alibaba-cloud-csi-operator.v0.1.9
+  version: 0.1.10

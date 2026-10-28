@@ -1,0 +1,189 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: commvaultconfigs.commvault.com
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+spec:
+  group: commvault.com
+  names:
+    kind: CommvaultConfig
+    listKind: CommvaultConfigList
+    plural: commvaultconfigs
+    singular: commvaultconfig
+    shortNames:
+      - cvconfig
+  scope: Namespaced
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: CommServe
+          type: boolean
+          jsonPath: .status.commServeReachable
+        - name: Gateway
+          type: boolean
+          jsonPath: .status.gatewayReady
+        - name: Plugin
+          type: boolean
+          jsonPath: .status.pluginReady
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          description: >-
+            CommvaultConfig is the Schema for the commvaultconfigs API.
+            It defines a Commvault Command Center connection and drives deployment
+            of the gateway and console plugin components.
+          type: object
+          required:
+            - spec
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              description: CommvaultConfigSpec defines the connection to a Commvault CommServe and deployment settings.
+              type: object
+              required:
+                - commServeURL
+                - tokenSecretRef
+              properties:
+                commServeURL:
+                  description: Base URL of the CommServe API (e.g. https://commserve.example.com/api).
+                  type: string
+                  minLength: 1
+                  pattern: "^https?://"
+                tokenSecretRef:
+                  description: Reference to a Secret containing the CommServe access token.
+                  type: object
+                  required:
+                    - name
+                    - key
+                  properties:
+                    name:
+                      description: Name of the Secret.
+                      type: string
+                      minLength: 1
+                    key:
+                      description: Key within the Secret data.
+                      type: string
+                      minLength: 1
+                refreshTokenKey:
+                  description: Key within the TokenSecretRef Secret that holds the refresh token. If empty, token refresh is disabled.
+                  type: string
+                clusterId:
+                  description: Commvault cluster ID for this OpenShift cluster.
+                  type: integer
+                  minimum: 0
+                ocpAPIServerURL:
+                  description: API server URL of this OpenShift cluster, used for CommServe cluster ID discovery.
+                  type: string
+                gateway:
+                  description: Gateway configuration for the backend proxy pod.
+                  type: object
+                  properties:
+                    replicas:
+                      description: Number of gateway replicas. Defaults to 1.
+                      type: integer
+                      format: int32
+                      default: 1
+                      minimum: 0
+                    image:
+                      description: Container image for the gateway.
+                      type: string
+                    resources:
+                      description: CPU and memory resource overrides for the gateway container.
+                      type: object
+                      properties:
+                        cpuRequest:
+                          description: "CPU request (e.g. 100m, 0.5)."
+                          type: string
+                          pattern: "^(\\d+m?|\\d+\\.\\d+)$"
+                        cpuLimit:
+                          description: "CPU limit (e.g. 500m, 1)."
+                          type: string
+                          pattern: "^(\\d+m?|\\d+\\.\\d+)$"
+                        memoryRequest:
+                          description: "Memory request (e.g. 128Mi, 1Gi)."
+                          type: string
+                          pattern: "^(\\d+(Ki|Mi|Gi|Ti)?)$"
+                        memoryLimit:
+                          description: "Memory limit (e.g. 256Mi, 2Gi)."
+                          type: string
+                          pattern: "^(\\d+(Ki|Mi|Gi|Ti)?)$"
+                plugin:
+                  description: Console plugin configuration for the UI pod.
+                  type: object
+                  properties:
+                    replicas:
+                      description: Number of plugin replicas. Defaults to 2.
+                      type: integer
+                      format: int32
+                      default: 2
+                      minimum: 0
+                    image:
+                      description: Container image for the console plugin.
+                      type: string
+            status:
+              description: CommvaultConfigStatus reflects the observed state of the CommvaultConfig.
+              type: object
+              properties:
+                phase:
+                  description: "High-level lifecycle state: Installing, Ready, or Degraded."
+                  type: string
+                  enum:
+                    - Installing
+                    - Ready
+                    - Degraded
+                commServeReachable:
+                  description: Whether the gateway can reach the CommServe API.
+                  type: boolean
+                lastChecked:
+                  description: Timestamp of the most recent reconciliation.
+                  type: string
+                  format: date-time
+                gatewayReady:
+                  description: Whether the gateway Deployment is available.
+                  type: boolean
+                pluginReady:
+                  description: Whether the plugin Deployment is available.
+                  type: boolean
+                conditions:
+                  description: Detailed status conditions for each managed component.
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - type
+                      - status
+                      - lastTransitionTime
+                      - reason
+                      - message
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                        enum: ["True", "False", "Unknown"]
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                      reason:
+                        type: string
+                      message:
+                        type: string
+                      observedGeneration:
+                        type: integer
+                        format: int64

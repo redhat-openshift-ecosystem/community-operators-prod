@@ -1,0 +1,917 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    containerImage: ghcr.io/vyogotech/frappe-operator:v5.2.7
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "FrappeBench",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/instance": "frappebench-sample",
+              "app.kubernetes.io/name": "frappebench",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "frappebench-sample"
+          },
+          "spec": {
+            "apps": [
+              {
+                "name": "frappe",
+                "source": "image"
+              },
+              {
+                "name": "erpnext",
+                "source": "image"
+              }
+            ],
+            "frappeVersion": "version-15"
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "FrappeSite",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "frappe-operator",
+              "app.kubernetes.io/instance": "frappesite-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "frappesite",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "frappesite-sample"
+          },
+          "spec": {
+            "benchRef": {
+              "name": "frappebench-sample"
+            },
+            "siteName": "site1.example.com"
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "FrappeWorkspace",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "frappe-operator",
+              "app.kubernetes.io/instance": "frappeworkspace-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "frappeworkspace",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "frappeworkspace-sample"
+          },
+          "spec": {
+            "description": "Frappe standard workspace"
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "SiteApp",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/instance": "siteapp-sample",
+              "app.kubernetes.io/name": "siteapp",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "siteapp-sample"
+          },
+          "spec": {
+            "appName": "erpnext",
+            "siteRef": {
+              "name": "frappesite-sample"
+            }
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "SiteBackup",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "frappe-operator",
+              "app.kubernetes.io/instance": "sitebackup-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "sitebackup",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "sitebackup-sample"
+          },
+          "spec": {
+            "site": "site1.example.com",
+            "withFiles": true
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "SiteDashboard",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "frappe-operator",
+              "app.kubernetes.io/instance": "sitedashboard-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "sitedashboard",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "sitedashboard-sample"
+          },
+          "spec": {
+            "description": "Executive ERP dashboard"
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "SiteDashboardChart",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "frappe-operator",
+              "app.kubernetes.io/instance": "sitedashboardchart-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "sitedashboardchart",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "sitedashboardchart-sample"
+          },
+          "spec": {
+            "description": "Monthly revenue analytics chart"
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "SiteDomain",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/instance": "sitedomain-sample",
+              "app.kubernetes.io/name": "sitedomain",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "sitedomain-sample"
+          },
+          "spec": {
+            "domain": "shop.example.com",
+            "siteRef": {
+              "name": "frappesite-sample"
+            }
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "SiteJob",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "frappe-operator",
+              "app.kubernetes.io/instance": "sitejob-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "sitejob",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "sitejob-sample"
+          },
+          "spec": {
+            "description": "Scheduled maintenance job"
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "SiteMigration",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/instance": "sitemigration-sample",
+              "app.kubernetes.io/name": "sitemigration",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "sitemigration-sample"
+          },
+          "spec": {
+            "site": "site1.example.com"
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "SiteRestore",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/instance": "siterestore-sample",
+              "app.kubernetes.io/name": "siterestore",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "siterestore-sample"
+          },
+          "spec": {
+            "backupSource": {
+              "existingBackupRef": {
+                "name": "sitebackup-sample"
+              }
+            },
+            "site": "site1.example.com"
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "SiteUser",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "frappe-operator",
+              "app.kubernetes.io/instance": "siteuser-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "siteuser",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "siteuser-sample"
+          },
+          "spec": {
+            "email": "admin@example.com",
+            "firstName": "Administrator",
+            "siteRef": {
+              "name": "frappesite-sample"
+            }
+          }
+        },
+        {
+          "apiVersion": "vyogo.tech/v1",
+          "kind": "SiteWorkspace",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "frappe-operator",
+              "app.kubernetes.io/instance": "siteworkspace-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "siteworkspace",
+              "app.kubernetes.io/part-of": "frappe-operator"
+            },
+            "name": "siteworkspace-sample"
+          },
+          "spec": {
+            "description": "Operations workspace"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: Application Runtime,Database
+    createdAt: "2026-09-23T07:10:49Z"
+    features.operators.openshift.io/disconnected-compliant: "true"
+    features.operators.openshift.io/fips-compliant: "false"
+    features.operators.openshift.io/proxy-aware: "false"
+    operatorframework.io/suggested-namespace: frappe-operator-system
+    operators.operatorframework.io/builder: operator-sdk-v1.42.2
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+  name: frappe-operator.v5.2.7
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: FrappeBench is the Schema for the frappebenches API
+      displayName: Frappe Bench
+      kind: FrappeBench
+      name: frappebenches.vyogo.tech
+      version: v1
+    - description: FrappeSite is the Schema for the frappesites API
+      displayName: Frappe Site
+      kind: FrappeSite
+      name: frappesites.vyogo.tech
+      version: v1
+    - description: FrappeWorkspace is the Schema for the frappeworkspaces API
+      displayName: Frappe Workspace
+      kind: FrappeWorkspace
+      name: frappeworkspaces.vyogo.tech
+      version: v1
+    - description: Manages Frappe site API keys and secrets for programmatic access.
+      displayName: Site API Key
+      kind: SiteAPIKey
+      name: siteapikeys.vyogo.tech
+      version: v1
+    - description: SiteApp is the Schema for the siteapps API
+      displayName: Site App
+      kind: SiteApp
+      name: siteapps.vyogo.tech
+      version: v1
+    - description: SiteBackup is the Schema for the sitebackups API
+      displayName: Site Backup
+      kind: SiteBackup
+      name: sitebackups.vyogo.tech
+      version: v1
+    - description: Manages custom client-side JavaScript extensions in Frappe Desk.
+      displayName: Site Client Script
+      kind: SiteClientScript
+      name: siteclientscripts.vyogo.tech
+      version: v1
+    - description: Manages Frappe site configuration variables and maintenance modes.
+      displayName: Site Config
+      kind: SiteConfig
+      name: siteconfigs.vyogo.tech
+      version: v1
+    - description: Manages scheduled cron jobs and periodic bench method execution.
+      displayName: Site Cron
+      kind: SiteCron
+      name: sitecrons.vyogo.tech
+      version: v1
+    - description: Manages Frappe DocType custom fields declaratively.
+      displayName: Site Custom Field
+      kind: SiteCustomField
+      name: sitecustomfields.vyogo.tech
+      version: v1
+    - description: SiteDashboardChart is the Schema for the sitedashboardcharts API
+      displayName: Site Dashboard Chart
+      kind: SiteDashboardChart
+      name: sitedashboardcharts.vyogo.tech
+      version: v1
+    - description: SiteDashboard is the Schema for the sitedashboards API
+      displayName: Site Dashboard
+      kind: SiteDashboard
+      name: sitedashboards.vyogo.tech
+      version: v1
+    - description: SiteDomain is the Schema for the sitedomains API
+      displayName: Site Domain
+      kind: SiteDomain
+      name: sitedomains.vyogo.tech
+      version: v1
+    - description: SiteJob is the Schema for the sitejobs API
+      displayName: Site Job
+      kind: SiteJob
+      name: sitejobs.vyogo.tech
+      version: v1
+    - description: SiteMigration is the Schema for the sitemigrations API
+      displayName: Site Migration
+      kind: SiteMigration
+      name: sitemigrations.vyogo.tech
+      version: v1
+    - description: Manages Frappe DocType property overrides declaratively.
+      displayName: Site Property Setter
+      kind: SitePropertySetter
+      name: sitepropertysetters.vyogo.tech
+      version: v1
+    - description: Enforces storage, site, and resource quotas across Frappe sites.
+      displayName: Site Quota
+      kind: SiteQuota
+      name: sitequotas.vyogo.tech
+      version: v1
+    - description: SiteRestore is the Schema for the siterestores API
+      displayName: Site Restore
+      kind: SiteRestore
+      name: siterestores.vyogo.tech
+      version: v1
+    - description: Manages Frappe user roles and permission sets.
+      displayName: Site Role
+      kind: SiteRole
+      name: siteroles.vyogo.tech
+      version: v1
+    - description: Manages server-side Python scripts executed on DocType events or
+        API calls.
+      displayName: Site Server Script
+      kind: SiteServerScript
+      name: siteserverscripts.vyogo.tech
+      version: v1
+    - description: Manages Frappe user data-level document permissions.
+      displayName: Site User Permission
+      kind: SiteUserPermission
+      name: siteuserpermissions.vyogo.tech
+      version: v1
+    - description: SiteUser is the Schema for the siteusers API
+      displayName: Site User
+      kind: SiteUser
+      name: siteusers.vyogo.tech
+      version: v1
+    - description: Manages outgoing webhooks triggered by Frappe DocType events.
+      displayName: Site Webhook
+      kind: SiteWebhook
+      name: sitewebhooks.vyogo.tech
+      version: v1
+    - description: SiteWorkspace is the Schema for the siteworkspaces API
+      displayName: Site Workspace
+      kind: SiteWorkspace
+      name: siteworkspaces.vyogo.tech
+      version: v1
+  description: |
+    The Frappe Operator brings the robust capabilities of Frappe and ERPNext frameworks natively into Kubernetes using the Operator Pattern.
+
+    ### Features
+    * **FrappeBench Provisioning**: Automatically deploy and scale custom Frappe stacks natively.
+    * **Database Harmonization**: Spin up shared or dedicated MariaDB instances tailored.
+    * **Automated Replicas**: High Availability web worker routing via Ingress.
+    * **GitOps Compliance**: Designed to operate smoothly with ArgoCD.
+
+    ### Prerequisites
+
+    **Install a database provider before creating sites.** MariaDB is the
+    default: a `FrappeSite` that does not set `spec.dbConfig.provider` uses it,
+    so install the MariaDB Operator unless every site specifies a different
+    provider.
+
+    These are deliberately not declared as OLM dependencies. The operator
+    supports four database providers, and a hard dependency would both force
+    MariaDB on PostgreSQL-only users and make the bundle impossible to install
+    on any cluster whose catalogs do not carry the required package.
+
+    Install whichever matches your configuration:
+
+    * Dedicated PostgreSQL with `postgresEngine: stackgres` needs StackGres (`stackgres-community`).
+    * Dedicated PostgreSQL with `postgresEngine: percona` needs the Percona Operator for PostgreSQL (`percona-postgresql-operator`).
+    * Shared PostgreSQL needs any reachable PostgreSQL, for example CloudNativePG.
+    * Worker autoscaling needs KEDA (`keda`).
+    * Admission webhooks, when enabled, need cert-manager.
+
+    Shared PostgreSQL mode is engine-agnostic: it only needs a reachable
+    `host:port` and a provisioner Secret, so any PostgreSQL will do.
+
+    ### Setup
+    Ensure that you have deployed the prerequisites above before bootstrapping an ERPNext portal using standard `kubectl apply` commands.
+  displayName: Frappe Operator
+  icon:
+  - base64data: iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAABCFBMVEX69vL39PH28/H18/H18vH08vH08vDz8vHy8fDx8fDx8PDw8PDt7+/s7+/r7e/q7e7p7e7n7O7n7O3m7O3l6+3h6ezg6Ozd5+vb5uvU4unT4enR4enR4ejQ4OjI3ObF2+XE2uXD2uXC2eXB2eTA2OS/2OS+1+S+1+O91uO41OK10+Kz0eGkyt2cxtyXw9uUwtqTwdqRwdmRwNmQwNmPv9mNv9iNvtiMvthwsNFtr9BsrtBrrtBrrdBqrdBqrc9prc9qrNBprM9orM9nrM9nq89mq89hqM1gqM1fp81ep81cpsxbpsxbpcxapcxZpcxZpMxZpMtYpMtWpMtWo8tVo8tWostVostUossFIrsWAAABkUlEQVR42u3ayVLCQBAG4JAYMuICIu5bjBh3UeKGorhjDIiKwvu/icekarrKcbqMWPX/Jw7d8IWaQ0+qjZE/jgEAAAAAEH8UlmpMh/oqvf4YIKb9smL8BUH8vl5/DLD8z5ZielVTBmj2JwDlVlMx7QoF0OsHAAAAAAAAAAAAACA5E3YjxXwckjOhVn9iKp7yXMV4c9RUrNevdS+wmPcCy8HVDAAAAAAAAAAAAOAHgCHmSCZ4gOHC/lEg5XTHlkudpRO5Mjied1gAUXroyK9a++qvaruexQTUQ9bFJHIBAAAAAAAAAAAA/hGAGioz+evnUMrbAQVYf5Urw5dlg7U/sLZ1dl6TcrtHPJbl3siVtcbuKm9/4H1jbELOOPVnjhKFhZn7Dm9/IFrJCDk5CpAjCrOT350hg3uIuIcYAAAAAAAAAAAAQG8iUk62yAZs5kuMFGcvmYDm3UWdk6tH7grHU8jLr+yQcAMAAAAAAAAAAAAwqAC/104p/YACOIvVSkoJtm3yZbWZWmwssQAAAAADBPgCbnRBE1ZmtlgAAAAASUVORK5CYII=
+    mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - limitranges
+          - persistentvolumeclaims
+          - resourcequotas
+          - secrets
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - autoscaling
+          resources:
+          - horizontalpodautoscalers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - batch
+          resources:
+          - cronjobs
+          - jobs
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - ingresses
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - k8s.mariadb.com
+          resources:
+          - databases
+          - grants
+          - mariadbs
+          - users
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - keda.sh
+          resources:
+          - scaledobjects
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - keda.sh
+          resources:
+          - scaledobjects/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - keda.sh
+          resources:
+          - scaledobjects/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingressclasses
+          - ingresses
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - pgv2.percona.com
+          resources:
+          - perconapgclusters
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          - routes/custom-host
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - stackgres.io
+          resources:
+          - sgclusters
+          - sginstanceprofiles
+          - sgpgconfigs
+          - sgpoolconfigs
+          - sgscripts
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - storage.k8s.io
+          resources:
+          - storageclasses
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - vyogo.tech
+          resources:
+          - frappebenches
+          - frappesites
+          - frappeworkspaces
+          - siteapikeys
+          - siteapps
+          - sitebackups
+          - siteclientscripts
+          - siteconfigs
+          - sitecrons
+          - sitecustomfields
+          - sitedashboardcharts
+          - sitedashboards
+          - sitedomains
+          - sitejobs
+          - sitemigrations
+          - sitepropertysetters
+          - sitequotas
+          - siterestores
+          - siteroles
+          - siteserverscripts
+          - siteuserpermissions
+          - siteusers
+          - sitewebhooks
+          - siteworkspaces
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - vyogo.tech
+          resources:
+          - frappebenches/finalizers
+          - frappesites/finalizers
+          - frappeworkspaces/finalizers
+          - siteapikeys/finalizers
+          - siteapps/finalizers
+          - sitebackups/finalizers
+          - siteconfigs/finalizers
+          - sitecrons/finalizers
+          - sitedashboardcharts/finalizers
+          - sitedashboards/finalizers
+          - sitedomains/finalizers
+          - sitejobs/finalizers
+          - sitemigrations/finalizers
+          - sitequotas/finalizers
+          - siterestores/finalizers
+          - siteroles/finalizers
+          - siteusers/finalizers
+          - siteworkspaces/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - vyogo.tech
+          resources:
+          - frappebenches/status
+          - frappesites/status
+          - frappeworkspaces/status
+          - siteapikeys/status
+          - siteapps/status
+          - sitebackups/status
+          - siteclientscripts/status
+          - siteconfigs/status
+          - sitecrons/status
+          - sitecustomfields/status
+          - sitedashboardcharts/status
+          - sitedashboards/status
+          - sitedomains/status
+          - sitejobs/status
+          - sitemigrations/status
+          - sitepropertysetters/status
+          - sitequotas/status
+          - siterestores/status
+          - siteroles/status
+          - siteserverscripts/status
+          - siteuserpermissions/status
+          - siteusers/status
+          - sitewebhooks/status
+          - siteworkspaces/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: frappe-operator-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/component: manager
+          app.kubernetes.io/created-by: frappe-operator
+          app.kubernetes.io/instance: controller-manager
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: deployment
+          app.kubernetes.io/part-of: frappe-operator
+          control-plane: controller-manager
+        name: frappe-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                    - matchExpressions:
+                      - key: kubernetes.io/arch
+                        operator: In
+                        values:
+                        - amd64
+                        - arm64
+                        - ppc64le
+                        - s390x
+                      - key: kubernetes.io/os
+                        operator: In
+                        values:
+                        - linux
+              containers:
+              - args:
+                - --secure-listen-address=0.0.0.0:8443
+                - --upstream=http://127.0.0.1:8080/
+                - --logtostderr=true
+                - --v=0
+                image: kubebuilder/kube-rbac-proxy:v0.13.1
+                name: kube-rbac-proxy
+                ports:
+                - containerPort: 8443
+                  name: https
+                  protocol: TCP
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 5m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              - args:
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=127.0.0.1:8080
+                - --leader-elect
+                command:
+                - /manager
+                env:
+                - name: FRAPPE_ENFORCE_HTTPS
+                  valueFrom:
+                    configMapKeyRef:
+                      key: enforceHTTPS
+                      name: frappe-operator-frappe-operator-config
+                      optional: true
+                - name: FRAPPE_DEFAULT_CLUSTER_ISSUER
+                  valueFrom:
+                    configMapKeyRef:
+                      key: defaultClusterIssuer
+                      name: frappe-operator-frappe-operator-config
+                      optional: true
+                - name: RELATED_IMAGE_FRAPPE_BENCH_V15
+                  value: frappe/erpnext:version-15
+                - name: RELATED_IMAGE_FRAPPE_BENCH_V14
+                  value: frappe/erpnext:version-14
+                - name: RELATED_IMAGE_MARIADB
+                  value: mariadb:10.6
+                - name: RELATED_IMAGE_REDIS
+                  value: redis:7.0-alpine
+                - name: RELATED_IMAGE_UTILITY_UBI
+                  value: registry.access.redhat.com/ubi9/ubi-minimal:latest
+                image: ghcr.io/vyogotech/frappe-operator:v5.2.7
+                imagePullPolicy: IfNotPresent
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 128Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+              serviceAccountName: frappe-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: frappe-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - frappe
+  - erpnext
+  - operator
+  links:
+  - name: Frappe Operator
+    url: https://github.com/vyogotech/frappe-operator
+  maintainers:
+  - email: dev@vyogo.tech
+    name: vyogo-dev
+  - email: info@vyogo.tech
+    name: varkrish
+  maturity: alpha
+  minKubeVersion: 1.27.0
+  provider:
+    name: Vyogo Tech
+    url: https://vyogo.tech
+  relatedImages:
+  - image: frappe/erpnext:version-15
+    name: frappe-bench-v15
+  - image: frappe/erpnext:version-14
+    name: frappe-bench-v14
+  - image: mariadb:10.6
+    name: mariadb
+  - image: redis:7.0-alpine
+    name: redis
+  - image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+    name: utility-ubi
+  version: 5.2.7

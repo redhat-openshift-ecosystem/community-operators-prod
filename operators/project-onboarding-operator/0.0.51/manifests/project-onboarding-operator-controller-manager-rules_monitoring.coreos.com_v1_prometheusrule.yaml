@@ -1,0 +1,78 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: project-onboarding-operator
+    control-plane: controller-manager
+  name: project-onboarding-operator-controller-manager-rules
+spec:
+  groups:
+  - name: project-onboarding-operator.rules
+    rules:
+    - alert: ProjectOnboardingOperatorDown
+      annotations:
+        description: Metrics scrape or deployment availability indicates project-onboarding-operator-controller-manager
+          is unavailable in project-onboarding-operator for 5 minutes.
+        summary: Project Onboarding operator controller is down
+      expr: |
+        (
+          sum(up{
+            namespace="project-onboarding-operator",
+            service=~".*controller-manager-metrics-service"
+          } == 1) < 1
+        )
+        or
+        (
+          kube_deployment_status_replicas_available{
+            namespace="project-onboarding-operator",
+            deployment="project-onboarding-operator-controller-manager"
+          } < 1
+        )
+      for: 5m
+      labels:
+        severity: critical
+    - alert: ProjectOnboardingReconcileErrors
+      annotations:
+        description: The projectonboarding controller has reported reconcile errors
+          for more than 10 minutes.
+        summary: Project Onboarding controller reconcile errors
+      expr: |
+        sum(rate(controller_runtime_reconcile_errors_total{controller="projectonboarding"}[5m])) > 0
+      for: 10m
+      labels:
+        severity: warning
+    - alert: ProjectOnboardingWorkqueueBacklog
+      annotations:
+        description: The projectonboarding controller workqueue depth has been above
+          10 for 15 minutes.
+        summary: Project Onboarding workqueue backlog
+      expr: |
+        workqueue_depth{name="projectonboarding"} > 10
+      for: 15m
+      labels:
+        severity: warning
+    - alert: TShirtSizeReconcileErrors
+      annotations:
+        description: The tshirtsize controller has reported reconcile errors for more
+          than 10 minutes.
+        summary: TShirtSize controller reconcile errors
+      expr: |
+        sum(rate(controller_runtime_reconcile_errors_total{controller="tshirtsize"}[5m])) > 0
+      for: 10m
+      labels:
+        severity: warning
+    - alert: ProjectOnboardingReconcileErrorsByReason
+      annotations:
+        description: The projectonboarding controller has reported reconcile errors
+          with reason {{ $labels.reason }} for more than 10 minutes.
+        summary: Project Onboarding reconcile errors ({{ $labels.reason }})
+      expr: |
+        sum(rate(projectonboarding_reconcile_errors_total[5m])) by (reason) > 0
+      for: 10m
+      labels:
+        severity: warning
+    - expr: sum(rate(projectonboarding_reconcile_errors_total[5m]))
+      record: projectonboarding:reconcile_error_rate5m
+    - expr: sum(projectonboarding_tenants_total)
+      record: projectonboarding:tenant_count

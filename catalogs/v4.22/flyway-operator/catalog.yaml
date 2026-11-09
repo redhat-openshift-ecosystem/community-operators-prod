@@ -1,0 +1,202 @@
+---
+defaultChannel: stable-v0.7
+description: |
+  The Flyway Operator runs [Flyway](https://flywaydb.org/) database migrations from a declarative
+  `Migration` resource. The operator creates a Kubernetes Job that runs Flyway against your database
+  and reports the result in the `Migration` status, so schema changes are applied, retried and observed
+  the same way as the rest of your cluster configuration, for example from GitOps.
+
+  ### Features
+
+  - **Migrations shipped as an image.** The SQL files come from a container image that is mounted read-only
+    into the Flyway container as an image volume. The image needs no shell and can be `FROM scratch`.
+  - **Status you can act on.** `Applied`, `Progressing` and `Failed` conditions, the attempt count and the
+    last applied image and generation.
+  - **Retries and deadlines.** Failed Jobs are retried up to `retryLimit` and stop at `activeDeadline`.
+  - **Pause.** Set an annotation to hold reconciliation while you investigate.
+  - **Observability.** Prometheus metrics, a `ServiceMonitor`, alert rules and Grafana dashboards.
+  - **Restricted by default.** Jobs run under the `restricted` Pod Security Standard.
+
+  ### Prerequisites
+
+  - Kubernetes 1.35 or later (OpenShift 4.22 or later). Migration Jobs use image volumes, and the
+    `ImageVolume` feature gate is on by default from Kubernetes 1.35.
+  - A container runtime with image volume support (CRI-O 1.31 or later, containerd 2.1 or later).
+  - A database reachable from the cluster and a Secret holding its password.
+
+  ### Getting started
+
+  Create a `Migration` that names the database, the Flyway configuration and the migration image, as in the
+  [usage guide](https://github.com/davidkarlsen/flyway-operator/blob/main/docs/usage.md). See also
+  [installing](https://github.com/davidkarlsen/flyway-operator/blob/main/docs/installing.md),
+  [metrics](https://github.com/davidkarlsen/flyway-operator/blob/main/docs/metrics.md),
+  [dashboards](https://github.com/davidkarlsen/flyway-operator/blob/main/docs/dashboards.md) and the
+  [runbook](https://github.com/davidkarlsen/flyway-operator/blob/main/docs/runbook.md) for the alerts.
+icon:
+  base64data: PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDIwIiBoZWlnaHQ9Ijk3MCIgdmlld0JveD0iMCAwIDEwMjAgOTcwIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6I2MwMDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPkZseXdheTwvdGl0bGU+PHBhdGggZD0iTTMuOSw4OTguM0MwLDg4NS42LDAsODczLjQsMCw4NjAuNVY3NjQuMkMwLDczMS42LjYsNjk0LjUsOC4yLDY2M2MyOC02LjksNTkuOC03LjMsOTMuMi03LjNoNzIuOWE3Ni45LDc2LjksMCwwLDEsMS43LDE1LjIsODYuNyw4Ni43LDAsMCwxLTEuNywxNS4yYy0xMC4yLDMuMy0yMC40LDMuMy0zMC45LDMuM0gxMDNjLTIxLjgsMC00MC43LDAtNTkuNSwzLjktMi43LDIwLjEtMy4zLDQ0LTMuMyw3MUgxNDkuNGE2Mi42LDYyLjYsMCwwLDEsMS42LDE0LjksNzMuNyw3My43LDAsMCwxLTEuNiwxNS43Yy0xMC41LDMuMy0yMC40LDMuMy0zMS42LDMuM0g0MC4ydjEwMGE4MS44LDgxLjgsMCwwLDEtMTcuNywxLjdBMTUwLjgsMTUwLjgsMCwwLDEsMy45LDg5OC4zWiIvPjxwYXRoIGQ9Ik0xOTkuOSw4OThhMjM0LjQsMjM0LjQsMCwwLDEtMS45LTMzLjVWNjg5LjZjMC0xMS42LDAtMjMsMy42LTM0LjNhNzQsNzQsMCwwLDEsMzAuNiwwYzMuMywxMS4yLDMuMywyMywzLjMsMzQuNlY4NjQuMWMwLDEwLjguMywyMS4xLTIsMzMuOWE1OS43LDU5LjcsMCwwLDEtMTYuMSwyQTcyLjgsNzIuOCwwLDAsMSwxOTkuOSw4OThaIi8+PHBhdGggZD0iTTI3My4yLDk2Ny43bDMzLjItNzUuOUwyNTkuOCw3NzguN2MtNS4yLTEzLjEtMTMuMi0zMS4yLTEzLjUtNDUuNmE2OS4yLDY5LjIsMCwwLDEsMTguOC0yLjMsNzAsNzAsMCwwLDEsMTcuNywybDQ0LDExNC43LDIzLjgtNTEuOWM3LjUtMTYuOSwxNy43LTQ0LjgsMjIuNi02Mi44YTc3LjIsNzcuMiwwLDAsMSwxOC41LTIsNzQuMSw3NC4xLDAsMCwxLDE4LDJjLTIuMiwyMS0xNC4xLDQ1LjYtMjYuMyw3My4zTDMxMyw5NjcuN2E4OS4zLDg5LjMsMCwwLDEtMTkuNCwyQTk0LjEsOTQuMSwwLDAsMSwyNzMuMiw5NjcuN1oiLz48cGF0aCBkPSJNNDU3LjgsODk4LDQyMy45LDc3MS4xYy00LTE0LjQtNy42LTI3LjYtOC4zLTM4LjFhODYuOCw4Ni44LDAsMCwxLDIwLjQtMi4zLDg1LjgsODUuOCwwLDAsMSwxOC44LDJsMjkuNiwxMjYuOUw1MzAuOCw3MzRhNjcsNjcsMCwwLDEsMTUuMS0xLjdBNzQuOCw3NC44LDAsMCwxLDU2Miw3MzRsNDYuNCwxMjUuNiwyOS41LTEyNi45YTgwLjcsODAuNywwLDAsMSwxOC41LTIsODcuNiw4Ny42LDAsMCwxLDIwLjcsMi4zYy0xLDEyLjEtNC4yLDI0LjktOCwzOC40TDYzNi4zLDg5OGMtOS4yLDIuMy0xNi4xLDMuMy0yMi43LDMuM3MtMTQuMi0xLTI0LjQtMy4zTDU0Ni40LDc4My45LDUwNC43LDg5OGMtOS41LDIuMy0xNi4xLDMuMy0yMywzLjNTNDY3LjksOTAwLjQsNDU3LjgsODk4WiIvPjxwYXRoIGQ9Ik02OTIuNSw4NDQuNFY4MzEuNmMwLTI0LjksMS4xLTY0LjQsMTEuNi04OS41LDI0LjMtMTEuOCw0NS4xLTE3LjEsNjQuNy0xNy4xLDQyLjQsMCw3NiwxMS4yLDc2LDU3Ljl2NjkuNGEzOTcuNSwzOTcuNSwwLDAsMS0yLjYsNDUuNiw0OS4yLDQ5LjIsMCwwLDEtMTMuOSwyLDY5LjgsNjkuOCwwLDAsMS0xNi0ybC0zLTE2Yy0xMS45LDEyLjEtMzIuOSwxOS42LTU1LDE5LjZTNjkyLjUsODkyLjIsNjkyLjUsODQ0LjRaTTgwNyw4NTIuN1Y3NjYuNWMtNy41LTYuMy0yMy05LjItMzguNS05LjJzLTMxLjIsMy0zOC43LDkuMnY5Mi43YzguMiw2LjYsMTksOS41LDMwLjIsOS41Qzc3Ni40LDg2OC44LDc5NC4xLDg2Mi42LDgwNyw4NTIuN1oiLz48cGF0aCBkPSJNODgzLjYsOTY3LjdsMzMuMi03NS45TDg3MC4xLDc3OC42Yy01LjMtMTMuMi0xMy4yLTMxLjItMTMuNS00NS42YTY5LDY5LDAsMCwxLDE4LjctMi4zLDcxLjQsNzEuNCwwLDAsMSwxNy44LDJsNDQsMTE0LjcsMjMuNy01MmM3LjUtMTYuOCwxNy44LTQ0LjcsMjIuNy02Mi43YTc3LjIsNzcuMiwwLDAsMSwxOC41LTIsNzUuMyw3NS4zLDAsMCwxLDE4LDJjLTIuMywyMS0xNC4xLDQ1LjYtMjYuMyw3My4zTDkyMy40LDk2Ny43YTg5LjMsODkuMywwLDAsMS0xOS40LDJBOTQuMSw5NC4xLDAsMCwxLDg4My42LDk2Ny43WiIvPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTQyOS40LDM3NC45YTU4LjYsNTguNiwwLDAsMCw5LjUtMjguNGwtNDQuNiw5LjJhMjguMywyOC4zLDAsMCwxLTUsLjUsMjUuMSwyNS4xLDAsMCwxLTUtNDkuNmwxMDEuMi0yMC44QTYwLjIsNjAuMiwwLDAsMCw1MjMuNiwyNjBhNjEuMiw2MS4yLDAsMCwwLDkuOC0yOC43bC00NC44LDkuMmEyOC4zLDI4LjMsMCwwLDEtNSwuNUEyNSwyNSwwLDAsMSw0NTksMjIwLjhjLTIuNy0xMy42LDYuNS0yNi43LDIwLjEtMjkuNWwxMDAtMjAuNWMxOS41LTQsMzAuOS0yMCwzNi0yOS4xYTgwLjUsODAuNSwwLDAsMCw5LTI2LjNMMzA5LjUsMTgwVjQxNy44bDgwLjgtMTYuNkE2MS42LDYxLjYsMCwwLDAsNDI5LjQsMzc0LjlaIi8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNNTEwLC4zYy04OCwwLTE2NC45LDE3LjgtMjAwLjYsNDMuNHY4NS4xTDY1NC40LDU4YTEzLjYsMTMuNiwwLDAsMSwxNiwxMC41bDIuMywxMS4zYzUuOCwyOC4zLjgsNTkuNy0xMy45LDg2LjItMTYsMjguOC00MC44LDQ3LjktNjkuOSw1My45bC01LjUsMS4xYTEwOC45LDEwOC45LDAsMCwxLTE4LjksNjcuN2MtMTYuMywyNC4yLTQxLjcsNDAuNS03MC4yLDQ2LjRsLTUuMywxLjFhMTEwLjUsMTEwLjUsMCwwLDEtODcuOCwxMTRMMzA5LjQsNDY5djIyLjhDMzQ1LjEsNTE3LjUsNDIyLDUzNS4zLDUxMCw1MzUuM3MxNjQuOS0xNy44LDIwMC42LTQzLjVWNDMuN0M2NzQuOSwxOC4xLDU5OCwuMyw1MTAsLjNaIi8+PC9zdmc+
+  mediatype: image/svg+xml
+name: flyway-operator
+schema: olm.package
+---
+entries:
+- name: flyway-operator.v0.7.1
+name: stable-v0
+package: flyway-operator
+schema: olm.channel
+---
+entries:
+- name: flyway-operator.v0.7.1
+name: stable-v0.7
+package: flyway-operator
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/flyway-operator:0.7.1
+name: flyway-operator.v0.7.1
+package: flyway-operator
+properties:
+- type: olm.gvk
+  value:
+    group: flyway.davidkarlsen.com
+    kind: Migration
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: flyway-operator
+    version: 0.7.1
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "flyway.davidkarlsen.com/v1alpha1",
+            "kind": "Migration",
+            "metadata": {
+              "name": "my-app"
+            },
+            "spec": {
+              "database": {
+                "credentials": {
+                  "key": "password",
+                  "name": "my-app-db"
+                },
+                "jdbcUrl": "jdbc:postgresql://my-db:5432/my_app",
+                "username": "myuser"
+              },
+              "flywayConfiguration": {},
+              "migrationSource": {
+                "imageRef": "registry.example.com/my-app-sql:1.4.0"
+              },
+              "retryLimit": 2
+            }
+          }
+        ]
+      capabilities: Deep Insights
+      categories: Database,Developer Tools
+      containerImage: ghcr.io/davidkarlsen/flyway-operator:0.7.1
+      createdAt: "2026-11-09T09:46:10Z"
+      description: Run Flyway database migrations declaratively with a Migration resource
+        that spawns and tracks a Kubernetes Job.
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "false"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operators.operatorframework.io/builder: operator-sdk-v1.42.3
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/davidkarlsen/flyway-operator
+      support: https://github.com/davidkarlsen/flyway-operator/issues
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Migration is the Schema for the migrations API
+        displayName: Migration
+        kind: Migration
+        name: migrations.flyway.davidkarlsen.com
+        version: v1alpha1
+    description: |
+      The Flyway Operator runs [Flyway](https://flywaydb.org/) database migrations from a declarative
+      `Migration` resource. The operator creates a Kubernetes Job that runs Flyway against your database
+      and reports the result in the `Migration` status, so schema changes are applied, retried and observed
+      the same way as the rest of your cluster configuration, for example from GitOps.
+
+      ### Features
+
+      - **Migrations shipped as an image.** The SQL files come from a container image that is mounted read-only
+        into the Flyway container as an image volume. The image needs no shell and can be `FROM scratch`.
+      - **Status you can act on.** `Applied`, `Progressing` and `Failed` conditions, the attempt count and the
+        last applied image and generation.
+      - **Retries and deadlines.** Failed Jobs are retried up to `retryLimit` and stop at `activeDeadline`.
+      - **Pause.** Set an annotation to hold reconciliation while you investigate.
+      - **Observability.** Prometheus metrics, a `ServiceMonitor`, alert rules and Grafana dashboards.
+      - **Restricted by default.** Jobs run under the `restricted` Pod Security Standard.
+
+      ### Prerequisites
+
+      - Kubernetes 1.35 or later (OpenShift 4.22 or later). Migration Jobs use image volumes, and the
+        `ImageVolume` feature gate is on by default from Kubernetes 1.35.
+      - A container runtime with image volume support (CRI-O 1.31 or later, containerd 2.1 or later).
+      - A database reachable from the cluster and a Secret holding its password.
+
+      ### Getting started
+
+      Create a `Migration` that names the database, the Flyway configuration and the migration image, as in the
+      [usage guide](https://github.com/davidkarlsen/flyway-operator/blob/main/docs/usage.md). See also
+      [installing](https://github.com/davidkarlsen/flyway-operator/blob/main/docs/installing.md),
+      [metrics](https://github.com/davidkarlsen/flyway-operator/blob/main/docs/metrics.md),
+      [dashboards](https://github.com/davidkarlsen/flyway-operator/blob/main/docs/dashboards.md) and the
+      [runbook](https://github.com/davidkarlsen/flyway-operator/blob/main/docs/runbook.md) for the alerts.
+    displayName: Flyway Operator
+    installModes:
+    - supported: false
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - schema
+    - versioning
+    - database
+    - flyway
+    - migration
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Flyway Operator
+      url: https://github.com/davidkarlsen/flyway-operator
+    - name: Usage
+      url: https://github.com/davidkarlsen/flyway-operator/blob/main/docs/usage.md
+    - name: Installing
+      url: https://github.com/davidkarlsen/flyway-operator/blob/main/docs/installing.md
+    - name: Metrics
+      url: https://github.com/davidkarlsen/flyway-operator/blob/main/docs/metrics.md
+    - name: Dashboards
+      url: https://github.com/davidkarlsen/flyway-operator/blob/main/docs/dashboards.md
+    - name: Runbook
+      url: https://github.com/davidkarlsen/flyway-operator/blob/main/docs/runbook.md
+    - name: Flyway
+      url: https://flywaydb.org/
+    maintainers:
+    - email: david@davidkarlsen.com
+      name: davidkarlsen
+    maturity: alpha
+    minKubeVersion: 1.35.0
+    provider:
+      name: David J. M. Karlsen
+      url: https://github.com/davidkarlsen/
+relatedImages:
+- image: ghcr.io/davidkarlsen/flyway-operator:0.7.1
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/flyway-operator:0.7.1
+  name: ""
+schema: olm.bundle

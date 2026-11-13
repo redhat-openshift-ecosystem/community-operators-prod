@@ -1,0 +1,521 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.20.1
+  creationTimestamp: null
+  name: dotvirts.dotvirt.io
+spec:
+  group: dotvirt.io
+  names:
+    kind: Dotvirt
+    listKind: DotvirtList
+    plural: dotvirts
+    shortNames:
+    - dv
+    singular: dotvirt
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Available")].status
+      name: Available
+      type: string
+    - jsonPath: .status.consoleURL
+      name: Console
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          Dotvirt is one dotvirt install. Namespaced singleton in the operator's namespace;
+          the operator itself holds the cluster RBAC to provision cluster-scoped resources.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DotvirtSpec is the desired dotvirt install.
+            properties:
+              argocd:
+                description: |-
+                  ArgoCDSpec locates the ArgoCD install dotvirt rides. Defaults suit OpenShift
+                  GitOps (openshift-gitops); override for community ArgoCD (argocd /
+                  argocd-application-controller). The operator binds the apply RBAC + AppProjects
+                  to this controller ServiceAccount.
+                properties:
+                  controllerServiceAccount:
+                    description: |-
+                      ControllerServiceAccount is the application-controller ServiceAccount the
+                      apply RBAC and AppProjects bind to; empty = the platform default.
+                    type: string
+                  namespace:
+                    description: |-
+                      Namespace is where the ArgoCD instance runs; empty = the platform default
+                      (openshift-gitops on OpenShift, argocd elsewhere).
+                    type: string
+                  serverURL:
+                    description: |-
+                      ServerURL is the externally reachable ArgoCD base URL the forge posts webhooks
+                      to (.../api/webhook) for instant sync. Empty = discover the OpenShift GitOps
+                      server Route; if neither resolves, the webhook is skipped (Argo falls back to
+                      its poll).
+                    type: string
+                  syncImpersonation:
+                    description: |-
+                      SyncImpersonation makes ArgoCD sync each dotvirt Application as its
+                      project's own ServiceAccount, which holds exactly the project's grants,
+                      instead of the shared controller's account. On by default.
+                    properties:
+                      enabled:
+                        description: |-
+                          Enabled, true when unset, turns impersonation on once every project's sync
+                          account holds its grants and nothing else on the instance would stop
+                          syncing; the SyncImpersonationReady condition says what is missing. The
+                          setting is instance-wide: every Application on that ArgoCD then syncs as
+                          the ServiceAccount its AppProject names, or not at all. false removes the
+                          setting.
+                        type: boolean
+                      ignoreForeignApplications:
+                        description: |-
+                          IgnoreForeignApplications turns impersonation on although the instance
+                          also syncs Applications outside dotvirt's AppProjects. Those fail to sync
+                          until their AppProjects name a ServiceAccount (destinationServiceAccounts).
+                        type: boolean
+                    type: object
+                  tenantKindsAllowed:
+                    description: |-
+                      TenantKindsAllowed are kinds a tenant repo may apply beyond the ones
+                      dotvirt has a UI for, each named by group and kind. They hold only while
+                      sync impersonation is in effect, the project's sync account then being
+                      the ceiling on what its repo applies; until then tenant repos keep the
+                      listed kinds. Grants, quotas, OLM, Argo CD's own kinds, KubeVirt's
+                      configuration and the platform tier's kinds are never allowed: one named
+                      here is left out, and ArgoReady names it. Name no kind whose operator
+                      acts with its own rights on a request that can name another namespace
+                      or a cluster-wide resource: a tenant repo could reach past its project
+                      through it.
+                    items:
+                      description: GroupKind names one kind by API group, the core
+                        group being empty.
+                      properties:
+                        group:
+                          pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)?$
+                          type: string
+                        kind:
+                          minLength: 1
+                          pattern: ^[A-Za-z][A-Za-z0-9]*$
+                          type: string
+                      required:
+                      - kind
+                      type: object
+                    maxItems: 64
+                    type: array
+                type: object
+                x-kubernetes-validations:
+                - message: 'tenantKindsAllowed needs sync impersonation: beyond the
+                    listed kinds, the project''s sync account is what keeps its repo
+                    within the project''s rights'
+                  rule: '!has(self.tenantKindsAllowed) || size(self.tenantKindsAllowed)
+                    == 0 || !has(self.syncImpersonation) || !has(self.syncImpersonation.enabled)
+                    || self.syncImpersonation.enabled'
+              auth:
+                description: |-
+                  AuthSpec adds a sign-in flow beside the always-present token login: OpenShift
+                  SSO or OIDC.
+                properties:
+                  oidc:
+                    description: |-
+                      OIDC adds a "Sign in with <displayName>" button for an OpenID Connect
+                      issuer the apiserver trusts. The issuer's ID token is the user's bearer,
+                      so the apiserver's AuthenticationConfiguration must accept this client ID
+                      as an audience of that issuer. Register https://<console host>/api/auth/callback
+                      as the client's redirect URI.
+                    properties:
+                      clientID:
+                        description: ClientID is the client's ID at the issuer.
+                        minLength: 1
+                        type: string
+                      clientSecret:
+                        description: |-
+                          ClientSecret is the key of a Secret in dotvirt's namespace holding the
+                          client secret. Unset: a public client, which PKCE alone protects. The
+                          console reads it when it starts: restart it after a rotation.
+                        properties:
+                          key:
+                            minLength: 1
+                            type: string
+                          name:
+                            minLength: 1
+                            type: string
+                        required:
+                        - key
+                        - name
+                        type: object
+                      displayName:
+                        description: 'DisplayName names the issuer on the sign-in
+                          button. Unset: "single sign-on".'
+                        maxLength: 40
+                        type: string
+                      issuerURL:
+                        description: IssuerURL is the issuer exactly as its tokens
+                          name it (their iss claim).
+                        pattern: ^https://[^\s?#]+$
+                        type: string
+                      scopes:
+                        description: |-
+                          Scopes are asked beside openid: those whose claims the apiserver maps
+                          to a username and groups.
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - clientID
+                    - issuerURL
+                    type: object
+                  openShiftSSO:
+                    description: |-
+                      OpenShiftSSO adds a "Sign in with OpenShift" button beside the token login.
+                      Unset turns it on wherever the cluster runs OpenShift's OAuth server and no
+                      oidc flow is set; false keeps it off. The operator generates the client
+                      credential and, once the console host is assigned, reports the exact
+                      OAuthClient to apply (redirect URI filled in) in status.ssoOAuthClient; a
+                      cluster admin signed in to the console can register it from there instead.
+                      Registering that cluster-scoped OAuthClient stays a cluster-admin act the
+                      operator deliberately doesn't perform. OpenShift only.
+                    type: boolean
+                type: object
+                x-kubernetes-validations:
+                - message: 'openShiftSSO and oidc are exclusive: pick one sign-in
+                    flow'
+                  rule: '!(has(self.openShiftSSO) && self.openShiftSSO && has(self.oidc))'
+              branding:
+                description: Branding dresses the console as a provider's; unset,
+                  it is dotvirt's own.
+                properties:
+                  configMap:
+                    description: |-
+                      ConfigMap names a ConfigMap in dotvirt's namespace holding theme.css,
+                      loaded after the console's own stylesheet so it may override its
+                      tokens, and logo.svg or logo.png. dotvirt serves them itself, each up to
+                      256 KiB: the console never loads a remote URL. An edit shows on the next
+                      page load.
+                    maxLength: 253
+                    pattern: ^[a-z0-9]([-a-z0-9.]*[a-z0-9])?$
+                    type: string
+                  links:
+                    description: Links lead back to the provider's own app from the
+                      masthead.
+                    items:
+                      description: BrandingLink is one masthead link.
+                      properties:
+                        label:
+                          description: Label is the link's text.
+                          maxLength: 32
+                          minLength: 1
+                          pattern: ^[^\x00-\x1f\x7f-\x9f]*$
+                          type: string
+                        url:
+                          description: URL is an https URL with a host and no credentials.
+                          pattern: ^https://[A-Za-z0-9]([-A-Za-z0-9.]*[A-Za-z0-9])?(:[0-9]{1,5})?([/?#]([^%@\s\x00-\x1f\x7f]|%[0-9A-Fa-f]{2})*)?$
+                          type: string
+                      required:
+                      - label
+                      - url
+                      type: object
+                    maxItems: 5
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  productName:
+                    description: |-
+                      ProductName replaces dotvirt throughout the console and in what it
+                      writes to the forge.
+                    maxLength: 40
+                    pattern: ^[^\x00-\x1f\x7f-\x9f]*$
+                    type: string
+                type: object
+              forge:
+                description: |-
+                  ForgeSpec points dotvirt at its git forge and the platform-tier repo. The forge
+                  credential here is the INSTALL-TIME admin token the operator uses to create the
+                  platform repo, distinct from (and more privileged than) dotvirt's runtime
+                  clone/push token, preserving the install-provisioner vs runtime-owns-nothing split.
+                properties:
+                  credentialsSecret:
+                    description: |-
+                      CredentialsSecret names a Secret holding the forge-admin credential (keys: url,
+                      username, token). For a managed forge the operator WRITES this secret; point it at
+                      an existing secret only for a bring-your-own forge.
+                    type: string
+                  insecureTLS:
+                    description: |-
+                      InsecureTLS skips TLS verification when calling the forge API (a self-signed forge
+                      Route, e.g. the bundled Forgejo). DEV/EVAL ONLY; never enable against a forge with
+                      a trusted certificate.
+                    type: boolean
+                  managed:
+                    description: Managed deploys a self-hosted Forgejo for evaluation;
+                      false = bring your own.
+                    type: boolean
+                  platformRepo:
+                    description: |-
+                      PlatformRepo is the cluster-scoped + tenancy repo (CUDN/NNCP/Namespace). The
+                      operator ensures it exists; dotvirt routes platform creates here by kind. Defaults
+                      to <forge URL>/dotvirt/platform.git for a managed forge.
+                    type: string
+                  pullRequests:
+                    description: |-
+                      PullRequests is who opens a proposal's or a revert's pull request:
+                      Dotvirt (the default) opens it with its forge account; Users leaves it
+                      to the requester, who opens it in the forge as themselves from the
+                      branch dotvirt pushed and the link it returns, so the forge's review
+                      rules see them as its poster. Leave dotvirt/proposed/** unprotected:
+                      dotvirt force-pushes each proposal's branch, which a protected branch
+                      refuses on Forgejo. Require approvals from a reviewer team instead.
+                    enum:
+                    - Dotvirt
+                    - Users
+                    type: string
+                  url:
+                    description: |-
+                      URL is the forge base URL. Leave empty with managed on OpenShift: the operator
+                      exposes Forgejo on a router-assigned host and reports it in status.forgeURL. Set it
+                      for a bring-your-own forge, or to pin the managed forge's host.
+                    type: string
+                  webURL:
+                    description: |-
+                      WebURL is where browsers open the forge's pages: pull requests, compare
+                      pages and repositories. Empty: the forge's URL. Set it when that URL is
+                      in-cluster, or when an app of yours fronts the forge on the same paths
+                      (<owner>/<repo>, .../pulls/<n>, .../compare/<base>...<head>); dotvirt's
+                      own API and git calls still go to the forge's URL. A managed forge also
+                      takes it as its ROOT_URL, so its own pages and clone links name it.
+                    pattern: ^https?://[A-Za-z0-9]([-A-Za-z0-9.]*[A-Za-z0-9])?(:[0-9]{1,5})?(/([^?#@%\s\x00-\x1f\x7f]|%[0-9A-Fa-f]{2})*)?$
+                    type: string
+                type: object
+              image:
+                description: Image is the dotvirt app image to deploy.
+                type: string
+              ingress:
+                description: IngressSpec controls how the UI is exposed.
+                properties:
+                  gateway:
+                    description: |-
+                      Gateway is what serves the UI and a managed forge, through HTTPRoutes. Its
+                      listener terminates TLS: the console URL is https. Name one where no router
+                      serves Routes, such as MicroShift with its ingress Removed.
+                    properties:
+                      name:
+                        minLength: 1
+                        type: string
+                      namespace:
+                        description: |-
+                          Namespace of the Gateway; empty is this Dotvirt's. Its listener must allow
+                          routes from the Dotvirt's namespace and no other: dotvirt's HTTPRoute
+                          matches every path, so a route another namespace attaches on the same
+                          hostname with a longer path takes that path, /api/login included.
+                        type: string
+                      sectionName:
+                        description: |-
+                          SectionName attaches to one listener; empty attaches to every listener
+                          that admits the hostname.
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  host:
+                    description: |-
+                      Host is the external hostname the UI is served on. Leave empty on OpenShift for a
+                      router-assigned host (reported in status.consoleURL); required for an Ingress on
+                      vanilla Kubernetes and for a Gateway.
+                    type: string
+                  type:
+                    description: |-
+                      IngressType selects how the dotvirt UI is exposed. "auto" picks a Gateway when
+                      spec.ingress.gateway names one, else Route on OpenShift and Ingress on vanilla
+                      Kubernetes (the operator detects the platform).
+                    enum:
+                    - auto
+                    - route
+                    - ingress
+                    - gateway
+                    type: string
+                type: object
+                x-kubernetes-validations:
+                - message: type gateway needs spec.ingress.gateway
+                  rule: '!has(self.type) || self.type != ''gateway'' || has(self.gateway)'
+                - message: 'a Gateway serves named hosts: set spec.ingress.host'
+                  rule: '!has(self.gateway) || (has(self.host) && size(self.host)
+                    > 0)'
+              metrics:
+                description: |-
+                  MetricsSpec points the Performance tab at a Prometheus/Thanos query API; empty
+                  disables it.
+                properties:
+                  url:
+                    description: |-
+                      URL is a Prometheus-compatible query API base URL (for OpenShift, the
+                      cluster Thanos querier service).
+                    type: string
+                type: object
+              publishing:
+                description: Publishing is off until Domain and GatewayClassName are
+                  set.
+                properties:
+                  clusterIssuer:
+                    description: |-
+                      ClusterIssuer is a cert-manager ClusterIssuer able to issue each
+                      project's wildcard (DNS-01). Empty: the Gateways serve HTTP only.
+                    type: string
+                  domain:
+                    description: |-
+                      Domain is the DNS zone each publishing project gets a subdomain of.
+                      The platform points each *.<project>.<domain> at that project's
+                      Gateway address; dotvirt writes no DNS.
+                    pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?\.)*[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                    type: string
+                  gatewayClassName:
+                    description: GatewayClassName is the GatewayClass of each project's
+                      Gateway.
+                    type: string
+                  portailNamespace:
+                    description: |-
+                      PortailNamespace holds portail's controller and its proxy Role, which a
+                      Gateway on a VM Network is bound to. Default portail-system.
+                    type: string
+                type: object
+            type: object
+          status:
+            description: DotvirtStatus is the observed install state.
+            properties:
+              conditions:
+                description: Conditions follow the standard k8s conventions (see the
+                  Condition* consts).
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              consoleURL:
+                description: |-
+                  ConsoleURL is the external URL the dotvirt UI is served on; assigned by the
+                  operator when spec.ingress.host is left empty on OpenShift.
+                type: string
+              forgeAdminHint:
+                description: |-
+                  ForgeAdminHint is the command that reveals the managed Forgejo bootstrap admin
+                  password (user dotvirt-bot); the value stays in the Secret, never in status.
+                  Set only for a managed forge.
+                type: string
+              forgeURL:
+                description: |-
+                  ForgeURL is the effective external forge base URL: the configured spec.forge.url,
+                  or the host the operator assigned to a managed Forgejo when the URL was left empty.
+                type: string
+              observedGeneration:
+                description: ObservedGeneration is the .metadata.generation last reconciled.
+                format: int64
+                type: integer
+              phase:
+                description: |-
+                  Phase is a short human-facing summary: Provisioning, BlockedOnDependencies or
+                  Ready (the Phase* consts).
+                type: string
+              ssoOAuthClient:
+                description: |-
+                  SSOOAuthClient is a ready-to-apply command that registers the cluster-scoped
+                  OAuthClient SSO needs, with the redirect URI filled from the assigned console host.
+                  Set only while auth.openShiftSSO is on; run it once to finish SSO.
+                type: string
+              syncImpersonationInstance:
+                description: |-
+                  SyncImpersonationInstance is the ArgoCD resource, as namespace/name, the
+                  operator set application.sync.impersonation.enabled on: it removes the
+                  setting there when spec.argocd moves to another instance and before the
+                  install is deleted, so no Application is left needing an account dotvirt
+                  no longer maps.
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

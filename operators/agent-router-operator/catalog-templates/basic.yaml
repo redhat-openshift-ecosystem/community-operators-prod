@@ -1,0 +1,13 @@
+---
+schema: olm.template.basic
+entries:
+  - schema: olm.package
+    name: agent-router-operator
+    defaultChannel: alpha
+  - schema: olm.channel
+    package: agent-router-operator
+    name: alpha
+    entries:
+      - name: agent-router-operator.v0.1.1
+  - schema: olm.bundle
+    image: quay.io/community-operator-pipeline-prod/agent-router-operator:0.1.1

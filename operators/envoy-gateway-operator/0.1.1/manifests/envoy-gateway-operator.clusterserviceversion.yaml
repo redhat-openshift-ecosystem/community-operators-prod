@@ -1,0 +1,632 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "envoygateway.ccangemi.github.io/v1alpha1",
+          "kind": "EnvoyGateway",
+          "metadata": {
+            "name": "envoy-gateway"
+          },
+          "spec": {}
+        }
+      ]
+    capabilities: Basic Install
+    categories: Networking
+    description: Installs Envoy Gateway on OpenShift with its upstream Helm chart, on top of the Gateway API that OpenShift provides.
+    features.operators.openshift.io/cnf: "false"
+    features.operators.openshift.io/cni: "false"
+    features.operators.openshift.io/csi: "false"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "false"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/initialization-resource: |-
+      {"apiVersion": "envoygateway.ccangemi.github.io/v1alpha1", "kind": "EnvoyGateway",
+       "metadata": {"name": "envoy-gateway"}, "spec": {}}
+    operatorframework.io/suggested-namespace: envoy-gateway-system
+    operators.operatorframework.io/builder: operator-sdk-v1.42.3
+    operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+    repository: https://github.com/ccangemi/envoy-operator
+    support: Community
+    containerImage: quay.io/gateway-operators/envoy-gateway-operator:v0.1.1@sha256:3d48325f506f2d7abe407049e501f08483bf286a931f5cdadcbf3cede67b1916
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/arch.arm64: supported
+    operatorframework.io/os.linux: supported
+  name: envoy-gateway-operator.v0.1.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - kind: Backend
+        name: backends.gateway.envoyproxy.io
+        version: v1alpha1
+        displayName: Backend
+        description: Backend allows the user to configure the endpoints of a backend and the behavior of the connection from Envoy Proxy to the backend.
+      - kind: BackendTrafficPolicy
+        name: backendtrafficpolicies.gateway.envoyproxy.io
+        version: v1alpha1
+        displayName: BackendTrafficPolicy
+        description: BackendTrafficPolicy allows the user to configure the behavior of the connection between the Envoy Proxy listener and the backend service.
+      - kind: ClientTrafficPolicy
+        name: clienttrafficpolicies.gateway.envoyproxy.io
+        version: v1alpha1
+        displayName: ClientTrafficPolicy
+        description: ClientTrafficPolicy allows the user to configure the behavior of the connection between the downstream client and Envoy Proxy listener.
+      - kind: EnvoyExtensionPolicy
+        name: envoyextensionpolicies.gateway.envoyproxy.io
+        version: v1alpha1
+        displayName: EnvoyExtensionPolicy
+        description: EnvoyExtensionPolicy allows the user to configure various envoy extensibility options for the Gateway.
+      - description: An installation of the Envoy Gateway controller. The spec holds the values of the upstream gateway-helm chart.
+        displayName: Envoy Gateway
+        kind: EnvoyGateway
+        name: envoygateways.envoygateway.ccangemi.github.io
+        version: v1alpha1
+      - kind: EnvoyPatchPolicy
+        name: envoypatchpolicies.gateway.envoyproxy.io
+        version: v1alpha1
+        displayName: EnvoyPatchPolicy
+        description: EnvoyPatchPolicy allows the user to modify the generated Envoy xDS resources by Envoy Gateway using this patch API
+      - kind: EnvoyProxy
+        name: envoyproxies.gateway.envoyproxy.io
+        version: v1alpha1
+        displayName: EnvoyProxy
+        description: EnvoyProxy is the schema for the envoyproxies API.
+      - kind: HTTPRouteFilter
+        name: httproutefilters.gateway.envoyproxy.io
+        version: v1alpha1
+        displayName: HTTPRouteFilter
+        description: HTTPRouteFilter is a custom Envoy Gateway HTTPRouteFilter which provides extended traffic processing options such as path regex rewrite, direct response and more.
+      - kind: SecurityPolicy
+        name: securitypolicies.gateway.envoyproxy.io
+        version: v1alpha1
+        displayName: SecurityPolicy
+        description: SecurityPolicy allows the user to configure various security settings for a Gateway.
+  description: |
+    This community operator installs [Envoy Gateway](https://gateway.envoyproxy.io/)
+    v1.9.3 on OpenShift. Envoy Gateway implements the Kubernetes
+    Gateway API with Envoy Proxy.
+
+    The operator is a Helm operator: it installs the upstream `gateway-helm`
+    chart, unchanged. The spec of the `EnvoyGateway` resource holds the values
+    of the chart, so the upstream documentation of the chart applies.
+
+    The operator uses the Gateway API that OpenShift provides. It never
+    installs, changes or removes the Gateway API CRDs
+    (`gateway.networking.k8s.io`), which belong to the OpenShift Ingress
+    Operator.
+
+    ## Before you install
+
+    * OpenShift 4.22, the only supported version. The operator needs
+      Gateway API v1.4 (`BackendTLSPolicy` v1), which OpenShift 4.22 provides.
+    * Create the namespace `envoy-gateway-system`, and install the operator
+      there with the "A specific namespace on the cluster" install mode.
+
+    ## Install Envoy Gateway
+
+    Create one `EnvoyGateway` resource, named `envoy-gateway`, in the namespace
+    of the operator:
+
+    ```yaml
+    apiVersion: envoygateway.ccangemi.github.io/v1alpha1
+    kind: EnvoyGateway
+    metadata:
+      name: envoy-gateway
+      namespace: envoy-gateway-system
+    spec: {}
+    ```
+
+    The operator then installs:
+
+    * the Envoy Gateway controller, in the same namespace;
+    * the certificates of the control plane, with the upstream `certgen` job.
+
+    The Envoy Gateway CRDs (`gateway.envoyproxy.io`) come with the operator.
+    OLM installs and upgrades them.
+
+    The operator does not create a GatewayClass, a Gateway or any route. You
+    create them, for example with a Helm chart or with Argo CD.
+
+    ## Values that the operator sets
+
+    Some values of the chart are fixed, so that the installation works on
+    OpenShift: no Gateway API CRDs, no fixed user IDs (the controller runs
+    with the `restricted-v2` SCC), no `watch` block, no namespace creation,
+    and the images pinned by digest. The topology injector is off by default.
+    The operator documentation lists all of them.
+
+    ## OpenShift notes
+
+    Envoy Gateway always runs the Envoy proxy pods with the fixed user ID
+    65532, which `restricted-v2` does not allow. Give the service account of
+    each Gateway the `nonroot-v2` SCC, with a RoleBinding to the cluster role
+    `system:openshift:scc:nonroot-v2`. The operator documentation has an
+    example.
+
+    ## The Agent Router
+
+    To use [The Agent Router](https://github.com/theagentrouter/agent-router)
+    (formerly Envoy AI Gateway), set the extension manager values of Envoy
+    Gateway in the `EnvoyGateway` resource, then install the Agent Router
+    operator. The operator documentation has a complete example.
+
+    ## Documentation
+
+    See the [operator repository](https://github.com/ccangemi/envoy-operator)
+    for the installation guide, the upgrade notes and the troubleshooting
+    guide.
+
+    This is a community project. It is not affiliated with, or endorsed by,
+    the Envoy project.
+  displayName: Envoy Gateway (Community)
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+                - serviceaccounts
+                - services
+              verbs:
+                - create
+                - delete
+                - deletecollection
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+            - apiGroups:
+                - ""
+              resources:
+                - namespaces
+                - nodes
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+                - pods/binding
+              verbs:
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - admissionregistration.k8s.io
+              resources:
+                - mutatingwebhookconfigurations
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - admissionregistration.k8s.io
+              resourceNames:
+                - envoy-gateway-topology-injector.envoy-gateway-system
+              resources:
+                - mutatingwebhookconfigurations
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - apps
+              resources:
+                - daemonsets
+              verbs:
+                - create
+                - delete
+                - deletecollection
+                - get
+                - list
+                - patch
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - create
+                - delete
+                - deletecollection
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - autoscaling
+              resources:
+                - horizontalpodautoscalers
+              verbs:
+                - create
+                - delete
+                - deletecollection
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - certificates.k8s.io
+              resources:
+                - clustertrustbundles
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - discovery.k8s.io
+              resources:
+                - endpointslices
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - envoygateway.ccangemi.github.io
+              resources:
+                - envoygateways
+                - envoygateways/finalizers
+                - envoygateways/status
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - gateway.envoyproxy.io
+              resources:
+                - backends
+                - backendtrafficpolicies
+                - clienttrafficpolicies
+                - envoyextensionpolicies
+                - envoypatchpolicies
+                - envoyproxies
+                - httproutefilters
+                - securitypolicies
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - gateway.envoyproxy.io
+              resources:
+                - backends/status
+                - backendtrafficpolicies/status
+                - clienttrafficpolicies/status
+                - envoyextensionpolicies/status
+                - envoypatchpolicies/status
+                - envoyproxies/status
+                - securitypolicies/status
+              verbs:
+                - update
+            - apiGroups:
+                - gateway.networking.k8s.io
+              resources:
+                - backendtlspolicies
+                - gateways
+                - grpcroutes
+                - httproutes
+                - listenersets
+                - referencegrants
+                - tcproutes
+                - tlsroutes
+                - udproutes
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - gateway.networking.k8s.io
+              resources:
+                - backendtlspolicies/status
+                - gatewayclasses/status
+                - gateways/status
+                - grpcroutes/status
+                - httproutes/status
+                - listenersets/status
+                - tcproutes/status
+                - tlsroutes/status
+                - udproutes/status
+              verbs:
+                - update
+            - apiGroups:
+                - gateway.networking.k8s.io
+              resources:
+                - gatewayclasses
+              verbs:
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - multicluster.x-k8s.io
+              resources:
+                - serviceimports
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - policy
+              resources:
+                - poddisruptionbudgets
+              verbs:
+                - create
+                - delete
+                - deletecollection
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - clusterrolebindings
+                - clusterroles
+                - rolebindings
+                - roles
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: envoy-gateway-operator-controller-manager
+      deployments:
+        - label:
+            app.kubernetes.io/managed-by: kustomize
+            app.kubernetes.io/name: envoy-gateway-operator
+            control-plane: controller-manager
+          name: envoy-gateway-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app.kubernetes.io/name: envoy-gateway-operator
+                control-plane: controller-manager
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  app.kubernetes.io/name: envoy-gateway-operator
+                  control-plane: controller-manager
+              spec:
+                affinity:
+                  nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      nodeSelectorTerms:
+                        - matchExpressions:
+                            - key: kubernetes.io/arch
+                              operator: In
+                              values:
+                                - amd64
+                                - arm64
+                            - key: kubernetes.io/os
+                              operator: In
+                              values:
+                                - linux
+                containers:
+                  - args:
+                      - --metrics-require-rbac
+                      - --metrics-secure
+                      - --metrics-bind-address=:8443
+                      - --leader-elect
+                      - --leader-election-id=envoy-gateway-operator
+                      - --health-probe-bind-address=:8081
+                    env:
+                      - name: WATCH_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.annotations['olm.targetNamespaces']
+                    image: quay.io/gateway-operators/envoy-gateway-operator:v0.1.1@sha256:3d48325f506f2d7abe407049e501f08483bf286a931f5cdadcbf3cede67b1916
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 512Mi
+                      requests:
+                        cpu: 10m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                securityContext:
+                  runAsNonRoot: true
+                  seccompProfile:
+                    type: RuntimeDefault
+                serviceAccountName: envoy-gateway-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: envoy-gateway-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+  keywords:
+    - envoy
+    - envoy-gateway
+    - gateway-api
+    - ingress
+    - api-gateway
+  links:
+    - name: Operator source code
+      url: https://github.com/ccangemi/envoy-operator
+    - name: Envoy Gateway
+      url: https://gateway.envoyproxy.io/
+  maintainers:
+    - email: asalvati@redhat.com
+      name: Amedeo Salvati
+  maturity: alpha
+  minKubeVersion: 1.35.0
+  nativeAPIs:
+    - group: gateway.networking.k8s.io
+      kind: GatewayClass
+      version: v1
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      version: v1
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      version: v1
+    - group: gateway.networking.k8s.io
+      kind: BackendTLSPolicy
+      version: v1
+  provider:
+    name: envoy-gateway-operator community
+    url: https://github.com/ccangemi/envoy-operator
+  version: 0.1.1
+  icon:
+    - base64data: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHJvbGU9ImltZyIgdmlld0JveD0iLTQuMjEgNDkuNTQgNDM5LjkyIDMzMi42NyI+PHN0eWxlPnN2ZyB7ZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA0MzIgNDMyfTwvc3R5bGU+PHBhdGggZmlsbD0iI2IzMWFhYiIgZD0iTTEwOS44IDIxMC42bC42IDI1LjQgMjYuOCAxNi42LS42LTI1LjR6bTY1LjQgMTA1LjhsLS42LTI0LjktMjMuNS0xNC42Yy0uMy0uMi0uNy0uNS0xLS43bC42IDI1IDI0LjUgMTUuMnpNOTEuNSAzNTBsLTYxLjMtMzgtMS41LTYzLjcgMzAuMS0xMy0uNi0yNS41LTQ4IDIwLjdjLTMuNyAxLjYtNS45IDUtNS44IDguOWwxLjggNzYuNWMuMSAzLjkgMi41IDcuOCA2LjMgMTAuMkw4NiAzNzEuN2MzLjQgMi4xIDcuNiAyLjcgMTEgMS42LjQtLjEuNy0uMiAxLS40bDQ1LjEtMTkuNC0yNC41LTE1LjJMOTEuNSAzNTB6Ii8+PHBhdGggZmlsbD0iI2QxNjNjZSIgZD0iTTI4OS42IDIwOS4xYy0uMS00LjYtMi45LTkuMS03LjMtMTEuOUwxOTMgMTQxLjlsLTIuOCAxLjIuNiAyNi44IDcwLjcgNDMuOCAxLjcgNzEuNiAyNyAxNi43IDEuNS0uNi0yLjEtOTIuM3pNMTgyLjcgMzM0LjhsLTgyLjktNTEuNC0yLTg2LjMgMzcuOC0xNi4zLS43LTI5LjctNTguNyAyNS4zYy00LjMgMS45LTYuOSA1LjgtNi44IDEwLjRMNzEuNyAyODhjLjEgNC42IDIuOSA5LjEgNy4zIDExLjhsOTcuMiA2MC4zYzQgMi41IDguOCAzLjEgMTIuOSAxLjkuNC0uMS44LS4zIDEuMi0uNWw1Ny40LTI0LjctMjguNi0xNy43LTM2LjQgMTUuN3oiLz48cGF0aCBmaWxsPSIjZTEzZWFmIiBkPSJNNDE1LjkgMTM4LjNMMjkxLjMgNjFjLTQuNi0yLjgtMTAuMS0zLjYtMTQuOC0yLjEtLjUuMS0uOS4zLTEuNC41bC0xMjEuNiA1Mi40Yy00LjkgMi4xLTcuOSA2LjYtNy44IDExLjlsMy4xIDEyOS42Yy4xIDUuMyAzLjMgMTAuNCA4LjQgMTMuNUwyODEuOCAzNDRjNC42IDIuOCAxMC4xIDMuNiAxNC43IDIuMS41LS4xLjktLjMgMS40LS41bDEyMS42LTUyLjRjNC45LTIuMSA3LjktNi43IDcuOC0xMS45bC0zLTEyOS42Yy0uMS01LjEtMy4zLTEwLjMtOC40LTEzLjR6TTI4OS4zIDMxNS4yTDE4MSAyNDguMWwtMi43LTExMi43IDEwNS42LTQ1LjVMMzkyLjIgMTU3bDIuNyAxMTIuNy0xMDUuNiA0NS41eiIvPjwvc3ZnPg==
+      mediatype: image/svg+xml
+  relatedImages:
+    - name: operator
+      image: quay.io/gateway-operators/envoy-gateway-operator:v0.1.1@sha256:3d48325f506f2d7abe407049e501f08483bf286a931f5cdadcbf3cede67b1916
+    - name: envoy-gateway
+      image: docker.io/envoyproxy/gateway:v1.9.3@sha256:192fc9bdadb6d2462e8cf7bd702ce3dd9648f3310c6038787448a1f509b7cd9f
+    - name: envoy-ratelimit
+      image: docker.io/envoyproxy/ratelimit:5ae0682e@sha256:b95206e32b1a5f824fb06062fbb85bbdfb7f5de54135e92afe8462f22c979681
+    - name: envoy-proxy
+      image: docker.io/envoyproxy/envoy:distroless-v1.39.5@sha256:9d84a586119a27b50437dbb01eccd4722832741539b1ed53c8e9d6da6067a6e0

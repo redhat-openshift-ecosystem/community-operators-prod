@@ -1,0 +1,15 @@
+---
+# GitHub user names that can approve changes to this operator.
+reviewers:
+  - amedeos
+  - ccangemi
+  - gpillon
+fbc:
+  enabled: true
+  # The operator supports only OpenShift 4.22, so it is not promoted to new
+  # OpenShift catalogs.
+  version_promotion_strategy: never
+  catalog_mapping:
+    - template_name: basic.yaml
+      catalog_names: ["v4.22"]
+      type: olm.template.basic

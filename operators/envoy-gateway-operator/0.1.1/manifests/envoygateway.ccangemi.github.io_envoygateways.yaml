@@ -1,0 +1,72 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: envoygateways.envoygateway.ccangemi.github.io
+spec:
+  group: envoygateway.ccangemi.github.io
+  names:
+    kind: EnvoyGateway
+    listKind: EnvoyGatewayList
+    plural: envoygateways
+    singular: envoygateway
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=="Deployed")].status
+      name: Deployed
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Deployed")].reason
+      name: Reason
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: EnvoyGateway installs the Envoy Gateway controller in the namespace
+          of the resource, with the upstream gateway-helm chart. Create one EnvoyGateway,
+          named envoy-gateway, in the namespace of the operator.
+        properties:
+          apiVersion:
+            description: APIVersion defines the versioned schema of this representation
+              of an object.
+            type: string
+          kind:
+            description: Kind is a string value representing the REST resource this
+              object represents.
+            type: string
+          metadata:
+            type: object
+          spec:
+            default: {}
+            description: Values of the operator chart. The values of the upstream
+              gateway-helm chart go under the key "gateway-helm". Some values are
+              set or refused by the operator; see the operator documentation.
+            properties:
+              gateway-helm:
+                default: {}
+                description: Values of the upstream gateway-helm chart.
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+          status:
+            description: Status of the Helm release, written by the operator.
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+        x-kubernetes-validations:
+        - message: the EnvoyGateway resource must be named envoy-gateway
+          rule: self.metadata.name == 'envoy-gateway'
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

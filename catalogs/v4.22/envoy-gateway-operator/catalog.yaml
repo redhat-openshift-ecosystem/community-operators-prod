@@ -1,0 +1,293 @@
+---
+defaultChannel: alpha
+name: envoy-gateway-operator
+schema: olm.package
+---
+entries:
+- name: envoy-gateway-operator.v0.1.1
+name: alpha
+package: envoy-gateway-operator
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/envoy-gateway-operator:0.1.1
+name: envoy-gateway-operator.v0.1.1
+package: envoy-gateway-operator
+properties:
+- type: olm.gvk
+  value:
+    group: envoygateway.ccangemi.github.io
+    kind: EnvoyGateway
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: gateway.envoyproxy.io
+    kind: Backend
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: gateway.envoyproxy.io
+    kind: BackendTrafficPolicy
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: gateway.envoyproxy.io
+    kind: ClientTrafficPolicy
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: gateway.envoyproxy.io
+    kind: EnvoyExtensionPolicy
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: gateway.envoyproxy.io
+    kind: EnvoyPatchPolicy
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: gateway.envoyproxy.io
+    kind: EnvoyProxy
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: gateway.envoyproxy.io
+    kind: HTTPRouteFilter
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: gateway.envoyproxy.io
+    kind: SecurityPolicy
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: envoy-gateway-operator
+    version: 0.1.1
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "envoygateway.ccangemi.github.io/v1alpha1",
+            "kind": "EnvoyGateway",
+            "metadata": {
+              "name": "envoy-gateway"
+            },
+            "spec": {}
+          }
+        ]
+      capabilities: Basic Install
+      categories: Networking
+      containerImage: quay.io/gateway-operators/envoy-gateway-operator:v0.1.1@sha256:3d48325f506f2d7abe407049e501f08483bf286a931f5cdadcbf3cede67b1916
+      description: Installs Envoy Gateway on OpenShift with its upstream Helm chart,
+        on top of the Gateway API that OpenShift provides.
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/initialization-resource: |-
+        {"apiVersion": "envoygateway.ccangemi.github.io/v1alpha1", "kind": "EnvoyGateway",
+         "metadata": {"name": "envoy-gateway"}, "spec": {}}
+      operatorframework.io/suggested-namespace: envoy-gateway-system
+      operators.operatorframework.io/builder: operator-sdk-v1.42.3
+      operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+      repository: https://github.com/ccangemi/envoy-operator
+      support: Community
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: Backend allows the user to configure the endpoints of a backend
+          and the behavior of the connection from Envoy Proxy to the backend.
+        displayName: Backend
+        kind: Backend
+        name: backends.gateway.envoyproxy.io
+        version: v1alpha1
+      - description: BackendTrafficPolicy allows the user to configure the behavior
+          of the connection between the Envoy Proxy listener and the backend service.
+        displayName: BackendTrafficPolicy
+        kind: BackendTrafficPolicy
+        name: backendtrafficpolicies.gateway.envoyproxy.io
+        version: v1alpha1
+      - description: ClientTrafficPolicy allows the user to configure the behavior
+          of the connection between the downstream client and Envoy Proxy listener.
+        displayName: ClientTrafficPolicy
+        kind: ClientTrafficPolicy
+        name: clienttrafficpolicies.gateway.envoyproxy.io
+        version: v1alpha1
+      - description: EnvoyExtensionPolicy allows the user to configure various envoy
+          extensibility options for the Gateway.
+        displayName: EnvoyExtensionPolicy
+        kind: EnvoyExtensionPolicy
+        name: envoyextensionpolicies.gateway.envoyproxy.io
+        version: v1alpha1
+      - description: An installation of the Envoy Gateway controller. The spec holds
+          the values of the upstream gateway-helm chart.
+        displayName: Envoy Gateway
+        kind: EnvoyGateway
+        name: envoygateways.envoygateway.ccangemi.github.io
+        version: v1alpha1
+      - description: EnvoyPatchPolicy allows the user to modify the generated Envoy
+          xDS resources by Envoy Gateway using this patch API
+        displayName: EnvoyPatchPolicy
+        kind: EnvoyPatchPolicy
+        name: envoypatchpolicies.gateway.envoyproxy.io
+        version: v1alpha1
+      - description: EnvoyProxy is the schema for the envoyproxies API.
+        displayName: EnvoyProxy
+        kind: EnvoyProxy
+        name: envoyproxies.gateway.envoyproxy.io
+        version: v1alpha1
+      - description: HTTPRouteFilter is a custom Envoy Gateway HTTPRouteFilter which
+          provides extended traffic processing options such as path regex rewrite,
+          direct response and more.
+        displayName: HTTPRouteFilter
+        kind: HTTPRouteFilter
+        name: httproutefilters.gateway.envoyproxy.io
+        version: v1alpha1
+      - description: SecurityPolicy allows the user to configure various security
+          settings for a Gateway.
+        displayName: SecurityPolicy
+        kind: SecurityPolicy
+        name: securitypolicies.gateway.envoyproxy.io
+        version: v1alpha1
+    description: |
+      This community operator installs [Envoy Gateway](https://gateway.envoyproxy.io/)
+      v1.9.3 on OpenShift. Envoy Gateway implements the Kubernetes
+      Gateway API with Envoy Proxy.
+
+      The operator is a Helm operator: it installs the upstream `gateway-helm`
+      chart, unchanged. The spec of the `EnvoyGateway` resource holds the values
+      of the chart, so the upstream documentation of the chart applies.
+
+      The operator uses the Gateway API that OpenShift provides. It never
+      installs, changes or removes the Gateway API CRDs
+      (`gateway.networking.k8s.io`), which belong to the OpenShift Ingress
+      Operator.
+
+      ## Before you install
+
+      * OpenShift 4.22, the only supported version. The operator needs
+        Gateway API v1.4 (`BackendTLSPolicy` v1), which OpenShift 4.22 provides.
+      * Create the namespace `envoy-gateway-system`, and install the operator
+        there with the "A specific namespace on the cluster" install mode.
+
+      ## Install Envoy Gateway
+
+      Create one `EnvoyGateway` resource, named `envoy-gateway`, in the namespace
+      of the operator:
+
+      ```yaml
+      apiVersion: envoygateway.ccangemi.github.io/v1alpha1
+      kind: EnvoyGateway
+      metadata:
+        name: envoy-gateway
+        namespace: envoy-gateway-system
+      spec: {}
+      ```
+
+      The operator then installs:
+
+      * the Envoy Gateway controller, in the same namespace;
+      * the certificates of the control plane, with the upstream `certgen` job.
+
+      The Envoy Gateway CRDs (`gateway.envoyproxy.io`) come with the operator.
+      OLM installs and upgrades them.
+
+      The operator does not create a GatewayClass, a Gateway or any route. You
+      create them, for example with a Helm chart or with Argo CD.
+
+      ## Values that the operator sets
+
+      Some values of the chart are fixed, so that the installation works on
+      OpenShift: no Gateway API CRDs, no fixed user IDs (the controller runs
+      with the `restricted-v2` SCC), no `watch` block, no namespace creation,
+      and the images pinned by digest. The topology injector is off by default.
+      The operator documentation lists all of them.
+
+      ## OpenShift notes
+
+      Envoy Gateway always runs the Envoy proxy pods with the fixed user ID
+      65532, which `restricted-v2` does not allow. Give the service account of
+      each Gateway the `nonroot-v2` SCC, with a RoleBinding to the cluster role
+      `system:openshift:scc:nonroot-v2`. The operator documentation has an
+      example.
+
+      ## The Agent Router
+
+      To use [The Agent Router](https://github.com/theagentrouter/agent-router)
+      (formerly Envoy AI Gateway), set the extension manager values of Envoy
+      Gateway in the `EnvoyGateway` resource, then install the Agent Router
+      operator. The operator documentation has a complete example.
+
+      ## Documentation
+
+      See the [operator repository](https://github.com/ccangemi/envoy-operator)
+      for the installation guide, the upgrade notes and the troubleshooting
+      guide.
+
+      This is a community project. It is not affiliated with, or endorsed by,
+      the Envoy project.
+    displayName: Envoy Gateway (Community)
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+    keywords:
+    - envoy
+    - envoy-gateway
+    - gateway-api
+    - ingress
+    - api-gateway
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Operator source code
+      url: https://github.com/ccangemi/envoy-operator
+    - name: Envoy Gateway
+      url: https://gateway.envoyproxy.io/
+    maintainers:
+    - email: asalvati@redhat.com
+      name: Amedeo Salvati
+    maturity: alpha
+    minKubeVersion: 1.35.0
+    nativeAPIs:
+    - group: gateway.networking.k8s.io
+      kind: GatewayClass
+      version: v1
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      version: v1
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      version: v1
+    - group: gateway.networking.k8s.io
+      kind: BackendTLSPolicy
+      version: v1
+    provider:
+      name: envoy-gateway-operator community
+      url: https://github.com/ccangemi/envoy-operator
+relatedImages:
+- image: docker.io/envoyproxy/envoy:distroless-v1.39.5@sha256:9d84a586119a27b50437dbb01eccd4722832741539b1ed53c8e9d6da6067a6e0
+  name: envoy-proxy
+- image: docker.io/envoyproxy/gateway:v1.9.3@sha256:192fc9bdadb6d2462e8cf7bd702ce3dd9648f3310c6038787448a1f509b7cd9f
+  name: envoy-gateway
+- image: docker.io/envoyproxy/ratelimit:5ae0682e@sha256:b95206e32b1a5f824fb06062fbb85bbdfb7f5de54135e92afe8462f22c979681
+  name: envoy-ratelimit
+- image: quay.io/community-operator-pipeline-prod/envoy-gateway-operator:0.1.1
+  name: ""
+- image: quay.io/gateway-operators/envoy-gateway-operator:v0.1.1@sha256:3d48325f506f2d7abe407049e501f08483bf286a931f5cdadcbf3cede67b1916
+  name: operator
+schema: olm.bundle

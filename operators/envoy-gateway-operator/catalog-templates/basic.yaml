@@ -1,0 +1,13 @@
+---
+schema: olm.template.basic
+entries:
+  - schema: olm.package
+    name: envoy-gateway-operator
+    defaultChannel: alpha
+  - schema: olm.channel
+    package: envoy-gateway-operator
+    name: alpha
+    entries:
+      - name: envoy-gateway-operator.v0.1.1
+  - schema: olm.bundle
+    image: quay.io/community-operator-pipeline-prod/envoy-gateway-operator:0.1.1

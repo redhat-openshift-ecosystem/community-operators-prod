@@ -1,0 +1,321 @@
+---
+defaultChannel: alpha
+name: agent-router-operator
+schema: olm.package
+---
+entries:
+- name: agent-router-operator.v0.1.1
+name: alpha
+package: agent-router-operator
+schema: olm.channel
+---
+image: quay.io/community-operator-pipeline-prod/agent-router-operator:0.1.1
+name: agent-router-operator.v0.1.1
+package: agent-router-operator
+properties:
+- type: olm.gvk
+  value:
+    group: agentrouter.ccangemi.github.io
+    kind: AgentRouter
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: aigateway.envoyproxy.io
+    kind: AIGatewayRoute
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: aigateway.envoyproxy.io
+    kind: AIGatewayRoute
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: aigateway.envoyproxy.io
+    kind: AIServiceBackend
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: aigateway.envoyproxy.io
+    kind: AIServiceBackend
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: aigateway.envoyproxy.io
+    kind: BackendSecurityPolicy
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: aigateway.envoyproxy.io
+    kind: BackendSecurityPolicy
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: aigateway.envoyproxy.io
+    kind: GatewayConfig
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: aigateway.envoyproxy.io
+    kind: GatewayConfig
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: aigateway.envoyproxy.io
+    kind: MCPRoute
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: aigateway.envoyproxy.io
+    kind: MCPRoute
+    version: v1beta1
+- type: olm.gvk
+  value:
+    group: aigateway.envoyproxy.io
+    kind: QuotaPolicy
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: agent-router-operator
+    version: 0.1.1
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "agentrouter.ccangemi.github.io/v1alpha1",
+            "kind": "AgentRouter",
+            "metadata": {
+              "name": "agent-router"
+            },
+            "spec": {}
+          }
+        ]
+      capabilities: Basic Install
+      categories: Networking,AI/Machine Learning
+      containerImage: quay.io/gateway-operators/agent-router-operator:v0.1.1@sha256:e26aa16fa9dc2b4546ebfdff26532928ed6db7ebf5c3384a20dcef26895e818c
+      description: Installs The Agent Router (formerly Envoy AI Gateway) on OpenShift
+        with its upstream Helm chart. It adds AI traffic features to Envoy Gateway.
+      features.operators.openshift.io/cnf: "false"
+      features.operators.openshift.io/cni: "false"
+      features.operators.openshift.io/csi: "false"
+      features.operators.openshift.io/disconnected: "true"
+      features.operators.openshift.io/fips-compliant: "false"
+      features.operators.openshift.io/proxy-aware: "false"
+      features.operators.openshift.io/tls-profiles: "false"
+      features.operators.openshift.io/token-auth-aws: "false"
+      features.operators.openshift.io/token-auth-azure: "false"
+      features.operators.openshift.io/token-auth-gcp: "false"
+      operatorframework.io/initialization-resource: |-
+        {"apiVersion": "agentrouter.ccangemi.github.io/v1alpha1", "kind": "AgentRouter",
+         "metadata": {"name": "agent-router"}, "spec": {}}
+      operatorframework.io/suggested-namespace: envoy-ai-gateway-system
+      operators.operatorframework.io/builder: operator-sdk-v1.42.3
+      operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+      repository: https://github.com/ccangemi/agent-router
+      support: Community
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: An installation of the Agent Router controller. The spec holds
+          the values of the upstream ai-gateway-helm chart.
+        displayName: Agent Router
+        kind: AgentRouter
+        name: agentrouters.agentrouter.ccangemi.github.io
+        version: v1alpha1
+      - description: AIGatewayRoute combines multiple AIServiceBackends and attaching
+          them to Gateway(s) resources.
+        displayName: AIGatewayRoute
+        kind: AIGatewayRoute
+        name: aigatewayroutes.aigateway.envoyproxy.io
+        version: v1alpha1
+      - description: AIGatewayRoute combines multiple AIServiceBackends and attaching
+          them to Gateway(s) resources.
+        displayName: AIGatewayRoute
+        kind: AIGatewayRoute
+        name: aigatewayroutes.aigateway.envoyproxy.io
+        version: v1beta1
+      - description: AIServiceBackend is a resource that represents a single backend
+          for AIGatewayRoute.
+        displayName: AIServiceBackend
+        kind: AIServiceBackend
+        name: aiservicebackends.aigateway.envoyproxy.io
+        version: v1alpha1
+      - description: AIServiceBackend is a resource that represents a single backend
+          for AIGatewayRoute.
+        displayName: AIServiceBackend
+        kind: AIServiceBackend
+        name: aiservicebackends.aigateway.envoyproxy.io
+        version: v1beta1
+      - description: BackendSecurityPolicy specifies configuration for authentication
+          and authorization rules on the traffic exiting the gateway to the backend.
+        displayName: BackendSecurityPolicy
+        kind: BackendSecurityPolicy
+        name: backendsecuritypolicies.aigateway.envoyproxy.io
+        version: v1alpha1
+      - description: BackendSecurityPolicy specifies configuration for authentication
+          and authorization rules on the traffic exiting the gateway to the backend.
+        displayName: BackendSecurityPolicy
+        kind: BackendSecurityPolicy
+        name: backendsecuritypolicies.aigateway.envoyproxy.io
+        version: v1beta1
+      - description: GatewayConfig provides configuration for the AI Gateway external
+          processor container that is deployed alongside the Gateway.
+        displayName: GatewayConfig
+        kind: GatewayConfig
+        name: gatewayconfigs.aigateway.envoyproxy.io
+        version: v1alpha1
+      - description: GatewayConfig provides configuration for the AI Gateway external
+          processor container that is deployed alongside the Gateway.
+        displayName: GatewayConfig
+        kind: GatewayConfig
+        name: gatewayconfigs.aigateway.envoyproxy.io
+        version: v1beta1
+      - description: MCPRoute defines how to route MCP requests to the backend MCP
+          servers.
+        displayName: MCPRoute
+        kind: MCPRoute
+        name: mcproutes.aigateway.envoyproxy.io
+        version: v1alpha1
+      - description: MCPRoute defines how to route MCP requests to the backend MCP
+          servers.
+        displayName: MCPRoute
+        kind: MCPRoute
+        name: mcproutes.aigateway.envoyproxy.io
+        version: v1beta1
+      - description: QuotaPolicy specifies token quota configuration for inference
+          services.
+        displayName: QuotaPolicy
+        kind: QuotaPolicy
+        name: quotapolicies.aigateway.envoyproxy.io
+        version: v1alpha1
+    description: |
+      This community operator installs
+      [The Agent Router](https://github.com/theagentrouter/agent-router)
+      v1.2.0 (formerly Envoy AI Gateway) on OpenShift. The Agent
+      Router adds AI traffic features to Envoy Gateway: routing to LLM
+      providers, token based rate limits, provider fallback and MCP routing.
+
+      The operator is a Helm operator: it installs the upstream
+      `ai-gateway-helm` chart, unchanged. The spec of the `AgentRouter`
+      resource holds the values of the chart, under the key `ai-gateway-helm`.
+
+      ## Before you install
+
+      * OpenShift 4.22, the only supported version (Gateway API v1.4).
+      * The cert-manager Operator for Red Hat OpenShift. cert-manager issues
+        and renews the certificate of the Agent Router webhook. You can turn
+        this off; the operator documentation explains what you must do then.
+      * Envoy Gateway, for example from the Envoy Gateway (Community)
+        operator, with the extension settings for the Agent Router. The
+        operator documentation has a complete example.
+      * Create the namespace `envoy-ai-gateway-system`, and install the
+        operator there with the "A specific namespace on the cluster" install
+        mode.
+
+      ## Install the Agent Router
+
+      Create one `AgentRouter` resource, named `agent-router`, in the namespace
+      of the operator:
+
+      ```yaml
+      apiVersion: agentrouter.ccangemi.github.io/v1alpha1
+      kind: AgentRouter
+      metadata:
+        name: agent-router
+        namespace: envoy-ai-gateway-system
+      spec: {}
+      ```
+
+      The operator then installs:
+
+      * the Agent Router controller, in the same namespace;
+      * a mutating webhook that adds the external processor to the Envoy proxy
+        pods (the pods with the label
+        `app.kubernetes.io/managed-by: envoy-gateway`). cert-manager issues its
+        certificate.
+
+      The Agent Router CRDs (`aigateway.envoyproxy.io`) come with the
+      operator. OLM installs and upgrades them.
+
+      By default the controller expects Envoy Gateway in the namespace
+      `envoy-gateway-system`. Set `ai-gateway-helm.envoyGateway.namespace` if
+      it runs somewhere else.
+
+      ## OpenShift notes
+
+      * The controller runs with the `restricted-v2` security context
+        constraint: the operator removes the fixed user ID of the upstream
+        chart.
+      * The operator does not install the Gateway API Inference Extension CRDs
+        (`InferencePool`). OpenShift AI provides them. The controller works
+        without them.
+
+      ## Documentation
+
+      See the [operator repository](https://github.com/ccangemi/agent-router)
+      for the installation guide, the upgrade notes and the troubleshooting
+      guide.
+
+      This is a community project. It is not affiliated with, or endorsed by,
+      the Envoy project.
+    displayName: The Agent Router (Community)
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+    keywords:
+    - agent-router
+    - ai-gateway
+    - envoy
+    - envoy-gateway
+    - gateway-api
+    - llm
+    - mcp
+    labels:
+      operatorframework.io/arch.amd64: supported
+      operatorframework.io/arch.arm64: supported
+      operatorframework.io/os.linux: supported
+    links:
+    - name: Operator source code
+      url: https://github.com/ccangemi/agent-router
+    - name: The Agent Router
+      url: https://github.com/theagentrouter/agent-router
+    - name: Envoy Gateway
+      url: https://gateway.envoyproxy.io/
+    maintainers:
+    - email: asalvati@redhat.com
+      name: Amedeo Salvati
+    maturity: alpha
+    minKubeVersion: 1.35.0
+    nativeAPIs:
+    - group: gateway.networking.k8s.io
+      kind: GatewayClass
+      version: v1
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      version: v1
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      version: v1
+    - group: gateway.networking.k8s.io
+      kind: BackendTLSPolicy
+      version: v1
+    provider:
+      name: agent-router-operator community
+      url: https://github.com/ccangemi/agent-router
+relatedImages:
+- image: docker.io/envoyproxy/ai-gateway-controller:v1.2.0@sha256:4d663346354321a677c4e942017277f690d0d7715f8e3348a535db174679e4f8
+  name: ai-gateway-controller
+- image: docker.io/envoyproxy/ai-gateway-extproc:v1.2.0@sha256:4af909a6f64ee6b97968995fec88c4fd3c41d020c6bcb7ca07136fdfffaa598c
+  name: ai-gateway-extproc
+- image: quay.io/community-operator-pipeline-prod/agent-router-operator:0.1.1
+  name: ""
+- image: quay.io/gateway-operators/agent-router-operator:v0.1.1@sha256:e26aa16fa9dc2b4546ebfdff26532928ed6db7ebf5c3384a20dcef26895e818c
+  name: operator
+schema: olm.bundle

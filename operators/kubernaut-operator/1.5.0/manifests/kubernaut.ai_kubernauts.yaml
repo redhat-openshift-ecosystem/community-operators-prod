@@ -1,0 +1,2099 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  creationTimestamp: null
+  name: kubernauts.kubernaut.ai
+spec:
+  group: kubernaut.ai
+  names:
+    kind: Kubernaut
+    listKind: KubernautList
+    plural: kubernauts
+    singular: kubernaut
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          Kubernaut is the Schema for the kubernauts API.
+          It declares a single Kubernaut deployment within the namespace it is created in.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: |-
+              KubernautSpec defines the desired state of a Kubernaut deployment on OCP.
+              The operator deploys all Kubernaut services into the CR's namespace and
+              auto-derives OCP platform configuration (monitoring, service-ca, Routes).
+            properties:
+              aiAnalysis:
+                description: AIAnalysis controller configuration.
+                properties:
+                  confidenceThreshold:
+                    description: |-
+                      Optional confidence threshold override for the Rego policy.
+                      Expressed as a decimal string, e.g. "0.85".
+                    type: string
+                  logging:
+                    description: LoggingSpec configures the log level for a service.
+                    properties:
+                      level:
+                        default: info
+                        description: 'Log level. One of: DEBUG, INFO, WARN, ERROR.'
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARN
+                        - ERROR
+                        - debug
+                        - info
+                        - warn
+                        - error
+                        type: string
+                    type: object
+                  policy:
+                    description: |-
+                      Policy ConfigMap reference. Required.
+                      The ConfigMap must contain key "approval.rego".
+                    properties:
+                      configMapName:
+                        description: Name of the ConfigMap.
+                        type: string
+                    required:
+                    - configMapName
+                    type: object
+                  resources:
+                    description: Resource requirements.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                required:
+                - policy
+                type: object
+              ansible:
+                description: Optional AWX/AAP integration for Ansible-based remediation
+                  workflows.
+                properties:
+                  apiURL:
+                    description: AWX/AAP API URL. Required when Enabled is true.
+                    type: string
+                  caCertSecretRef:
+                    description: |-
+                      CACertSecretRef references a Secret containing the PEM-encoded CA
+                      certificate for the AAP/AWX API endpoint. Use this when the AAP uses
+                      a self-signed certificate or a private CA. If omitted, the system
+                      trust store is used.
+                    properties:
+                      key:
+                        default: ca.crt
+                        description: Key within the Secret containing the CA PEM.
+                        type: string
+                      name:
+                        description: Name of the Secret.
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  enabled:
+                    default: false
+                    description: Whether AWX/AAP integration is enabled.
+                    type: boolean
+                  organizationID:
+                    default: 1
+                    description: AWX organization ID.
+                    minimum: 1
+                    type: integer
+                  tokenSecretRef:
+                    description: Reference to the Secret containing the AWX API token.
+                    properties:
+                      key:
+                        default: token
+                        description: 'Key within the Secret. Default: "token".'
+                        type: string
+                      name:
+                        description: Name of the Secret.
+                        type: string
+                    required:
+                    - name
+                    type: object
+                type: object
+                x-kubernetes-validations:
+                - message: ansible.apiURL is required when ansible.enabled is true
+                  rule: '!self.enabled || has(self.apiURL)'
+              apiFrontend:
+                description: APIFrontend configures the API Frontend (MCP/A2A gateway)
+                  service.
+                properties:
+                  agentCardURL:
+                    description: |-
+                      Display name for the A2A agent card (/.well-known/agent-card.json).
+                      External URL for the A2A agent card discovery endpoint.
+                      When empty, auto-derived from the in-cluster service FQDN.
+                      Must be a valid HTTPS URL when set.
+                    pattern: ^$|^https?://
+                    type: string
+                  auth:
+                    description: OIDC authentication configuration.
+                    properties:
+                      allowInsecureIssuers:
+                        description: |-
+                          Allow HTTP (non-TLS) JWKS URLs. Must remain false in production
+                          (FedRAMP SC-8: transmission confidentiality). Intended for dev/test only.
+                        type: boolean
+                      audience:
+                        default: kubernaut-apifrontend
+                        description: 'Expected JWT audience claim (FedRAMP SC-23:
+                          session authenticity).'
+                        type: string
+                      issuerURL:
+                        description: OIDC issuer URL (e.g. "https://login.kubernaut.ai/realms/kubernaut").
+                        type: string
+                      jwksURL:
+                        description: |-
+                          Explicit JWKS endpoint URL for token signature verification
+                          (FedRAMP IA-5: authenticator management). When empty, derived from
+                          issuerURL + "/protocol/openid-connect/certs".
+                        type: string
+                      oidcCaFile:
+                        description: |-
+                          Path to CA bundle for OIDC/JWKS TLS trust (FedRAMP IA-5). When set,
+                          AF uses this CA to verify the OIDC provider's certificate chain.
+                        type: string
+                      tokenReviewAudience:
+                        description: |-
+                          TokenReview audience for Kubernetes ServiceAccount token validation.
+                          When set, the API Frontend passes this audience to the TokenReview API
+                          so only tokens issued for this specific audience are accepted
+                          (FedRAMP IA-5: authenticator management).
+                        type: string
+                    type: object
+                  enabled:
+                    default: true
+                    description: |-
+                      Whether the API Frontend component is deployed. Defaults to true.
+                      Set to false to skip all AF resources (Deployment, Service, RBAC, etc.).
+                    type: boolean
+                  healthPort:
+                    description: |-
+                      Override for the AF health probe port. Defaults to 8081 (or 8082 when
+                      kagenti sidecar port shifting is active). Use when cluster policies
+                      restrict port ranges.
+                    format: int32
+                    maximum: 65535
+                    minimum: 1024
+                    type: integer
+                  logging:
+                    description: LoggingSpec configures the log level for a service.
+                    properties:
+                      level:
+                        default: info
+                        description: 'Log level. One of: DEBUG, INFO, WARN, ERROR.'
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARN
+                        - ERROR
+                        - debug
+                        - info
+                        - warn
+                        - error
+                        type: string
+                    type: object
+                  metricsPort:
+                    description: |-
+                      Override for the AF metrics port. Defaults to 9090 (or 9092 when
+                      kagenti sidecar port shifting is active). Use when cluster policies
+                      restrict port ranges.
+                    format: int32
+                    maximum: 65535
+                    minimum: 1024
+                    type: integer
+                  rateLimit:
+                    description: Request rate limiting configuration.
+                    properties:
+                      ipRequestsPerSec:
+                        default: 50
+                        description: Per-IP requests per second.
+                        type: integer
+                      maxConcurrentSessions:
+                        default: 100
+                        description: Maximum concurrent MCP/A2A sessions.
+                        type: integer
+                      toolCallsPerMinute:
+                        default: 60
+                        description: Tool calls per minute per user.
+                        type: integer
+                      userRequestsPerSec:
+                        default: 20
+                        description: Per-user requests per second.
+                        type: integer
+                    type: object
+                  rbac:
+                    description: |-
+                      SAR-based RBAC configuration for tool authorization.
+                      When set, the operator provisions persona-based tool ClusterRoles
+                      and group-to-role ClusterRoleBindings instead of file-based RBAC.
+                    properties:
+                      roleBindings:
+                        description: RoleBindings maps persona-based tool roles to
+                          OIDC groups.
+                        items:
+                          description: ToolRoleBinding binds a persona-based tool
+                            role to one or more OIDC groups.
+                          properties:
+                            groups:
+                              description: Groups are the OIDC group names to bind
+                                to this role.
+                              items:
+                                type: string
+                              minItems: 1
+                              type: array
+                            role:
+                              description: |-
+                                Role is the persona name. Must be one of: sre, ai-orchestrator, cicd,
+                                observability, l3-audit, remediation-approver.
+                              enum:
+                              - sre
+                              - ai-orchestrator
+                              - cicd
+                              - observability
+                              - l3-audit
+                              - remediation-approver
+                              type: string
+                          required:
+                          - groups
+                          - role
+                          type: object
+                        type: array
+                      sarCacheTTL:
+                        default: 30s
+                        description: |-
+                          SARCacheTTL is the cache duration for SubjectAccessReview results.
+                          Must be a valid Go duration string (e.g. "30s", "2m").
+                        type: string
+                    type: object
+                  rbacRolesConfigMapRef:
+                    description: |-
+                      Reference to a pre-existing ConfigMap containing RBAC role-to-tool
+                      mappings (key: "rbac_roles.yaml"). When empty, the operator generates
+                      a default RBAC roles ConfigMap.
+                      Deprecated: replaced by RBAC field with SAR-based tool authorization.
+                    properties:
+                      configMapName:
+                        description: Name of the ConfigMap.
+                        type: string
+                    required:
+                    - configMapName
+                    type: object
+                  resources:
+                    description: Resource requirements.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                  route:
+                    description: |-
+                      Route configuration for OCP external access (FedRAMP SC-8).
+                      Disabled by default; set route.enabled=true to expose AF via an
+                      OpenShift Route with reencrypt TLS termination.
+                    properties:
+                      enabled:
+                        default: false
+                        description: Whether to create an OCP Route for the API Frontend.
+                        type: boolean
+                      hostname:
+                        description: Hostname override. When empty, the OCP router
+                          auto-generates a hostname.
+                        type: string
+                    type: object
+                  shutdown:
+                    description: Graceful shutdown configuration.
+                    properties:
+                      drainSeconds:
+                        default: 15
+                        description: Seconds to wait for in-flight requests to drain
+                          during shutdown.
+                        maximum: 300
+                        minimum: 0
+                        type: integer
+                    type: object
+                  spire:
+                    description: |-
+                      SPIRE mTLS identity configuration for kagenti agent card discovery
+                      (FedRAMP SC-8, IA-5). When enabled, a ClusterSPIFFEID is created and
+                      a SPIRE-aware mTLS sidecar is injected into the AF deployment so the
+                      kagenti-operator can perform verified fetch with identity binding.
+                    properties:
+                      className:
+                        description: |-
+                          SPIRE class name for the ClusterSPIFFEID (e.g. "zero-trust-workload-identity-manager-spire").
+                          When empty, the className field is omitted from the ClusterSPIFFEID spec.
+                        type: string
+                      enabled:
+                        default: true
+                        description: Whether SPIRE mTLS sidecar injection is enabled.
+                        type: boolean
+                      trustDomain:
+                        description: |-
+                          TrustDomain overrides the SPIFFE ID trust domain. When empty (default),
+                          the operator uses SPIRE's {{ .TrustDomain }} template variable, which
+                          resolves to the cluster's configured trust domain at SVID registration
+                          time. Set this only if you need a fixed trust domain that differs from
+                          the SPIRE server's.
+                        type: string
+                    type: object
+                type: object
+              authWebhook:
+                description: AuthWebhook admission controller settings.
+                properties:
+                  logging:
+                    description: LoggingSpec configures the log level for a service.
+                    properties:
+                      level:
+                        default: info
+                        description: 'Log level. One of: DEBUG, INFO, WARN, ERROR.'
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARN
+                        - ERROR
+                        - debug
+                        - info
+                        - warn
+                        - error
+                        type: string
+                    type: object
+                  resources:
+                    description: Resource requirements.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                type: object
+              dataStorage:
+                description: DataStorage service settings.
+                properties:
+                  endpointPropagationDelay:
+                    default: 10s
+                    description: |-
+                      EndpointPropagationDelay is the delay before newly created endpoints
+                      are considered ready. Prevents traffic routing to pods that haven't
+                      finished warming up. Must be a valid Go duration string.
+                    type: string
+                  logging:
+                    description: LoggingSpec configures the log level for a service.
+                    properties:
+                      level:
+                        default: info
+                        description: 'Log level. One of: DEBUG, INFO, WARN, ERROR.'
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARN
+                        - ERROR
+                        - debug
+                        - info
+                        - warn
+                        - error
+                        type: string
+                    type: object
+                  resources:
+                    description: Resource requirements.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                  retention:
+                    description: Retention configures periodic purge of expired audit
+                      events (FedRAMP AU-11).
+                    properties:
+                      batchSize:
+                        default: 1000
+                        description: Maximum number of rows deleted per batch.
+                        minimum: 1
+                        type: integer
+                      defaultDays:
+                        default: 2555
+                        description: |-
+                          Number of days to retain audit events before purge.
+                          Clamped to a maximum of 2555 (≈7 years per ADR-034 / SOC 2 / ISO 27001).
+                        maximum: 2555
+                        minimum: 1
+                        type: integer
+                      enabled:
+                        description: |-
+                          Whether the retention purge worker is active.
+                          Defaults to false (safe default — no data is deleted without opt-in).
+                        type: boolean
+                      interval:
+                        default: 24h
+                        description: How often the purge worker runs. Must be a valid
+                          Go duration string.
+                        type: string
+                    type: object
+                  signingCert:
+                    description: |-
+                      SigningCert configures the audit export signing certificate (FedRAMP AU-9).
+                      When set, the named Secret is mounted into the DS pod at /etc/certs.
+                    properties:
+                      mountPath:
+                        default: /etc/certs
+                        description: Mount path inside the container. Defaults to
+                          /etc/certs.
+                        type: string
+                      secretName:
+                        description: Name of the Kubernetes Secret containing the
+                          signing cert (tls.crt, tls.key).
+                        type: string
+                    required:
+                    - secretName
+                    type: object
+                type: object
+              effectivenessMonitor:
+                description: EffectivenessMonitor controller configuration.
+                properties:
+                  assessment:
+                    description: Assessment windows for remediation effectiveness
+                      evaluation.
+                    properties:
+                      stabilizationWindow:
+                        default: 30s
+                        type: string
+                      validityWindow:
+                        default: 300s
+                        type: string
+                    type: object
+                  logging:
+                    description: LoggingSpec configures the log level for a service.
+                    properties:
+                      level:
+                        default: info
+                        description: 'Log level. One of: DEBUG, INFO, WARN, ERROR.'
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARN
+                        - ERROR
+                        - debug
+                        - info
+                        - warn
+                        - error
+                        type: string
+                    type: object
+                  resources:
+                    description: Resource requirements.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                type: object
+              gateway:
+                description: Gateway service settings.
+                properties:
+                  config:
+                    description: Gateway server and middleware configuration.
+                    properties:
+                      cors:
+                        description: |-
+                          CORS configuration. Gateway is an M2M webhook API, not a browser
+                          target, so the defaults block all cross-origin requests.
+                        properties:
+                          allowCredentials:
+                            default: false
+                            description: Whether cross-origin requests may include
+                              credentials.
+                            type: boolean
+                          allowedMethods:
+                            description: |-
+                              HTTP methods allowed for cross-origin requests.
+                              Default: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"].
+                            items:
+                              type: string
+                            type: array
+                          allowedOrigins:
+                            description: |-
+                              Allowed origins for CORS requests.
+                              Default: ["https://no-browser-clients.invalid"] (blocks all browser clients).
+                            items:
+                              type: string
+                            type: array
+                          maxAge:
+                            default: 300
+                            description: Preflight cache duration in seconds.
+                            type: integer
+                        type: object
+                      deduplicationCooldown:
+                        default: 5m
+                        description: Deduplication cooldown period for alert processing.
+                        type: string
+                      k8sRequestTimeout:
+                        default: 15s
+                        description: 'Timeout for outbound K8s API requests. Default:
+                          "15s".'
+                        type: string
+                      trustedProxyCIDRs:
+                        description: |-
+                          Trusted proxy CIDRs for X-Forwarded-For / RealIP extraction.
+                          Empty = fail-closed (proxy headers never trusted).
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  enabled:
+                    default: true
+                    description: |-
+                      Whether the Gateway component is deployed. Defaults to true.
+                      Set to false to skip all Gateway resources (Deployment, Service, RBAC, etc.).
+                    type: boolean
+                  logging:
+                    description: LoggingSpec configures the log level for a service.
+                    properties:
+                      level:
+                        default: info
+                        description: 'Log level. One of: DEBUG, INFO, WARN, ERROR.'
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARN
+                        - ERROR
+                        - debug
+                        - info
+                        - warn
+                        - error
+                        type: string
+                    type: object
+                  resources:
+                    description: Resource requirements.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                  route:
+                    description: Route configuration for OCP external access.
+                    properties:
+                      enabled:
+                        default: true
+                        description: Whether to create an OCP Route for the Gateway.
+                        type: boolean
+                      hostname:
+                        description: Hostname override. When empty, the OCP router
+                          auto-generates a hostname.
+                        type: string
+                    type: object
+                type: object
+              image:
+                description: Image pull policy, pull secrets, and optional per-component
+                  overrides.
+                properties:
+                  overrides:
+                    additionalProperties:
+                      type: string
+                    description: |-
+                      Per-component image overrides. Keys are component names
+                      (e.g. "gateway", "datastorage", "kubernautagent"), values are full
+                      image references (e.g. "myregistry.example.com/gateway:v1.4.0").
+                      When set, overrides the RELATED_IMAGE env var for that component.
+                    type: object
+                  pullPolicy:
+                    default: IfNotPresent
+                    description: Pull policy for all containers.
+                    type: string
+                  pullSecrets:
+                    description: Pull secrets for private registries.
+                    items:
+                      description: |-
+                        LocalObjectReference contains enough information to let you locate the
+                        referenced object inside the same namespace.
+                      properties:
+                        name:
+                          default: ""
+                          description: |-
+                            Name of the referent.
+                            This field is effectively required, but due to backwards compatibility is
+                            allowed to be empty. Instances of this type with an empty value here are
+                            almost certainly wrong.
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
+                type: object
+              kubernautAgent:
+                description: Kubernaut Agent (KA) -- LLM-powered investigation and
+                  analysis service.
+                properties:
+                  additionalClusterRoleBindings:
+                    description: |-
+                      AdditionalClusterRoleBindings is an optional list of pre-existing
+                      ClusterRole names to bind to the Kubernaut Agent ServiceAccount.
+                    items:
+                      type: string
+                    maxItems: 64
+                    type: array
+                    x-kubernetes-list-type: set
+                  alignmentCheck:
+                    description: Alignment check (shadow agent) configuration.
+                    properties:
+                      enabled:
+                        default: false
+                        description: Whether alignment check is enabled.
+                        type: boolean
+                      llm:
+                        description: Optional dedicated LLM for alignment checks.
+                        properties:
+                          apiKey:
+                            type: string
+                          endpoint:
+                            type: string
+                          model:
+                            type: string
+                          provider:
+                            type: string
+                        type: object
+                      maxStepTokens:
+                        default: 500
+                        description: Maximum tokens per alignment step.
+                        type: integer
+                      timeout:
+                        default: 10s
+                        description: Timeout for alignment check requests.
+                        type: string
+                    type: object
+                  audit:
+                    description: Audit logging configuration.
+                    properties:
+                      enabled:
+                        default: true
+                        description: Whether audit logging is enabled.
+                        type: boolean
+                    type: object
+                  interactive:
+                    description: Interactive mode JWT identity delegation configuration.
+                    properties:
+                      allowInsecureJWKS:
+                        description: |-
+                          AllowInsecureJWKS permits HTTP (non-TLS) JWKS URLs for dev/test.
+                          Production deployments MUST leave this false.
+                        type: boolean
+                      enabled:
+                        description: |-
+                          Whether MCP interactive mode endpoint and Lease-based session
+                          management are enabled. When true, KA exposes a Streamable HTTP
+                          MCP endpoint at POST /api/v1/mcp.
+                        type: boolean
+                      inactivityTimeout:
+                        description: |-
+                          Session timeout after last operator activity.
+                          Must be a valid Go duration string (e.g. "10m").
+                        type: string
+                      jwtProviders:
+                        description: JWT providers for OIDC-based identity delegation.
+                        items:
+                          description: JWTProviderSpec configures a single OIDC JWT
+                            provider.
+                          properties:
+                            audience:
+                              description: Expected audience claim value.
+                              type: string
+                            issuer:
+                              description: Expected issuer claim value.
+                              type: string
+                            jwksURL:
+                              description: JWKS endpoint URL. Must use HTTPS unless
+                                allowInsecureJWKS is true.
+                              maxLength: 2048
+                              minLength: 1
+                              type: string
+                            name:
+                              description: Human-readable name for this provider (e.g.
+                                "rhbk", "auth0").
+                              maxLength: 63
+                              minLength: 1
+                              type: string
+                          required:
+                          - jwksURL
+                          - name
+                          type: object
+                        maxItems: 8
+                        type: array
+                      maxConcurrentSessions:
+                        description: Maximum concurrent interactive sessions per agent
+                          replica.
+                        minimum: 1
+                        type: integer
+                      rateLimitPerUser:
+                        description: Maximum MCP requests per second per authenticated
+                          user.
+                        minimum: 1
+                        type: integer
+                      sessionTTL:
+                        description: |-
+                          Maximum duration for an interactive session before auto-release.
+                          Must be a valid Go duration string (e.g. "30m").
+                        type: string
+                    type: object
+                  llm:
+                    description: LLM provider and credentials configuration.
+                    properties:
+                      azureApiVersion:
+                        description: Azure OpenAI API version.
+                        type: string
+                      bedrockRegion:
+                        description: AWS Bedrock region.
+                        type: string
+                      credentialsSecretName:
+                        description: Name of the Secret containing LLM API credentials.
+                        minLength: 1
+                        type: string
+                      endpoint:
+                        description: LLM API endpoint override. When empty, uses the
+                          provider default.
+                        type: string
+                      maxRetries:
+                        default: 3
+                        description: Maximum number of retries for LLM API calls.
+                        type: integer
+                      model:
+                        description: LLM model name (e.g. "gpt-4o", "gemini-2.5-pro").
+                        minLength: 1
+                        type: string
+                      oauth2:
+                        description: OAuth2 configuration for LLM authentication.
+                        properties:
+                          credentialsSecretRef:
+                            description: |-
+                              Name of the Secret containing OAuth2 client credentials
+                              (keys: "client-id", "client-secret").
+                            type: string
+                          enabled:
+                            default: false
+                            description: Whether OAuth2 authentication is enabled.
+                            type: boolean
+                          scopes:
+                            description: OAuth2 scopes.
+                            items:
+                              type: string
+                            type: array
+                          tokenURL:
+                            description: Token endpoint URL.
+                            type: string
+                        type: object
+                      provider:
+                        description: LLM provider name (e.g. "openai", "vertexai",
+                          "bedrock", "azure").
+                        minLength: 1
+                        type: string
+                      runtimeConfigMapName:
+                        description: |-
+                          Name of a pre-existing ConfigMap for the LLM runtime configuration.
+                          When set, the operator skips generating kubernaut-agent-llm-runtime
+                          and mounts this ConfigMap instead. Must contain key "llm-runtime.yaml".
+                        type: string
+                      temperature:
+                        description: |-
+                          Sampling temperature for LLM responses (e.g. "0.7").
+                          Serialized as string to avoid CRD float portability issues.
+                        type: string
+                      timeoutSeconds:
+                        default: 120
+                        description: Timeout in seconds for LLM API calls.
+                        type: integer
+                      tlsCaFile:
+                        description: Path to a CA certificate file for TLS to the
+                          LLM endpoint.
+                        type: string
+                      tlsCertFile:
+                        description: |-
+                          Path to a client certificate file for mTLS to the LLM endpoint.
+                          Must be set together with TLSKeyFile.
+                        type: string
+                      tlsClientSecretRef:
+                        description: |-
+                          Name of the Secret containing the TLS client certificate and key
+                          for mTLS to the LLM endpoint. The Secret must contain tls.crt and
+                          tls.key entries. Required when TLSCertFile and TLSKeyFile are set.
+                        type: string
+                      tlsKeyFile:
+                        description: |-
+                          Path to a client key file for mTLS to the LLM endpoint.
+                          Must be set together with TLSCertFile.
+                        type: string
+                      vertexLocation:
+                        description: GCP Vertex AI location (e.g. "us-central1").
+                        type: string
+                      vertexProject:
+                        description: GCP Vertex AI project ID.
+                        type: string
+                    required:
+                    - credentialsSecretName
+                    - model
+                    - provider
+                    type: object
+                  logging:
+                    description: LoggingSpec configures the log level for a service.
+                    properties:
+                      level:
+                        default: info
+                        description: 'Log level. One of: DEBUG, INFO, WARN, ERROR.'
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARN
+                        - ERROR
+                        - debug
+                        - info
+                        - warn
+                        - error
+                        type: string
+                    type: object
+                  maxTurns:
+                    default: 40
+                    description: |-
+                      MaxTurns is the maximum number of LLM conversation turns the
+                      investigator may execute per analysis session.
+                    minimum: 1
+                    type: integer
+                  resources:
+                    description: Resource requirements.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                  safety:
+                    description: Safety guardrails for LLM interactions.
+                    properties:
+                      anomaly:
+                        description: Anomaly detection thresholds.
+                        properties:
+                          maxRepeatedFailures:
+                            default: 3
+                            description: Max repeated failures before circuit-breaker.
+                            type: integer
+                          maxToolCallsPerTool:
+                            default: 10
+                            description: Max tool calls per individual tool.
+                            type: integer
+                          maxTotalToolCalls:
+                            default: 40
+                            description: Max total tool calls across all tools.
+                            type: integer
+                        type: object
+                      sanitization:
+                        description: Input sanitization rules.
+                        properties:
+                          credentialScrubEnabled:
+                            default: true
+                            description: Whether credential scrubbing is enabled.
+                            type: boolean
+                          injectionPatternsEnabled:
+                            default: true
+                            description: Whether prompt injection pattern detection
+                              is enabled.
+                            type: boolean
+                        type: object
+                    type: object
+                  session:
+                    description: Session configuration.
+                    properties:
+                      ttl:
+                        default: 30m
+                        description: Session time-to-live.
+                        type: string
+                    type: object
+                  shutdown:
+                    description: Graceful shutdown configuration.
+                    properties:
+                      drainSeconds:
+                        default: 15
+                        description: Seconds to wait for in-flight requests to drain
+                          during shutdown.
+                        maximum: 300
+                        minimum: 0
+                        type: integer
+                    type: object
+                  summarizer:
+                    description: Summarizer configuration for tool output compression.
+                    properties:
+                      maxToolOutputSize:
+                        default: 100000
+                        description: Maximum tool output size in bytes before truncation.
+                        type: integer
+                      threshold:
+                        default: 8000
+                        description: Token threshold above which tool output is summarized.
+                        type: integer
+                    type: object
+                required:
+                - llm
+                type: object
+              monitoring:
+                description: OCP monitoring integration (Prometheus, AlertManager).
+                properties:
+                  enabled:
+                    default: true
+                    description: |-
+                      Whether OCP monitoring integration is enabled.
+                      When true, the operator auto-derives Prometheus/AlertManager URLs
+                      and provisions monitoring RBAC.
+                    type: boolean
+                type: object
+              networkPolicies:
+                description: |-
+                  NetworkPolicies controls the creation of Kubernetes NetworkPolicy
+                  resources that enforce a default-deny posture with explicit allow rules.
+                properties:
+                  apiServerCIDR:
+                    description: |-
+                      API server CIDR for egress rules (e.g. "10.0.0.0/16").
+                      When empty, API server egress rules are omitted.
+                    type: string
+                  enabled:
+                    default: false
+                    description: |-
+                      Whether the operator creates NetworkPolicy resources.
+                      When true, a default-deny posture is applied with explicit allow rules
+                      matching the upstream Helm chart traffic matrix.
+                    type: boolean
+                  externalEgressCIDRs:
+                    description: |-
+                      ExternalEgressCIDRs lists CIDRs that AF is allowed to reach for external
+                      services (OIDC/Keycloak JWKS endpoints, etc.) on port 443.
+                      Example: ["10.128.0.0/14"] for cluster-internal Keycloak, or
+                      ["0.0.0.0/0"] to allow any external HTTPS destination.
+                    items:
+                      type: string
+                    type: array
+                  gatewayIngressNamespaces:
+                    description: Gateway ingress namespaces. Namespaces allowed to
+                      send traffic to the Gateway.
+                    items:
+                      type: string
+                    type: array
+                  ingressNamespace:
+                    description: |-
+                      IngressNamespace is the namespace where the OpenShift Router (or ingress
+                      controller) runs. AF needs ingress from this namespace for Route-based traffic.
+                      Typically "openshift-ingress" on OCP.
+                    type: string
+                  monitoringNamespace:
+                    description: Monitoring namespace for Prometheus scrape ingress
+                      (e.g. "openshift-monitoring").
+                    type: string
+                type: object
+              notification:
+                description: Notification controller settings.
+                properties:
+                  logging:
+                    description: LoggingSpec configures the log level for a service.
+                    properties:
+                      level:
+                        default: info
+                        description: 'Log level. One of: DEBUG, INFO, WARN, ERROR.'
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARN
+                        - ERROR
+                        - debug
+                        - info
+                        - warn
+                        - error
+                        type: string
+                    type: object
+                  resources:
+                    description: Resource requirements for the notification controller.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                  routing:
+                    description: |-
+                      Optional routing ConfigMap reference for advanced notification routing.
+                      Must contain key "routing.yaml" with Alertmanager-style routing rules.
+                    properties:
+                      configMapName:
+                        description: Name of the ConfigMap.
+                        type: string
+                    required:
+                    - configMapName
+                    type: object
+                  slack:
+                    description: Slack quickstart shortcut.
+                    properties:
+                      channel:
+                        default: '#kubernaut-alerts'
+                        description: Slack channel for notifications.
+                        type: string
+                      secretName:
+                        description: |-
+                          Name of the Secret containing the Slack webhook URL (key: "webhook-url").
+                          Empty = no Slack, console-only delivery.
+                        type: string
+                    type: object
+                type: object
+              postgresql:
+                description: |-
+                  BYO PostgreSQL connection. The operator validates the secret and derives
+                  the DataStorage db-secrets.yaml Secret automatically.
+                properties:
+                  host:
+                    description: PostgreSQL hostname or service DNS.
+                    minLength: 1
+                    type: string
+                  port:
+                    default: 5432
+                    description: PostgreSQL port.
+                    format: int32
+                    maximum: 65535
+                    minimum: 1
+                    type: integer
+                  secretName:
+                    description: |-
+                      Name of the Secret containing PostgreSQL credentials.
+                      Required keys: POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB.
+                    minLength: 1
+                    type: string
+                  sslMode:
+                    default: verify-full
+                    description: PostgreSQL SSL mode (disable, require, verify-ca,
+                      verify-full).
+                    enum:
+                    - require
+                    - verify-ca
+                    - verify-full
+                    type: string
+                required:
+                - host
+                - secretName
+                type: object
+              remediationOrchestrator:
+                description: RemediationOrchestrator controller configuration.
+                properties:
+                  asyncPropagation:
+                    description: Async propagation delay configuration.
+                    properties:
+                      gitOpsSyncDelay:
+                        default: 3m
+                        type: string
+                      operatorReconcileDelay:
+                        default: 1m
+                        type: string
+                      proactiveAlertDelay:
+                        default: 5m
+                        type: string
+                    type: object
+                  dryRun:
+                    default: false
+                    description: |-
+                      DryRun enables dry-run mode: the pipeline stops after AI analysis
+                      without executing remediation workflows. Operators use this to
+                      build confidence before enabling fully autonomous remediation.
+                    type: boolean
+                  dryRunHoldPeriod:
+                    default: 1h
+                    description: |-
+                      DryRunHoldPeriod suppresses re-triggering of the same signal after
+                      a dry-run completion. Must be a valid Go duration string.
+                      Only effective when DryRun is true.
+                    type: string
+                  effectivenessAssessment:
+                    description: Effectiveness assessment configuration.
+                    properties:
+                      stabilizationWindow:
+                        default: 5m
+                        type: string
+                    type: object
+                  logging:
+                    description: LoggingSpec configures the log level for a service.
+                    properties:
+                      level:
+                        default: info
+                        description: 'Log level. One of: DEBUG, INFO, WARN, ERROR.'
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARN
+                        - ERROR
+                        - debug
+                        - info
+                        - warn
+                        - error
+                        type: string
+                    type: object
+                  notifications:
+                    description: Notification behaviour for remediation events.
+                    properties:
+                      notifySelfResolved:
+                        default: false
+                        description: Whether to notify on self-resolved remediations.
+                        type: boolean
+                    type: object
+                  resources:
+                    description: Resource requirements.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                  retention:
+                    description: Retention policy for completed remediation records.
+                    properties:
+                      period:
+                        default: 24h
+                        description: How long to retain completed remediation records.
+                        type: string
+                    type: object
+                  routing:
+                    description: Routing thresholds for failure detection and cooldowns.
+                    properties:
+                      consecutiveFailureCooldown:
+                        default: 1h
+                        type: string
+                      consecutiveFailureThreshold:
+                        default: 3
+                        type: integer
+                      exponentialBackoffBase:
+                        default: 1m
+                        type: string
+                      exponentialBackoffMax:
+                        default: 10m
+                        type: string
+                      exponentialBackoffMaxExponent:
+                        default: 4
+                        type: integer
+                      ineffectiveChainThreshold:
+                        default: 3
+                        type: integer
+                      ineffectiveTimeWindow:
+                        default: 4h
+                        type: string
+                      noActionRequiredDelayHours:
+                        default: 24
+                        type: integer
+                      recentlyRemediatedCooldown:
+                        default: 5m
+                        type: string
+                      recurrenceCountThreshold:
+                        default: 5
+                        type: integer
+                      scopeBackoffBase:
+                        default: 5s
+                        type: string
+                      scopeBackoffMax:
+                        default: 5m
+                        type: string
+                    type: object
+                  timeouts:
+                    description: Timeout configuration for remediation phases.
+                    properties:
+                      analyzing:
+                        default: 10m
+                        type: string
+                      awaitingApproval:
+                        default: 15m
+                        type: string
+                      executing:
+                        default: 30m
+                        type: string
+                      global:
+                        default: 1h
+                        type: string
+                      processing:
+                        default: 5m
+                        type: string
+                      verifying:
+                        default: 30m
+                        type: string
+                    type: object
+                type: object
+              signalProcessing:
+                description: SignalProcessing controller configuration.
+                properties:
+                  logging:
+                    description: LoggingSpec configures the log level for a service.
+                    properties:
+                      level:
+                        default: info
+                        description: 'Log level. One of: DEBUG, INFO, WARN, ERROR.'
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARN
+                        - ERROR
+                        - debug
+                        - info
+                        - warn
+                        - error
+                        type: string
+                    type: object
+                  policy:
+                    description: |-
+                      Policy ConfigMap reference. Required.
+                      The ConfigMap must contain key "policy.rego".
+                    properties:
+                      configMapName:
+                        description: Name of the ConfigMap.
+                        type: string
+                    required:
+                    - configMapName
+                    type: object
+                  proactiveSignalMappings:
+                    description: |-
+                      Optional proactive signal mappings ConfigMap reference.
+                      Must contain key "proactive-signal-mappings.yaml".
+                    properties:
+                      configMapName:
+                        description: Name of the ConfigMap.
+                        type: string
+                    required:
+                    - configMapName
+                    type: object
+                  resources:
+                    description: Resource requirements.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                required:
+                - policy
+                type: object
+              valkey:
+                description: BYO Valkey/Redis connection.
+                properties:
+                  host:
+                    description: Valkey hostname or service DNS.
+                    minLength: 1
+                    type: string
+                  port:
+                    default: 6379
+                    description: Valkey port.
+                    format: int32
+                    maximum: 65535
+                    minimum: 1
+                    type: integer
+                  secretName:
+                    description: |-
+                      Name of the Secret containing Valkey credentials.
+                      Required key: valkey-secrets.yaml (YAML content: "password: <value>").
+                    minLength: 1
+                    type: string
+                  tls:
+                    description: |-
+                      TLS configures client-side TLS for the Valkey/Redis connection.
+                      Server-side TLS provisioning is the platform admin's responsibility
+                      (Valkey is BYO).
+                    properties:
+                      caSecretName:
+                        description: |-
+                          Name of the Secret containing the CA certificate to verify the server.
+                          Required key: ca.crt
+                        type: string
+                      clientCertSecretName:
+                        description: |-
+                          Name of the Secret containing client certificate and key for mTLS.
+                          Required keys: tls.crt, tls.key
+                        type: string
+                      enabled:
+                        description: Whether TLS is enabled for the Valkey/Redis connection.
+                        type: boolean
+                    required:
+                    - enabled
+                    type: object
+                required:
+                - host
+                - secretName
+                type: object
+              workflowExecution:
+                description: WorkflowExecution controller configuration.
+                properties:
+                  cooldownPeriod:
+                    default: 1m
+                    description: Cooldown period between workflow executions.
+                    type: string
+                  logging:
+                    description: LoggingSpec configures the log level for a service.
+                    properties:
+                      level:
+                        default: info
+                        description: 'Log level. One of: DEBUG, INFO, WARN, ERROR.'
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARN
+                        - ERROR
+                        - debug
+                        - info
+                        - warn
+                        - error
+                        type: string
+                    type: object
+                  resources:
+                    description: Resource requirements.
+                    properties:
+                      claims:
+                        description: |-
+                          Claims lists the names of resources, defined in spec.resourceClaims,
+                          that are used by this container.
+
+                          This field depends on the
+                          DynamicResourceAllocation feature gate.
+
+                          This field is immutable. It can only be set for containers.
+                        items:
+                          description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                          properties:
+                            name:
+                              description: |-
+                                Name must match the name of one entry in pod.spec.resourceClaims of
+                                the Pod where this field is used. It makes that resource available
+                                inside a container.
+                              type: string
+                            request:
+                              description: |-
+                                Request is the name chosen for a request in the referenced claim.
+                                If empty, everything from the claim is made available, otherwise
+                                only the result of this request.
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        type: array
+                        x-kubernetes-list-map-keys:
+                        - name
+                        x-kubernetes-list-type: map
+                      limits:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Limits describes the maximum amount of compute resources allowed.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                      requests:
+                        additionalProperties:
+                          anyOf:
+                          - type: integer
+                          - type: string
+                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          x-kubernetes-int-or-string: true
+                        description: |-
+                          Requests describes the minimum amount of compute resources required.
+                          If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                          otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                          More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                        type: object
+                    type: object
+                  tekton:
+                    description: Tekton integration configuration.
+                    properties:
+                      enabled:
+                        description: Whether Tekton integration is enabled. When nil,
+                          auto-detected.
+                        type: boolean
+                    type: object
+                  workflowNamespace:
+                    default: kubernaut-workflows
+                    description: Namespace for workflow Job/PipelineRun execution.
+                    type: string
+                type: object
+            required:
+            - kubernautAgent
+            - postgresql
+            - valkey
+            type: object
+          status:
+            description: KubernautStatus defines the observed state of a Kubernaut
+              deployment.
+            properties:
+              boundAdditionalClusterRoles:
+                description: |-
+                  ClusterRole names for which the operator has created additional
+                  agent ClusterRoleBindings. Used for stale-pruning on spec changes
+                  and finalizer cleanup.
+                items:
+                  type: string
+                type: array
+              boundToolRoleBindings:
+                description: |-
+                  BoundToolRoleBindings tracks the set of tool role binding CRB names
+                  currently managed by the operator for stale-pruning and finalizer cleanup.
+                items:
+                  type: string
+                type: array
+              conditions:
+                description: Standard conditions following the metav1.Condition contract.
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
+              lastMigrationHash:
+                description: |-
+                  Hash of the last successfully completed migration Job spec.
+                  Used to skip re-running migration when the Job has been deleted
+                  (e.g. TTL cleanup, manual deletion) but nothing has changed.
+                type: string
+              lastMigrationTime:
+                description: Timestamp of the last successfully completed migration.
+                format: date-time
+                type: string
+              phase:
+                description: Aggregate lifecycle phase.
+                enum:
+                - Validating
+                - Migrating
+                - Deploying
+                - Running
+                - Degraded
+                - Error
+                type: string
+              services:
+                description: Per-service readiness.
+                items:
+                  description: ServiceStatus reports the readiness of a single managed
+                    service.
+                  properties:
+                    desiredReplicas:
+                      description: Desired number of replicas.
+                      format: int32
+                      type: integer
+                    name:
+                      description: Service name (e.g. "gateway", "datastorage").
+                      type: string
+                    ready:
+                      description: Whether the service has all desired replicas ready.
+                      type: boolean
+                    readyReplicas:
+                      description: Number of ready replicas.
+                      format: int32
+                      type: integer
+                  required:
+                  - desiredReplicas
+                  - name
+                  - ready
+                  - readyReplicas
+                  type: object
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

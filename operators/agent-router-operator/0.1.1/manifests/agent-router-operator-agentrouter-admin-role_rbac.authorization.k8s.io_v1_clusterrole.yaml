@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: agent-router-operator
+  name: agent-router-operator-agentrouter-admin-role
+rules:
+- apiGroups:
+  - agentrouter.ccangemi.github.io
+  resources:
+  - agentrouters
+  verbs:
+  - '*'
+- apiGroups:
+  - agentrouter.ccangemi.github.io
+  resources:
+  - agentrouters/status
+  verbs:
+  - get

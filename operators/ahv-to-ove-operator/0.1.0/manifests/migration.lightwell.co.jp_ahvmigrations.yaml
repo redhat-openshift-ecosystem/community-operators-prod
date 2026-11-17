@@ -1,0 +1,533 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.21.0
+  name: ahvmigrations.migration.lightwell.co.jp
+spec:
+  group: migration.lightwell.co.jp
+  names:
+    kind: AHVMigration
+    listKind: AHVMigrationList
+    plural: ahvmigrations
+    shortNames:
+    - ahvmig
+    singular: ahvmigration
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.totalVMs
+      name: VMs
+      type: integer
+    - jsonPath: .status.completedVMs
+      name: Completed
+      type: integer
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: AHVMigration は Nutanix AHV から OpenShift Virtualization (OVE)
+          への VM 移行を表す
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              networkMappings:
+                description: NetworkMappings は AHV ネットワーク → OVE NAD のマッピング
+                items:
+                  properties:
+                    source:
+                      description: Source は AHV 上のネットワーク名（VLAN 名等）
+                      type: string
+                    target:
+                      description: Target は OVE 側の本番 NetworkAttachmentDefinition 名
+                      type: string
+                    targetNamespace:
+                      description: TargetNamespace は NAD の Namespace
+                      type: string
+                    testTarget:
+                      description: |-
+                        TestTarget はテスト移行時に使う OVE 側の NAD 名。
+                        指定した場合、VM は最初にこの NAD で起動（TestRunning フェーズ）し、
+                        手動承認後に Target の本番 NAD に切り替わる（SwitchingNetwork フェーズ）。
+                        省略するとテストフェーズをスキップして直接本番 NAD で起動する。
+                      type: string
+                  required:
+                  - source
+                  - target
+                  type: object
+                type: array
+              source:
+                description: Source は移行元 AHV (Prism Central) の接続情報
+                properties:
+                  cbt:
+                    description: |-
+                      CBT は warm 移行の CBT（Changed Block Tracking）差分同期設定。
+                      有効にすると v3 vm_snapshots + data/changed_regions を使って差分だけを転送し、
+                      cutover 時の停止時間を「最終差分の転送時間」まで短縮する。
+                    properties:
+                      deltaSyncThresholdMB:
+                        description: |-
+                          DeltaSyncThresholdMB は「差分がこの値未満になったら収束」とみなす閾値（MB）。
+                          収束後は cutover 待ち（pauseBeforeCutover=true なら承認待ち）に進む。省略時 512。
+                        format: int64
+                        type: integer
+                      enabled:
+                        description: Enabled が true の場合、warm 移行で CBT 差分同期を行う
+                        type: boolean
+                      maxDeltaRounds:
+                        description: |-
+                          MaxDeltaRounds は cutover 前の差分同期ループの最大回数。省略時 10。
+                          上限到達時は差分が閾値超のままでも収束扱いにする（最終差分で必ず整合するため安全）。
+                        format: int32
+                        type: integer
+                      nfsServer:
+                        description: |-
+                          NFSServer は差分読み出しで snapshot のストレージコンテナを NFS マウントするサーバ。
+                          差分データは Prism v3 images/file が HTTP Range 非対応のため、snapshot_file_path の
+                          コンテナを直接 NFS(RO) マウントして os.ReadAt で該当オフセットだけ読む。
+                          省略時は PEEndpoint（無ければ Endpoint）のホストを使う。対象コンテナの
+                          Filesystem Whitelist に OCP ノードのサブネット登録が前提。
+                        type: string
+                    required:
+                    - enabled
+                    type: object
+                  cdiProxyURL:
+                    description: |-
+                      CDIProxyURL は CDI DataVolume 用の HTTP プロキシ URL
+                      Prism の TLS 証明書が IP SAN なしの場合に使用する
+                      例: "http://prism-proxy.vm-migration.svc:9440"
+                    type: string
+                  endpoint:
+                    description: 'Endpoint は Prism Central の URL (例: https://prism-central.example.com:9440)'
+                    type: string
+                  insecure:
+                    description: Insecure が true の場合、TLS 証明書を検証しない
+                    type: boolean
+                  pauseBeforeCutover:
+                    description: |-
+                      PauseBeforeCutover が true の場合、WarmSyncing 完了後に ReadyForCutover フェーズで停止する
+                      再開するには annotation: migration.lightwell.co.jp/cutover-approved=true を付与する
+                    type: boolean
+                  peEndpoint:
+                    description: |-
+                      PEEndpoint は Prism Element の URL (例: https://prism-element.example.com:9440)
+                      指定時は電源操作（ShutdownVM）に Prism Element v2 API を使用する。
+                      PC v3 PUT が使えない場合（PE VM Put request not supported）に有効。
+                      省略時は endpoint への v3 PUT → 405 時に v2 フォールバックで対応する。
+                    type: string
+                  peSecretRef:
+                    description: |-
+                      PESecretRef は Prism Element の認証情報を持つ Secret の参照
+                      Secret には user/password キーが必要。省略時は SecretRef を使用する。
+                    properties:
+                      name:
+                        default: ""
+                        description: |-
+                          Name of the referent.
+                          This field is effectively required, but due to backwards compatibility is
+                          allowed to be empty. Instances of this type with an empty value here are
+                          almost certainly wrong.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  secretRef:
+                    description: |-
+                      SecretRef は Prism Central の認証情報を持つ Secret の参照
+                      Secret には user/password キーが必要
+                    properties:
+                      name:
+                        default: ""
+                        description: |-
+                          Name of the referent.
+                          This field is effectively required, but due to backwards compatibility is
+                          allowed to be empty. Instances of this type with an empty value here are
+                          almost certainly wrong.
+                          More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        type: string
+                    type: object
+                    x-kubernetes-map-type: atomic
+                  shutdownBeforeMigration:
+                    description: |-
+                      ShutdownBeforeMigration が true の場合、移行前に VM を ACPI シャットダウンする
+                      Bare disk（image backing なし）を正確にコピーするために必要
+                    type: boolean
+                  warmFinalFullSync:
+                    description: |-
+                      WarmFinalFullSync が true（または省略）の場合、warm 移行の cutover（ソースVM停止）後に
+                      ディスクを image 化し直してフルコピーをやり直す（WarmFinalSync フェーズ）。
+                      プリコピー image 作成以降のゲスト書き込みを取りこぼさないための再同期（RPO=0 担保）。
+                      false にするとプリコピーのみで VM を作成する（image 化以降の書き込みは失われる）。
+                      cbt.enabled=true の場合は差分同期（WarmDeltaSync/WarmFinalDelta）が優先され、この設定は無視される。
+                    type: boolean
+                  warmMigration:
+                    description: |-
+                      WarmMigration が true の場合、VM を起動したまま初回 image 化+CDI インポートを行い
+                      完了後に ACPI シャットダウンして VM を作成する（ダウンタイム最小化）
+                      shutdownBeforeMigration より優先される
+                    type: boolean
+                required:
+                - endpoint
+                - secretRef
+                type: object
+              storageMappings:
+                description: StorageMappings は AHV ストレージ → OVE StorageClass のマッピング
+                items:
+                  properties:
+                    accessMode:
+                      description: 'AccessMode は PVC の accessMode（省略時: ReadWriteMany）'
+                      type: string
+                    source:
+                      description: Source は AHV 上のストレージコンテナ名
+                      type: string
+                    targetStorageClass:
+                      description: TargetStorageClass は OVE 側の StorageClass 名
+                      type: string
+                    volumeMode:
+                      description: 'VolumeMode は PVC の volumeMode（省略時: Block）'
+                      type: string
+                  required:
+                  - source
+                  - targetStorageClass
+                  type: object
+                type: array
+              targetNamespace:
+                description: 'TargetNamespace は OVE 側の移行先 Namespace（省略時: AHVMigration
+                  と同じ ns）'
+                type: string
+              vms:
+                description: VMs は移行対象 VM のリスト
+                items:
+                  properties:
+                    diskBus:
+                      description: |-
+                        DiskBus は OVE 側 VM のディスクバスタイプを指定する。省略時は scsi。
+                        scsi:   virtio-scsi。AHV は Linux/Windows とも virtio-scsi ネイティブのため推奨（デフォルト）
+                        virtio: virtio-blk。高速だが viostor サービスが必要（AHV Windows には存在せず INACCESSIBLE_BOOT_DEVICE になる）
+                        sata:   ドライバー不要のフォールバック（性能は劣る）
+                      enum:
+                      - virtio
+                      - sata
+                      - scsi
+                      type: string
+                    guestPrepConfig:
+                      description: 'GuestPrepConfig は GuestPrepMode: ssh の設定'
+                      properties:
+                        preMigrationScript:
+                          description: PreMigrationScript はSSH経由で実行する bash スクリプト
+                          type: string
+                        sshSecretRef:
+                          description: |-
+                            SSHSecretRef は SSH認証情報を持つ Secret 名
+                            Secret に必要なキー: host (例: "192.168.1.10:22"), user, privateKey または password
+                          properties:
+                            name:
+                              default: ""
+                              description: |-
+                                Name of the referent.
+                                This field is effectively required, but due to backwards compatibility is
+                                allowed to be empty. Instances of this type with an empty value here are
+                                almost certainly wrong.
+                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              type: string
+                          type: object
+                          x-kubernetes-map-type: atomic
+                        timeoutSeconds:
+                          description: 'TimeoutSeconds はスクリプト実行タイムアウト（デフォルト: 300）'
+                          type: integer
+                      required:
+                      - preMigrationScript
+                      - sshSecretRef
+                      type: object
+                    guestPrepMode:
+                      description: |-
+                        GuestPrepMode は移行前のゲストOS準備方式
+                        none:  ディスクコピーのみ (デフォルト)
+                        ssh:   SSH経由で preMigrationScript を実行してドライバーを注入する（Linux向け）
+                        winrm: WinRM経由で PowerShell スクリプトを実行してドライバーを注入する（Windows向け）
+                      enum:
+                      - none
+                      - ssh
+                      - winrm
+                      type: string
+                    guestPrepWinRMConfig:
+                      description: 'GuestPrepWinRMConfig は GuestPrepMode: winrm の設定'
+                      properties:
+                        preMigrationScript:
+                          description: |-
+                            PreMigrationScript は WinRM 経由で実行する PowerShell スクリプト。
+                            省略時はデフォルトの virtio-win ドライバーインストールスクリプトを使用する。
+                            スクリプトは AHV VM に影響を与えずドライバーを追加インストールする。
+                            VM のシャットダウンは Operator が ShutdownBeforeMigration で行う。
+                          type: string
+                        timeoutSeconds:
+                          description: 'TimeoutSeconds はスクリプト実行タイムアウト（デフォルト: 600）'
+                          type: integer
+                        useHTTPS:
+                          description: UseHTTPS が true の場合、WinRM HTTPS（ポート 5986）を使用する
+                          type: boolean
+                        virtIOWinISOPath:
+                          description: 'VirtIOWinISOPath は VM 内での virtio-win ISO のパス（デフォルト:
+                            C:\virtio-win.iso）'
+                          type: string
+                        winrmSecretRef:
+                          description: |-
+                            WinRMSecretRef は WinRM 認証情報を持つ Secret 名
+                            Secret に必要なキー: host (例: "192.168.1.10"), username, password
+                          properties:
+                            name:
+                              default: ""
+                              description: |-
+                                Name of the referent.
+                                This field is effectively required, but due to backwards compatibility is
+                                allowed to be empty. Instances of this type with an empty value here are
+                                almost certainly wrong.
+                                More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                              type: string
+                          type: object
+                          x-kubernetes-map-type: atomic
+                      required:
+                      - winrmSecretRef
+                      type: object
+                    keepMAC:
+                      description: |-
+                        KeepMAC は移行後の OVE VM で AHV の MAC アドレスを引き継ぐかを制御する。
+                        nil または true の場合、AHV の MAC アドレスを KubeVirt VM に設定する（デフォルト）。
+                        false の場合、KubeVirt に MAC アドレスを自動割り当てさせる（IP も変わる）。
+                      type: boolean
+                    name:
+                      description: Name は AHV 上の VM 名
+                      type: string
+                    nicModel:
+                      description: |-
+                        NICModel は OVE 側 VM の NIC モデルを指定する。
+                        virtio: 高速だが virtio-net ドライバーが必要（Linux デフォルト）
+                        e1000e: ドライバー不要（Windows 移行時に推奨）
+                      enum:
+                      - virtio
+                      - e1000e
+                      - rtl8139
+                      type: string
+                    targetName:
+                      description: TargetName は OVE 側の VM 名（省略時は Name と同じ）
+                      type: string
+                    uefi:
+                      description: |-
+                        UEFI は OVE 側 VM を UEFI ファームウェアで起動するかどうかを指定する。
+                        nil (省略) の場合はオペレーターが Prism のディスクパーティションを自動検出する。
+                      type: boolean
+                  required:
+                  - name
+                  type: object
+                type: array
+            required:
+            - source
+            - vms
+            type: object
+          status:
+            description: AHVMigrationStatus は移行の現在状態を表す
+            properties:
+              completedVMs:
+                description: CompletedVMs は移行完了 VM 数
+                format: int32
+                type: integer
+              completionTime:
+                description: CompletionTime は移行完了時刻
+                format: date-time
+                type: string
+              conditions:
+                description: Conditions は詳細な状態条件
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              failedVMs:
+                description: FailedVMs は移行失敗 VM 数
+                format: int32
+                type: integer
+              phase:
+                description: Phase は移行全体のフェーズ
+                enum:
+                - Pending
+                - GuestPrepping
+                - FetchingVMInfo
+                - PreparingImages
+                - ImportingDisks
+                - WaitingForImport
+                - WarmPreSync
+                - WarmSyncing
+                - ReadyForCutover
+                - WarmCutover
+                - WarmFinalSync
+                - WarmDeltaSync
+                - WarmFinalDelta
+                - CreatingVMs
+                - TestRunning
+                - TestPending
+                - SwitchingNetwork
+                - Completed
+                - Failed
+                type: string
+              startTime:
+                description: StartTime は移行開始時刻
+                format: date-time
+                type: string
+              totalVMs:
+                description: TotalVMs は移行対象 VM 総数
+                format: int32
+                type: integer
+              vms:
+                description: VMs は VM ごとの移行状態
+                items:
+                  properties:
+                    ahvUUID:
+                      description: AHVUUID は AHV 上の VM UUID（停止・電源操作用）
+                      type: string
+                    dataVolumeRefs:
+                      description: DataVolumeRefs は作成した DataVolume 名のリスト
+                      items:
+                        type: string
+                      type: array
+                    deltaImageRefs:
+                      description: DeltaImageRefs は差分読み出し用に一時作成した image UUID（ラウンド終了時に削除）
+                      items:
+                        type: string
+                      type: array
+                    deltaRounds:
+                      description: DeltaRounds は実行済みの差分同期ラウンド数
+                      format: int32
+                      type: integer
+                    error:
+                      description: Error は失敗時のエラーメッセージ
+                      type: string
+                    lastDeltaBytes:
+                      description: LastDeltaBytes は直近ラウンドの差分バイト数（全ディスク合計）
+                      format: int64
+                      type: integer
+                    lastSnapshotUUID:
+                      description: LastSnapshotUUID は CBT 差分同期の基準となる直近の vm_snapshot
+                        UUID
+                      type: string
+                    name:
+                      description: Name は VM 名（AHV 側）
+                      type: string
+                    pendingSnapshotPaths:
+                      description: PendingSnapshotPaths は同期中ラウンドの snapshot_file_path（完了後に
+                        SnapshotPaths へ昇格）
+                      items:
+                        type: string
+                      type: array
+                    pendingSnapshotUUID:
+                      description: PendingSnapshotUUID は同期中ラウンドの新 snapshot UUID（完了後に
+                        LastSnapshotUUID へ昇格）
+                      type: string
+                    phase:
+                      description: Phase はこの VM の移行フェーズ
+                      type: string
+                    progress:
+                      description: Progress は進捗率 (0-100)
+                      format: int32
+                      type: integer
+                    snapshotPaths:
+                      description: SnapshotPaths は基準 snapshot の disk ごとの snapshot_file_path（DiskList
+                        Index 順）
+                      items:
+                        type: string
+                      type: array
+                    syncJobRefs:
+                      description: SyncJobRefs は実行中の delta-sync Job 名のリスト
+                      items:
+                        type: string
+                      type: array
+                    tempImageRefs:
+                      description: TempImageRefs は Prism 上に一時作成した image UUID のリスト（移行完了後に削除）
+                      items:
+                        type: string
+                      type: array
+                    vmRef:
+                      description: VMRef は作成した KubeVirt VirtualMachine 名
+                      type: string
+                  required:
+                  - name
+                  type: object
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

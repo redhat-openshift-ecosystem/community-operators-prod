@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  neuron_scheduler_config.yaml: "apiVersion: kubescheduler.config.k8s.io/v1\nkind:
+    KubeSchedulerConfiguration\nprofiles:\n  - schedulerName: neuron-scheduler\nextenders:\n
+    \ - urlPrefix: 'http://awslabs-gpu-operator-neuron-scheduler-extension.ai-operator-on-aws.svc.cluster.local:12345'\n
+    \   filterVerb: filter\n    bindVerb: bind\n    enableHTTPS: false\n    nodeCacheCapable:
+    false\n    managedResources:\n      - name: 'aws.amazon.com/neuron'\n        ignoredByScheduler:
+    false\n      - name: 'aws.amazon.com/neuroncore'\n        ignoredByScheduler:
+    false\n    ignorable: false\nleaderElection:\n  leaderElect: true\n  resourceNamespace:
+    ai-operator-on-aws \n  resourceName: neuron-scheduler\n"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: aws-neuron
+    app.kubernetes.io/name: aws-neuron
+    app.kubernetes.io/part-of: aws-neuron
+  name: awslabs-gpu-operator-neuron-scheduler-config

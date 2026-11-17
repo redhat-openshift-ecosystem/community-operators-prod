@@ -1,0 +1,801 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "charts.clusterpulse.io/v1alpha1",
+          "kind": "ClusterPulse",
+          "metadata": {
+            "name": "clusterpulse-prod"
+          },
+          "spec": {
+            "api": {
+              "enabled": true,
+              "imagePullPolicy": "Always",
+              "logging": {
+                "json": true,
+                "level": "INFO"
+              },
+              "oauth": {
+                "enabled": true,
+                "headerEmail": "X-Forwarded-Email",
+                "headerUser": "X-Forwarded-User"
+              },
+              "rbac": {
+                "auditEnabled": true,
+                "cacheTTL": 0,
+                "defaultDeny": true,
+                "enabled": true,
+                "groupSyncInterval": 300
+              },
+              "replicas": 3,
+              "resources": {
+                "limits": {
+                  "cpu": "500m",
+                  "memory": "512Mi"
+                },
+                "requests": {
+                  "cpu": "100m",
+                  "memory": "256Mi"
+                }
+              },
+              "security": {
+                "allowedOrigins": [
+                  "*"
+                ],
+                "sessionExpireMinutes": 1440,
+                "trustedHosts": [
+                  "*"
+                ]
+              },
+              "server": {
+                "host": "0.0.0.0",
+                "port": 8080,
+                "reload": false,
+                "workers": 1
+              }
+            },
+            "clusterEngine": {
+              "policy": {
+                "batch": {
+                  "cacheClearBatchSize": 500,
+                  "redisPipelineBatchSize": 1000,
+                  "redisScanBatchSize": 100
+                },
+                "cache": {
+                  "groupCacheTTL": 300,
+                  "policyCacheTTL": 300
+                },
+                "limits": {
+                  "maxPoliciesPerUser": 100,
+                  "policyValidationInterval": 300
+                }
+              },
+              "replicas": 1,
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "1Gi"
+                },
+                "requests": {
+                  "cpu": "100m",
+                  "memory": "256Mi"
+                }
+              },
+              "timing": {
+                "cacheTTL": "600",
+                "fullScanInterval": "300",
+                "reconciliationInterval": "30"
+              }
+            },
+            "frontend": {
+              "config": {
+                "enableAnonymousAccess": false,
+                "features": {
+                  "devTools": false,
+                  "mockData": false,
+                  "nodeDetails": true,
+                  "operatorDetails": true,
+                  "registryStatus": true
+                },
+                "refreshInterval": 30000,
+                "theme": {
+                  "defaultTheme": "auto"
+                }
+              },
+              "enabled": true,
+              "oauth": {
+                "enabled": true,
+                "image": "quay.io/openshift/origin-oauth-proxy:4.17"
+              },
+              "replicas": 3,
+              "route": {
+                "enabled": true,
+                "tls": {
+                  "termination": "reencrypt"
+                }
+              }
+            },
+            "redis": {
+              "enabled": true,
+              "global": {
+                "compatibility": {
+                  "openshift": {
+                    "adaptSecurityContext": "force"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "clusterpulse.io/v1alpha1",
+          "kind": "ClusterConnection",
+          "metadata": {
+            "name": "example-cluster"
+          },
+          "spec": {
+            "credentialsRef": {
+              "name": "cluster-credentials"
+            },
+            "displayName": "Example Production Cluster",
+            "endpoint": "https://api.example.openshift.com:6443",
+            "monitoring": {
+              "interval": 30,
+              "timeout": 10
+            }
+          }
+        },
+        {
+          "apiVersion": "clusterpulse.io/v1alpha1",
+          "kind": "MonitorAccessPolicy",
+          "metadata": {
+            "name": "example"
+          },
+          "spec": {
+            "access": {
+              "effect": "Allow",
+              "enabled": true
+            },
+            "identity": {
+              "priority": 100,
+              "subjects": {
+                "groups": [
+                  "default-group"
+                ],
+                "users": [
+                  "default-user"
+                ]
+              }
+            },
+            "scope": {
+              "clusters": {
+                "default": "none",
+                "rules": [
+                  {
+                    "permissions": {
+                      "view": true,
+                      "viewMetrics": true
+                    },
+                    "resources": [
+                      {
+                        "type": "nodes",
+                        "visibility": "all"
+                      },
+                      {
+                        "type": "operators",
+                        "visibility": "all"
+                      },
+                      {
+                        "type": "namespaces",
+                        "visibility": "all"
+                      },
+                      {
+                        "type": "pods",
+                        "visibility": "all"
+                      },
+                      {
+                        "type": "deployment-metrics",
+                        "visibility": "all"
+                      }
+                    ],
+                    "selector": {
+                      "matchPattern": ".*"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "clusterpulse.io/v1alpha1",
+          "kind": "RegistryConnection",
+          "metadata": {
+            "name": "dockerhub",
+            "namespace": "clusterpulse"
+          },
+          "spec": {
+            "displayName": "Docker Hub",
+            "endpoint": "https://registry-1.docker.io",
+            "healthCheckPaths": [
+              "/v2/"
+            ],
+            "insecure": false,
+            "labels": {
+              "environment": "production",
+              "provider": "dockerhub"
+            },
+            "monitoring": {
+              "checkCatalog": false,
+              "interval": 60,
+              "maxCatalogEntries": 100,
+              "timeout": 10
+            },
+            "skipTLSVerify": false
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: Monitoring
+    containerImage: quay.io/clusterpulse/operator
+    createdAt: "2026-03-23T00:11:36Z"
+    description: Provides OpenShift cluster health monitoring
+    operatorframework.io/suggested-namespace: clusterpulse
+    operators.operatorframework.io/builder: operator-sdk-v1.41.1
+    operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+    repository: https://github.com/ClusterPulse/operator
+    support: None
+  name: clusterpulse.v1.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: Defines a connection to a monitored Kubernetes/OpenShift cluster
+      displayName: Cluster Connection
+      kind: ClusterConnection
+      name: clusterconnections.clusterpulse.io
+      resources:
+      - kind: Secret
+        name: ""
+        version: v1
+      specDescriptors:
+      - description: Reference to secret containing cluster credentials
+        displayName: Credentials Configuration
+        path: credentialsRef
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Monitoring and health check configuration
+        displayName: Monitoring Configuration
+        path: monitoring
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Human-friendly name for the cluster
+        displayName: Display Name
+        path: displayName
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Cluster API endpoint URL
+        displayName: API Endpoint
+        path: endpoint
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Name of the secret containing credentials
+        displayName: Credentials Secret
+        path: credentialsRef.name
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - description: Reconciliation interval in seconds
+        displayName: Check Interval
+        path: monitoring.interval
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - description: Connection timeout in seconds
+        displayName: Connection Timeout
+        path: monitoring.timeout
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      statusDescriptors:
+      - description: Current connection status
+        displayName: Connection Status
+        path: phase
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.phase
+      - description: Cluster health status
+        displayName: Health
+        path: health
+        x-descriptors:
+        - urn:alm:descriptor:text
+      version: v1alpha1
+    - description: Manages the deployment and configuration of ClusterPulse monitoring
+        platform
+      displayName: ClusterPulse Instance
+      kind: ClusterPulse
+      name: clusterpulses.charts.clusterpulse.io
+      resources:
+      - kind: Deployment
+        name: ""
+        version: v1
+      - kind: Service
+        name: ""
+        version: v1
+      - kind: ConfigMap
+        name: ""
+        version: v1
+      - kind: Secret
+        name: ""
+        version: v1
+      - kind: ServiceAccount
+        name: ""
+        version: v1
+      - kind: Role
+        name: ""
+        version: v1
+      - kind: RoleBinding
+        name: ""
+        version: v1
+      - kind: Route
+        name: ""
+        version: v1
+      specDescriptors:
+      - description: Redis configuration for data storage
+        displayName: Redis Configuration
+        path: redis
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: API service configuration
+        displayName: API Configuration
+        path: api
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Cluster controller engine configuration
+        displayName: Cluster Engine Configuration
+        path: clusterEngine
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Frontend UI configuration
+        displayName: Frontend Configuration
+        path: frontend
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Enable Redis deployment for data storage
+        displayName: Enable Redis
+        path: redis.enabled
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Enable API service deployment
+        displayName: Enable API
+        path: api.enabled
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Number of API server replicas
+        displayName: API Replicas
+        path: api.replicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:podCount
+      - description: Docker image for API service
+        displayName: API Image
+        path: api.image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Enable frontend UI deployment
+        displayName: Enable Frontend
+        path: frontend.enabled
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Number of frontend replicas
+        displayName: Frontend Replicas
+        path: frontend.replicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:podCount
+      - description: Docker image for frontend UI
+        displayName: Frontend Image
+        path: frontend.image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Number of cluster controller replicas
+        displayName: Cluster Controller Replicas
+        path: clusterEngine.replicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:podCount
+      - description: Docker image for cluster controller
+        displayName: Cluster Controller Image
+        path: clusterEngine.image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      statusDescriptors:
+      - description: Current deployment phase
+        displayName: Phase
+        path: phase
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.phase
+      version: v1alpha1
+    - kind: MetricSource
+      name: metricsources.clusterpulse.io
+      version: v1alpha1
+    - description: Defines fine-grained access control policies for cluster monitoring
+      displayName: Monitor Access Policy
+      kind: MonitorAccessPolicy
+      name: monitoraccesspolicies.clusterpulse.io
+      resources:
+      - kind: ConfigMap
+        name: ""
+        version: v1
+      specDescriptors:
+      - description: Access control configuration
+        displayName: Access Configuration
+        path: access
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Identity and priority configuration
+        displayName: Identity Configuration
+        path: identity
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Operational aspects configuration
+        displayName: Operations Configuration
+        path: operations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Scope and cluster rules configuration
+        displayName: Scope Configuration
+        path: scope
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Policy priority (higher values take precedence)
+        displayName: Priority
+        path: identity.priority
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - description: List of users this policy applies to
+        displayName: Users
+        path: identity.subjects.users
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: List of groups this policy applies to
+        displayName: Groups
+        path: identity.subjects.groups
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Allow or Deny access
+        displayName: Effect
+        path: access.effect
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:select:Allow
+        - urn:alm:descriptor:com.tectonic.ui:select:Deny
+      - description: Whether this policy is active
+        displayName: Enabled
+        path: access.enabled
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Default access for clusters not matching any rule
+        displayName: Default Cluster Access
+        path: scope.clusters.default
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:select:allow
+        - urn:alm:descriptor:com.tectonic.ui:select:deny
+        - urn:alm:descriptor:com.tectonic.ui:select:none
+      - description: Log all access attempts using this policy
+        displayName: Log Access
+        path: operations.audit.logAccess
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      statusDescriptors:
+      - description: Current policy state
+        displayName: State
+        path: state
+        x-descriptors:
+        - urn:alm:descriptor:text
+      version: v1alpha1
+    - description: Defines a connection to a container registry for monitoring
+      displayName: Registry Connection
+      kind: RegistryConnection
+      name: registryconnections.clusterpulse.io
+      resources:
+      - kind: Secret
+        name: ""
+        version: v1
+      specDescriptors:
+      - description: Human-friendly name for the registry
+        displayName: Display Name
+        path: displayName
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Registry endpoint URL
+        displayName: Registry Endpoint
+        path: endpoint
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Allow insecure HTTP connections
+        displayName: Allow Insecure
+        path: insecure
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Skip TLS certificate verification
+        displayName: Skip TLS Verify
+        path: skipTLSVerify
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Health check interval in seconds
+        displayName: Check Interval
+        path: monitoring.interval
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - description: Paths to check for registry health
+        displayName: Health Check Paths
+        path: healthCheckPaths
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Labels for registry categorization
+        displayName: Labels
+        path: labels
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Registry monitoring configuration
+        displayName: Monitoring Configuration
+        path: monitoring
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      statusDescriptors:
+      - description: Whether registry is reachable
+        displayName: Available
+        path: available
+        x-descriptors:
+        - urn:alm:descriptor:text
+      - description: Registry health status
+        displayName: Health
+        path: health
+        x-descriptors:
+        - urn:alm:descriptor:text
+      version: v1alpha1
+  description: |
+    ## About ClusterPulse
+    ClusterPulse is a comprehensive multi-cluster monitoring and management platform designed for OpenShift environments. It provides centralized visibility, policy-based access control, and real-time monitoring across multiple clusters through a unified dashboard. For more information, visit [https://github.com/ClusterPulse/operator](https://github.com/ClusterPulse/operator).
+
+    ## Features and Capabilities
+    - **Multi-Cluster Monitoring**: Connect and monitor multiple OpenShift/Kubernetes clusters from a single interface
+    - **Policy-Based Access Control**: Fine-grained access policies using MonitorAccessPolicy CRDs
+    - **Real-Time Metrics**: Live cluster health, node status, and resource utilization tracking
+    - **Registry Monitoring**: Monitor connected container registries
+    - **OAuth Integration**: Seamless OpenShift OAuth integration for authentication
+    - **Redis-Backed Storage**: Scalable data storage using Redis for metrics and state
+  displayName: ClusterPulse
+  icon:
+  - base64data: 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
+    mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+        - apiGroups:
+          - charts.clusterpulse.io
+          resources:
+          - clusterpulses
+          - clusterpulses/status
+          - clusterpulses/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          - clusterroles
+          verbs:
+          - '*'
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - networkpolicies
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - secrets
+          - serviceaccounts
+          - services
+          verbs:
+          - '*'
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - rolebindings
+          - roles
+          verbs:
+          - '*'
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - statefulsets
+          verbs:
+          - '*'
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          verbs:
+          - '*'
+        - apiGroups:
+          - policy
+          resources:
+          - poddisruptionbudgets
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - clusterpulse.io
+          resources:
+          - metricsources
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: clusterpulse-controller-manager
+      deployments:
+      - label:
+          app.kubernetes.io/managed-by: kustomize
+          app.kubernetes.io/name: clusterpulse
+          control-plane: controller-manager
+        name: clusterpulse-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: clusterpulse
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                app.kubernetes.io/name: clusterpulse
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --metrics-require-rbac
+                - --metrics-secure
+                - --metrics-bind-address=:8443
+                - --leader-elect
+                - --leader-election-id=clusterpulse
+                - --health-probe-bind-address=:8081
+                image: quay.io/clusterpulse/operator:1.0.1
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: "1"
+                    memory: 512Mi
+                  requests:
+                    cpu: 10m
+                    memory: 64Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+              serviceAccountName: clusterpulse-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: clusterpulse-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - clusterpulse
+  links:
+  - name: ClusterPulse
+    url: https://github.com/ClusterPulse/operator
+  maintainers:
+  - email: asmoore@redhat.com
+    name: Asa Moore
+  maturity: alpha
+  minKubeVersion: 1.23.0
+  provider:
+    name: ClusterPulse
+  version: 1.0.1

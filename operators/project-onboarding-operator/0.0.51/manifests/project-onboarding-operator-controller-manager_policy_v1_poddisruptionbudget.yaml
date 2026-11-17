@@ -1,0 +1,13 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/name: project-onboarding-operator
+    control-plane: controller-manager
+  name: project-onboarding-operator-controller-manager
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: project-onboarding-operator
+      control-plane: controller-manager

@@ -1,0 +1,350 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "lightspeed.openstack.org/v1beta1",
+          "kind": "OpenStackLightspeed",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "openstack-lightspeed-operator"
+            },
+            "name": "openstacklightspeed-sample"
+          },
+          "spec": {
+            "llmCredentials": "openstack-lightspeed-apitoken",
+            "llmEndpoint": "http://llm_provider:11434/v1",
+            "llmEndpointType": "openai",
+            "modelName": "llama3.1:8b",
+            "tlsCACertBundle": "openstack-lightspeed-certs"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: AI/Machine Learning
+    containerImage: quay.io/openstack-lightspeed/operator@sha256:e16587bdfe9cd6893cb4aa5a8dedeb6ae063905b959a82c0d91d917489cf7a3b
+    createdAt: "2026-02-19T14:28:58Z"
+    description: AI-powered virtual assistant for Red Hat OpenStack Services on OpenShift
+    support: Community
+    features.operators.openshift.io/cnf: "false"
+    features.operators.openshift.io/cni: "false"
+    features.operators.openshift.io/csi: "false"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "false"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/suggested-namespace: openshift-lightspeed
+    operators.operatorframework.io/builder: operator-sdk-v1.38.0
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+    repository: https://github.com/openstack-lightspeed/operator
+  name: openstack-lightspeed-operator.v0.0.1
+  namespace: openshift-lightspeed
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: OpenStackLightspeed is the Schema for the openstacklightspeeds API
+        displayName: Open Stack Lightspeed
+        kind: OpenStackLightspeed
+        name: openstacklightspeeds.lightspeed.openstack.org
+        resources:
+          - kind: ClusterServiceVersion
+            name: ""
+            version: v1alpha1
+          - kind: InstallPlan
+            name: ""
+            version: v1alpha
+          - kind: Subscription
+            name: ""
+            version: v1alpha1
+          - kind: OLSConfig
+            name: cluster
+            version: v1alpha1
+        specDescriptors:
+          - description: |-
+              Secret name containing API token for the LLMEndpoint. The secret must contain
+              a field named "apitoken" which holds the token value.
+            displayName: LLM Credentials Secret
+            path: llmCredentials
+          - description: URL pointing to the LLM
+            displayName: LLM Endpoint
+            path: llmEndpoint
+          - description: Type of the provider serving the LLM
+            displayName: Provider Type
+            path: llmEndpointType
+          - description: Name of the model to use at the API endpoint provided in LLMEndpoint
+            displayName: Model Name
+            path: modelName
+          - description: Configmap name containing a CA Certificates bundle
+            displayName: TLS CA Certificate Bundle
+            path: tlsCACertBundle
+        version: v1beta1
+  description: |-
+    OpenStack Lightspeed is a generative AI-based virtual assistant for Red Hat OpenStack Services on OpenShift (RHOSO) users which integrates into the OpenShift Lightspeed.
+
+    OpenStack Lightspeed can answer natural-language questions about Red Hat OpenStack Services on OpenShift (RHOSO). It can assist users in troubleshooting issues, providing configuration guidance, and offering best practices for managing their OpenStack environments on OpenShift.
+
+    To set up the OpenStack Lightspeed Operator, you will need a Large Language Model (LLM). You can run one yourself with Red Hat Enterprise Linux AI (RHELAI) or Red Hat OpenShift AI (RHOAI), or you can use a model from a SaaS provider such as OpenAI.
+  displayName: OpenStack Lightspeed (Community)
+  icon:
+    - base64data: iVBORw0KGgoAAAANSUhEUgAAAXwAAAF8CAYAAADM5wDKAAAACXBIWXMAAG66AABuugHW3rEXAAAgAElEQVR4nO3dT2gjeX738a9KVaU/lltSe3tmOhmQhg0sgYT2QAgLaZ5WX5bc1k0O8+RkGXJIDmGcQ0gCgfVCYLPk4iGH5LBg+ZRnD8HaW8hl1Q8bWELgUZNAWNhlLdikd7rbltyW9adUKj0HW467226rflUllareL2h6plu/qh/j4eOfv79/iclkIgCA6NMW3QEAwHwQ+AAQEwQ+AMQEgQ8AMUHgA0BMEPgAEBMEPgDEBIEPADFB4ANATOiL7kBUtdvth5PJ5Lccx3k0mUyK4/H4a5PJJC0iYllWYdH9AxbNNM2OiEgikRgkk8mfJBKJtqZpTxOJxL8Vi8UfLbp/UZTgaAXvjo+Ptx3HeeQ4zm/atv0ro9Eos+g+AcvOMIy+ruv/rWnav2ua9vTu3bu7i+7TsiPwXep0OiXHcf7Qtu3ftW37a4Q7MD8X3wR+ouv6P2ma9veFQqG16D4tEwJ/Bu12+zPbtv9oNBr9NgEPhIdhGH3DMP5V1/W/KxaL3190f8KOwL9Bu93+bDQa/bllWb8xHo+Z6wBCLplM2qZp/odhGH9N+F+PwL+i3W4/tG37r4bD4e8Q8sDySiaTdiqV+hdd1/+SCeD/QeCLyNHR0fcsy/o9Vs8A0WOaZsc0zX9cW1v7g0X3ZdFiG/idTqc0Go32Gc0D8TAd9RuGsRnXyd7YBX673X44Go3+djgcPnAcJ7Ho/gCYL03TJqlU6plhGH8ct3JPbAL/Iuhr/X7/q4vuC4BwyGQyPzMMoxqX4I984E9LN71e79Gi+wIgnLLZ7NM4lHoiHfivXr066Pf736R0A+A2mqZNMpnMD77yla88WXRfghLJwD8+Pt7u9Xp/E9bJWE3TxDTNa/8ulUrNuTdAcIbD4bV/blmWOI4z597MJplM2tls9k+jeJRDpAK/0+mUBoPBj4fD4UeL7otpmqLruhiGIaZpXoa8pnFAKTDlOM5l+FuWJaPRSGzbFsuyFt01SaVSv0yn01+PUpknMoG/yPKNruuSTqcvwz2dTs+7C0DkDAaDy28Cg8FAbNueex+iVuZZ+sDvdDqlfr/fnPemqWw2K6lUSrLZrOh6KCtHQKTYti29Xk+Gw6H0er25vts0zU4mk1lf9tH+Ugf+8fHxd87Ozv5sHqN6TdMkm81KJpORbDYb9OsA3KLX60m/35derzeX+QBN0yYrKyvfvXv37l8E/rKALGXgdzqdkmVZ9X6/vx70u6Yhn8vlgn4VAEXdbvcy/IOWyWSapmluLONof+kCv91uP+z3+/8c5DHFmqbJ6uqq5HI5yjXAErFtW7rdrpyengY66jcMo5/JZL6xbBu2lirwgy7h6Lou+Xye0TwQAd1uV05OTgKb7F3GEs/SBP6rV68Ozs7ONoJ4djqdltXVVWrzQAT1ej05PT2VwWAQyPNXVlbqy7KKZykC/8WLFz8N4gwcXddlbW2NZZRADAwGAzk6OgpkxJ/JZH72wQcf/JrvD/ZZqAM/qCWXmqZJsVikdAPEULfblXa77XuNfxmWboY28DudTqnX6/2n35Oz+Xxe7ty5w45XIMYcx5HXr1/LycmJr881DKOfzWZ/PayhH8rAD2IlTjqdlmKxeOMZNgDix7Isabfbvtb3wxz6oQv8drv9Wbfb/Qe/VuJomnY5qgeA60xH+36VeTRNm+Ryud8P22XqoQp8v8PeNE25d+8ea+kB3Mq2bXn58qVvB7eFMfRDE/idTqd0enr6c7/CPp/PS6HAneQA3Ol0Or7V9jVNm6yurn4SlvJOKALfzwlaTdPk3r17LLUEoGwwGMjLly99KfGEqaa/8MD3M+xN05QPP/yQFTgAPHMcR7788ktfSjxhCf2FJ2O/32/6Efa5XE7u379P2APwhaZpcv/+fV/264xGo0y/32/60C1PFpqOL168+Kkfm6ry+bysra350SUAeMPa2prk83nPz7Esq/DixYuf+tAlZQsL/Isbqjwfl7C2tsbkLIBAFQoFXwaV/X7/q69evTrwoUtKFhL4F6deejoITdM0WVtb43gEAHORy+VkbW3Nc9n47Oxs4/j4+Ds+dcuVuU/attvth91u9/96WX6paZp8+OGH7JoFMHeWZcmXX37paQXPxRr9/zXv8/TnGvh+rMgh7AEsmh+hv4iVO3Mt6ViWVSfsASw7P5aAj0ajjGVZdR+7dau5Bf7x8fF3vN5By+FnAMLCNE0pFouentHv99fnWc+fS0nHj2MTmKAFEEbdbleOjo6U28/z+IW5jPD7/X7TS9hzzyyAsMrlcp7W6TuOk5jXpqzAA//Vq1cHXjZX5XI51tkDCLVCoeBpUGpZVmEe6/MDLel4LeWYpin379/3u1sAEIjnz58rn70zj9JOoCP8wWDwY9Wwn67IAYBl4WXljuM4icFg8GOfu/SGwAL/+Ph4ezgcfqTa/t69exyEBmCpTI9nVzUcDj86Pj7e9rFLbwispPOLX/xiNB6Pla6a4vISAMvMyyUqyWTS/vjjjw2fuyQiAY3wX716daAa9qZpEvYAllqhUFDeMzQej/WgJnB9H+F7maidnj/NHbQAlp1t2/L8+XOl4xeCmsD1fYQ/Go32VSdq8/k8YQ8gEnRdV16f7zhOYjQa7fvcJX8Dv91uP+z1eo9U2qbTablz546f3QGAhbpz547y/dq9Xu9Ru91+6Gd/fA380WhUU23r9UwKAAgjL9nmJVOv41vgt9vth6o3WOXzeQ5FAxBJpmkql3b6/f5X/Rzl+xb4o9Hob5U6oGmUcgBE2p07d5T3Falm63V8CfxOp1MaDocPVNoWi0U2WAGINE3TlEs7w+HwQafTKfnSDz8eoroyR9d1TsEEEAu5XE5pFaKfK3Z8CfzhcPg7Ku38uAUeAJaFauapZuzbPAf+0dHR91R21abTaeXlSgCwjFRzbzwe60dHR9/z+n7PgW9Z1u+ptFtdXfX6agBYOqrZp5q1V3kK/Ha7/VDlchNd1yWbzXp5NQAspWw2q1TLtyyr4HWJpqfAt237r1TaebkODACWnWoGqmbulKfAV5lI0DSNlTkAYi2XyyktR/c6easc+O12+zOVyVpq9wCgloXj8Vhvt9ufqb5TOfBHo9Gfq7RjdA8A6lmomr0iHgLfsqzfcNtGdbICAKJGdfGKSvZevlOlkWo5J5PJqLwOmDu70bj850ShIMn19cV1BpGVyWSk1+u5ajMt6xSLxe+7fZ/SCN+27T9y/SIma7EERvW6nJTLcvr48eWv159+Kiflsozq9UV3DxGjOnmrksEiioE/Go1+220b1t0j7M6qVek+eSJO691b5ZxWS7pPnshZtTr/jiHSVLJRJYNFFAK/0+mURqOR69oM5RyE2aheF2v/9vOprP19RvrwlUo2jkajjMoJmq4D33GcP3TbRoQRPsKtt70dyGeB26hmo0oWuw5827Z/120bwh5hNm42ry3j3MRptd6Y1AW8UslIlSxWCfyvuW2TSqXcNgHmZtLpLLoLiDmVjFTJYteBr1K/Z4QPADdTnLh1ncWuAv/4+Nh18VLXdTZbAcB7qOak20x2Ffjj8XjDXXeES04AYAYqWek4ziM3n3cV+JPJ5GN33RExDMNtEwCIHZWsdBznN9183lXg27b9K+66I2KaptsmABA7KlnpNpNdBb7KJAElHQC4nUpWus3kmQNf5WotRvcAMDuVzHSTzTMH/mQy+S23HWF1DgDMTiUz3WTzzIHvdjZYhAlbAHBDceJ25mx2M8Ivuu0IJR0AmJ1KZrrJ5pkDfzweu9/Gq3DOMwDElUpmuslmNyN811PIjPABYHaKI/yZsznQITgjfACYXdCZOfPTLcsquHowYQ8ArrnNTjfZHFgqU84BAPeCzE6G4QAQEwQ+AMQEgQ8AMUHgA0BMzBT4KgensUoHAMJlplQuFos/cvtgztEBAPeCzE6G4QAQIkFWRwh8AIgJDqxHqNmNhjiHhyIiopXLolcqC+0PsMwIfISSVatJf2dHnFbrjT/XSiVJb29Lant7QT0DlhclHYTOWbUqZ1tb74S9iIjTaknvT/5EzqrV+XcMWHIEPkLFqtXE2t+//XP7+2LVasF3CIgQAh+h0t/ZCeSzAAh8hIjdaFxbxrmJ02qJ3WgE1yEgYgh8LLVxs7noLgBLg8DHUrMJfGBmBD6WGiUdYHYEPkJDZVOV02rJpNPxvzNABLHxKuYajYYcXuxkLZfLUlnwTtbkgwcyfvbMVZtxs8kOXGAGjPBjqlarSblclsePH8vW1pZsbW3J48ePpVwuS22B69tVgntEWQeYCYEfQ9VqVba2tqR1zRLIVqslW1tbUl3QTlZ9fd11G+r4wGwI/Jip1WqyP8NO1v39/YWEflIh8FmaCcyGwI+ZHRe7UxcR+sn1dUnk867aTE5OLk/UBHAzAj9Gms3mtWWc91lU6LvFKB+4HYEfIx3F5YvzDn0mboFgEPiYyTxDX2XilhE+cDsCP0YKhYKn9vMKfZURvv30qf8dASKGwI+R9fV1KZVKnp4xj9BPFAqiKfSTUT7wfgR+zLhZpXOTeYS+ysQt6/GB9yPwY6Zarcrm5qbn5wQd+kqBzwgfeC8CP4ZqtVroQ99QqONT0gHej8CPqbCHvsrErdtD14C4IfBjLOyhn3zwwHUb6vjAzQj8mAtz6KvU8dmABdyMwEdoQ1+ljg/gZgQ+RCScoa8ywgdwMwIfl8IW+iqBr3ncTQxEGYGPN4Qt9E2XfTE2Njy/E4gqAh/vCFPoZ1zsDE59/rlo5bKn9wFRRuDjWmEJfa1clpW9vVs/l3zwwNU3ByCOCHzcKCyhb1arsvrDH4r+6NE7f5fI5yX9rW/JaqMhCer3wHvpi+4Awq1Wq4mIzHQP7vtM20+f55ZeqchqoyHO4eEb1xkm19cJemBGBD5uFZbQFzkv8VCnB9RQ0sFMwlLeAaCOwMfMCH1guRH4cIXQB5YXgQ/XCH1gORH4UELoA8uHVToBOzw8lMOLZYSFQkHWI3QgWJhW7wC4HSP8gNTrdSmXy/LJJ5/I48eP5fHjx/Lpp59KuVyWer2+6O75hpE+sDwI/ABUq1V58uSJtFqtd/6u1WrJkydPIhVuhD6wHAh8n9Xr9ZlKHPv7+4z0r0HoA8Eh8H22vb0dyGeXAaEPhBuB76NGo3FtGecmrVZLGhG7g5XQB8KLwPdRs9l03SZqgS9C6ANhReD7qKxwqFeUlmleRegD4UPg+0glvKMa+CLRDn2OZMYyIvB9VC6XpVQqzfz5Uqmk9FPBMlmG0NcrFdFcfN20UknpgnVg0Qh8n7nZLRrkzlK70ZDh7q5YtZrYC54nWIbQz+7uBvJZIEw4WsFnlUpFPv/8c/niiy/e+7lvfetbUqlUfH//cHdX+js7Mjk5eefvkg8eiF6piL6+LsmLX/MS9mMYjI0NMTc3xbqlf+bmphgbG76+G5iXxGQymemDrVZrtg9eyOfzUohxnbNer8v29vY7yzRLpZLs7u7KRgChcVat3hpYVyXyeUmur19+E9ArlcBr09Vq1XPoi4hsbm4G8hPSqF6X3va2OG993bRSSbK7u4Q9AtfpdOTkmgHb+5RKpcQsnyPwA9ZoNKTZbEqn05FKpRLIqF5ExKrV5Gxry/NzpvXp5Pq6GJWK6AH016/Q39vbC6zEM242ZdLpXP57EP8dgOsQ+LjVSbn8zqjUL8kHDy6/AfhVCvIj9Eul0uVJpEBUBBn4TNpGwLjZDCzsRUTGz56Jtb8vZ1tb8vrTT6WdSMhZtSqOh7D1YyK31WopbXYD4orAj4DxAkLP2t+Xk08+EctDHd2P0O9cKbsAeD8CH56cbW15Wvbp15JNALcj8CNAW/Dmrf7Ojqf2XkKfeSJgdgR+BLjdKeo3++lTz2UlldAvlUqRPpoC8BsbryIiu7sr3SdPFvZ+5/DQ8+odt5uzdjz+ZIHgNBqNyxVU5XI5sOXIcIfAj4hZd4oGxcuKnatmDf3Nzc3QHaiG86/fzs7OtRsOd3Z2+JotGCWdCFmp1WRlb28h5R0/j2mo1Wqyt7d37UF0pVJJ9vb2Aj2HCGqq1apsbW3deJfz1tYWgb9gbLyKqHGzKXajIfbF70Gu00/k81IIaHnk2xfEUBoIp1qtJlsz7vQO6liMqAhy4xUlnYia7ohNXfz7pNORcbMpo0ZD7Ebj/OgAl/9T3SQV4N28BPxycDOfEtQBeLgdI/wYcw4PL78JjJtNsZ8+df2M5IMHcofdrrHWbDbl008/dd2Okf71GOEjEFq5LFq5/MYJkFdLQeNmU8bPnt3YPvX555JhpUzsqe52ZqQ/fwQ+3vB2KUjk/DKV0ZVaulYoiLGxsfANX1h+hP58Efi4lR7QMcmIBq+lW0J/fliWCcCT9fV1V3c5XyeMF9VHEYEPwDM/dj0T+sEj8AF4Vq1WQ39RPQh8AD7x66hrQj84BD4A3xD64UbgA/AVoR9eBD4A3xH64UTgAwgEoR8+BD6AwBD64ULgAwgUoR8eBD6AwBH64cBZOgGz37rAA+9KFAq+3pj1Ps1mU/l0R3hTrVal2WzKs/ecwDoLzt5RR+AHZFSvS297O9CbpqJEK5Uku7v7xlHNfqrX67K9vX3t9XtYPoS+Gko6ATirVqX75Alh74LTakn3yRM5C+DH9Wq1Kk+ePCHsI2Z/f1+2A7xtLYoIfJ+N6nWxLkYfcM/a35dRve7b8+r1+uVoENHzxRdfvHPvMW7GFYc+OymXGdl7pJVKkj889OVZ5XKZkX3ElUolOfTp/5cwCPKKQ0b4Pho3m4S9D5xWy5fJ7kajQdjHQKvVYiJ+RgS+jyb8TxcqhEB8NJvNRXdhKRD4ABATBD5CKeHD/E+ZS9ZjY31O+ziWHYHvI71SEc3j3Z44n7T1YyOWH3etIvxKpVIsF4ioIPB9lt3dXXQXlp6f/w13+XpEHpuvZkfg+8zY2BDThzND4src3PR1t+3GxoYvZ7ggnD7//HOpVCqL7sbSIPADsFKrSe7ggPKOC1qpJLmDA1kJYLRWq9Xk4OCA8k7EbG5u8hOcS2y8Cti42WS55gz0OY3S2JW5WNvb254PTxM5D/uolnKC3HjF4WkBm9cpkJgNP/4vTrVaJewXjJIOgMBVq1VfzjQi7L0h8AEEirAPDwIfQGAI+3Ah8AEEgrAPHwIfgO8I+3Ai8AH4irAPLwIfgG8I+3Aj8AH4grAPPwIfgGe1Wo2wXwIEPgDPdnZ2PD+DsA8egQ/Ak2az6fnuYMJ+PjhLB7eyGw0ZNRriHB6KiIhWLou5scE5QRAR73cHE/bzQ+DjDeNmU+xGQ+xmU8bNpoxvOOxq8O1vi/HNb8pKrebLdYSIJ8J+vgj8GHMOD2XcbMqo0TgP+qdPXbUf/eAHclqpyGqjQejHmOox6IT9/BH4MTHpdC7D3b4I+InLM7evM372TAa7u5LxYdIOy2l6d7CbOj5hvxhcgBJR01C3L0o0jsdJtfdJ5POSPzwMZJTfaDTk8GLuoFwuc559SNVqNdna2prps4T9+3EBCmZm1WrS39kJNODfNjk5kXGz6eutVbVaTXZ2dt4ZNZZKJdnZ2ZFqterbu+BdtVqVRqNx61p8wn6xWJYZIWfVqpxtbc017INQrVZla2vr2hJBq9WSra0tAj+EarWa7O3tXXt3cKlUkr29PcJ+wSjpRIRVq8nZjD9SB2H1hz/0ZYTvZnv+3t4ewR9Sb98dTCludkGWdAj8iDgplxc6ss///OeilcuenuH2LJZSqXRZ3weiIsjAp6QTAUFPyt5Gf/Ro7mEvcl7eaTabnt4LxAmBD8+8Lsn0csqi112eQJwQ+PBkZW/PU+3eryN1AdyOwIcSc3NT8j//uZgeJk39CHvmiYDZsQ4/AvRKRbRSKbA6fvLBA0mur4tRqUhyfd2XQ9P8CPtSqSTrHOAGzIzAD9jh4eEbO0XLHic3b5Ld3ZXukyeen6OVSpehblQqvm6mmvKrjOPHGew3sa8sK0wUCpwMikgg8ANSr9dle3v72p2iu7u7srGx4ev7jI0NMTc3xXIRpIl8XpLr66JXKqJf/B70IWh+XoMXxBr8Ub0uve3td35a0kolye7uiuHz1w2YJ9bhB2CWUAtqi/lNgSVyXpqZhrtfpRk3wn7n6Vm1eus3THNzU1bYLYoAsfFqidTrdXkyY2nl4ODA95H+1LjZlMmVJYtBlGbcCHvYj+r1mUtiuYMDRvoIDIG/RMrl8szHxMZlp2jYw17E3U5lrVSSfAy+blgMdtouiUaj4epM8Far9c6ZI1GzDGE/bjZdrXByWq03JnWBZUHg+0hlm3+UA38Zwl5E3ih9AVFG4PtIZZt/VMteyxL2QJwQ+D5SOQI2ihuHCHsgnAh8H1UqFcnn8zN/vlQqRe6ccMIeCC8C32dudn/u7u4G15EFIOyBcCPwfba9vS2bm5u3fm5zczOwNfiLQNgD4UfgB6BWq8nBwcGNd3seHBxEKtQIe2A5cJZOQDY2NmRjY0MajYY0m03pdDpSqVSo2d+AsAeCR+AHLIohP0XYA8uFkg6UEPbA8iHw4RphDywnAh+uEPbA8iLwMTPCHlhuBD5mQtgDy49VOrhVmMJ+3GyKc3gozuHh5fWMAGZD4OO9whL2dqMh/Z0dsZ8+fePPE/m8pLa3Jb29Hfh9vMCyo6SDG4Ul7K1aTU4fP34n7EVEJicnMvj2t+W0UuFce+AWBD6uFZawdw4P5Wxr69bPjZ89k76Lg+uAOCLw8Y6whL2IuArx4RdfiMNds8CNCHy8IUxhLyJiuezLqF73/E4gqgh8XApb2I8V7ggeM8IHbkTgQ0TCF/YiaoHPxC1wMwIfoQx7EZFRo+G6jVYu+/Z+IGoI/JgLa9iLqI3wDTZiATci8GMszGEvcr7U0i123gI3I/BjKuxhbyuUc5IPHvjeDyBKCPwYCnvYi6jV75Pr6/53BIgQAj9marVa6MNeRK1+rxP4wHsR+DGz48PxA/M44lgp8KnfA+9F4MdIs9mUVqvl6RnzCPtJpyOOQj8p6QDvR+DHSMfjpqR5XV6iMmGrP3rkf0eAiCHwMZN53lRlK5RzGN0DtyPwY6SgeEHIvK8lVBnhs+EKuB2BHyPr6+tSKpVctVnEHbQqE7aM8IHbEfgx42aVzqLCfnJy4qpNIp/nDB1gBgR+zFSrVdnc3Lz1c4sIexFG90CQCPwYqtVqsre3d215p1Qqyd7e3kLCXkRtwpb198Bs9EV3AItRrValWq1K460J0sqCw5MJWyA4BH7MLTrg36ZyQiYlHWA2lHQQGiqje61UkoTiclMgbgh8hIajcB8t9XtgdgQ+lhonZAKzI/ARGipr6RnhA7Mj8BEaeqUimoudwFqpxIQt4AKBj1DJ7u4G8lkABD5CxtjYEHOGncDm5qYYGxtz6BEQHQQ+QmelVpOVvb1ryztaqSS5gwNZWdBOYGCZsfEKoWRWq2JWq+eHqV1c3JIoFKjZAx4Q+Ag1Ah7wDyUdAIgJAh8AYiKwwB+NRkE9GgAiazgcum7TbrcfzvK5wALfcZygHg0AuKJYLP5ols9R0gGAmCDwASAmCHwAiAkCHwBiIrDAtywrqEcDQGQFmZ0zB75pmh03D2aVDgC45zY73WRzoCUdQh8AZhd0Zs4c+IlEYuD24ZR1AGB2KpnpJptnDvxkMvkTtx1hhA8As1PJTDfZ7GaE33bbEUb4ADA7xRH+zNk8c+BrmvbUbUc4TwcAZqeSmW6y2c0I/9/cdsS2bbdNACC2VDLTTTbPHPizHs5zFSUdAJidSma6yWZXyzINw+i77cxg4HpxDwDEjkpWus1kV4Gv6/p/u+sOo3wAmIVKVrrNZFeBr2nav7vrDhO3ADALxQlbV5nsNvBdr9ShpAMAt1PJSreZ7Crw7969u+uuO+ezzqzWAYCbqeak20x2fZaOysRtr9dz2wQAYkMlI1Wy2HXg67ru+ogFlUt5gTBLFAqL7gIiRCUjVbJYJfD/yW0bRvgIM71SEa1UmvnzWqkkyfX1AHuEuFHJSJUsdh34mqb9vds2IoQ+wi27O3sp1M1ngduoZqNKFrsO/EKh0FKpHfX7rpsAc2NsbIi5uXnr58zNTTE2NubQI8SFSjYahtEvFAott+2ULkAxDONf3bZhhI+wW6nVJHdwcG15RyuVJHdwICu12vw7hkhTnLB1ncEiIonJZOK6Ubvd/uz169f/x227tbU1yeVyrt8HzNu42ZRJ539ujtMrlcV1BpHV7Xbl6OjIdbs7d+7872Kx+H237ZQCX0TkF7/4xWg8Hutu2mSzWbl3757S+wAgal6+fOl6hJ9MJu2PP/7YUHmf8p22pmn+h9s2vV6PTVgAIOebrVTKOSrZO6Uc+IZh/LVKu263q/pKAIgM1SxUzV4RD4FfLBa/n0wmXQ/XT09PVV8JAJGhkoXJZNJWqd1PKQe+iEgqlfoXt20cx2GUDyDWut2u0oXlKpl7lafA13X9L1XanZyceHktACw11QxUzdwpT4FfLBZ/ZJpm5/ZPvkl1sgIAlp3q4hXTNDsqV81e5SnwLzrxjyrtqOUDiCPV7FPN2quU1+FfpbImX0Tkww8/lHQ67fn9ALAMBoOBfPnll67beVl7f5XnEb6I+kSCyg4zAFhWqpnndbJ2ypfANwxjU9M01z8q2LbNih0AsdDtdpVq95qmTQzDuP1kv1me5cdDCoVCK5VKPVNp2263lZYnAcCycBxH2u22UttUKvVM5WTM6/gS+CIihmH8sUo7x3Hk9evXfnUDAELn9evXygNb1Wy9jm+BXywWf5TJZH6m0vbk5EQsy/KrKwAQGpZlKa+7z2QyP/O6FPMq3wJfRMQwjKpqW9UfdwAgzLxkm5dMvY6vgV8sFn+UzWafqrQdDAaUdgBEyuvXr2UwGCi1zWazT/0c3Yv4HPgi6it2RM5LOxyfDCAKbNtWLuX4uTLnjef6/cBCodDKZDI/UGnrOI68fPnS7y4BwNy9fPlSeaI2k8n8wNmmD0EAAAcPSURBVK+VOVf5stP2Oqq7b0VE8vm8FAoFv7sEAHPR6XSUR/d+7aq9ju8j/KlsNvunqm1PTk6U614AsEiDwcDTicBesvM2gY3wRUR++ctfPh8Ohx+ptNU0TX71V39VNC2w70kA4CvHceS//uu/lEs5qVTqlx999NF9n7t1KdA0TafTX1edwHUcR+mQIQBYlC+//FI57DVNm6TT6a/73KU33xHkw71M4Iqcb1jggDUAy+Do6MjTBtKgJmqvCrSkM/X8+fO2ZVnKs7BM4gIIMy+TtCLnl5vcv3+/6GOXrjWXAnkmk1lXLe2InE/icqomgDDqdruewl7TtEkmk1n3sUs3v2seLykUCq2VlZXvennG0dERoQ8gVLrdruey88rKyneDLuVMzaWkM/XixYv/1+/3lb+TaZomH374oZim6We3AMA1y7I8TdKKiGQymeYHH3zwqY/deq+5rnk0TXPDMIy+avvpyh1O1gSwSH6EvWEYfdM0N3zs1q3mGvgXq3a+4aWeT+gDWCQ/wv6ibv+NeZVyLt87z5eJnJ+o6bWePw19avoA5qnb7XoOe5Hzur3fJ2HOYq41/KtevXp1cHZ25vnHmbW1Ncnlcn50CQBu5McErYjIyspK/Stf+coTH7rk2sICX0TkxYsXP+33+1/1+hzW6QMIktd19lOZTOZnH3zwwa/50CUlCw18Ee+bsqZyuZysra350SUAuOTXkvB5ba56n4WfTJbJZNa9rNyZ6na78vz5c8+1NQAQOZ8rfP78uS9hbxhGf16bq95n4SN8EZFOp1Pq9Xr/ORqNMl6fpWma3Lt3T9LptB9dAxBDg8HA0wUmVxmG0c9ms78+7xU51wlF4Iuch/7p6enPHcdJ+PE86voAVPhVrxc5X365urr6SRjCXiQEJZ2pQqHQyuVyv+9ljf5VJycn8vz5c+7IBTAT27bl+fPnvoZ9Lpf7/bCEvUiIRvhT7Xb7s263+w9+jfQ1TZN8Pi937tzx43EAIuj169dycnLi2xzgNOyLxeL3fXmgT0IX+CL+1vSn0um0FItFzuEBcMmyLGm3275eqRqmmv3bQhn4IsGEvohcjva5OhGIL8dxLkf1fgpz2IuEOPBFzkO/3+83/Vinf5WmaVIsFtmhC8RQt9uVdrvt+xJu0zQ7mUxmPaxhLxLywJ/ya0fu23Rdl7W1NZZwAjEwGAzk6OgokIUci95BO6ulCHwR/87euU46nZbV1VXJZrNBPB7AAvV6PTk9PfW1Tn/VIs/GcWtpAl9E5Pj4+DtnZ2d/5tcKnrfpui75fJ5SDxAB06sHg1qarWnaZGVl5bt37979i0BeEIClCnwRkXa7/bDf7/+z35O5V2maJqurq5LL5UTX9aBeA8Bntm1Lt9uV09PTQI9ZuTgq4RuLOOLYi6ULfJHzyVzLsuperkucVTablUwmw6gfCLFutyv9fl96vV7g78pkMk3TNDfCPDl7k6UM/KmgSzxXaZp2Gf7U+oHF6/V6lyE/j0MTl7GE87alDnyR4JZu3iabzUoqlZJsNkvZB5gD27al1+vJcDicy0j+qmVYcjmLpQ/8qVevXh30+/1vzmO0/zZd1yWdTothGGKaJss8AR8MBgOxLEtGo5EMBoOFnIt1cffsD5ZlFc5tIhP4Iuej/cFg8OPhcPjRovtimqboun75TUDTtMvfAZxzHEcsy7r8fTQaiW3bYlnWorsmqVTql+l0+uvLPqq/KlKBP3V8fLzd6/X+Zjweh7bWctNPAalUas49AYIzHA6v/fNpyIdRMpm0s9nsn969e3d30X3xWyQDf2qRZR4AyyVq5ZvrRDrwRc7LPKPRaL/X6z1adF8AhFM2m31qGMZmlMo314l84E+12+2Ho9GoFsSZPACWUyaT+ZlhGNVl20ClKjaBP3UR/H87HA4fUOoB4kfTtEkqlXpmGMYfxyXop2IX+FPTUs9wOPydME/uAvBHMpm0U6nUv8ShdHOT2Ab+VUdHR9+zLOv35r15C0DwTNPsmKb5j2tra3+w6L4sGoF/Rbvdfmjb9l8x6geW23Q0r+v6X8atbPM+BP4N2u32Z6PR6M8ty/oNwh8Iv2QyaZum+R+GYfx12C4PDwsCfwbtdvsz27b/aDQa/XaQxzIDcMcwjL5hGP+q6/rfEfK3I/Bd6nQ6Jcdx/tC27d+1bftrfAMA5scwjL6u6z/Rdf2fNE37+7hOvqoi8H1wfHy87TjOI8dxftO27V/hmwDg3UW4/7emaf+uadrTKB51MG8EfkDa7fbDyWTyW47jPJpMJsXxePy1yWSSFhFhNRBwvnpGRCSRSAySyeRPEolEW9O0p4lE4t+YaA0GgR8u5YtfQFQ0RaSz6E7gHIEPADHB4ewAEBMEPgDEBIEPADFB4ANATBD4ABATBD4AxASBDwAxQeADQEz8f+okfdtl9DojAAAAAElFTkSuQmCC
+      mediatype: image/png
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - config.openshift.io
+              resources:
+                - clusterversions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - lightspeed.openstack.org
+              resources:
+                - openstacklightspeeds
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - lightspeed.openstack.org
+              resources:
+                - openstacklightspeeds/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - lightspeed.openstack.org
+              resources:
+                - openstacklightspeeds/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - ols.openshift.io
+              resources:
+                - olsconfigs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ols.openshift.io
+              resources:
+                - olsconfigs/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - ols.openshift.io
+              resources:
+                - olsconfigs/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - operators.coreos.com
+              resources:
+                - clusterserviceversions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: openstack-lightspeed-operator-controller-manager
+      deployments:
+        - label:
+            app.kubernetes.io/managed-by: kustomize
+            app.kubernetes.io/name: openstack-lightspeed-operator
+            control-plane: controller-manager
+          name: openstack-lightspeed-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                control-plane: controller-manager
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+              spec:
+                containers:
+                  - args:
+                      - --metrics-bind-address=:8443
+                      - --leader-elect
+                      - --health-probe-bind-address=:8081
+                    command:
+                      - /manager
+                    env:
+                      - name: OPENSHIFT_LIGHTSPEED_OPERATOR_VERSION
+                        value: 1.0.9
+                      - name: WATCH_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.annotations['olm.targetNamespaces']
+                      - name: RELATED_IMAGE_OPENSTACK_LIGHTSPEED_IMAGE_URL_DEFAULT
+                        value: quay.io/openstack-lightspeed/rag-content@sha256:c9a2625fbed1924afe8350ae4d6dd2b57adfe5014fef5ee925b3bdfb8c562f1d
+                    image: quay.io/openstack-lightspeed/operator@sha256:e16587bdfe9cd6893cb4aa5a8dedeb6ae063905b959a82c0d91d917489cf7a3b
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 10m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: openstack-lightspeed-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+            - apiGroups:
+                - operators.coreos.com
+              resources:
+                - clusterserviceversions
+              verbs:
+                - delete
+                - patch
+                - update
+            - apiGroups:
+                - operators.coreos.com
+              resources:
+                - installplans
+              verbs:
+                - delete
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - operators.coreos.com
+              resources:
+                - subscriptions
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+          serviceAccountName: openstack-lightspeed-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: false
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: false
+      type: AllNamespaces
+  keywords:
+    - ai
+    - assistant
+    - openstack
+    - llm
+  links:
+    - name: OpenStack Lightspeed Operator
+      url: https://github.com/openstack-lightspeed/operator
+  maintainers:
+    - email: lmartins@redhat.com
+      name: Lucas Alvares Gomes
+    - email: geguileo@redhat.com
+      name: Gorka Eguileor
+    - email: lpiwowar@redhat.com
+      name: Lukas Piwowarski
+  maturity: alpha
+  minKubeVersion: 1.31.0
+  provider:
+    name: Red Hat
+    url: https://github.com/openstack-lightspeed/operator
+  relatedImages:
+    - image: quay.io/openstack-lightspeed/rag-content@sha256:c9a2625fbed1924afe8350ae4d6dd2b57adfe5014fef5ee925b3bdfb8c562f1d
+      name: openstack-lightspeed-image-url-default
+    - image: quay.io/openstack-lightspeed/operator@sha256:e16587bdfe9cd6893cb4aa5a8dedeb6ae063905b959a82c0d91d917489cf7a3b
+      name: manager
+    - image: quay.io/openstack-lightspeed/rag-content@sha256:c9a2625fbed1924afe8350ae4d6dd2b57adfe5014fef5ee925b3bdfb8c562f1d
+      name: openstack_lightspeed_image_url_default
+  version: 0.0.1

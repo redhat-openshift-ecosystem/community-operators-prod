@@ -1,0 +1,1077 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: clusterpulses.charts.clusterpulse.io
+spec:
+  group: charts.clusterpulse.io
+  names:
+    kind: ClusterPulse
+    listKind: ClusterPulseList
+    plural: clusterpulses
+    singular: clusterpulse
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - description: API replicas
+      jsonPath: .spec.api.replicas
+      name: API
+      type: integer
+    - description: Redis enabled
+      jsonPath: .spec.redis.enabled
+      name: Redis
+      type: boolean
+    - description: Frontend replicas
+      jsonPath: .spec.frontend.replicas
+      name: UI
+      type: integer
+    - description: Cluster controller replicas
+      jsonPath: .spec.clusterEngine.replicas
+      name: Cluster Engine
+      type: integer
+    - description: Policy engine enabled
+      jsonPath: .spec.policyEngine.enabled
+      name: Policy Engine
+      type: boolean
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ClusterPulse is the Schema for the clusterpulses API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Spec defines the desired state of ClusterPulse
+            properties:
+              api:
+                description: Configuration for the API component
+                properties:
+                  affinity:
+                    description: Pod affinity rules
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  enabled:
+                    default: true
+                    description: Enable API deployment
+                    type: boolean
+                  extraEnv:
+                    description: Additional environment variables
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  image:
+                    description: Docker image for API
+                    type: string
+                  imagePullPolicy:
+                    default: Always
+                    description: Image pull policy
+                    enum:
+                    - Always
+                    - IfNotPresent
+                    - Never
+                    type: string
+                  logging:
+                    description: Logging configuration
+                    properties:
+                      json:
+                        default: true
+                        description: Use JSON logging format
+                        type: boolean
+                      level:
+                        default: INFO
+                        description: Log level
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARNING
+                        - ERROR
+                        - CRITICAL
+                        type: string
+                    type: object
+                  nodeSelector:
+                    additionalProperties:
+                      type: string
+                    description: Node selector for pod placement
+                    type: object
+                  oauth:
+                    description: OAuth configuration for API
+                    properties:
+                      enabled:
+                        default: true
+                        description: Enable OAuth proxy
+                        type: boolean
+                      headerEmail:
+                        default: X-Forwarded-Email
+                        description: OAuth header for email
+                        type: string
+                      headerUser:
+                        default: X-Forwarded-User
+                        description: OAuth header for user
+                        type: string
+                    type: object
+                  rbac:
+                    description: RBAC configuration
+                    properties:
+                      auditEnabled:
+                        default: true
+                        description: Enable RBAC audit logging
+                        type: boolean
+                      cacheTTL:
+                        default: 300
+                        description: RBAC cache TTL in seconds (0 to disable)
+                        maximum: 3600
+                        minimum: 0
+                        type: integer
+                      defaultDeny:
+                        default: true
+                        description: Default deny policy
+                        type: boolean
+                      enabled:
+                        default: true
+                        description: Enable RBAC
+                        type: boolean
+                      groupSyncInterval:
+                        default: 300
+                        description: Group sync interval in seconds
+                        maximum: 3600
+                        minimum: 60
+                        type: integer
+                    type: object
+                  redis:
+                    description: Redis connection configuration for API
+                    properties:
+                      db:
+                        description: Redis database number
+                        type: string
+                      host:
+                        description: Redis host (defaults to release-name-redis-master)
+                        type: string
+                      passwordKey:
+                        default: redis-password
+                        description: Key in secret containing Redis password
+                        type: string
+                      passwordSecret:
+                        description: Name of secret containing Redis password
+                        type: string
+                      port:
+                        default: "6379"
+                        description: Redis port
+                        type: string
+                    type: object
+                  replicas:
+                    default: 3
+                    description: Number of API replicas
+                    maximum: 10
+                    minimum: 1
+                    type: integer
+                  resources:
+                    description: Resource requests and limits
+                    properties:
+                      limits:
+                        properties:
+                          cpu:
+                            default: 500m
+                            description: CPU limit
+                            type: string
+                          memory:
+                            default: 512Mi
+                            description: Memory limit
+                            type: string
+                        type: object
+                      requests:
+                        properties:
+                          cpu:
+                            default: 100m
+                            description: CPU request
+                            type: string
+                          memory:
+                            default: 256Mi
+                            description: Memory request
+                            type: string
+                        type: object
+                    type: object
+                  security:
+                    description: Security configuration
+                    properties:
+                      allowedOrigins:
+                        default:
+                        - '*'
+                        description: CORS allowed origins
+                        items:
+                          type: string
+                        type: array
+                      sessionExpireMinutes:
+                        default: 1440
+                        description: Session expiration in minutes
+                        maximum: 10080
+                        minimum: 60
+                        type: integer
+                      trustedHosts:
+                        default:
+                        - '*'
+                        description: List of trusted hosts
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  server:
+                    description: Server configuration
+                    properties:
+                      host:
+                        default: 0.0.0.0
+                        description: Server bind host
+                        type: string
+                      port:
+                        default: 8080
+                        description: Server port
+                        maximum: 65535
+                        minimum: 1024
+                        type: integer
+                      reload:
+                        default: false
+                        description: Enable auto-reload (dev only)
+                        type: boolean
+                      workers:
+                        default: 1
+                        description: Number of worker processes
+                        maximum: 10
+                        minimum: 1
+                        type: integer
+                    type: object
+                  service:
+                    description: Service configuration
+                    properties:
+                      annotations:
+                        additionalProperties:
+                          type: string
+                        description: Service annotations
+                        type: object
+                      nodePort:
+                        description: Node port (for NodePort service type)
+                        maximum: 32767
+                        minimum: 30000
+                        type: integer
+                      port:
+                        default: 8080
+                        description: Service port
+                        maximum: 65535
+                        minimum: 1
+                        type: integer
+                      sessionAffinity:
+                        default: None
+                        description: Session affinity
+                        enum:
+                        - None
+                        - ClientIP
+                        type: string
+                      sessionAffinityConfig:
+                        description: Session affinity configuration
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                      type:
+                        default: ClusterIP
+                        description: Service type
+                        enum:
+                        - ClusterIP
+                        - NodePort
+                        - LoadBalancer
+                        type: string
+                    type: object
+                  tolerations:
+                    description: Pod tolerations
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  volumeMounts:
+                    description: Additional volume mounts
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  volumes:
+                    description: Additional volumes
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                type: object
+              clusterEngine:
+                description: Configuration for the cluster controller component
+                properties:
+                  affinity:
+                    description: Pod affinity rules
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  extraEnv:
+                    description: Additional environment variables
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  image:
+                    description: Docker image for cluster controller
+                    type: string
+                  imagePullPolicy:
+                    default: Always
+                    description: Image pull policy
+                    enum:
+                    - Always
+                    - IfNotPresent
+                    - Never
+                    type: string
+                  logging:
+                    description: Logging configuration
+                    properties:
+                      level:
+                        default: INFO
+                        description: Log level
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARNING
+                        - ERROR
+                        - CRITICAL
+                        type: string
+                    type: object
+                  nodeSelector:
+                    additionalProperties:
+                      type: string
+                    description: Node selector for pod placement
+                    type: object
+                  probes:
+                    description: Liveness and readiness probe configuration
+                    properties:
+                      liveness:
+                        properties:
+                          failureThreshold:
+                            default: 3
+                            type: integer
+                          initialDelaySeconds:
+                            default: 10
+                            type: integer
+                          periodSeconds:
+                            default: 30
+                            type: integer
+                          timeoutSeconds:
+                            default: 5
+                            type: integer
+                        type: object
+                      readiness:
+                        properties:
+                          failureThreshold:
+                            default: 3
+                            type: integer
+                          initialDelaySeconds:
+                            default: 5
+                            type: integer
+                          periodSeconds:
+                            default: 10
+                            type: integer
+                          timeoutSeconds:
+                            default: 5
+                            type: integer
+                        type: object
+                    type: object
+                  redis:
+                    description: Redis connection configuration
+                    properties:
+                      db:
+                        description: Redis database number
+                        type: string
+                      host:
+                        description: Redis host (defaults to release-name-redis-master)
+                        type: string
+                      passwordKey:
+                        default: redis-password
+                        description: Key in secret containing Redis password
+                        type: string
+                      passwordSecret:
+                        description: Name of secret containing Redis password
+                        type: string
+                      port:
+                        default: "6379"
+                        description: Redis port
+                        type: string
+                    type: object
+                  replicas:
+                    default: 1
+                    description: Number of cluster controller replicas
+                    minimum: 1
+                    type: integer
+                  resources:
+                    description: Resource requests and limits
+                    properties:
+                      limits:
+                        properties:
+                          cpu:
+                            default: 1000m
+                            description: CPU limit
+                            type: string
+                          memory:
+                            default: 1Gi
+                            description: Memory limit
+                            type: string
+                        type: object
+                      requests:
+                        properties:
+                          cpu:
+                            default: 100m
+                            description: CPU request
+                            type: string
+                          memory:
+                            default: 256Mi
+                            description: Memory request
+                            type: string
+                        type: object
+                    type: object
+                  thresholds:
+                    description: Resource usage thresholds
+                    properties:
+                      cpuCritical:
+                        default: "90"
+                        description: CPU critical threshold percentage
+                        type: string
+                      cpuWarning:
+                        default: "85"
+                        description: CPU warning threshold percentage
+                        type: string
+                      memoryCritical:
+                        default: "90"
+                        description: Memory critical threshold percentage
+                        type: string
+                      memoryWarning:
+                        default: "85"
+                        description: Memory warning threshold percentage
+                        type: string
+                      nodeUnhealthy:
+                        default: "0.5"
+                        description: Node unhealthy threshold (fraction)
+                        type: string
+                    type: object
+                  timing:
+                    description: Timing configuration for various operations
+                    properties:
+                      cacheTTL:
+                        default: "600"
+                        description: Cache TTL in seconds
+                        type: string
+                      connectTimeout:
+                        default: "10"
+                        description: Connection timeout in seconds
+                        type: string
+                      fullScanInterval:
+                        default: "300"
+                        description: Full cluster scan interval in seconds
+                        type: string
+                      metricsRetention:
+                        default: "3600"
+                        description: Metrics retention period in seconds
+                        type: string
+                      nodeMetricsInterval:
+                        default: "15"
+                        description: Node metrics collection interval in seconds
+                        type: string
+                      operatorScanInterval:
+                        default: "300"
+                        description: Operator scan interval in seconds
+                        type: string
+                      reconciliationInterval:
+                        default: "30"
+                        description: Reconciliation interval in seconds
+                        type: string
+                    type: object
+                  tolerations:
+                    description: Pod tolerations
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  volumeMounts:
+                    description: Additional volume mounts
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  volumes:
+                    description: Additional volumes
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                type: object
+              frontend:
+                description: Configuration for the frontend UI component
+                properties:
+                  affinity:
+                    description: Pod affinity rules
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  config:
+                    description: Frontend application configuration
+                    properties:
+                      apiUrl:
+                        description: Backend API URL override
+                        type: string
+                      enableAnonymousAccess:
+                        default: false
+                        description: Enable access to the cluster page w/ restricted
+                          permissions to unauthenticated users.
+                        type: boolean
+                      features:
+                        description: Feature flags
+                        properties:
+                          devTools:
+                            default: false
+                            description: Enable React Query DevTools
+                            type: boolean
+                          mockData:
+                            default: false
+                            description: Use mock data
+                            type: boolean
+                          nodeDetails:
+                            default: true
+                            description: Enable node details view
+                            type: boolean
+                          operatorDetails:
+                            default: true
+                            description: Enable operator details view
+                            type: boolean
+                          registryStatus:
+                            default: true
+                            description: Show registry status
+                            type: boolean
+                        type: object
+                      refreshInterval:
+                        default: 30000
+                        description: Data refresh interval in milliseconds
+                        maximum: 300000
+                        minimum: 5000
+                        type: integer
+                      theme:
+                        properties:
+                          defaultTheme:
+                            default: auto
+                            description: Default theme setting
+                            enum:
+                            - light
+                            - dark
+                            - auto
+                            type: string
+                          persistPreference:
+                            default: true
+                            description: Persist theme preference
+                            type: boolean
+                        type: object
+                    type: object
+                  enabled:
+                    default: true
+                    description: Enable frontend deployment
+                    type: boolean
+                  extraEnv:
+                    description: Additional environment variables
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  image:
+                    description: Docker image for frontend
+                    type: string
+                  imagePullPolicy:
+                    default: Always
+                    description: Image pull policy
+                    enum:
+                    - Always
+                    - IfNotPresent
+                    - Never
+                    type: string
+                  nginx:
+                    description: Nginx configuration
+                    properties:
+                      port:
+                        default: 8080
+                        description: Nginx listen port
+                        type: integer
+                      upstreamTimeout:
+                        properties:
+                          connect:
+                            default: 60s
+                            description: Connection timeout
+                            type: string
+                          read:
+                            default: 60s
+                            description: Read timeout
+                            type: string
+                          send:
+                            default: 60s
+                            description: Send timeout
+                            type: string
+                        type: object
+                      websocket:
+                        default: true
+                        description: Enable WebSocket support
+                        type: boolean
+                    type: object
+                  nodeSelector:
+                    additionalProperties:
+                      type: string
+                    description: Node selector for pod placement
+                    type: object
+                  oauth:
+                    description: OAuth proxy configuration
+                    properties:
+                      delegateUrls:
+                        description: Delegate URL permissions
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                      emailDomain:
+                        default: '*'
+                        description: Allowed email domains
+                        type: string
+                      enabled:
+                        default: true
+                        description: Enable OAuth proxy sidecar
+                        type: boolean
+                      image:
+                        default: quay.io/openshift/origin-oauth-proxy:4.17
+                        description: OAuth proxy image
+                        type: string
+                      imagePullPolicy:
+                        default: IfNotPresent
+                        description: OAuth proxy image pull policy
+                        type: string
+                      passHeaders:
+                        description: Headers to pass to upstream
+                        properties:
+                          accessToken:
+                            default: true
+                            description: Pass access token to upstream
+                            type: boolean
+                          basicAuth:
+                            default: false
+                            description: Pass basic auth to upstream
+                            type: boolean
+                          bearerToken:
+                            default: true
+                            description: Pass bearer token to upstream
+                            type: boolean
+                          userHeaders:
+                            default: true
+                            description: Pass user headers to upstream
+                            type: boolean
+                        type: object
+                      provider:
+                        default: openshift
+                        description: OAuth provider type
+                        enum:
+                        - openshift
+                        - oidc
+                        - github
+                        - gitlab
+                        type: string
+                      resources:
+                        description: OAuth proxy resource requirements
+                        properties:
+                          limits:
+                            properties:
+                              cpu:
+                                default: 100m
+                                description: CPU limit
+                                type: string
+                              memory:
+                                default: 128Mi
+                                description: Memory limit
+                                type: string
+                            type: object
+                          requests:
+                            properties:
+                              cpu:
+                                default: 50m
+                                description: CPU request
+                                type: string
+                              memory:
+                                default: 64Mi
+                                description: Memory request
+                                type: string
+                            type: object
+                        type: object
+                      sar:
+                        description: Subject access review configuration
+                        properties:
+                          resource:
+                            default: namespaces
+                            description: Resource to check access for
+                            type: string
+                          verb:
+                            default: get
+                            description: Verb to check access for
+                            type: string
+                        type: object
+                      sessionSecret:
+                        default: ""
+                        description: Base64 encoded session secret
+                        type: string
+                      skipAuthRegex:
+                        description: Paths to skip authentication
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  replicas:
+                    default: 3
+                    description: Number of frontend replicas
+                    maximum: 10
+                    minimum: 1
+                    type: integer
+                  resources:
+                    description: Frontend container resource requirements
+                    properties:
+                      limits:
+                        properties:
+                          cpu:
+                            default: 200m
+                            description: CPU limit
+                            type: string
+                          memory:
+                            default: 256Mi
+                            description: Memory limit
+                            type: string
+                        type: object
+                      requests:
+                        properties:
+                          cpu:
+                            default: 50m
+                            description: CPU request
+                            type: string
+                          memory:
+                            default: 128Mi
+                            description: Memory request
+                            type: string
+                        type: object
+                    type: object
+                  route:
+                    description: OpenShift route configuration
+                    properties:
+                      enabled:
+                        default: true
+                        description: Create OpenShift route
+                        type: boolean
+                      host:
+                        description: Custom hostname for route (auto-generated if
+                          not set)
+                        type: string
+                      tls:
+                        properties:
+                          caCertificate:
+                            description: Custom CA certificate
+                            type: string
+                          certificate:
+                            description: Custom TLS certificate
+                            type: string
+                          insecureEdgeTerminationPolicy:
+                            default: Redirect
+                            description: Insecure traffic policy
+                            enum:
+                            - Allow
+                            - Redirect
+                            - None
+                            type: string
+                          key:
+                            description: Custom TLS key
+                            type: string
+                          termination:
+                            default: reencrypt
+                            description: TLS termination type
+                            enum:
+                            - edge
+                            - passthrough
+                            - reencrypt
+                            type: string
+                        type: object
+                    type: object
+                  service:
+                    description: Service configuration
+                    properties:
+                      annotations:
+                        additionalProperties:
+                          type: string
+                        description: Service annotations
+                        type: object
+                      httpsPort:
+                        default: 8443
+                        description: HTTPS port
+                        type: integer
+                      type:
+                        default: ClusterIP
+                        description: Service type
+                        enum:
+                        - ClusterIP
+                        - NodePort
+                        - LoadBalancer
+                        type: string
+                    type: object
+                  tolerations:
+                    description: Pod tolerations
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  volumeMounts:
+                    description: Additional volume mounts
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  volumes:
+                    description: Additional volumes
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                type: object
+              policyEngine:
+                description: Configuration for the policy controller component
+                properties:
+                  affinity:
+                    description: Pod affinity rules
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  batch:
+                    description: Batch processing configuration
+                    properties:
+                      cacheClearBatchSize:
+                        default: 500
+                        description: Cache clear batch size
+                        maximum: 5000
+                        minimum: 100
+                        type: integer
+                      redisPipelineBatchSize:
+                        default: 1000
+                        description: Redis pipeline batch size
+                        maximum: 10000
+                        minimum: 100
+                        type: integer
+                      redisScanBatchSize:
+                        default: 100
+                        description: Redis SCAN batch size
+                        maximum: 1000
+                        minimum: 10
+                        type: integer
+                    type: object
+                  cache:
+                    description: Cache configuration for policy engine
+                    properties:
+                      groupCacheTTL:
+                        default: 300
+                        description: Group membership cache TTL in seconds
+                        maximum: 3600
+                        minimum: 60
+                        type: integer
+                      policyCacheTTL:
+                        default: 300
+                        description: Policy cache TTL in seconds
+                        maximum: 3600
+                        minimum: 60
+                        type: integer
+                    type: object
+                  enabled:
+                    default: true
+                    description: Enable policy engine deployment
+                    type: boolean
+                  extraEnv:
+                    description: Additional environment variables
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  image:
+                    description: Docker image for policy controller
+                    type: string
+                  imagePullPolicy:
+                    default: Always
+                    description: Image pull policy
+                    enum:
+                    - Always
+                    - IfNotPresent
+                    - Never
+                    type: string
+                  limits:
+                    description: Policy engine limits
+                    properties:
+                      maxPoliciesPerUser:
+                        default: 100
+                        description: Maximum number of policies per user
+                        maximum: 1000
+                        minimum: 10
+                        type: integer
+                      policyValidationInterval:
+                        default: 300
+                        description: Policy validation interval in seconds
+                        maximum: 3600
+                        minimum: 60
+                        type: integer
+                    type: object
+                  logging:
+                    description: Logging configuration
+                    properties:
+                      level:
+                        default: INFO
+                        description: Log level
+                        enum:
+                        - DEBUG
+                        - INFO
+                        - WARNING
+                        - ERROR
+                        - CRITICAL
+                        type: string
+                    type: object
+                  nodeSelector:
+                    additionalProperties:
+                      type: string
+                    description: Node selector for pod placement
+                    type: object
+                  probes:
+                    description: Liveness and readiness probe configuration
+                    properties:
+                      liveness:
+                        properties:
+                          failureThreshold:
+                            default: 3
+                            type: integer
+                          initialDelaySeconds:
+                            default: 10
+                            type: integer
+                          periodSeconds:
+                            default: 30
+                            type: integer
+                          timeoutSeconds:
+                            default: 5
+                            type: integer
+                        type: object
+                      readiness:
+                        properties:
+                          failureThreshold:
+                            default: 3
+                            type: integer
+                          initialDelaySeconds:
+                            default: 5
+                            type: integer
+                          periodSeconds:
+                            default: 10
+                            type: integer
+                          timeoutSeconds:
+                            default: 5
+                            type: integer
+                        type: object
+                    type: object
+                  redis:
+                    description: Redis connection configuration for policy engine
+                    properties:
+                      db:
+                        description: Redis database number
+                        type: string
+                      host:
+                        description: Redis host (defaults to release-name-redis-master)
+                        type: string
+                      passwordKey:
+                        default: redis-password
+                        description: Key in secret containing Redis password
+                        type: string
+                      passwordSecret:
+                        description: Name of secret containing Redis password
+                        type: string
+                      port:
+                        default: "6379"
+                        description: Redis port
+                        type: string
+                    type: object
+                  replicas:
+                    default: 1
+                    description: Number of policy controller replicas
+                    maximum: 3
+                    minimum: 1
+                    type: integer
+                  resources:
+                    description: Resource requests and limits
+                    properties:
+                      limits:
+                        properties:
+                          cpu:
+                            default: 500m
+                            description: CPU limit
+                            type: string
+                          memory:
+                            default: 512Mi
+                            description: Memory limit
+                            type: string
+                        type: object
+                      requests:
+                        properties:
+                          cpu:
+                            default: 50m
+                            description: CPU request
+                            type: string
+                          memory:
+                            default: 128Mi
+                            description: Memory request
+                            type: string
+                        type: object
+                    type: object
+                  tolerations:
+                    description: Pod tolerations
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  volumeMounts:
+                    description: Additional volume mounts
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                  volumes:
+                    description: Additional volumes
+                    items:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    type: array
+                type: object
+              redis:
+                properties:
+                  enabled:
+                    default: true
+                    description: Enable Redis subchart deployment
+                    type: boolean
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+          status:
+            description: Status defines the observed state of ClusterPulse
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

@@ -1,0 +1,74 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: frappe-operator
+    app.kubernetes.io/instance: frappe-aggregated-view-role
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/part-of: frappe-operator
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+  name: frappe-operator-aggregated-view
+rules:
+- apiGroups:
+  - vyogo.tech
+  resources:
+  - frappebenches
+  - frappesites
+  - frappeworkspaces
+  - siteapikeys
+  - siteapps
+  - sitebackups
+  - siteclientscripts
+  - siteconfigs
+  - sitecrons
+  - sitecustomfields
+  - sitedashboardcharts
+  - sitedashboards
+  - sitedomains
+  - sitejobs
+  - sitemigrations
+  - sitepropertysetters
+  - sitequotas
+  - siterestores
+  - siteroles
+  - siteserverscripts
+  - siteuserpermissions
+  - siteusers
+  - sitewebhooks
+  - siteworkspaces
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - vyogo.tech
+  resources:
+  - frappebenches/status
+  - frappesites/status
+  - frappeworkspaces/status
+  - siteapikeys/status
+  - siteapps/status
+  - sitebackups/status
+  - siteclientscripts/status
+  - siteconfigs/status
+  - sitecrons/status
+  - sitecustomfields/status
+  - sitedashboardcharts/status
+  - sitedashboards/status
+  - sitedomains/status
+  - sitejobs/status
+  - sitemigrations/status
+  - sitepropertysetters/status
+  - sitequotas/status
+  - siterestores/status
+  - siteroles/status
+  - siteserverscripts/status
+  - siteuserpermissions/status
+  - siteusers/status
+  - sitewebhooks/status
+  - siteworkspaces/status
+  verbs:
+  - get

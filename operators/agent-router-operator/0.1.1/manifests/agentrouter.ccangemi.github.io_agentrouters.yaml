@@ -1,0 +1,73 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: agentrouters.agentrouter.ccangemi.github.io
+spec:
+  group: agentrouter.ccangemi.github.io
+  names:
+    kind: AgentRouter
+    listKind: AgentRouterList
+    plural: agentrouters
+    singular: agentrouter
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=="Deployed")].status
+      name: Deployed
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Deployed")].reason
+      name: Reason
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: AgentRouter installs the Agent Router controller (formerly Envoy
+          AI Gateway) in the namespace of the resource, with the upstream ai-gateway-helm
+          chart. Create one AgentRouter, named agent-router, in the namespace of the
+          operator.
+        properties:
+          apiVersion:
+            description: APIVersion defines the versioned schema of this representation
+              of an object.
+            type: string
+          kind:
+            description: Kind is a string value representing the REST resource this
+              object represents.
+            type: string
+          metadata:
+            type: object
+          spec:
+            default: {}
+            description: Values of the operator chart. The values of the upstream
+              ai-gateway-helm chart go under the key "ai-gateway-helm". Some values
+              are set by the operator; see the operator documentation.
+            properties:
+              ai-gateway-helm:
+                default: {}
+                description: Values of the upstream ai-gateway-helm chart.
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+          status:
+            description: Status of the Helm release, written by the operator.
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+        x-kubernetes-validations:
+        - message: the AgentRouter resource must be named agent-router
+          rule: self.metadata.name == 'agent-router'
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

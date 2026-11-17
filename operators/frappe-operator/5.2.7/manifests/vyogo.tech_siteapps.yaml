@@ -1,0 +1,212 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  creationTimestamp: null
+  name: siteapps.vyogo.tech
+spec:
+  group: vyogo.tech
+  names:
+    kind: SiteApp
+    listKind: SiteAppList
+    plural: siteapps
+    singular: siteapp
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .spec.appName
+      name: App
+      type: string
+    - jsonPath: .spec.siteRef.name
+      name: Site
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: SiteApp is the Schema for the siteapps API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: SiteAppSpec defines the desired state of SiteApp
+            properties:
+              appName:
+                description: AppName specifies the name of the Frappe Python module/app
+                  (e.g. "erpnext_australian_localisation").
+                minLength: 1
+                type: string
+              autoMigrate:
+                default: true
+                description: AutoMigrate determines whether to trigger database migration
+                  after app installation. Defaults to true.
+                type: boolean
+              backupBeforeInstall:
+                default: true
+                description: |-
+                  BackupBeforeInstall determines whether the operator takes a full backup of
+                  the site and waits for it to succeed before installing/upgrading the app.
+                  This creates a rollback point in case the install corrupts the site.
+                  Defaults to true; set false to skip (e.g. for throwaway sites).
+                type: boolean
+              fpmPackage:
+                description: |-
+                  FPMPackage, when set, installs the app from a prebuilt FPM package
+                  ("<org>/<app>==<version>", e.g. "frappe/wiki==3.0.0") instead of a runtime
+                  git clone. The package ships compiled assets + vendored wheels, so no
+                  yarn/pip build runs on the bench. This is the preferred path; GitRepo is the
+                  fallback for apps that have no published package.
+                type: string
+              fpmRepo:
+                description: |-
+                  FPMRepo is the FPM registry the package is resolved from — either an HTTP
+                  registry ("https://fpm.vyogo.tech") or an OCI registry
+                  ("ghcr.io/vyogotech/fpm", where the built packages live). Required
+                  alongside FPMPackage.
+                type: string
+              fpmRepoType:
+                description: |-
+                  FPMRepoType is the registry backend: "oci" or "http" (default "http").
+                  OCI registries (ghcr) hold the prod-built packages and are usually private,
+                  so credentials come from the "fpm-registry-auth" Secret (keys: username,
+                  token) in the site's namespace.
+                enum:
+                - http
+                - oci
+                type: string
+              gitBranch:
+                description: GitBranch specifies the Git branch or tag to clone (defaults
+                  to "main" or "master").
+                type: string
+              gitRepo:
+                description: GitRepo specifies an optional Git repository URL to dynamically
+                  fetch the app source code if not already in the bench.
+                type: string
+              siteRef:
+                description: SiteRef specifies the target FrappeSite custom resource.
+                properties:
+                  name:
+                    description: Name of the resource
+                    type: string
+                  namespace:
+                    description: Namespace of the resource
+                    type: string
+                required:
+                - name
+                type: object
+            required:
+            - appName
+            - siteRef
+            type: object
+          status:
+            description: SiteAppStatus defines the observed state of SiteApp
+            properties:
+              conditions:
+                description: Conditions represent the latest available observations
+                  of the SiteApp's state.
+                items:
+                  description: Condition contains details for one aspect of the current
+                    state of this API Resource.
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              installedVersion:
+                description: InstalledVersion stores the version or commit of the
+                  installed app.
+                type: string
+              observedGeneration:
+                description: ObservedGeneration is the most recent generation observed
+                  by the controller.
+                format: int64
+                type: integer
+              phase:
+                description: Phase represents the current state of the SiteApp (Pending,
+                  Installing, Ready, Failed, Uninstalling).
+                type: string
+              preBackupRef:
+                description: |-
+                  PreBackupRef is the name of the SiteBackup taken before this install as a
+                  rollback point (set when backupBeforeInstall is enabled).
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

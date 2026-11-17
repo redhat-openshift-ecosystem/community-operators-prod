@@ -1,0 +1,405 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "headscale.jicoyne.io/v1alpha1",
+          "kind": "Headscale",
+          "metadata": {
+            "name": "headscale"
+          },
+          "spec": {
+            "apiKey": {
+              "autoBootstrap": true,
+              "ownerUser": "admin",
+              "secretName": "headscale-api-key"
+            },
+            "consolePlugin": {
+              "enabled": false
+            },
+            "storage": {
+              "className": "",
+              "size": "1Gi"
+            },
+            "subnetRouter": {
+              "authKeySecretRef": "tailscale-router-authkey",
+              "enabled": false,
+              "exitNode": true
+            },
+            "ui": {
+              "enabled": true
+            },
+            "version": "0.27.1"
+          }
+        }
+      ]
+    capabilities: Seamless Upgrades
+    categories: Networking
+    containerImage: ghcr.io/jim-coyne/headscale-operator@sha256:c2d42085c12d6b7847f91055c7f004a605a5acf8f45064870d6c9fad78145f2e
+    createdAt: "2026-07-23T16:50:50Z"
+    description: Deploy and manage a self-hosted Headscale coordination server, admin
+      web UI, OpenShift console plugin and an optional Tailscale subnet router on
+      OpenShift.
+    operators.operatorframework.io/builder: operator-sdk-v1.42.3
+    operators.operatorframework.io/project_layout: ansible.sdk.operatorframework.io/v1
+    repository: https://github.com/jicoyne/headscale-openshift
+    support: Community
+  name: headscale-operator.v0.1.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: A self-hosted Headscale control-plane stack (server, UI, optional
+        console plugin and subnet router).
+      displayName: Headscale
+      kind: Headscale
+      name: headscales.headscale.jicoyne.io
+      specDescriptors:
+      - description: OpenShift *.apps ingress domain (auto-detected if empty).
+        displayName: Apps Domain
+        path: appsDomain
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Headscale Version
+        path: version
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Enable UI
+        path: ui.enabled
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - displayName: Enable Console Plugin
+        path: consolePlugin.enabled
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - displayName: Enable Subnet Router
+        path: subnetRouter.enabled
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      statusDescriptors:
+      - displayName: Phase
+        path: phase
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.phase
+      - displayName: Coordination URL
+        path: coordinationURL
+        x-descriptors:
+        - urn:alm:descriptor:org.w3:link
+      - displayName: Online Nodes
+        path: onlineNodes
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      version: v1alpha1
+  description: |
+    ## Headscale Operator
+
+    The Headscale Operator installs and manages a complete self-hosted
+    [Headscale](https://headscale.net) control-plane stack on OpenShift from a
+    single `Headscale` custom resource:
+
+    * **Headscale coordination server** (SQLite, embedded DERP) with the
+      `node-counter` and `register-api` sidecars.
+    * **Admin web UI** protected by an OpenShift `oauth-proxy`.
+    * **OpenShift console plugin** (optional) adding a Headscale nav section.
+    * **Tailscale subnet router / exit node** (optional, privileged).
+
+    The operator automates the previously manual bootstrap: it auto-detects the
+    cluster ingress domain, and — when `spec.apiKey.autoBootstrap` is enabled —
+    creates the owner user and an API key, then writes the derived Secrets.
+
+    ### Security notes for reviewers
+
+    * The operator needs `pods/exec` to run `headscale users/apikeys create`
+      inside the running server during API-key bootstrap.
+    * The optional subnet router requires the `privileged` SCC and is **disabled
+      by default**.
+    * The console plugin is deployed from a **pre-built image**
+      (`spec.consolePlugin.image`); no on-cluster build is performed.
+  displayName: Headscale Operator
+  icon:
+  - base64data: PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjE4IiBmaWxsPSIjMWExYTJlIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSIzMCIgcj0iOSIgZmlsbD0iIzRhZGU4MCIvPjxjaXJjbGUgY3g9IjI2IiBjeT0iNjYiIHI9IjkiIGZpbGw9IiM0YWRlODAiLz48Y2lyY2xlIGN4PSI3NCIgY3k9IjY2IiByPSI5IiBmaWxsPSIjNGFkZTgwIi8+PGcgc3Ryb2tlPSIjNGFkZTgwIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+PGxpbmUgeDE9IjUwIiB5MT0iMzAiIHgyPSIyNiIgeTI9IjY2Ii8+PGxpbmUgeDE9IjUwIiB5MT0iMzAiIHgyPSI3NCIgeTI9IjY2Ii8+PGxpbmUgeDE9IjI2IiB5MT0iNjYiIHgyPSI3NCIgeTI9IjY2Ii8+PC9nPjwvc3ZnPgo=
+    mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - headscale.jicoyne.io
+          resources:
+          - headscales
+          - headscales/status
+          - headscales/finalizers
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - serviceaccounts
+          - services
+          - configmaps
+          - persistentvolumeclaims
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - pods/log
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - pods/exec
+          verbs:
+          - create
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces
+          verbs:
+          - get
+          - list
+          - patch
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          - routes/custom-host
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - roles
+          - rolebindings
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - clusterrolebindings
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - console.openshift.io
+          resources:
+          - consoleplugins
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - operator.openshift.io
+          resources:
+          - consoles
+          verbs:
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - config.openshift.io
+          resources:
+          - ingresses
+          - networks
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        serviceAccountName: headscale-operator-controller-manager
+      deployments:
+      - label:
+          control-plane: controller-manager
+        name: headscale-operator-controller-manager
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              control-plane: controller-manager
+          strategy: {}
+          template:
+            metadata:
+              annotations:
+                kubectl.kubernetes.io/default-container: manager
+              labels:
+                control-plane: controller-manager
+            spec:
+              containers:
+              - args:
+                - --leader-elect
+                - --leader-election-id=headscale-operator
+                - --health-probe-bind-address=:6789
+                env:
+                - name: ANSIBLE_GATHERING
+                  value: explicit
+                image: ghcr.io/jim-coyne/headscale-operator@sha256:c2d42085c12d6b7847f91055c7f004a605a5acf8f45064870d6c9fad78145f2e
+                imagePullPolicy: IfNotPresent
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 6789
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: manager
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 6789
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  limits:
+                    cpu: 500m
+                    memory: 512Mi
+                  requests:
+                    cpu: 10m
+                    memory: 128Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+              securityContext:
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+              serviceAccountName: headscale-operator-controller-manager
+              terminationGracePeriodSeconds: 10
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        serviceAccountName: headscale-operator-controller-manager
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - headscale
+  - tailscale
+  - vpn
+  - wireguard
+  - networking
+  links:
+  - name: Source
+    url: https://github.com/jicoyne/headscale-openshift
+  - name: Headscale
+    url: https://headscale.net
+  maintainers:
+  - email: jicoyne@users.noreply.github.com
+    name: jicoyne
+  maturity: alpha
+  minKubeVersion: 1.25.0
+  provider:
+    name: jicoyne
+    url: https://github.com/jicoyne/headscale-openshift
+  version: 0.1.0

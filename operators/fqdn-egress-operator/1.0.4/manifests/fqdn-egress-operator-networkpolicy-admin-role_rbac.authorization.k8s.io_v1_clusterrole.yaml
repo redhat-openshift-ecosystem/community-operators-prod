@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: fqdn-egress-operator
+  name: fqdn-egress-operator-networkpolicy-admin-role
+rules:
+- apiGroups:
+  - networking.turbosimone.com
+  resources:
+  - networkpolicies
+  verbs:
+  - '*'
+- apiGroups:
+  - networking.turbosimone.com
+  resources:
+  - networkpolicies/status
+  verbs:
+  - get

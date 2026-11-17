@@ -1,0 +1,218 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  creationTimestamp: null
+  name: workspaces.automotive.sdv.cloud.redhat.com
+spec:
+  group: automotive.sdv.cloud.redhat.com
+  names:
+    kind: Workspace
+    listKind: WorkspaceList
+    plural: workspaces
+    singular: workspace
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.owner
+      name: Owner
+      type: string
+    - jsonPath: .spec.architecture
+      name: Arch
+      type: string
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .spec.leaseID
+      name: Lease
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Workspace is the Schema for the workspaces API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: WorkspaceSpec defines the desired state of a developer workspace.
+            properties:
+              architecture:
+                description: Architecture is the target architecture (e.g., "arm64",
+                  "amd64")
+                type: string
+              autoPauseTimeoutMinutes:
+                description: |-
+                  AutoPauseTimeoutMinutes overrides the global auto-pause timeout for this workspace.
+                  nil = use global default from OperatorConfig (default: 30 minutes)
+                  0 = disable auto-pause for this workspace
+                  >0 = custom timeout in minutes
+                format: int32
+                minimum: 0
+                type: integer
+              clientConfigSecretRef:
+                description: |-
+                  ClientConfigSecretRef is the name of the Secret containing the Jumpstarter client config
+                  The secret should have a key "client.yaml"
+                type: string
+              image:
+                description: Image is the toolchain container image to use
+                type: string
+              leaseID:
+                description: LeaseID is the Jumpstarter lease ID for board access
+                type: string
+              nodeSelector:
+                additionalProperties:
+                  type: string
+                description: NodeSelector is a set of key-value pairs that must match
+                  node labels for scheduling
+                type: object
+              owner:
+                description: Owner is the authenticated user who created this workspace
+                type: string
+              pvcSize:
+                default: 10Gi
+                description: PVCSize is the size of the persistent volume for workspace
+                  storage
+                type: string
+              resources:
+                description: Resources defines the CPU and memory requests/limits
+                  for the workspace container
+                properties:
+                  claims:
+                    description: |-
+                      Claims lists the names of resources, defined in spec.resourceClaims,
+                      that are used by this container.
+
+                      This is an alpha field and requires enabling the
+                      DynamicResourceAllocation feature gate.
+
+                      This field is immutable. It can only be set for containers.
+                    items:
+                      description: ResourceClaim references one entry in PodSpec.ResourceClaims.
+                      properties:
+                        name:
+                          description: |-
+                            Name must match the name of one entry in pod.spec.resourceClaims of
+                            the Pod where this field is used. It makes that resource available
+                            inside a container.
+                          type: string
+                        request:
+                          description: |-
+                            Request is the name chosen for a request in the referenced claim.
+                            If empty, everything from the claim is made available, otherwise
+                            only the result of this request.
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                  limits:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Limits describes the maximum amount of compute resources allowed.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
+                  requests:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: |-
+                      Requests describes the minimum amount of compute resources required.
+                      If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
+                      otherwise to an implementation-defined value. Requests cannot exceed Limits.
+                      More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+                    type: object
+                type: object
+              stopped:
+                description: |-
+                  Stopped indicates the workspace pod should not be running.
+                  When true, the controller deletes the pod but preserves the PVC.
+                type: boolean
+              storageClass:
+                description: |-
+                  StorageClass is the storage class for workspace PVCs
+                  If empty, the cluster default storage class is used
+                type: string
+              tmpfsBuildDir:
+                description: TmpfsBuildDir adds a tmpfs-backed emptyDir at /tmp/build
+                  for fast compilation
+                type: boolean
+            required:
+            - owner
+            type: object
+          status:
+            description: WorkspaceStatus defines the observed state of a Workspace.
+            properties:
+              buildCachePVCName:
+                description: |-
+                  BuildCachePVCName is the name of the PVC used for build cache storage.
+                  Created lazily on first build referencing this workspace.
+                type: string
+              lastActivityTime:
+                description: |-
+                  LastActivityTime is the last time activity was detected in the workspace pod.
+                  Used by the auto-pause controller to determine idle duration.
+                format: date-time
+                type: string
+              message:
+                description: Message provides additional detail about the current
+                  phase
+                type: string
+              phase:
+                description: Phase is the current phase of the workspace
+                enum:
+                - Pending
+                - Creating
+                - Running
+                - Failed
+                - Terminating
+                - Stopped
+                type: string
+              podName:
+                description: PodName is the name of the workspace pod
+                type: string
+              pvcName:
+                description: PVCName is the generated name of the workspace PVC
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

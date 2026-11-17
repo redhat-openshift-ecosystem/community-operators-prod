@@ -1,8 +1,22 @@
 ---
-updateGraph: semver-mode
-
 addReviewers: true
 
 # A list of reviewers to be added to pull requests (GitHub user name)
 reviewers:
-  - Zerpet
+  - MirahImage
+  - mkuratczyk
+  - ansd
+  - rabbitmq-ci
+
+fbc:
+  enabled: true
+  catalog_mapping:
+    - template_name: v4.18.yaml
+      catalog_names: ["v4.18"]
+      type: olm.template.basic
+    - template_name: v4.19.yaml
+      catalog_names: ["v4.19"]
+      type: olm.template.basic
+    - template_name: v4.20.yaml
+      catalog_names: ["v4.20", "v4.21", "v4.22"]
+      type: olm.template.basic

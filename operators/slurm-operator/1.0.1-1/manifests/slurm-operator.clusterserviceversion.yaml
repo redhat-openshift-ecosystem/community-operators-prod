@@ -1,0 +1,1058 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "slinky.slurm.net/v1beta1",
+          "kind": "Accounting",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "app.kubernetes.io/part-of": "slurm",
+              "app.kubernetes.io/version": "25.11",
+              "helm.sh/chart": "slurm-1.0.1"
+            },
+            "name": "slurm",
+            "namespace": "slurm"
+          },
+          "spec": {
+            "jwtHs256KeyRef": {
+              "key": "jwt_hs256.key",
+              "name": "slurm-auth-jwths256"
+            },
+            "service": {
+              "metadata": {},
+              "spec": {}
+            },
+            "slurmKeyRef": {
+              "key": "slurm.key",
+              "name": "slurm-auth-slurm"
+            },
+            "slurmdbd": {
+              "args": [],
+              "image": "quay.io/slinky-on-openshift/slurmdbd:25.05.4-centos9-ohpc",
+              "imagePullPolicy": "IfNotPresent",
+              "resources": {}
+            },
+            "storageConfig": {
+              "database": "slurm_acct_db",
+              "host": "mariadb",
+              "passwordKeyRef": {
+                "key": "password",
+                "name": "mariadb-password"
+              },
+              "port": 3306,
+              "username": "slurm"
+            },
+            "template": {
+              "spec": {
+                "affinity": {},
+                "imagePullSecrets": null,
+                "initContainers": [],
+                "nodeSelector": {
+                  "kubernetes.io/os": "linux"
+                },
+                "priorityClassName": null,
+                "resources": {},
+                "tolerations": []
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "slinky.slurm.net/v1beta1",
+          "kind": "Controller",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "app.kubernetes.io/part-of": "slurm",
+              "app.kubernetes.io/version": "25.11",
+              "helm.sh/chart": "slurm-1.0.1"
+            },
+            "name": "slurm",
+            "namespace": "slurm"
+          },
+          "spec": {
+            "accountingRef": {
+              "name": "slurm",
+              "namespace": "slurm"
+            },
+            "epilogScriptRefs": null,
+            "epilogSlurmctldScriptRefs": null,
+            "extraConf": "PartitionName=all Nodes=ALL Default=YES MaxTime=UNLIMITED State=UP\n",
+            "jwtHs256KeyRef": {
+              "key": "jwt_hs256.key",
+              "name": "slurm-auth-jwths256"
+            },
+            "logfile": {
+              "image": "registry.redhat.io/ubi9/ubi:latest",
+              "imagePullPolicy": "IfNotPresent",
+              "resources": {}
+            },
+            "metrics": {
+              "enabled": false,
+              "serviceMonitor": {
+                "annotations": {},
+                "enabled": false,
+                "endpoints": [
+                  {
+                    "path": "/metrics/jobs"
+                  },
+                  {
+                    "path": "/metrics/nodes"
+                  },
+                  {
+                    "path": "/metrics/partitions"
+                  },
+                  {
+                    "path": "/metrics/scheduler"
+                  }
+                ],
+                "interval": "30s",
+                "labels": {},
+                "scrapeTimeout": "25s"
+              }
+            },
+            "persistence": {
+              "accessModes": [
+                "ReadWriteOnce"
+              ],
+              "enabled": true,
+              "existingClaim": "",
+              "resources": {
+                "requests": {
+                  "storage": "4Gi"
+                }
+              }
+            },
+            "prologScriptRefs": null,
+            "prologSlurmctldScriptRefs": null,
+            "reconfigure": {
+              "image": "quay.io/slinky-on-openshift/slurmctld:25.05.4-centos9-ohpc",
+              "imagePullPolicy": "IfNotPresent",
+              "resources": {}
+            },
+            "service": {
+              "metadata": {},
+              "spec": {}
+            },
+            "slurmKeyRef": {
+              "key": "slurm.key",
+              "name": "slurm-auth-slurm"
+            },
+            "slurmctld": {
+              "args": [],
+              "image": "quay.io/slinky-on-openshift/slurmctld:25.11-ubuntu24.04",
+              "imagePullPolicy": "IfNotPresent",
+              "resources": {}
+            },
+            "template": {
+              "spec": {
+                "affinity": {},
+                "imagePullSecrets": null,
+                "initContainers": [],
+                "nodeSelector": {
+                  "kubernetes.io/os": "linux"
+                },
+                "priorityClassName": null,
+                "resources": {},
+                "tolerations": []
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "slinky.slurm.net/v1beta1",
+          "kind": "LoginSet",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "app.kubernetes.io/part-of": "slurm",
+              "app.kubernetes.io/version": "25.11",
+              "helm.sh/chart": "slurm-1.0.1"
+            },
+            "name": "slurm-login-slinky",
+            "namespace": "slurm"
+          },
+          "spec": {
+            "controllerRef": {
+              "name": "slurm",
+              "namespace": "slurm"
+            },
+            "initconf": {
+              "image": "docker.io/library/alpine:latest",
+              "imagePullPolicy": "IfNotPresent",
+              "resources": {}
+            },
+            "login": {
+              "env": [],
+              "image": "quay.io/slinky-on-openshift/login:25.05.4-centos9-ohpc",
+              "imagePullPolicy": "IfNotPresent",
+              "resources": {},
+              "securityContext": {
+                "privileged": true
+              },
+              "volumeMounts": []
+            },
+            "replicas": 1,
+            "service": {
+              "metadata": {},
+              "spec": {
+                "type": "LoadBalancer"
+              }
+            },
+            "sssdConfRef": {
+              "key": "sssd.conf",
+              "name": "slurm-login-slinky-sssd-conf"
+            },
+            "template": {
+              "spec": {
+                "affinity": {},
+                "imagePullSecrets": null,
+                "initContainers": [],
+                "nodeSelector": {
+                  "kubernetes.io/os": "linux"
+                },
+                "priorityClassName": null,
+                "resources": {},
+                "tolerations": [],
+                "volumes": []
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "slinky.slurm.net/v1beta1",
+          "kind": "NodeSet",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "app.kubernetes.io/part-of": "slurm",
+              "app.kubernetes.io/version": "25.11",
+              "helm.sh/chart": "slurm-1.0.1"
+            },
+            "name": "slurm-worker-slinky",
+            "namespace": "slurm"
+          },
+          "spec": {
+            "controllerRef": {
+              "name": "slurm",
+              "namespace": "slurm"
+            },
+            "logfile": {
+              "image": "registry.redhat.io/ubi9/ubi:latest",
+              "imagePullPolicy": "IfNotPresent",
+              "resources": {}
+            },
+            "partition": {
+              "enabled": true
+            },
+            "replicas": 1,
+            "slurmd": {
+              "args": [],
+              "env": [
+                {
+                  "name": "POD_CPUS",
+                  "value": "0"
+                },
+                {
+                  "name": "POD_MEMORY",
+                  "value": "0"
+                }
+              ],
+              "image": "quay.io/slinky-on-openshift/slurmd:25.05.4-centos9-ohpc",
+              "imagePullPolicy": "IfNotPresent",
+              "resources": {},
+              "volumeMounts": []
+            },
+            "taintKubeNodes": false,
+            "template": {
+              "spec": {
+                "affinity": {},
+                "hostname": "slinky-",
+                "imagePullSecrets": null,
+                "initContainers": [],
+                "nodeSelector": {
+                  "kubernetes.io/os": "linux"
+                },
+                "priorityClassName": null,
+                "resources": {},
+                "tolerations": [],
+                "volumes": []
+              }
+            },
+            "updateStrategy": {
+              "rollingUpdate": {
+                "maxUnavailable": "25%"
+              },
+              "type": "RollingUpdate"
+            }
+          }
+        },
+        {
+          "apiVersion": "slinky.slurm.net/v1beta1",
+          "kind": "RestApi",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/managed-by": "Helm",
+              "app.kubernetes.io/part-of": "slurm",
+              "app.kubernetes.io/version": "25.11",
+              "helm.sh/chart": "slurm-1.0.1"
+            },
+            "name": "slurm",
+            "namespace": "slurm"
+          },
+          "spec": {
+            "controllerRef": {
+              "name": "slurm",
+              "namespace": "slurm"
+            },
+            "replicas": 1,
+            "service": {
+              "metadata": {},
+              "spec": {}
+            },
+            "slurmrestd": {
+              "args": [],
+              "env": [],
+              "image": "quay.io/slinky-on-openshift/slurmrestd:25.05.4-centos9-ohpc",
+              "resources": {}
+            },
+            "template": {
+              "spec": {
+                "affinity": {},
+                "imagePullSecrets": null,
+                "initContainers": [],
+                "nodeSelector": {
+                  "kubernetes.io/os": "linux"
+                },
+                "priorityClassName": null,
+                "resources": {},
+                "tolerations": []
+              }
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    categories: AI/Machine Learning, Big Data
+    certified: "false"
+    containerImage: ghcr.io/slinkyproject/slurm-operator:1.0.1
+    createdAt: "2026-01-19T19:52:14Z"
+    description: Run Slurm on Kubernetes, by SchedMD. A Slinky project.
+    features.operators.openshift.io/disconnected: "false"
+    features.operators.openshift.io/fips-compliant: "false"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/suggested-namespace: slinky
+    operatorframework.io/suggested-namespace-template: |-
+      {
+        "apiVersion": "v1",
+        "kind": "Namespace",
+        "metadata": {
+          "name": "slinky",
+          "labels": {
+            "pod-security.kubernetes.io/enforce": "privileged",
+            "pod-security.kubernetes.io/audit": "privileged",
+            "pod-security.kubernetes.io/warn": "privileged",
+          },
+          "annotations": {
+            "openshift.io/node-selector": ""
+          },
+        }
+      }
+    operators.operatorframework.io/builder: operator-sdk-v1.39.2
+    operators.operatorframework.io/project_layout: unknown
+    repository: https://github.com/redhat-hpc/slinky-on-openshift
+    support: SchedMD
+  labels:
+    operatorframework.io/arch.amd64: supported
+    operatorframework.io/os.linux: supported
+  name: slurm-operator.v1.0.1-1
+  namespace: slurm-operator
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: Accounting
+      name: accountings.slinky.slurm.net
+      version: v1beta1
+    - kind: Controller
+      name: controllers.slinky.slurm.net
+      version: v1beta1
+    - kind: LoginSet
+      name: loginsets.slinky.slurm.net
+      version: v1beta1
+    - kind: NodeSet
+      name: nodesets.slinky.slurm.net
+      version: v1beta1
+    - kind: RestApi
+      name: restapis.slinky.slurm.net
+      version: v1beta1
+    - kind: Token
+      name: tokens.slinky.slurm.net
+      version: v1beta1
+  description: |
+    # Kubernetes Operator for Slurm Clusters
+
+    Run [Slurm] on [Kubernetes], by [SchedMD]. A [Slinky] project.
+
+    ## Documentation
+
+    Project documentation is located in the docs directory of [this repository](https://github.com/SlinkyProject/slurm-operator)
+
+    There is also supplemental work in the community for enabling [Slinky On OpenShift](https://github.com/redhat-hpc/slinky-on-openshift)
+
+    ## Quickstart with Slinky on OpenShift
+
+    Create the namespace with privileged SecurityContextConstraint. This makes it easier to deploy Slurm in
+    containers today but in the future we plan to provide a more restrictive SCC that fits what Slurm requires.
+
+    ```
+    oc adm new-project slurm
+    oc adm policy add-scc-to-user privileged -n slurm -z default
+    ```
+
+    This `helm` command deploys the Slurm operator on OpenShift with the upstream chart and uses a SSH key
+    for the root user of the LoginSet:
+
+    ```
+    helm install slurm oci://ghcr.io/slinkyproject/charts/slurm --namespace=slurm \
+      --version 1.0.1 \
+      --set loginsets.slinky.enabled=true \
+      --set loginsets.slinky.login.securityContext.privileged=true \
+      --set-literal loginsets.slinky.rootSshAuthorizedKeys="$(cat $HOME/.ssh/id_rsa.pub)"
+    ```
+
+    Then SSH to the login pod:
+
+    ```
+    ssh -o ProxyCommand='oc exec -i -n slurm svc/%h -- socat STDIO TCP:localhost:22' root@slurm-login-slinky
+    ```
+
+    ## Overview
+
+    [Slurm] and [Kubernetes] are workload managers originally designed for different
+    kinds of workloads. In broad strokes: Kubernetes excels at scheduling workloads
+    that typically run for an indefinite amount of time, with potentially vague
+    resource requirements, on a single node, with loose policy, but can scale its
+    resource pool infinitely to meet demand; Slurm excels at quickly scheduling
+    workloads that run for a finite amount of time, with well defined resource
+    requirements and topology, on multiple nodes, with strict policy, but its
+    resource pool is known.
+
+    This project enables the best of both workload managers, unified on Kubernetes.
+    It contains a [Kubernetes] operator to deploy and manage certain components of
+    [Slurm] clusters. This repository implements [custom-controllers] and
+    [custom resource definitions (CRDs)][crds] designed for the lifecycle (creation,
+    upgrade, graceful shutdown) of Slurm clusters.
+
+    ### Slurm Cluster
+
+    Slurm clusters are very flexible and can be configured in various ways. Our
+    Slurm helm chart provides a reference implementation that is highly customizable
+    and tries to expose everything Slurm has to offer.
+
+    ## Features
+
+    ### NodeSets
+
+    A set of homogeneous Slurm workers (compute nodes), which are delegated to
+    execute the Slurm workload.
+
+    The operator will take into consideration the running workload among Slurm nodes
+    as it needs to scale-in, upgrade, or otherwise handle node failures. Slurm nodes
+    will be marked as [drain][slurm-drain] before their eventual termination pending
+    scale-in or upgrade.
+
+    Slurm node states (e.g. Idle, Allocated, Mixed, Down, Drain, Not Responding,
+    etc...) are applied to each NodeSet pod via their pod conditions; each NodeSet
+    pod contains a pod status that reflects their own Slurm node state.
+
+    The operator supports NodeSet scale to zero, scaling the resource down to zero
+    replicas. Hence, any Horizontal Pod Autoscaler (HPA) that also support scale to
+    zero can be best paired with NodeSets.
+
+    ### LoginSets
+
+    A set of homogeneous login nodes (submit node, jump host) for Slurm, which
+    manage user identity via SSSD.
+
+    The operator supports LoginSet scale to zero, scaling the resource down to zero
+    replicas. Hence, any Horizontal Pod Autoscaler (HPA) that also support scale to
+    zero can be best paired with LoginSets.
+
+    ### Hybrid Support
+
+    Sometimes a Slurm cluster has some, but not all, of its components in
+    Kubernetes. The operator and its CRD are designed support these use cases.
+
+    ### Slurm
+
+    Slurm is a full featured HPC workload manager. To highlight a few features:
+
+    - [**Accounting**][slurm-accounting]: collect accounting information for every
+      job and job step executed.
+    - [**Partitions**][slurm-arch]: job queues with sets of resources and
+      constraints (e.g. job size limit, job time limit, users permitted).
+    - [**Reservations**][slurm-reservations]: reserve resources for jobs being
+      executed by select users and/or select accounts.
+    - [**Job Dependencies**][slurm-dependency]: defer the start of jobs until the
+      specified dependencies have been satisfied.
+    - [**Job Containers**][slurm-containers]: jobs which run an unprivileged OCI
+      container bundle.
+    - [**MPI**][slurm-mpi]: launch parallel MPI jobs, supports various MPI
+      implementations.
+    - [**Priority**][slurm-priority]: assigns priorities to jobs upon submission and
+      on an ongoing basis (e.g. as they age).
+    - [**Preemption**][slurm-preempt]: stop one or more low-priority jobs to let a
+      high-priority job run.
+    - [**QoS**][slurm-qos]: sets of policies affecting scheduling priority,
+      preemption, and resource limits.
+    - [**Fairshare**][slurm-fairshare]: distribute resources equitably among users
+      and accounts based on historical usage.
+    - [**Node Health Check**][slurm-healthcheck]: periodically check node health via
+      script.
+
+    ## Compatibility
+
+    | Software   |                             Minimum Version                              |
+    | :--------- | :----------------------------------------------------------------------: |
+    | Kubernetes | [v1.29](https://kubernetes.io/blog/2023/12/13/kubernetes-v1-29-release/) |
+    | Slurm      | [25.05](https://www.schedmd.com/slurm-version-25-05-0-is-now-available/) |
+
+    ## Support and Development
+
+    Feature requests, code contributions, and bug reports are welcome!
+
+    Github/Gitlab submitted issues and PRs/MRs are handled on a best effort basis.
+
+    The SchedMD official issue tracker is at <https://support.schedmd.com/>.
+
+    To schedule a demo or simply to reach out, please
+    [contact SchedMD][contact-schedmd].
+
+    ## License
+
+    Copyright (C) SchedMD LLC.
+
+    Licensed under the
+    [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0) you
+    may not use project except in compliance with the license.
+
+    Unless required by applicable law or agreed to in writing, software distributed
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+    CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+    <!-- links -->
+
+
+    [cert-manager]: https://cert-manager.io/docs/installation/helm/
+    [contact-schedmd]: https://www.schedmd.com/slurm-resources/contact-schedmd/
+    [crds]: https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#customresourcedefinitions
+    [custom-controllers]: https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/#custom-controllers
+
+    [kubernetes]: https://kubernetes.io/
+    [schedmd]: https://schedmd.com/
+    [slinky]: https://slinky.ai/
+    [slinky-docs]: https://slinky.schedmd.com/
+    [slurm]: https://slurm.schedmd.com/overview.html
+    [slurm-accounting]: https://slurm.schedmd.com/accounting.html
+    [slurm-arch]: https://slurm.schedmd.com/quickstart.html#arch
+    [slurm-containers]: https://slurm.schedmd.com/containers.html
+    [slurm-dependency]: https://slurm.schedmd.com/sbatch.html#OPT_dependency
+
+    [slurm-drain]: https://slurm.schedmd.com/scontrol.html#OPT_DRAIN
+    [slurm-fairshare]: https://slurm.schedmd.com/fair_tree.html
+    [slurm-healthcheck]: https://slurm.schedmd.com/slurm.conf.html#OPT_HealthCheckProgram
+    [slurm-mpi]: https://slurm.schedmd.com/mpi_guide.html
+    [slurm-preempt]: https://slurm.schedmd.com/preempt.html
+    [slurm-priority]: https://slurm.schedmd.com/priority_multifactor.html
+    [slurm-qos]: https://slurm.schedmd.com/qos.html
+    [slurm-reservations]: https://slurm.schedmd.com/reservations.html
+  displayName: Slurm Operator
+  icon:
+  - base64data: PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNTkwIiBoZWlnaHQ9IjU0MCI+CjxwYXRoIGZpbGw9IiM0MkFGRUIiIGQ9Im0gMjc2LjUxODY5LDEuMzU1OTUgYyAtMTAuMDM3NDcsMCAtMTguMTcxODksOC4wNzYyMyAtMTguMTcxODksMTguMDQxODggbCAwLDAgMCwzNC43MjYwNCBjIDAsOS45NTg2NCA4LjEzNDQyLDE4LjA0NDUzIDE4LjE3MTg5LDE4LjA0NDUzIGwgMCwwIDM2LjA5MzMxLDAgYyAxMC4wMzc0OSwwIDE4LjE4NTE1LC04LjA4NTg5IDE4LjE4NTE1LC0xOC4wNDQ1MyBsIDAsMCAwLC0zNC43MjYwNCBjIDAsLTkuOTY1NjUgLTguMTQ3NjYsLTE4LjA0MTg4IC0xOC4xODUxNSwtMTguMDQxODggbCAwLDAgLTM2LjA5MzMxLDAgeiBtIDg4LjcxNTY1LDU0Ljk0NjQ4IGMgLTcuNTM5NiwwIC0xMy42NTQxNCw2LjE3NjI2IC0xMy42NTQxNCwxMy43NzQ0MiBsIDAsMCAwLDI2LjQ5ODY1IGMgMCw3LjYwNjA3IDYuMTE0NTQsMTMuNzc3OTMgMTMuNjU0MTQsMTMuNzc3OTMgbCAwLDAgMjcuMTE4MDIsMCBjIDcuNTQwNDgsMCAxMy42NDk3LC02LjE3MTg2IDEzLjY0OTcsLTEzLjc3NzkzIGwgMCwwIDAsLTI2LjQ5ODY1IGMgMCwtNy41OTgxNiAtNi4xMDkyMiwtMTMuNzc0NDIgLTEzLjY0OTcsLTEzLjc3NDQyIGwgMCwwIC0yNy4xMTgwMiwwIHogbSAtMTY4LjQ1Njg1LDAgYyAtNy41MzcsMCAtMTMuNjUyMzksNi4xNzYyNiAtMTMuNjUyMzksMTMuNzc0NDIgbCAwLDAgMCwyNi40OTg2NSBjIDAsNy42MDYwNyA2LjExNTM5LDEzLjc3NzkzIDEzLjY1MjM5LDEzLjc3NzkzIGwgMCwwIDI3LjExNjE3LDAgYyA3LjUzNjA3LDAgMTMuNjU0MTQsLTYuMTcxODYgMTMuNjU0MTQsLTEzLjc3NzkzIGwgMCwwIDAsLTI2LjQ5ODY1IGMgMCwtNy41OTgxNiAtNi4xMTgwNywtMTMuNzc0NDIgLTEzLjY1NDE0LC0xMy43NzQ0MiBsIDAsMCAtMjcuMTE2MTcsMCB6IG0gNzkuNzQxMiwzMC4zOTQ0IGMgLTEwLjAzNzQ3LDAgLTE4LjE3MTg5LDguMDcxODQgLTE4LjE3MTg5LDE4LjA0MzY1IGwgMCwwIDAsMzQuNzIzNDEgYyAwLDkuOTYzOTEgOC4xMzQ0MiwxOC4wNDcxNiAxOC4xNzE4OSwxOC4wNDcxNiBsIDAsMCAzNi4wOTMzMSwwIGMgMTAuMDM3NDksMCAxOC4xODUxNSwtOC4wODMyNSAxOC4xODUxNSwtMTguMDQ3MTYgbCAwLDAgMCwtMzQuNzIzNDEgYyAwLC05Ljk3MTgxIC04LjE0NzY2LC0xOC4wNDM2NSAtMTguMTg1MTUsLTE4LjA0MzY1IGwgMCwwIC0zNi4wOTMzMSwwIHogbSAxNTguNDc1MTksMTYuMjc5MDEgYyAtNS42MDczMiwwIC0xMC4xNTI1Myw0LjU4NTYxIC0xMC4xNTI1MywxMC4yNDg2NSBsIDAsMCAwLDE5LjcxMjUxIGMgMCw1LjY1MDcyIDQuNTQ1MjEsMTAuMjM5ODQgMTAuMTUyNTMsMTAuMjM5ODQgbCAwLDAgMjAuMTc0MDgsMCBjIDUuNjAzODQsMCAxMC4xNTI1NCwtNC41ODkxMiAxMC4xNTI1NCwtMTAuMjM5ODQgbCAwLDAgMCwtMTkuNzEyNTEgYyAwLC01LjY2MzA0IC00LjU0ODcsLTEwLjI0ODY1IC0xMC4xNTI1NCwtMTAuMjQ4NjUgbCAwLDAgLTIwLjE3NDA4LDAgeiBtIC0zMDAuMTQwNjgsMCBjIC01LjYwNTYzLDAgLTEwLjE1NjA3LDQuNTg1NjEgLTEwLjE1NjA3LDEwLjI0ODY1IGwgMCwwIDAsMTkuNzEyNTEgYyAwLDUuNjUwNzIgNC41NTA0NCwxMC4yMzk4NCAxMC4xNTYwNywxMC4yMzk4NCBsIDAsMCAyMC4xNjc4MywwIGMgNS42MTI3LDAgMTAuMTU3ODYsLTQuNTg5MTIgMTAuMTU3ODYsLTEwLjIzOTg0IGwgMCwwIDAsLTE5LjcxMjUxIGMgMCwtNS42NjMwNCAtNC41NDUxNiwtMTAuMjQ4NjUgLTEwLjE1Nzg2LC0xMC4yNDg2NSBsIDAsMCAtMjAuMTY3ODMsMCB6IG0gMjMwLjM4MTE0LDIwLjc0Njg3IGMgLTcuNTM5NiwwIC0xMy42NTQxNCw2LjE2NjU4IC0xMy42NTQxNCwxMy43NjU2MiBsIDAsMCAwLDI2LjUwNzQ0IGMgMCw3LjU5OTkzIDYuMTE0NTQsMTMuNzY5MTQgMTMuNjU0MTQsMTMuNzY5MTQgbCAwLDAgMjcuMTE4MDIsMCBjIDcuNTQwNDgsMCAxMy42NDk3LC02LjE2OTIxIDEzLjY0OTcsLTEzLjc2OTE0IGwgMCwwIDAsLTI2LjUwNzQ0IGMgMCwtNy41OTkwNCAtNi4xMDkyMiwtMTMuNzY1NjIgLTEzLjY0OTcsLTEzLjc2NTYyIGwgMCwwIC0yNy4xMTgwMiwwIHogbSAtMTY4LjQ1Njg1LDAgYyAtNy41MzcsMCAtMTMuNjUyMzksNi4xNjY1OCAtMTMuNjUyMzksMTMuNzY1NjIgbCAwLDAgMCwyNi41MDc0NCBjIDAsNy41OTk5MyA2LjExNTM5LDEzLjc2OTE0IDEzLjY1MjM5LDEzLjc2OTE0IGwgMCwwIDI3LjExNjE3LDAgYyA3LjUzNjA3LDAgMTMuNjU0MTQsLTYuMTY5MjEgMTMuNjU0MTQsLTEzLjc2OTE0IGwgMCwwIDAsLTI2LjUwNzQ0IGMgMCwtNy41OTkwNCAtNi4xMTgwNywtMTMuNzY1NjIgLTEzLjY1NDE0LC0xMy43NjU2MiBsIDAsMCAtMjcuMTE2MTcsMCB6IG0gMjM4LjIxNjM5LDMzLjM5MiBjIC01LjYwNzMyLDAgLTEwLjE1MjUzLDQuNTgyOTggLTEwLjE1MjUzLDEwLjIzODk4IGwgMCwwIDAsMTkuNzEzMzggYyAwLDUuNjUxNjIgNC41NDUyMSwxMC4yNDE2MiAxMC4xNTI1MywxMC4yNDE2MiBsIDAsMCAyMC4xNzQwOCwwIGMgNS42MDM4NCwwIDEwLjE1MjU0LC00LjU5IDEwLjE1MjU0LC0xMC4yNDE2MiBsIDAsMCAwLC0xOS43MTMzOCBjIDAsLTUuNjU2IC00LjU0ODcsLTEwLjIzODk4IC0xMC4xNTI1NCwtMTAuMjM4OTggbCAwLDAgLTIwLjE3NDA4LDAgeiBtIC0zMDAuMTQwNjgsMCBjIC01LjYwNTYzLDAgLTEwLjE1NjA3LDQuNTgyOTggLTEwLjE1NjA3LDEwLjIzODk4IGwgMCwwIDAsMTkuNzEzMzggYyAwLDUuNjUxNjIgNC41NTA0NCwxMC4yNDE2MiAxMC4xNTYwNywxMC4yNDE2MiBsIDAsMCAyMC4xNjc4MywwIGMgNS42MTI3LDAgMTAuMTU3ODYsLTQuNTkgMTAuMTU3ODYsLTEwLjI0MTYyIGwgMCwwIDAsLTE5LjcxMzM4IGMgMCwtNS42NTYgLTQuNTQ1MTYsLTEwLjIzODk4IC0xMC4xNTc4NiwtMTAuMjM4OTggbCAwLDAgLTIwLjE2NzgzLDAgeiBtIDE0MS42NjU0OSwxNC4xODA0MyBjIC0xMC4wMzc0NywwIC0xOC4xNzE4OSw4LjA3OTczIC0xOC4xNzE4OSwxOC4wNDYyOSBsIDAsMCAwLDM0LjcyNjAzIGMgMCw5Ljk2NDc5IDguMTM0NDIsMTguMDM4MzkgMTguMTcxODksMTguMDM4MzkgbCAwLDAgMzYuMDkzMzEsMCBjIDEwLjAzNzQ5LDAgMTguMTg1MTUsLTguMDczNiAxOC4xODUxNSwtMTguMDM4MzkgbCAwLDAgMCwtMzQuNzI2MDMgYyAwLC05Ljk2NjU2IC04LjE0NzY2LC0xOC4wNDYyOSAtMTguMTg1MTUsLTE4LjA0NjI5IGwgMCwwIC0zNi4wOTMzMSwwIHogbSAyMTguMDk0NTcsMTQuODM2MDEgYyAtNC4xNjk4NCwwIC03LjU0MzE0LDMuNDA4MDEgLTcuNTQzMTQsNy42MDYwNyBsIDAsMCAwLDE0LjYzMyBjIDAsNC4xOTgwNiAzLjM3MzMsNy41OTk5MyA3LjU0MzE0LDcuNTk5OTMgbCAwLDAgMTQuOTczOTMsMCBjIDQuMTU3NDcsMCA3LjUyODA3LC0zLjQwMTg3IDcuNTI4MDcsLTcuNTk5OTMgbCAwLDAgMCwtMTQuNjMzIGMgMCwtNC4xOTgwNiAtMy4zNzA2LC03LjYwNjA3IC03LjUyODA3LC03LjYwNjA3IGwgMCwwIC0xNC45NzM5MywwIHogbSAtNDE0LjE3NTczOCwwIGMgLTQuMTYzNjg4LDAgLTcuNTM2OTUsMy40MDgwMSAtNy41MzY5NSw3LjYwNjA3IGwgMCwwIDAsMTQuNjMzIGMgMCw0LjE5ODA2IDMuMzczMjYyLDcuNTk5OTMgNy41MzY5NSw3LjU5OTkzIGwgMCwwIDE0Ljk2NzY5MSwwIGMgNC4xNjYzNiwwIDcuNTM4NzM3LC0zLjQwMTg3IDcuNTM4NzM3LC03LjU5OTkzIGwgMCwwIDAsLTE0LjYzMyBjIDAsLTQuMTk4MDYgLTMuMzcyMzc3LC03LjYwNjA3IC03LjUzODczNywtNy42MDYwNyBsIDAsMCAtMTQuOTY3NjkxLDAgeiBtIDI4NC43OTY4MTgsNS4wMjQxNCBjIC03LjUzOTYsMCAtMTMuNjU0MTQsNi4xNjIxOCAtMTMuNjU0MTQsMTMuNzYyOTggbCAwLDAgMCwyNi41MDIxNiBjIDAsNy42MDYwOCA2LjExNDU0LDEzLjc3MzUzIDEzLjY1NDE0LDEzLjc3MzUzIGwgMCwwIDI3LjExODAyLDAgYyA3LjU0MDQ4LDAgMTMuNjQ5NywtNi4xNjc0NSAxMy42NDk3LC0xMy43NzM1MyBsIDAsMCAwLC0yNi41MDIxNiBjIDAsLTcuNjAwOCAtNi4xMDkyMiwtMTMuNzYyOTggLTEzLjY0OTcsLTEzLjc2Mjk4IGwgMCwwIC0yNy4xMTgwMiwwIHogbSAtMTY4LjQ1Njg1LDAgYyAtNy41MzcsMCAtMTMuNjUyMzksNi4xNjIxOCAtMTMuNjUyMzksMTMuNzYyOTggbCAwLDAgMCwyNi41MDIxNiBjIDAsNy42MDYwOCA2LjExNTM5LDEzLjc3MzUzIDEzLjY1MjM5LDEzLjc3MzUzIGwgMCwwIDI3LjExNjE3LDAgYyA3LjUzNjA3LDAgMTMuNjU0MTQsLTYuMTY3NDUgMTMuNjU0MTQsLTEzLjc3MzUzIGwgMCwwIDAsLTI2LjUwMjE2IGMgMCwtNy42MDA4IC02LjExODA3LC0xMy43NjI5OCAtMTMuNjU0MTQsLTEzLjc2Mjk4IGwgMCwwIC0yNy4xMTYxNywwIHogbSAyMzguMjE2MzksMjAuNTAyNTUgYyAtNS42MDczMiwwIC0xMC4xNTI1Myw0LjU5NTI3IC0xMC4xNTI1MywxMC4yNTY1NSBsIDAsMCAwLDE5LjcwODExIGMgMCw1LjY2MjE1IDQuNTQ1MjEsMTAuMjM5ODUgMTAuMTUyNTMsMTAuMjM5ODUgbCAwLDAgMjAuMTc0MDgsMCBjIDUuNjAzODQsMCAxMC4xNTI1NCwtNC41Nzc3IDEwLjE1MjU0LC0xMC4yMzk4NSBsIDAsMCAwLC0xOS43MDgxMSBjIDAsLTUuNjYxMjggLTQuNTQ4NywtMTAuMjU2NTUgLTEwLjE1MjU0LC0xMC4yNTY1NSBsIDAsMCAtMjAuMTc0MDgsMCB6IG0gLTMwMC4xNDA2OCwwIGMgLTUuNjA1NjMsMCAtMTAuMTU2MDcsNC41OTUyNyAtMTAuMTU2MDcsMTAuMjU2NTUgbCAwLDAgMCwxOS43MDgxMSBjIDAsNS42NjIxNSA0LjU1MDQ0LDEwLjIzOTg1IDEwLjE1NjA3LDEwLjIzOTg1IGwgMCwwIDIwLjE2NzgzLDAgYyA1LjYxMjcsMCAxMC4xNTc4NiwtNC41Nzc3IDEwLjE1Nzg2LC0xMC4yMzk4NSBsIDAsMCAwLC0xOS43MDgxMSBjIDAsLTUuNjYxMjggLTQuNTQ1MTYsLTEwLjI1NjU1IC0xMC4xNTc4NiwtMTAuMjU2NTUgbCAwLDAgLTIwLjE2NzgzLDAgeiBtIDM1OS43NjAwNiwxOS4wNDExMSBjIC00LjE2OTg0LDAgLTcuNTQzMTQsMy40MDQ0OSAtNy41NDMxNCw3LjYwMjU1IGwgMCwwIDAsMTQuNjMzMDEgYyAwLDQuMTkwMTMgMy4zNzMzLDcuNjA2MDYgNy41NDMxNCw3LjYwNjA2IGwgMCwwIDE0Ljk3MzkzLDAgYyA0LjE1NzQ3LDAgNy41MjgwNywtMy40MTU5MyA3LjUyODA3LC03LjYwNjA2IGwgMCwwIDAsLTE0LjYzMzAxIGMgMCwtNC4xOTgwNiAtMy4zNzA2LC03LjYwMjU1IC03LjUyODA3LC03LjYwMjU1IGwgMCwwIC0xNC45NzM5MywwIHogbSAtNDE0LjE3NTczOCwwIGMgLTQuMTYzNjg4LDAgLTcuNTM2OTUsMy40MDQ0OSAtNy41MzY5NSw3LjYwMjU1IGwgMCwwIDAsMTQuNjMzMDEgYyAwLDQuMTkwMTMgMy4zNzMyNjIsNy42MDYwNiA3LjUzNjk1LDcuNjA2MDYgbCAwLDAgMTQuOTY3NjkxLDAgYyA0LjE2NjM2LDAgNy41Mzg3MzcsLTMuNDE1OTMgNy41Mzg3MzcsLTcuNjA2MDYgbCAwLDAgMCwtMTQuNjMzMDEgYyAwLC00LjE5ODA2IC0zLjM3MjM3NywtNy42MDI1NSAtNy41Mzg3MzcsLTcuNjAyNTUgbCAwLDAgLTE0Ljk2NzY5MSwwIHogbSA0NjMuNjEwNzI4LDE0LjYyMTU4IGMgLTMuMTQzMDksMCAtNS42OTY3NSwyLjU2Nzg2IC01LjY5Njc1LDUuNzM2ODUgbCAwLDAgMCwxMS4wMzk1NiBjIDAsMy4xNTkzMSAyLjU1MzY2LDUuNzMyNDUgNS42OTY3NSw1LjczMjQ1IGwgMCwwIDExLjI5NDM2LDAgYyAzLjEzMDc4LDAgNS42ODI2LC0yLjU3MzE0IDUuNjgyNiwtNS43MzI0NSBsIDAsMCAwLC0xMS4wMzk1NiBjIDAsLTMuMTY4OTkgLTIuNTUxODIsLTUuNzM2ODUgLTUuNjgyNiwtNS43MzY4NSBsIDAsMCAtMTEuMjk0MzYsMCB6IG0gLTUwOS4zNjUzMDQsMCBjIC0zLjE0MTM1NiwwIC01LjY5MTQ0LDIuNTY3ODYgLTUuNjkxNDQsNS43MzY4NSBsIDAsMCAwLDExLjAzOTU2IGMgMCwzLjE1OTMxIDIuNTUwMDg0LDUuNzMyNDUgNS42OTE0NCw1LjczMjQ1IGwgMCwwIDExLjI4NzI4NywwIGMgMy4xNDIyNDEsMCA1LjY4NTI0MiwtMi41NzMxNCA1LjY4NTI0MiwtNS43MzI0NSBsIDAsMCAwLC0xMS4wMzk1NiBjIDAsLTMuMTY4OTkgLTIuNTQzMDAxLC01LjczNjg1IC01LjY4NTI0MiwtNS43MzY4NSBsIDAsMCAtMTEuMjg3Mjg3LDAgeiIvPgo8cGF0aCBkPSJtIDEyNC41NzE4Myw0NzguMTIyOCAwLDQ5LjIxMzggMy45ODI2MiwwIDAsLTE2Ljg3ODcgYyAyLjM3MDYsMS43MTA2IDExLjk4MTk5LDguNTc5NyAxNy43MzIxMywxMi42MTE2IDQuMzQyOTUsMi44MzM0IDQuMjEwMiwzLjkwMyA0LjI2NzA5LDQuMjY3MSBsIDUuMzEwMTYsMCBjIDAsLTIuNTU2NSAtMi44OTc4MywtMy44MzA5IC02LjE2MzU4LC02LjA2ODcgLTEuOTgzNzIsLTEuMzY5MyAtMTYuNjg5MDYsLTExLjY2MzQgLTE2LjY4OTA2LC0xMS42NjM0IDAsMCAxNC4zMTg0NiwtOS40NDgzIDE2LjMwOTc3LC0xMC44MSAzLjI1ODE2LC0yLjI0MTYgNS44NzkxLC0zLjUwODUgNS44NzkxLC02LjA2ODcgbCAtNS4xMjA1MSwwIGMgLTAuMDQ1NSwwLjM1MjcgMC4xNzg0MiwxLjQyOTkgLTQuMTcyMjcsNC4yNjcgLTUuNDM5MTEsMy44MzQ3IC0xNC40MTMyOCwxMC4yMjk3IC0xNy4zNTI4MywxMi4zMjcyIGwgMCwtMzEuMTk3MiAtMy45ODI2MiwwIHogbSAzNy4zNjA3NSwwIDAsNDkuMjEzOCAzLjk4MjYyLDAgMCwtNDkuMjEzOCAtMy45ODI2MiwwIHogbSAxMTguOTA5NiwwIDAsNDEuMzQzNCAwLDAuMDk1IDAsMC40NzQxIGMgMC4wMDMsMC42MTQ0IC0wLjEwMjI2LDEuNzI5NiAtMC40NzQxMiwyLjQ2NTQgLTAuNDQzNzgsMC43MzIxIC0wLjYxODI1LDEuMDgxIC0xLjgwMTY2LDEuMTM3OSBsIC0xOS41MzM3OSwwIGMgLTEuMTc1ODIsLTAuMDU3IC0xLjM1NDA5LC0wLjQwNTggLTEuODAxNjYsLTEuMTM3OSAtMC4yNzcwNCwtMC41NSAtMC40Mjg2MSwtMS4yNzgyIC0wLjQ3NDEyLC0xLjg5NjUgbCAwLC0yMC4xOTc1IDAsLTAuMDk1IDAsLTAuMzc5MyBjIC0wLjAxMjEsLTAuNjMzNCAwLjA5ODYsLTEuODI0NCAwLjQ3NDEyLC0yLjU2MDMgMC40NDc1NywtMC43MzU4IDAuNjE0NDYsLTEuMDU4MiAxLjgwMTY2LC0xLjEzNzggbCAxOS41MzM3OSwwIDAsLTMuOTgyNyAtMTkuNTMzNzksMCBjIC0yLjY5MzAxLC0wLjA2OCAtNC42OTk0OSwxLjcyMiAtNS40MDQ5OCwzLjQxMzcgLTAuNzg1MTUsMS42NzY1IC0wLjg0MjA0LDMuMzE1MSAtMC44NTM0Miw0LjI2NzEgbCAwLDAuNjYzOCAwLDE4LjY4MDMgMCwwLjc1ODYgMCwwLjY2MzggMCwwLjY2MzggMC4wOTQ3LDAgYyAwLjA5MSwwLjg0NTggMC4yODA2OCwxLjkxMTYgMC43NTg1OSwyLjkzOTUgMC43MDU1LDEuNjgwMyAyLjcxMTk4LDMuMzg3MSA1LjQwNDk5LDMuMzE4OSBsIDE5LjUzMzc5LDAgMC4xODk2NSwwIGMgMi42MDU3NywwIDQuNTA5ODQsLTEuNjcyNyA1LjIxNTMzLC0zLjMxODkgMC43Nzc1NiwtMS42ODAzIDAuODQ5NjMsLTMuMzI2NCAwLjg1MzQyLC00LjI2NzEgbCAwLC0wLjc1ODYgMCwtNDEuMTUzNyAtMy45ODI2MiwwIHogbSAtMTc4LjY0ODg3LDE0LjMxODUgYyAtMi4xOTEzNywwLjMxNTYgLTMuNzM3OTksMS44NDUyIC00LjM2MTkxOCwzLjMxODggLTAuNzg1MTQ1LDEuNjc2NSAtMC44MzQ0NTQsMy4zMTg5IC0wLjg1MzQxOCw0LjI2NzEgbCAwLDAuNzU4NiAwLDI2LjU1MDggMy45ODI2MTYsMCAwLC0yNi43NDA0IDAsLTAuMDk1IDAsLTAuNDc0MSBjIC0wLjAwNiwtMC42MzcyIDAuMTAyMjYsLTEuODI4MiAwLjQ3NDEyLC0yLjU2MDMgMC40Mzk5OSwtMC43MzU4IDAuNTI3MjMsLTAuOTcxIDEuNzA2ODQsLTEuMDQzIGwgMTQuNzkyNTgsMCAwLC0zLjk4MjcgLTE0Ljc5MjU4LDAgYyAtMC4zMzY2MywtMC4wMSAtMC42MzUxOSwtMC4wNDUgLTAuOTQ4MjQsMCB6IG0gMjE2LjM4ODkyLDAgYyAtMi42ODU0MiwtMC4wNjggLTQuNjgwNTIsMS43Mjk2IC01LjQwNDk4LDMuNDEzNyAtMC43ODEzNSwxLjY4MDIgLTAuODQyMDQsMy4zMjI2IC0wLjg1MzQyLDQuMjY3IGwgMCwwLjY2MzggMCwyNi42NDU2IDQuMDc3NDQsMCAwLC0yNi44MzUyIC0wLjA5NDcsLTAuMDk1IDAsLTAuMzc5MyBjIDAsLTAuNjI5NiAwLjEwMjI2LC0xLjgxNjggMC40NzQxMiwtMi41NjAzIDAuNDMyNCwtMC43MzU4IDAuNjI1ODQsLTAuOTc4NSAxLjgwMTY2LC0xLjA0MyBsIDE1LjM2MTUzLDAgMCwzMC45MTI3IDMuOTgyNjIsMCAwLC0zMC45MTI3IDE1LjU1MTE4LDAgYyAxLjE3OTYxLDAuMDY0IDEuMjY2ODUsMC4zMDM0IDEuNzA2ODMsMS4wNDMgMC4zNjc5MiwwLjc0MzUgMC40ODU1LDEuOTMwNyAwLjQ3NDEyLDIuNTYwMyBsIDAsMC4zNzkzIDAsMC4wOTUgMCwyNi44MzUyIDMuOTgyNjIsMCAwLC0yNi42NDU2IDAsLTAuNjYzOCBjIC0wLjAxMjEsLTAuOTQ0NCAtMC4wNjgsLTIuNTkwNiAtMC44NTM0MiwtNC4yNjcgLTAuNzA1NDksLTEuNjg0MSAtMi42MTMzNSwtMy40ODIgLTUuMzEwMTUsLTMuNDEzNyBsIC0zNC44OTUzMywwIHogbSA5NS41ODI4NCwwIGMgLTIuNjk2OCwtMC4wNjUgLTQuNjg4MTEsMS43MzM0IC01LjQwNDk4LDMuNDEzNyAtMC43ODEzNSwxLjY4MDIgLTAuODQ1ODMsMy4zMjI2IC0wLjg1MzQyLDQuMjY3IGwgMCwwLjY2MzggMCwyNi42NDU2IDQuMDc3NDQsMCAwLC0yNi44MzUyIC0wLjA5NDcsLTAuMDk1IDAsLTAuMzc5MyBjIC0wLjAyNDMsLTAuNjI5NiAwLjExMzc5LC0xLjgxNjggMC40NzQxMiwtMi41NjAzIDAuNDQzNzgsLTAuNzMyIDAuNjEwNjcsLTEuMDY5NiAxLjgwMTY2LC0xLjEzNzggbCAxOC44NzAwMywwLjA5NSBjIDEuMTkwOTksMC4wNjUgMS4zNjkyNiwwLjMwMzUgMS44MDE2NiwxLjA0MzEgMC4zNzE3MSwwLjc0MzQgMC40ODkyOSwxLjkzMDYgMC40NzQxMiwyLjU2MDIgbCAwLDAuMzc5MyAwLDAuMDk1IDAsMjYuODM1MyAzLjk4MjYyLDAgMCwtMjYuNjQ1NiAwLC0wLjY2MzggYyAtMC4wMTIxLC0wLjk0NDUgLTAuMDY4MywtMi41OTA2IC0wLjg1MzQyLC00LjI2NzEgLTAuNzAxNywtMS42ODAzIC0yLjcxOTU2LC0zLjQ3ODIgLTUuNDA0OTgsLTMuNDEzNyBsIC0xOC44NzAwMywwIHogbSAxNTYuODM5MywwIGMgLTIuMTg3NiwwLjMxMyAtMy43NDc5NCwxLjg0MTkgLTQuMzYxOTIsMy4zMTg4IC0wLjc5NjUyLDEuNjc2NSAtMC44NDIwNCwzLjMxNTEgLTAuODUzNDEsNC4yNjcxIGwgMCwwLjc1ODYgMCwyNi41NTA4IDMuOTgyNjEsMCAwLC0yNi43NDA0IDAsLTAuMDk1IDAsLTAuNDc0MSBjIC0wLjAxODIsLTAuNjQxIDAuMDkwNywtMS44MjgyIDAuNDc0MTMsLTIuNTYwMyAwLjQxNzIyLC0wLjczOTYgMC42MTgyNSwtMC45NzQ4IDEuODAxNjYsLTEuMDQzIGwgMTQuNzkyNTgsMCAwLC0zLjk4MjcgLTE0Ljc5MjU4LDAgYyAtMC4zMzU2NywtMC4wMSAtMC43MzA1NiwtMC4wNDUgLTEuMDQzMDcsMCB6IG0gLTU2OC4xODY4Njk5LDAuMjg0MyAwLDI2LjU1MDggYyAtMC4wMTIxMzcsMC4xMjE0IDAsMC40MTM0IDAsMC43NTg2IDAuMDA2MDcsMC45NDA2IDAuMDYwOTkxLDIuNTg2OCAwLjg1MzQxODIsNC4yNjcxIDAuNjk3OTA2NCwxLjY0NjEgMi42MDk1NjMyLDMuMzE4OCA1LjIxNTMzMzQsMy4zMTg4IGwgMC4xODk2NDg1LDAgMzQuODAwNDk2OCwwIGMgMi42OTY4MDIsMC4wNjggNC42OTE5MDQsLTEuNjM4NSA1LjQwNDk4MiwtMy4zMTg4IDAuNzgxMzUyLC0xLjY4MDMgMC44NDU4MzIsLTMuMzI2NSAwLjg1MzQxOCwtNC4yNjcxIGwgMCwtMC43NTg2IDAsLTI2LjU1MDggLTMuOTgyNjE4LDAgMCwyNi43NDA0IDAsMC4wOTUgMCwwLjQ3NDEgYyAwLjAxMjE0LDAuNjE0NSAtMC4xMDk4NDQsMS43Mjk2IC0wLjQ3NDEyMSwyLjQ2NTUgLTAuNDQzNzc4LDAuNzM1OCAtMC42MTQ0NjEsMS4wODEgLTEuODAxNjYxLDEuMTM3OSBsIC0xNS4yNjY3MDMsMCAwLC0zMC45MTI3IC0zLjk4MjYxOCwwIDAsMzAuOTEyNyAtMTUuNTUxMTc1OCwwIGMgLTEuMTgzNDA2NiwtMC4wNTcgLTEuMzU0MDkwMiwtMC40MDIxIC0xLjgwMTY2MDYsLTEuMTM3OSAtMC4zNzE3MTExLC0wLjczNTkgLTAuNDg1NTAwMiwtMS44NTEgLTAuNDc0MTIxMywtMi40NjU1IGwgMCwtMC40NzQxIDAsLTAuMDk1IDAsLTI2Ljc0MDQgLTMuOTgyNjE4MiwwIHogbSA1OS41NDk2MjQ5LDAgYyAtMi4xODg3ODcsMC4zMDQxIC0zLjc0MTI5NSwxLjgzNTMgLTQuMzYxOTE2LDMuMzE4OSAtMC43OTI3MywxLjY3NjQgLTAuODQ5NjI1LDMuMzIyNiAtMC44NTM0MTgsNC4yNjcgbCAwLDAuNjYzOCAwLDE4LjMwMTEgMCwwLjc1ODYgYyAwLjAwMywwLjk0MDYgMC4wNjA5OSwyLjU4NjggMC44NTM0MTgsNC4yNjcxIDAuNjkwMzIxLDEuNjQ2MSAyLjYwNTc3MSwzLjMxODggNS4yMTUzMzQsMy4zMTg4IGwgMC4xODk2NDgsMCAxOS43MjM0NDMsMCBjIDIuNjkzMDA5LDAuMDY4IDQuNjkxOTA0LC0xLjYzODUgNS40MDQ5ODIsLTMuMzE4OCAwLjc4ODkzOCwtMS42ODAzIDAuODQ1ODMyLC0zLjMyNjUgMC44NTM0MTgsLTQuMjY3MSBsIC0wLjA5NDY3LC0wLjY2MzggMCwtMTguMzk1OSAwLjA5NDY3LC0wLjY2MzggYyAtMC4wMDYxLC0wLjk0NDQgLTAuMDY0NjMsLTIuNTkwNiAtMC44NTM0MTgsLTQuMjY3IC0wLjcxMzA3OCwtMS42OTU1IC0yLjcxMTk3MywtMy4zOTQ4IC01LjQwNDk4MiwtMy4zMTg5IGwgLTE5LjcyMzQ0MywwIGMgLTAuMzM2MTQ4LC0wLjAxIC0wLjczMDM3NCwtMC4wNDMgLTEuMDQzMDY2LDAgeiBtIDExNi4wNjQ4NzUsMCBjIC0yLjE5MDI0LDAuMzA0MSAtMy43NDEyOSwxLjgzNTMgLTQuMzYxOTIsMy4zMTg5IC0wLjc4ODkzLDEuNjc2NCAtMC45MzMwNywzLjMyMjYgLTAuOTQ4MjQsNC4yNjcgbCAwLjA5NDcsMC42NjM4IDAsMTguMzAxMSAtMC4wOTQ3LDAuNzU4NiBjIDAuMDE1MiwwLjk0MDYgMC4xNTkzMSwyLjU4NjggMC45NDgyNCw0LjI2NzEgMC43MDE3LDEuNjQ2MSAyLjU5ODE5LDMuMzE4OCA1LjIxNTM0LDMuMzE4OCBsIDAuMDk0NywwIDE5LjgxODI3LDAgYyAyLjY3NDA0LDAuMDY4IDQuNTk3MDgsLTEuNjM4NSA1LjMxMDE2LC0zLjMxODggMC43ODUxNCwtMS42ODAzIDAuODQyMDMsLTMuMzI2NSAwLjg1MzQxLC00LjI2NzEgbCAwLC0wLjY2MzggMCwtMTguMzk1OSAwLC0wLjY2MzggYyAtMC4wMTIxLC0wLjk0NDQgLTAuMDY4MywtMi41OTA2IC0wLjg1MzQxLC00LjI2NyAtMC43MTMwOCwtMS42OTU1IC0yLjYzNjEyLC0zLjM5NDggLTUuMzEwMTYsLTMuMzE4OSBsIC0xOS44MTgyNywwIGMgLTAuMzM2MTUsLTAuMDEgLTAuNjM1MzQsLTAuMDQzIC0wLjk0ODI0LDAgeiBtIDM0LjUxNjAyLDAgMCwzLjk4MjYgMjYuNTUwNzksMCBjIDEuMTgzNDEsMC4wNjUgMS4zNjU0NywwLjMwNzMgMS44MDE2NiwxLjA0MzEgMC4zNjc5MiwwLjczNTggMC40OTMwOSwxLjk0MiAwLjQ3NDEyLDIuNTYwMiBsIDAsMC40NzQyIDAsMC4wOTUgMCwxOC41ODU2IDAsMC4wOTUgMCwwLjQ3NDEgYyAwLjAxMjEsMC42MTQ0IC0wLjEwNjIsMS43Mjk2IC0wLjQ3NDEyLDIuNDY1NCAtMC40MzYxOSwwLjczNTggLTAuNjE4MjUsMS4wNzcyIC0xLjgwMTY2LDEuMTM3OSBsIC0yMS4yNDA2MywwIGMgLTEuMzQ2NSwtMC4wNTcgLTEuNDQ1MTIsLTAuMzc1NSAtMS44MDE2NiwtMC44NTM0IC0wLjMwNzIzLC0wLjUwODMgLTAuNDc0MTIsLTEuNDI2MiAtMC40NzQxMiwtMS44OTY1IGwgMCwtMC4yODQzIDAsLTAuMDk1IDAsLTcuMzAxNSAwLC0wLjA5NSAwLC0wLjQ3NDIgYyAwLC0wLjYxODIgMC4wOTg2LC0xLjgyMDYgMC40NzQxMiwtMi41NjAyIDAuNDMyNCwtMC43MzU4IDAuNjE0NDYsLTAuOTc0OCAxLjgwMTY2LC0xLjA0MzEgbCAyMS4yNDA2MywwIDAsLTMuOTgyNiAtMjEuMjQwNjMsMCBjIC0yLjY5NjgsLTAuMDY4IC00LjY4MDUyLDEuNjM4NiAtNS40MDQ5OCwzLjMxODkgLTAuNzg1MTQsMS42ODQgLTAuODQ1ODMsMy4zMTg4IC0wLjg1MzQyLDQuMjY3IGwgMCwwLjc1ODYgMCw2LjkyMjIgMCwwLjU2OSBjIDAuMDA2LDAuODQyIDAuMTAyNTYsMi4zNTkyIDAuOTQ4MjQsMy44ODc3IDAuODA0MTEsMS41NTE0IDIuNzc2NDYsMi45MDkzIDUuMzEwMTYsMi44NDQ4IGwgMjEuMjQwNjMsMCAwLjE4OTY1LDAgYyAyLjYxNzE1LDAgNC41MjEyMiwtMS42NzY1IDUuMjE1MzMsLTMuMzE4OSAwLjc4NTE1LC0xLjY4NDEgMC44NDU4NCwtMy4zMjY0IDAuODUzNDIsLTQuMjY3MSBsIDAsLTAuNzU4NiAwLC0xOC4zMDEgMCwtMC42NjM4IGMgLTAuMDA2LC0wLjk0NDUgLTAuMDY4MywtMi41OTA2IC0wLjg1MzQyLC00LjI2NzEgLTAuNzEzMDcsLTEuNjkxNyAtMi43MTU3NiwtMy4zOTA5IC01LjQwNDk4LC0zLjMxODggbCAtMjYuNTUwNzksMCB6IG0gMTU0Ljc1MzE3LDAgMCwzLjk4MjYgMjYuNjQ1NjEsMCBjIDEuMTY4MjQsMC4wNjUgMS4yNjY4NSwwLjMwNzMgMS43MDY4NCwxLjA0MzEgMC4zNzE3MSwwLjczNTggMC40NzQxMiwxLjk0NTggMC40NzQxMiwyLjU2MDIgbCAwLDAuNDc0MiAwLDAuMDk1IDAsMTguNTg1NiAwLDAuMDk1IDAsMC40NzQxIGMgMCwwLjYxNDQgLTAuMTAyMjYsMS43Mjk2IC0wLjQ3NDEyLDIuNDY1NCAtMC40Mzk5OSwwLjczNTggLTAuNTM4NiwxLjA3NzIgLTEuNzA2ODQsMS4xMzc5IGwgLTIxLjMzNTQ1LDAgYyAtMS4xODcyLC0wLjA2MSAtMS4zNTc4OCwtMC40MDIxIC0xLjgwMTY2LC0xLjEzNzkgLTAuMzY0MTMsLTAuNzM5NiAtMC40NzQxMiwtMS44NTEgLTAuNDc0MTIsLTIuNDY1NCBsIDAsLTAuNDc0MSAwLC0wLjA5NSAwLC02LjI1ODQgMCwtMC4wOTUgMCwtMC4wOTUgMCwtMC4zNzkzIGMgLTAuMDEyMSwtMC42MTgyIDAuMTA5ODQsLTEuODIwNiAwLjQ3NDEyLC0yLjU2MDIgMC40NDM3OCwtMC43MzU4IDAuNjE0NDYsLTAuOTc0OCAxLjgwMTY2LC0xLjA0MzEgbCAyMS4zMzU0NSwwIDAsLTMuOTgyNiAtMjEuMzM1NDUsMCBjIC0yLjY4NTQyLC0wLjA2OCAtNC42OTE5MSwxLjYzODYgLTUuNDA0OTgsMy4zMTg5IC0wLjc3Mzc3LDEuNjg0IC0wLjg1MzQyLDMuMzE4OCAtMC44NTM0Miw0LjI2NyBsIDAsMC43NTg2IDAsNS44NzkxIDAsMC43NTg2IGMgMC4wMDYsMC45NDA3IDAuMDc5NSwyLjU4MyAwLjg1MzQyLDQuMjY3MSAwLjcxMzA3LDEuNjc2NSAyLjcxOTU2LDMuMzg3MSA1LjQwNDk4LDMuMzE4OSBsIDIxLjMzNTQ1LDAgMC4wOTQ3LDAgYyAyLjYwNTc3LDAgNC41MjEyMiwtMS42NzY1IDUuMjE1MzMsLTMuMzE4OSAwLjc4NTE0LC0xLjY4NDEgMC44NDU4MywtMy4zMjY0IDAuODUzNDIsLTQuMjY3MSBsIDAsLTAuNjYzNyAwLC0xOC4zOTU5IDAsLTAuNjYzOCBjIC0wLjAwNiwtMC45NDgyIC0wLjA2ODMsLTIuNTg2OCAtMC44NTM0MiwtNC4yNjcxIC0wLjcwMTcsLTEuNjkxNyAtMi42MjQ3NCwtMy4zOTA5IC01LjMxMDE2LC0zLjMxODggbCAtMjYuNjQ1NjEsMCB6IG0gNzkuOTM2ODQsMCAwLDMuOTgyNiAyNi41NTA3OSwwIGMgMS4xNzU4MiwwLjA2NSAxLjM2MTY3LDAuMzA3MyAxLjgwMTY2LDEuMDQzMSAwLjM3MTcxLDAuNzM1OCAwLjQ4NTUsMS45NDU4IDAuNDc0MTIsMi41NjAyIGwgMCwwLjQ3NDIgMCwwLjA5NSAwLDE4LjU4NTYgMCwwLjA5NSAwLDAuNDc0MSBjIDAuMDEyMSwwLjYxNDQgLTAuMTAyMjYsMS43Mjk2IC0wLjQ3NDEyLDIuNDY1NCAtMC40Mzk5OSwwLjczNTggLTAuNjI1ODQsMS4wNzcyIC0xLjgwMTY2LDEuMTM3OSBsIC0yMS4zMzU0NiwwIGMgLTEuMzM1MTIsLTAuMDU3IC0xLjQ2MDI5LC0wLjM3NTUgLTEuODAxNjYsLTAuODUzNCAtMC4zMTQ4MiwtMC41MDgzIC0wLjM3OTMsLTEuNDI2MiAtMC4zNzkzLC0xLjg5NjUgbCAwLC0wLjI4NDMgMCwtMC4wOTUgMCwtNy4zMDE1IDAsLTAuMDk1IDAsLTAuMDk1IDAsLTAuMzc5MyBjIDAsLTAuNjE4MyAwLjA4NzQsLTEuODIwNiAwLjQ3NDEzLC0yLjU2MDMgMC40Mjg2LC0wLjczNTggMC41MTk2MywtMC45NzQ4IDEuNzA2ODMsLTEuMDQzIGwgMjEuMzM1NDYsMCAwLC0zLjk4MjYgLTIxLjMzNTQ2LDAgYyAtMi42OTY4LC0wLjA2OCAtNC41OTcwOCwxLjYzODUgLTUuMzEwMTYsMy4zMTg4IC0wLjc4NTE0LDEuNjg0MSAtMC44NDU4MywzLjMxODkgLTAuODUzNDEsNC4yNjcxIGwgMCwwLjc1ODYgMCw2LjkyMjIgMCwwLjU2ODkgYyAwLDAuODQyIDAuMTAyMjUsMi4zNTU0IDAuOTQ4MjQsMy44ODc4IDAuODAwMzEsMS41NDM3IDIuNzc2NDUsMi45MDkyIDUuMzEwMTYsMi44NDQ3IGwgMjEuMjQwNjMsMCAwLjE4OTY0LDAgYyAyLjU5NDQsMCA0LjUyMTIyLC0xLjY3NjUgNS4yMTUzNCwtMy4zMTg4IDAuNzgxMzUsLTEuNjg0MSAwLjg0NTgzLC0zLjMyNjUgMC44NTM0MiwtNC4yNjcxIGwgMCwtMC42NjM4IDAsLTE4LjM5NTkgMCwtMC42NjM4IGMgLTAuMDA5LC0wLjk0ODIgLTAuMDcyMiwtMi41ODY4IC0wLjg1MzQyLC00LjI2NyAtMC43MTY4NywtMS42OTE3IC0yLjcxOTU2LC0zLjM5MSAtNS40MDQ5OCwtMy4zMTg5IGwgLTI2LjU1MDc5LDAgeiBtIDQzLjQyOTUsMCBjIC0yLjE5MTI3LDAuMzExNiAtMy43NDQ2LDEuODM4NyAtNC4zNjE5MSwzLjMxODkgLTAuNDgxNzEsMS4wMzE2IC0wLjY3MTM2LDEuOTk4OCAtMC43NTg2LDIuODQ0NyBsIC0wLjA5NDcsMCAwLDAuNzU4NiAwLDAuNjYzNyAwLDAuNjYzOCAwLDE2LjEyMDEgMCwwLjY2MzggYyAwLjAxNTIsMC45NDgyIDAuMDcxOSwyLjQ5NTggMC44NTM0Miw0LjE3MjMgMC42OTc5LDEuNjUzNyAyLjYwOTU2LDMuNDEzNiA1LjIxNTMzLDMuNDEzNiBsIDAuMTg5NjUsMCAyMC41NzY4NiwwIDAsLTMuOTgyNiAtMjAuNTc2ODYsMCBjIC0xLjE3NTgyLC0wLjA2NSAtMS4zNTc4OCwtMC40MDIgLTEuODAxNjYsLTEuMTM3OSAtMC4zNzE3MSwtMC43MzU4IC0wLjQ4MTcxLC0xLjgzMiAtMC40NzQxMiwtMi40NjU0IGwgMCwtMC40NzQxIDAsLTAuMDk1IDAsLTE3LjQ0NzcgYyAwLjA0OTUsLTAuNjIyIDAuMjEyNCwtMS40MzM3IDAuNDc0MTIsLTEuOTkxMyAwLjQ0Mzc4LC0wLjczMiAwLjYyNTg0LC0wLjk3NDggMS44MDE2NiwtMS4wNDMgbCAyMS4yNDA2MywwIGMgMS4xODcyLDAuMDY4IDEuMzU3ODgsMC4zMTEgMS44MDE2NiwxLjA0MyAwLjM3MTcxLDAuNzQzNSAwLjQ4MTcxLDEuOTQyIDAuNDc0MTIsMi41NjAzIGwgMCwwLjQ3NDEgMCwwLjA5NSAwLDI5Ljk2NDQgMCwwLjA5NSAwLDAuNDc0MSBjIDAuMDA2LDAuNjI1OSAtMC4xMDI1NiwxLjgyNDUgLTAuNDc0MTIsMi41NjAzIC0wLjQ0Mzc4LDAuNzMyIC0wLjYxNDQ2LDAuOTc4NiAtMS44MDE2NiwxLjA0MzEgbCAtMTkuMDU5NjcsMCAwLDMuOTgyNiAxOS4wNTk2NywwIDAuMTg5NjUsMCBjIDIuNjAxOTgsMCA0LjUwOTg0LC0xLjY3NjUgNS4yMTUzMywtMy4zMTg5IDAuNzgxMzUsLTEuNjg3OCAwLjgzODI1LC0zLjMyMjYgMC44NTM0MiwtNC4yNjcxIGwgMCwtMC42NjM3IDAsLTI5Ljc3NDggMCwtMC42NjM4IGMgMCwtMC45NDQ1IC0wLjA3MjIsLTIuNTg2OCAtMC44NTM0MiwtNC4yNjcxIC0wLjcxNjg3LC0xLjY5MTcgLTIuNzExOTcsLTMuMzkwOSAtNS40MDQ5OCwtMy4zMTg4IGwgLTIxLjI0MDYzLDAgYyAtMC4zMzY2MywtMC4wMSAtMC43MzAwNCwtMC4wNDUgLTEuMDQzMDcsMCB6IG0gNDAuMzAwMzEsMCBjIC0yLjE4NjA5LDAuMzA2NiAtMy43MjgwMSwxLjgzODcgLTQuMzYxOTIsMy4zMTg5IC0wLjc3Mzc3LDEuNjc2NCAtMC44NDIwNCwzLjMyMjYgLTAuODUzNDIsNC4yNjcgbCAwLDAuNjYzOCAwLDE4LjMwMTEgMCwwLjc1ODYgYyAwLDAuOTQwNiAwLjA3OTgsMi41ODMgMC44NTM0Miw0LjI2NzEgMC43MTY4NywxLjY3NjUgMi43MjMzNSwzLjM4NzEgNS40MDQ5OCwzLjMxODggbCAyNi41NTA3OSwwIDAsLTMuOTgyNiAtMjYuNTUwNzksMCBjIC0xLjE4MzQsLTAuMDYxIC0xLjM1Nzg4LC0wLjQwMiAtMS44MDE2NiwtMS4xMzc5IC0wLjM2MDMzLC0wLjczNTggLTAuNDg5MjksLTEuODUxIC0wLjQ3NDEyLC0yLjQ2NTQgbCAwLC0wLjQ3NDEgMCwtMC4wOTUgMCwtMTguNTg1NiAwLC0wLjA5NSAwLC0wLjA5NSAwLC0wLjM3OTMgYyAtMC4wMTUyLC0wLjYxMDcgMC4xMTM3OSwtMS44MTY4IDAuNDc0MTIsLTIuNTYwMyAwLjQ0Mzc4LC0wLjczNTggMC42MTgyNiwtMC45Nzg1IDEuODAxNjYsLTEuMDQzIGwgMjEuMjQwNjMsMCBjIDEuMTc1ODIsMC4wNjUgMS4zNTc4OSwwLjMwNzIgMS44MDE2NiwxLjA0MyAwLjMxODYxLDAuNjUyNCAwLjQ1MTM3LDEuNjE5NiAwLjQ3NDEyLDIuMjc1OCBsIDAsNy4xMTE4IDAsMC4wOTUgMCwwLjA5NSAwLDAuMTg5NiBjIDAuMDA2LDAuMzg2OSAtMC4xMDYyLDEuMTExNCAtMC4zNzkyOSwxLjUxNzIgLTAuMjkxOTEsMC4zNzU1IC0wLjQ4OTMsMC43MDU1IC0xLjg5NjQ5LDAuNzU4NiBsIC0yMS4yNDA2MywwIDAsNC4wNzc1IDIxLjI0MDYzLDAgMC4xODk2NSwwIGMgMi4zOTcxNiwwIDQuMjc4NDcsLTEuMjEgNS4xMjA1MSwtMi42NTUxIDAuODcyMzgsLTEuNDUyNyAwLjk0MDY2LC0yLjkwNTQgMC45NDgyNCwtMy42OTgyIGwgMCwtMC41Njg5IDAsLTUuOTczOSAwLC0wLjY2MzggYyAtMC4wMDYsLTAuOTQ4MiAtMC4wNjgzLC0yLjU4NjggLTAuODUzNDIsLTQuMjY3MSAtMC43MDU0OSwtMS42OTE3IC0yLjcyMzM1LC0zLjM5MDkgLTUuNDA0OTgsLTMuMzE4OCBsIC0yMS4yNDA2MywwIGMgLTAuMzM1MjEsLTAuMDEgLTAuNzMwNzcsLTAuMDQ0IC0xLjA0MzA2LDAgeiBtIC00NjcuOTU3NjQ5LDMuOTgyNiAxOS43MjM0NDMsMCBjIDEuMTcyMDI4LDAuMDY0IDEuMzY1NDY5LDAuMzAzNSAxLjgwMTY2MSwxLjA0MzEgMC4zNjAzMzIsMC43MzU4IDAuNDgxNzA3LDEuOTQyIDAuNDc0MTIxLDIuNTYwMiBsIC0wLjA5NDY3LDAuNDc0MiAwLDAuMDk1IDAsMTguNTg1NiAwLDAuMDk1IDAuMDk0NjcsMC40NzQxIGMgMC4wMDYxLDAuNjE0NCAtMC4xMTM3ODksMS43Mjk2IC0wLjQ3NDEyMSwyLjQ2NTQgLTAuNDM2MTkyLDAuNzM1OCAtMC42Mjk2MzMsMS4wODEgLTEuODAxNjYxLDEuMTM3OSBsIC0xOS43MjM0NDMsMCBjIC0xLjE3OTYxMywtMC4wNTcgLTEuMzYxNjc2LC0wLjQwMjEgLTEuODAxNjYsLTEuMTM3OSAtMC4zNjQxMjUsLTAuNzM1OCAtMC40ODU1LC0xLjg1MSAtMC40NzQxMjEsLTIuNDY1NCBsIDAsLTAuNDc0MSAwLC0wLjA5NSAwLC0xOC41ODU2IDAsLTAuMDk1IDAsLTAuNDc0MiBjIC0wLjAxMjE0LC0wLjYxODIgMC4xMDk4NDQsLTEuODI0NCAwLjQ3NDEyMSwtMi41NjAyIDAuNDM5OTg0LC0wLjczOTYgMC42MTQ0NjEsLTAuOTc4NiAxLjgwMTY2LC0xLjA0MzEgeiBtIDExNS45NzAwNDksMCAxOS44MTgyNywwIGMgMS4xNzIwMywwLjA2NCAxLjI2Njg1LDAuMzAzNSAxLjcwNjg0LDEuMDQzMSAwLjM3MTcxLDAuNzM1OCAwLjQ4MTcsMS45NDIgMC40NzQxMiwyLjU2MDIgbCAwLDAuNDc0MiAwLDAuMDk1IDAsMTguNTg1NiAwLDAuMDk1IDAsMC40NzQxIGMgMC4wMDYsMC42MTQ0IC0wLjEwMjI2LDEuNzI5NiAtMC40NzQxMiwyLjQ2NTQgLTAuNDM5OTksMC43MzU4IC0wLjUzNDgxLDEuMDgxIC0xLjcwNjg0LDEuMTM3OSBsIC0xOS44MTgyNywwIGMgLTEuMTgzNCwtMC4wNTcgLTEuMjYzMDYsLTAuNDAyMSAtMS43MDY4MywtMS4xMzc5IC0wLjM2MDM0LC0wLjczNTggLTAuNDg1NSwtMS44NTEgLTAuNDc0MTMsLTIuNDY1NCBsIDAsLTAuNDc0MSAwLC0wLjA5NSAwLC0xOC41ODU2IDAsLTAuMDk1IDAsLTAuNDc0MiBjIC0wLjAxMjEsLTAuNjE4MiAwLjExMzc5LC0xLjgyNDQgMC40NzQxMywtMi41NjAyIDAuNDQzNzcsLTAuNzM5NiAwLjUyMzQzLC0wLjk3ODYgMS43MDY4MywtMS4wNDMxIHoiLz4KPHBhdGggZD0ibSA1ODEuMDUxMjgsMzMwLjE4NzczIGMgLTQuNDE4ODEsLTMuNTU3ODEgLTEyLjc5MzY5LC00LjM1MDU0IC0xNy42MzczMSwtNC41MDYwNSAtMi4yMzQwNiwtMC4wNjA3IC0zLjczMjI4LDAgLTMuNzMyMjgsMCBsIC0xMTMuNzE3MDMsMCBjIDAsMCAtMy40NDc4MSwtMC4yNjU1MSAtNy42NjU1OSwwIC00LjEwNzc5LDAuMjY1NTEgLTguOTQzODIsMS4wMzU0OCAtMTEuOTcwNjEsMy4wOTEyNyAtNy42OTIxNSw1LjE4NDk5IC04LjY1OTM1LDEzLjY1NDY5IC04LjY1OTM1LDIxLjMzOTI1IGwgMCw5Ny42MjcyNCAyOC4yOTU1NSwwIDAsLTg1LjcxMzUzIGMgMCwtMTIuMzAwNiAxMC41MzY4NywtMTAuOTU0MDkgMTAuNTM2ODcsLTEwLjk1NDA5IGwgMzIuODQ3MTIsMCAwLDk2LjU1MDA0IDI2Ljk2ODAxLDAgMCwtOTYuNTUwMDQgMzMuNjEzMywwIGMgOS4wNTAwMywwIDkuNzIxMzgsNy44NzA0MSA5Ljc1MTczLDkuNjM0MTQgbCAwLDAuMzY3OTIgMCw4Ni42NjU1NiAyOC4zMTgzMSwwIDAsLTk2LjY2NzYyIDAsLTAuNjg2NTMgYyAtMC4wNDE2LC0zLjAxMTYyIC0wLjU4NzkxLC0xNS4wODQ2NCAtNi45NDg3MiwtMjAuMTk3NTYgbSAtMjM5LjI2NDMzLC00LjUwNjA1IGMgLTQuMTE1MzcsMC4yNjU1MSAtOC45NTE0LDEuMDM1NDggLTExLjk4NTc4LDMuMDkxMjcgLTcuNjkyMTQsNS4xODQ5OSAtOC42NDc5NywxMy42NTQ2OSAtOC42NDc5NywyMS4zMzkyNSBsIDAsOTcuNjI3MjQgMjguMjkxNzYsMCAwLC04NS43MTM1MyBjIDAsLTEyLjMwMDYgMTAuNTQwNjYsLTEwLjk1NDA5IDEwLjU0MDY2LC0xMC45NTQwOSBsIDM3LjUzNTIzLDAgMCwtMjUuMzkwMTQgLTQ4LjA3NTg5LDAgYyAwLDAgLTMuNDQ3ODEsLTAuMjY1NTEgLTcuNjU4MDEsMCBtIC03Mi4xMDgxNCw4NS42MDM1MyBjIDAsMTIuMjk2ODEgLTEwLjUzMzA4LDEwLjk1Nzg5IC0xMC41MzMwOCwxMC45NTc4OSBsIC0zOC42NDI3OCwwIGMgLTkuMDM0ODUsMCAtOS43MTc1OSwtNy44ODE3OSAtOS43NDc5MywtOS42NTMxMSBsIDAsLTAuMzUyNzQgMCwtODYuNjg0NTMgLTI4LjMwNjkzLDAgMCw5Ni42OTAzOCAwLDAuNjg2NTMgYyAwLjAzNCwyLjk4ODg2IDAuNTg0MTEsMTUuMDc3MDUgNi45NDQ5MywyMC4xOTM3NyA0LjQxNTAxLDMuNTU0MDEgMTIuNzg2MSw0LjM1MDU0IDE3LjYyOTcyLDQuNDk4NDYgMi4yMzc4NSwwLjA3MTkgMy43MzIyOCwwIDMuNzMyMjgsMCBsIDU4LjkyMzc5LDAgYyAwLDAgMy40NTE2LDAuMjczMSA3LjY1OCwwIDQuMTE1MzcsLTAuMjYxODYgOC45NDc2MiwtMS4wNDMwNiAxMS45ODE5OSwtMy4wOTEyNyA3LjY4NDU2LC01LjE5NjM3IDguNjU5MzUsLTEzLjY0MzMxIDguNjU5MzUsLTIxLjMzNTQ1IGwgMCwtOTcuNjQyNDIgLTI4LjI5OTM0LDAgMCw4NS43MzI0OSB6IG0gLTE0MC4xNjU0MSwzNi4zMzY2NSAyOC4yOTU1NiwwIDAsLTE3My42MjY5OCAtMjguMjk1NTYsMCAwLDE3My42MjY5OCB6IG0gLTI1LjEyMDg0LC01NS43MTExNCBjIDAsMCAwLjI1NzkyLC04Ljk3MDM3IC01LjM0NDI5MiwtMTIuODQyOTkgLTUuMTU4NDM5LC0zLjUzNTA1IC0xMi41NzM2OTUsLTMuNTM1MDUgLTEyLjU3MzY5NSwtMy41MzUwNSBsIC01MS41Mjc0OTQsMCBjIDAsMCAtNy43NTY2MjMsMC41MTk2NCAtNy43NTY2MjMsLTcuNzU2NjIgbCAwLC04LjY5MzQ5IGMgMCwwIC0wLjY4MjczNSwtOS4xODI3OCA5LjE3ODk4NiwtOS4xODI3OCBsIDY2LjgyMDc0OCwwIDAsLTI0LjM0NzA3IC03Mi4yOTQwMDMsMCBjIDAsMCAtMTEuOTc4MTk4LC0wLjE2MzI1IC0xNi43MzQ1ODIsMC45NjM0MSBDIDcuODY1Mjc1MywzMjguMDA2NzcgMSwzMzEuMjMwNzkgMSwzNDUuNTUzMDUgbCAwLDM0LjU1MDE2IGMgMCwxOC43NjM4MiAxNy44ODc2NDUsMTYuNzk1MjcgMTcuODg3NjQ1LDE2Ljc5NTI3IGwgNDguMDMwMzc2LDAgYyAxMS4zODI3MDIsMCAxMC41NzQ3OTksOC40MDUyMiAxMC41NzQ3OTksOC40MDUyMiBsIDAsOC4zMDY2IGMgMCwxMC45ODA2NSAtMTIuNDQ0NzMzLDkuMjMyMDkgLTEyLjQ0NDczMyw5LjIzMjA5IGwgLTY0LjA0ODA4NywwIDAsMjQuNzc5NDcgODIuOTYzNjI3LDAgYyAwLDAgMTAuODYzMDY1LDAuMzcxNzEgMTUuODU4NDA2LC01LjM5NzM5IDUuMDAyOTI3LC01Ljc2OTExIDQuNTcwNTI3LC0xNS4yNDAxNiA0LjU3MDUyNywtMTUuMjQwMTYgbCAwLC0zNS4wNzM1OSB6Ii8+Cjwvc3ZnPgo=
+    mediatype: image/svg+xml
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - events
+          - persistentvolumeclaims
+          - pods
+          - secrets
+          - services
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - nodes
+          verbs:
+          - get
+          - list
+          - watch
+          - patch
+        - apiGroups:
+          - ""
+          resources:
+          - pods/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - apps
+          resources:
+          - controllerrevisions
+          - deployments
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - policy
+          resources:
+          - poddisruptionbudgets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - slinky.slurm.net
+          resources:
+          - accountings
+          - controllers
+          - loginsets
+          - nodesets
+          - restapis
+          - tokens
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - slinky.slurm.net
+          resources:
+          - accountings/finalizers
+          - controllers/finalizers
+          - loginsets/finalizers
+          - nodesets/finalizers
+          - restapis/finalizers
+          - tokens/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - slinky.slurm.net
+          resources:
+          - accountings/status
+          - controllers/status
+          - loginsets/status
+          - nodesets/status
+          - restapis/status
+          - tokens/status
+          verbs:
+          - get
+          - patch
+          - update
+        - apiGroups:
+          - security.openshift.io
+          resourceNames:
+          - privileged
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - use
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          resources:
+          - secrets/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - slinky.slurm.net
+          resources:
+          - tokens
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - slinky.slurm.net
+          resources:
+          - tokens/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - slinky.slurm.net
+          resources:
+          - tokens/status
+          verbs:
+          - get
+          - patch
+          - update
+        serviceAccountName: slurm-operator
+      - rules:
+        - apiGroups:
+          - slinky.slurm.net
+          resources:
+          - accountings
+          - controllers
+          - loginsets
+          - nodesets
+          - restapis
+          - tokens
+          verbs:
+          - create
+          - delete
+          - update
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+        serviceAccountName: slurm-operator-webhook
+      deployments:
+      - label:
+          app.kubernetes.io/instance: slurm-operator
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: slurm-operator
+          app.kubernetes.io/version: "25.11"
+          helm.sh/chart: slurm-operator-1.0.1
+        name: slurm-operator
+        spec:
+          replicas: 1
+          revisionHistoryLimit: 0
+          selector:
+            matchLabels:
+              app.kubernetes.io/instance: slurm-operator
+              app.kubernetes.io/name: slurm-operator
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                app.kubernetes.io/instance: slurm-operator
+                app.kubernetes.io/managed-by: Helm
+                app.kubernetes.io/name: slurm-operator
+                app.kubernetes.io/version: "25.11"
+                helm.sh/chart: slurm-operator-1.0.1
+            spec:
+              containers:
+              - args:
+                - --accounting-workers
+                - "4"
+                - --controller-workers
+                - "4"
+                - --loginset-workers
+                - "4"
+                - --nodeset-workers
+                - "4"
+                - --restapi-workers
+                - "4"
+                - --token-workers
+                - "4"
+                - --slurmclient-workers
+                - "2"
+                - --zap-log-level
+                - info
+                - --health-addr
+                - :8081
+                - --metrics-addr
+                - :8080
+                image: ghcr.io/slinkyproject/slurm-operator:1.0.1
+                imagePullPolicy: IfNotPresent
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                name: slurm-operator
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                resources: {}
+              hostname: slurm-operator
+              serviceAccountName: slurm-operator
+      - label:
+          app.kubernetes.io/instance: slurm-operator
+          app.kubernetes.io/managed-by: Helm
+          app.kubernetes.io/name: slurm-operator-webhook
+          app.kubernetes.io/version: "25.11"
+          helm.sh/chart: slurm-operator-1.0.1
+        name: slurm-operator-webhook
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app.kubernetes.io/instance: slurm-operator
+              app.kubernetes.io/name: slurm-operator-webhook
+          strategy:
+            rollingUpdate:
+              maxSurge: 1
+              maxUnavailable: 0
+            type: RollingUpdate
+          template:
+            metadata:
+              labels:
+                app.kubernetes.io/instance: slurm-operator
+                app.kubernetes.io/managed-by: Helm
+                app.kubernetes.io/name: slurm-operator-webhook
+                app.kubernetes.io/version: "25.11"
+                helm.sh/chart: slurm-operator-1.0.1
+            spec:
+              containers:
+              - args:
+                - --zap-log-level
+                - info
+                - --health-addr
+                - :8081
+                image: ghcr.io/slinkyproject/slurm-operator-webhook:1.0.1
+                imagePullPolicy: IfNotPresent
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                name: webhook
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                resources: {}
+                volumeMounts:
+                - mountPath: /tmp/k8s-webhook-server/serving-certs/
+                  name: certificates
+                  readOnly: true
+              hostname: slurm-operator-webhook
+              serviceAccountName: slurm-operator-webhook
+              volumes:
+              - name: certificates
+                secret:
+                  defaultMode: 420
+                  secretName: slurm-operator-webhook-ca
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - slurm-operator
+  - slurm
+  - slinky
+  links:
+  - name: Slinky on OpenShift
+    url: https://github.com/redhat-hpc/slinky-on-openshift/tree/v1.0.1
+  - name: Slurm Operator
+    url: https://github.com/SlinkyProject/slurm-operator/tree/v1.0.1
+  maintainers:
+  - email: jkincl@redhat.com
+    name: Jason Kincl
+  maturity: alpha
+  minKubeVersion: 1.29.0
+  provider:
+    name: Red Hat HPC Community
+  version: 1.0.1-1
+  webhookdefinitions:
+  - admissionReviewVersions:
+    - v1beta1
+    containerPort: 443
+    deploymentName: slurm-operator-webhook
+    failurePolicy: Fail
+    generateName: accountings-validate.slinky.slurm.net
+    matchPolicy: Equivalent
+    rules:
+    - apiGroups:
+      - slinky.slurm.net
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - accountings
+      scope: Namespaced
+    sideEffects: None
+    targetPort: 9443
+    timeoutSeconds: 10
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-slinky-slurm-net-v1beta1-accounting
+  - admissionReviewVersions:
+    - v1beta1
+    containerPort: 443
+    deploymentName: slurm-operator-webhook
+    failurePolicy: Fail
+    generateName: controllers-validate.slinky.slurm.net
+    matchPolicy: Equivalent
+    rules:
+    - apiGroups:
+      - slinky.slurm.net
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - controllers
+      scope: Namespaced
+    sideEffects: None
+    targetPort: 9443
+    timeoutSeconds: 10
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-slinky-slurm-net-v1beta1-controller
+  - admissionReviewVersions:
+    - v1beta1
+    containerPort: 443
+    deploymentName: slurm-operator-webhook
+    failurePolicy: Fail
+    generateName: loginsets-validate.slinky.slurm.net
+    matchPolicy: Equivalent
+    rules:
+    - apiGroups:
+      - slinky.slurm.net
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - loginsets
+      scope: Namespaced
+    sideEffects: None
+    targetPort: 9443
+    timeoutSeconds: 10
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-slinky-slurm-net-v1beta1-loginset
+  - admissionReviewVersions:
+    - v1beta1
+    containerPort: 443
+    deploymentName: slurm-operator-webhook
+    failurePolicy: Fail
+    generateName: nodesets-validate.slinky.slurm.net
+    matchPolicy: Equivalent
+    rules:
+    - apiGroups:
+      - slinky.slurm.net
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - nodesets
+      scope: Namespaced
+    sideEffects: None
+    targetPort: 9443
+    timeoutSeconds: 10
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-slinky-slurm-net-v1beta1-nodeset
+  - admissionReviewVersions:
+    - v1beta1
+    containerPort: 443
+    deploymentName: slurm-operator-webhook
+    failurePolicy: Fail
+    generateName: restapis-validate.slinky.slurm.net
+    matchPolicy: Equivalent
+    rules:
+    - apiGroups:
+      - slinky.slurm.net
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - restapis
+      scope: Namespaced
+    sideEffects: None
+    targetPort: 9443
+    timeoutSeconds: 10
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-slinky-slurm-net-v1beta1-restapi
+  - admissionReviewVersions:
+    - v1beta1
+    containerPort: 443
+    deploymentName: slurm-operator-webhook
+    failurePolicy: Fail
+    generateName: tokens-validate.slinky.slurm.net
+    matchPolicy: Equivalent
+    rules:
+    - apiGroups:
+      - slinky.slurm.net
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - tokens
+      scope: Namespaced
+    sideEffects: None
+    targetPort: 9443
+    timeoutSeconds: 10
+    type: ValidatingAdmissionWebhook
+    webhookPath: /validate-slinky-slurm-net-v1beta1-token

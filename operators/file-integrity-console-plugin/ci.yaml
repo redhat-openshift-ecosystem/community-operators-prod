@@ -1,0 +1,12 @@
+---
+# Reviewers whose approval lets a change to this operator merge automatically.
+reviewers:
+  - amedeos
+
+# Upgrade edges come from the CSV's `replaces`/`skips` fields and from nothing
+# else. Deliberately not semver-mode: this package ships one bundle per console
+# generation, and in semver `0.1.0-ocp4.16` is a *prerelease* of `0.1.0`, so a
+# version-ordered graph would describe an upgrade from the 4.16 build to the
+# 4.22 one. They are different builds for different consoles, not successive
+# releases.
+updateGraph: replaces-mode

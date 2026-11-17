@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/instance: slurm-operator
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: slurm-operator
+    app.kubernetes.io/version: "25.11"
+    helm.sh/chart: slurm-operator-1.0.0
+  name: slurm-operator
+spec:
+  ports:
+  - name: metrics
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: health
+    port: 8081
+    protocol: TCP
+    targetPort: 8081
+  selector:
+    app.kubernetes.io/instance: slurm-operator
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: slurm-operator
+    app.kubernetes.io/version: "25.11"
+    helm.sh/chart: slurm-operator-1.0.0
+status:
+  loadBalancer: {}

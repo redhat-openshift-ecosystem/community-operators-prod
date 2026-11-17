@@ -1,0 +1,153 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: headscales.headscale.jicoyne.io
+spec:
+  group: headscale.jicoyne.io
+  names:
+    kind: Headscale
+    listKind: HeadscaleList
+    plural: headscales
+    singular: headscale
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    - jsonPath: .status.coordinationURL
+      name: URL
+      type: string
+    - jsonPath: .status.onlineNodes
+      name: Nodes
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Headscale deploys a self-hosted Headscale coordination server,
+          an admin web UI, an optional OpenShift console plugin and an optional in-cluster
+          Tailscale subnet router / exit node.
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          metadata:
+            type: object
+          spec:
+            properties:
+              apiKey:
+                default:
+                  autoBootstrap: true
+                  ownerUser: admin
+                  secretName: headscale-api-key
+                properties:
+                  autoBootstrap:
+                    default: true
+                    description: When true, the operator creates the owner user and
+                      an API key on first reconcile and writes the derived Secrets.
+                    type: boolean
+                  ownerUser:
+                    default: admin
+                    type: string
+                  secretName:
+                    default: headscale-api-key
+                    type: string
+                type: object
+              appsDomain:
+                description: The OpenShift *.apps ingress wildcard domain used to
+                  build the public Route hostnames. If omitted, it is auto-detected
+                  from ingresses.config.openshift.io/cluster.
+                type: string
+              consolePlugin:
+                default:
+                  enabled: false
+                properties:
+                  enabled:
+                    default: false
+                    type: boolean
+                  image:
+                    description: Pre-built console plugin image. Required when consolePlugin.enabled
+                      is true.
+                    type: string
+                type: object
+              images:
+                description: Optional image overrides.
+                properties:
+                  headscale:
+                    type: string
+                  nginx:
+                    type: string
+                  oauthProxy:
+                    type: string
+                  sidecar:
+                    type: string
+                type: object
+              storage:
+                default:
+                  size: 1Gi
+                properties:
+                  className:
+                    description: ReadWriteOnce StorageClass for the headscale PVC.
+                      Defaults to the cluster default StorageClass when empty.
+                    type: string
+                  size:
+                    default: 1Gi
+                    type: string
+                type: object
+              subnetRouter:
+                default:
+                  enabled: false
+                properties:
+                  authKeySecretRef:
+                    default: tailscale-router-authkey
+                    description: Name of a Secret with a TS_AUTHKEY key holding a
+                      headscale pre-auth key. Must be created out-of-band.
+                    type: string
+                  enabled:
+                    default: false
+                    type: boolean
+                  exitNode:
+                    default: true
+                    type: boolean
+                  hostname:
+                    default: openshift-cluster
+                    type: string
+                  routes:
+                    description: Cluster CIDRs to advertise onto the tailnet. Auto-detected
+                      from network.config.openshift.io/cluster when omitted.
+                    items:
+                      type: string
+                    type: array
+                type: object
+              ui:
+                default:
+                  enabled: true
+                properties:
+                  enabled:
+                    default: true
+                    type: boolean
+                type: object
+              version:
+                default: 0.27.1
+                description: Headscale server version (container image tag).
+                type: string
+            type: object
+          status:
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null

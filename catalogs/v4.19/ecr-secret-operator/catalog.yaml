@@ -7,6 +7,19 @@ name: ecr-secret-operator
 schema: olm.package
 ---
 entries:
+- name: ecr-secret-operator.v0.6.0
+  replaces: ecr-secret-operator.v0.5.1
+  skips:
+  - ecr-secret-operator.v0.3.2
+  - ecr-secret-operator.v0.4.0
+  - ecr-secret-operator.v0.4.1
+  - ecr-secret-operator.v0.5.0
+- name: ecr-secret-operator.v0.5.1
+  replaces: ecr-secret-operator.v0.5.0
+  skips:
+  - ecr-secret-operator.v0.3.2
+  - ecr-secret-operator.v0.4.0
+  - ecr-secret-operator.v0.4.1
 - name: ecr-secret-operator.v0.5.0
   replaces: ecr-secret-operator.v0.4.1
   skips:
@@ -533,5 +546,281 @@ relatedImages:
 - image: quay.io/community-operator-pipeline-prod/ecr-secret-operator@sha256:0843807a61d1888b77d64c24fa4f43e57196539bf2b76bc4d9526489d9a9b05f
   name: ""
 - image: quay.io/rh-mobb/ecr-secret-operator:v0.5.0
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/ecr-secret-operator@sha256:1101ed2612769f7fed6a7d7cc335479338cb28eed327151cb6b0c7caef96eecf
+name: ecr-secret-operator.v0.5.1
+package: ecr-secret-operator
+properties:
+- type: olm.gvk
+  value:
+    group: ecr.mobb.redhat.com
+    kind: ArgoHelmRepoSecret
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: ecr.mobb.redhat.com
+    kind: Secret
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: ecr-secret-operator
+    version: 0.5.1
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "ecr.mobb.redhat.com/v1alpha1",
+            "kind": "Secret",
+            "metadata": {
+              "name": "ecr-secret-sample",
+              "namespace": "test-ecr-secret-operator"
+            },
+            "spec": {
+              "ecr_registry": "ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com",
+              "frequency": "10h",
+              "generated_secret_name": "ecr-credentials",
+              "region": "us-east-2"
+            }
+          },
+          {
+            "apiVersion": "ecr.mobb.redhat.com/v1alpha1",
+            "kind": "ArgoHelmRepoSecret",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/created-by": "ecr-secret-operator",
+                "app.kubernetes.io/instance": "argohelmreposecret-sample",
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "argohelmreposecret",
+                "app.kubernetes.io/part-of": "ecr-secret-operator"
+              },
+              "name": "argohelmreposecret-sample"
+            },
+            "spec": null
+          }
+        ]
+      capabilities: Basic Install
+      categories: Integration & Delivery
+      com.redhat.openshift.versions: v4.16
+      containerImage: quay.io/rh-mobb/ecr-secret-operator:v0.5.1
+      createdAt: "2026-03-10T16:28:13Z"
+      description: Automatically refreshes AWS ECR authentication tokens as Kubernetes
+        image pull secrets before they expire.
+      operatorframework.io/suggested-namespace: ecr-secret-operator
+      operators.operatorframework.io/builder: operator-sdk-v1.42.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/rh-mobb/ecr-secret-operator
+      support: Community based
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: ArgoHelmRepoSecret is the Schema for the argohelmreposecrets
+          API
+        displayName: Argo Helm Repo Secret
+        kind: ArgoHelmRepoSecret
+        name: argohelmreposecrets.ecr.mobb.redhat.com
+        version: v1alpha1
+      - description: Secret is the Schema for the secrets API
+        displayName: Secret
+        kind: Secret
+        name: secrets.ecr.mobb.redhat.com
+        version: v1alpha1
+    description: "# ECR Secret Operator\n\nAmazon Elastic Container Registry [Private
+      Registry Authentication](https://docs.aws.amazon.com/AmazonECR/latest/userguide/registry_auth.html)
+      provides a temporary token that is valid only for 12 hours. It is a challenge
+      for automatic container image build process to refresh the token or secret in
+      a timely manner.\n\nThis operators frequently talks with AWS ECR GetAuthroization
+      Token and create/update the secret, so that the service account can perform
+      docker image build.\n\n\n## How to use this operator\n\n### Prerequisites\n\n*
+      [Create an ECR private repository](https://docs.aws.amazon.com/AmazonECR/latest/userguide/repository-create.html)\n*
+      Create An Openshift Cluster\n* Provide AWS Authentication to the operator. Two
+      Options:\n  **Note: You have to provide a secret aws-ecr-cloud-credentials in
+      the installed namespace**\n  * [IAM User](https://github.com/rh-mobb/ecr-secret-operator/tree/main/docs/iam_user.md)\n
+      \ * [STS Assume Role](https://github.com/rh-mobb/ecr-secret-operator/tree/main/docs/iam_assume_role.md)\n\n###
+      Install the operator\n\n### Create the ECR Secret CRD\n\n```\napiVersion: ecr.mobb.redhat.com/v1alpha1\nkind:
+      Secret\nmetadata:\n  name: ecr-secret\n  namespace: test-ecr-secret-operator\nspec:\n
+      \ generated_secret_name: ecr-credentials\n  ecr_registry: [ACCOUNT_ID].dkr.ecr.us-east-2.amazonaws.com\n
+      \ frequency: 10h\n  region: us-east-2\n```\n\n```\noc create -f CRD_FILE\n```\n\nA
+      docker registry secret is created by the operator momentally and the token is
+      patched every 10 hours\n\n```\noc get secret ecr-credentials   \nNAME              TYPE
+      \                            DATA   AGE\necr-credentials   kubernetes.io/dockerconfigjson
+      \  1      16h\n```\n\n### A sample build process with generated secret\n\n\nLink
+      the secret to builder\n\n```\noc secrets link builder ecr-credentials \n```\n\nConfigure
+      [build config](https://github.com/rh-mobb/ecr-secret-operator/tree/main/samples/build-config.yaml)
+      to point to your ECR Container repository\n\n```\noc create imagestream ruby\noc
+      tag openshift/ruby:2.5-ubi8 ruby:2.5\noc create -f samples/build-config.yaml\noc
+      start-build ruby-sample-build --wait\n```\n\nBuild should succeed and push the
+      image to the the private ECR Container repository\n\n"
+    displayName: ECR Secret Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - ecr
+    - aws
+    - redhat
+    links:
+    - name: Ecr Secret Operator
+      url: https://github.com/rh-mobb/ecr-secret-operator
+    maintainers:
+    - email: cloud-ssa-global@redhat.com
+      name: Red Hat's Global Cloud Services SSA Team
+    maturity: alpha
+    minKubeVersion: 1.29.0
+    provider:
+      name: Red Hat's Global Cloud Services SSA Team
+relatedImages:
+- image: quay.io/brancz/kube-rbac-proxy:v0.21.0@sha256:059a43ab03f230eedb7dde2eb0d910a41e9d7ee04efff0f5cdc7ee614111397a
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/ecr-secret-operator@sha256:1101ed2612769f7fed6a7d7cc335479338cb28eed327151cb6b0c7caef96eecf
+  name: ""
+- image: quay.io/rh-mobb/ecr-secret-operator:v0.5.1
+  name: ""
+schema: olm.bundle
+---
+image: quay.io/community-operator-pipeline-prod/ecr-secret-operator@sha256:58fa6c1972c7152dee0b210d260a59e27a173be79f28f5408a9f9509f43d14b9
+name: ecr-secret-operator.v0.6.0
+package: ecr-secret-operator
+properties:
+- type: olm.gvk
+  value:
+    group: ecr.mobb.redhat.com
+    kind: ArgoHelmRepoSecret
+    version: v1alpha1
+- type: olm.gvk
+  value:
+    group: ecr.mobb.redhat.com
+    kind: Secret
+    version: v1alpha1
+- type: olm.package
+  value:
+    packageName: ecr-secret-operator
+    version: 0.6.0
+- type: olm.csv.metadata
+  value:
+    annotations:
+      alm-examples: |-
+        [
+          {
+            "apiVersion": "ecr.mobb.redhat.com/v1alpha1",
+            "kind": "Secret",
+            "metadata": {
+              "name": "ecr-secret-sample",
+              "namespace": "test-ecr-secret-operator"
+            },
+            "spec": {
+              "ecr_registry": "ACCOUNT_ID.dkr.ecr.us-east-2.amazonaws.com",
+              "frequency": "10h",
+              "generated_secret_name": "ecr-credentials",
+              "region": "us-east-2"
+            }
+          },
+          {
+            "apiVersion": "ecr.mobb.redhat.com/v1alpha1",
+            "kind": "ArgoHelmRepoSecret",
+            "metadata": {
+              "labels": {
+                "app.kubernetes.io/created-by": "ecr-secret-operator",
+                "app.kubernetes.io/instance": "argohelmreposecret-sample",
+                "app.kubernetes.io/managed-by": "kustomize",
+                "app.kubernetes.io/name": "argohelmreposecret",
+                "app.kubernetes.io/part-of": "ecr-secret-operator"
+              },
+              "name": "argohelmreposecret-sample"
+            },
+            "spec": null
+          }
+        ]
+      capabilities: Basic Install
+      categories: Integration & Delivery
+      com.redhat.openshift.versions: v4.16
+      containerImage: quay.io/rh-mobb/ecr-secret-operator:v0.6.0
+      createdAt: "2026-07-08T18:17:43Z"
+      description: Automatically refreshes AWS ECR authentication tokens as Kubernetes
+        image pull secrets before they expire.
+      operatorframework.io/suggested-namespace: ecr-secret-operator
+      operators.operatorframework.io/builder: operator-sdk-v1.42.0
+      operators.operatorframework.io/project_layout: go.kubebuilder.io/v4
+      repository: https://github.com/rh-mobb/ecr-secret-operator
+      support: Community based
+    apiServiceDefinitions: {}
+    crdDescriptions:
+      owned:
+      - description: ArgoHelmRepoSecret is the Schema for the argohelmreposecrets
+          API
+        displayName: Argo Helm Repo Secret
+        kind: ArgoHelmRepoSecret
+        name: argohelmreposecrets.ecr.mobb.redhat.com
+        version: v1alpha1
+      - description: Secret is the Schema for the secrets API
+        displayName: Secret
+        kind: Secret
+        name: secrets.ecr.mobb.redhat.com
+        version: v1alpha1
+    description: "# ECR Secret Operator\n\nAmazon Elastic Container Registry [Private
+      Registry Authentication](https://docs.aws.amazon.com/AmazonECR/latest/userguide/registry_auth.html)
+      provides a temporary token that is valid only for 12 hours. It is a challenge
+      for automatic container image build process to refresh the token or secret in
+      a timely manner.\n\nThis operators frequently talks with AWS ECR GetAuthroization
+      Token and create/update the secret, so that the service account can perform
+      docker image build.\n\n\n## How to use this operator\n\n### Prerequisites\n\n*
+      [Create an ECR private repository](https://docs.aws.amazon.com/AmazonECR/latest/userguide/repository-create.html)\n*
+      Create An Openshift Cluster\n* Provide AWS Authentication to the operator. Two
+      Options:\n  **Note: You have to provide a secret aws-ecr-cloud-credentials in
+      the installed namespace**\n  * [IAM User](https://github.com/rh-mobb/ecr-secret-operator/tree/main/docs/iam_user.md)\n
+      \ * [STS Assume Role](https://github.com/rh-mobb/ecr-secret-operator/tree/main/docs/iam_assume_role.md)\n\n###
+      Install the operator\n\n### Create the ECR Secret CRD\n\n```\napiVersion: ecr.mobb.redhat.com/v1alpha1\nkind:
+      Secret\nmetadata:\n  name: ecr-secret\n  namespace: test-ecr-secret-operator\nspec:\n
+      \ generated_secret_name: ecr-credentials\n  ecr_registry: [ACCOUNT_ID].dkr.ecr.us-east-2.amazonaws.com\n
+      \ frequency: 10h\n  region: us-east-2\n```\n\n```\noc create -f CRD_FILE\n```\n\nA
+      docker registry secret is created by the operator momentally and the token is
+      patched every 10 hours\n\n```\noc get secret ecr-credentials   \nNAME              TYPE
+      \                            DATA   AGE\necr-credentials   kubernetes.io/dockerconfigjson
+      \  1      16h\n```\n\n### A sample build process with generated secret\n\n\nLink
+      the secret to builder\n\n```\noc secrets link builder ecr-credentials \n```\n\nConfigure
+      [build config](https://github.com/rh-mobb/ecr-secret-operator/tree/main/samples/build-config.yaml)
+      to point to your ECR Container repository\n\n```\noc create imagestream ruby\noc
+      tag openshift/ruby:2.5-ubi8 ruby:2.5\noc create -f samples/build-config.yaml\noc
+      start-build ruby-sample-build --wait\n```\n\nBuild should succeed and push the
+      image to the the private ECR Container repository\n\n"
+    displayName: ECR Secret Operator
+    installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: true
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+    keywords:
+    - ecr
+    - aws
+    - redhat
+    links:
+    - name: Ecr Secret Operator
+      url: https://github.com/rh-mobb/ecr-secret-operator
+    maintainers:
+    - email: cloud-ssa-global@redhat.com
+      name: Red Hat's Global Cloud Services SSA Team
+    maturity: alpha
+    minKubeVersion: 1.29.0
+    provider:
+      name: Red Hat's Global Cloud Services SSA Team
+relatedImages:
+- image: quay.io/brancz/kube-rbac-proxy:v0.21.0@sha256:059a43ab03f230eedb7dde2eb0d910a41e9d7ee04efff0f5cdc7ee614111397a
+  name: ""
+- image: quay.io/community-operator-pipeline-prod/ecr-secret-operator@sha256:58fa6c1972c7152dee0b210d260a59e27a173be79f28f5408a9f9509f43d14b9
+  name: ""
+- image: quay.io/rh-mobb/ecr-secret-operator:v0.6.0
   name: ""
 schema: olm.bundle

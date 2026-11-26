@@ -1,0 +1,85 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/created-by: flyway-operator
+    app.kubernetes.io/instance: controller-manager-alerts
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: prometheusrule
+    app.kubernetes.io/part-of: flyway-operator
+    control-plane: controller-manager
+  name: flyway-operator-controller-manager-alerts
+spec:
+  groups:
+  - name: flyway-operator.operator
+    rules:
+    - alert: FlywayOperatorMetricsAbsent
+      annotations:
+        description: Prometheus has no up flyway-operator scrape target for 10m, so
+          no Migration alert can fire. Check the operator pod and the ServiceMonitor,
+          and that Prometheus is bound to the metrics-reader ClusterRole.
+        runbook_url: https://github.com/davidkarlsen/flyway-operator/blob/main/docs/runbook.md#flywayoperatormetricsabsent
+        summary: No flyway-operator metrics target is up.
+      expr: absent(up{job=~".*flyway-operator.*"} == 1)
+      for: 10m
+      labels:
+        alert_audience: platform
+        severity: warning
+    - alert: FlywayOperatorReconcileErrors
+      annotations:
+        description: '{{ $value | humanizePercentage }} of Migration reconciles failed
+          over the last 15m. Check the operator logs.'
+        runbook_url: https://github.com/davidkarlsen/flyway-operator/blob/main/docs/runbook.md#flywayoperatorreconcileerrors
+        summary: More than 10% of Migration reconciles fail.
+      expr: |
+        sum by (namespace) (rate(controller_runtime_reconcile_errors_total{controller="migration"}[15m]))
+          / sum by (namespace) (rate(controller_runtime_reconcile_total{controller="migration"}[15m])) > 0.1
+      for: 15m
+      labels:
+        alert_audience: platform
+        severity: warning
+  - name: flyway-operator.migrations
+    rules:
+    - alert: FlywayMigrationFailed
+      annotations:
+        description: retryLimit is exhausted (condition reason TimedOut when the last
+          attempt exceeded spec.activeDeadline, else RetryLimitExceeded), or the cluster
+          does not support image volumes (ImageVolumeUnsupported). Check `kubectl
+          -n {{ $labels.namespace }} describe migration {{ $labels.migration }}` and
+          `kubectl -n {{ $labels.namespace }} logs job/{{ $labels.migration }} -c
+          flyway`. A spec change starts a new run.
+        runbook_url: https://github.com/davidkarlsen/flyway-operator/blob/main/docs/runbook.md#flywaymigrationfailed
+        summary: Migration {{ $labels.namespace }}/{{ $labels.migration }} failed
+          and is not retried.
+      expr: |
+        max by (namespace, migration) (
+          flyway_operator_migration_status_condition{condition="Failed", status="true"}
+        ) == 1
+      for: 1m
+      keep_firing_for: 5m
+      labels:
+        alert_audience: workload
+        severity: warning
+    - alert: FlywayMigrationStuck
+      annotations:
+        description: The Job may be waiting on a database lock, an unreachable database
+          or an unschedulable pod. Check `kubectl -n {{ $labels.namespace }} describe
+          migration {{ $labels.migration }}` and the Job's pods.
+        runbook_url: https://github.com/davidkarlsen/flyway-operator/blob/main/docs/runbook.md#flywaymigrationstuck
+        summary: Migration {{ $labels.namespace }}/{{ $labels.migration }} has been
+          progressing for more than 1h.
+      expr: |
+        max by (namespace, migration) (
+          flyway_operator_migration_status_condition{condition="Progressing", status="true"}
+        ) == 1
+        and on (namespace, migration)
+        time() - max by (namespace, migration) (
+          flyway_operator_migration_status_condition_last_transition_timestamp_seconds{condition="Progressing"}
+        ) > 3600
+        unless on (namespace, migration) max by (namespace, migration) (flyway_operator_migration_paused) == 1
+      for: 5m
+      keep_firing_for: 5m
+      labels:
+        alert_audience: workload
+        severity: warning

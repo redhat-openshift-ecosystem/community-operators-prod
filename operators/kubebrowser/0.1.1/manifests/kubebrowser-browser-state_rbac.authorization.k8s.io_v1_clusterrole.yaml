@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+  name: kubebrowser-browser-state
+rules:
+- apiGroups:
+  - subresource.kubebrowser.io
+  resources:
+  - browsers/state
+  verbs:
+  - watch
